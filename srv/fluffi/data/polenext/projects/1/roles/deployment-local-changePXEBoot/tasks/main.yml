@@ -10,7 +10,7 @@
 
 - name: Set default OSRootDirName and bootFile
   set_fact:
-§§    OSRootDirName: "{{OSRootDirNameArgument}}"
+    OSRootDirName: "{{OSRootDirNameArgument}}"
 
 §§- name: Clean root directory of the TFTP server
   local_action: "shell rm -r {{TFTPRootPath}}/*"

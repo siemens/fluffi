@@ -14,27 +14,27 @@ Author(s): Michael Kraus, Junes Najah, Thomas Riedmaier, Abian Blome, Pascal Eck
 
 {% block content %}
 
-§§<div class="container">
+<div class="container">
 §§    <h1>Locations</h1>
 §§    {{ flashMessages() }}
 §§    <hr>
 </div>
-§§
-§§
-§§<div class="jumbotron">
-§§    <div class="container"></div>
-§§</div>
-§§
-§§</br>
-§§
-§§<div class="container">
-§§    <table class="table">
-§§        <thead>
+
+
+<div class="jumbotron">
+    <div class="container"></div>
+</div>
+
+</br>
+
+<div class="container">
+    <table class="table">
+        <thead>
 §§        <tr>
 §§            <th>Name</th>
 §§            <th style="text-align: center;"><span class="glyphicon glyphicon-trash"></span></th>
 §§        </tr>
-§§        </thead>
+        </thead>
 §§        <tbody>
 §§        {% for location in locations %}
 §§        <tr>
@@ -44,9 +44,9 @@ Author(s): Michael Kraus, Junes Najah, Thomas Riedmaier, Abian Blome, Pascal Eck
 §§                    class="glyphicon glyphicon-remove"></span></a></td>
 §§
 §§        </tr>
-§§        {% endfor %}
-§§        </tbody>
-§§    </table>
-§§</div>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
 
 {% endblock %}

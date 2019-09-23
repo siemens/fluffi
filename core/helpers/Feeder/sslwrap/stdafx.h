@@ -9,23 +9,23 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 Author(s): Michael Kraus, Thomas Riedmaier, Pascal Eckmann
 */
-§§
-§§#pragma once
-§§
-§§#include "targetver.h"
-§§#include <stdio.h>
-§§#include <winsock.h>
-§§
-§§#include <stdio.h>
-§§#include <string>
-§§#include <tchar.h>
-§§#include <winsock.h>
+
+#pragma once
+
+#include "targetver.h"
+#include <stdio.h>
+#include <winsock.h>
+
+#include <stdio.h>
+#include <string>
+#include <tchar.h>
+#include <winsock.h>
 #include <iostream>
-§§
-§§#include <openssl/ssl.h>
-§§#include <openssl/err.h>
-§§#include <openssl/pem.h>
-§§#include <openssl/x509.h>
-§§#include <openssl/x509_vfy.h>
+
+#include <openssl/ssl.h>
+#include <openssl/err.h>
+#include <openssl/pem.h>
+#include <openssl/x509.h>
+#include <openssl/x509_vfy.h>
 
 §§extern "C" FILE* __cdecl __iob_func(void);

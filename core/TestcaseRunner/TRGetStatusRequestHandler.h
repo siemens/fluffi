@@ -21,7 +21,7 @@ public:
 	TRGetStatusRequestHandler(CommInt* comm, int* numberOfProcessedTestcases);
 	~TRGetStatusRequestHandler();
 
-§§private:
+private:
 	int* m_numberOfProcessedTestcasesSinceLastStatusRequest;
 
 	std::string generateStatus();

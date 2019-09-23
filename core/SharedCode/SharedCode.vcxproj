@@ -314,7 +314,7 @@ exit 0</Command>
     <ClInclude Include="FluffiTestResult.h" />
     <ClInclude Include="GarbageCollectorWorker.h" />
     <ClInclude Include="GetStatusRequestHandler.h" />
-§§    <ClInclude Include="GetTestcaseChunkRequestHandler.h" />
+    <ClInclude Include="GetTestcaseChunkRequestHandler.h" />
     <ClInclude Include="IFLUFFIMessageHandler.h" />
     <ClInclude Include="IWorkerThreadStateBuilder.h" />
     <ClInclude Include="FluffiLMConfiguration.h" />
@@ -349,7 +349,7 @@ exit 0</Command>
     <ClCompile Include="FluffiTestResult.cpp" />
     <ClCompile Include="GarbageCollectorWorker.cpp" />
     <ClCompile Include="GetStatusRequestHandler.cpp" />
-§§    <ClCompile Include="GetTestcaseChunkRequestHandler.cpp" />
+    <ClCompile Include="GetTestcaseChunkRequestHandler.cpp" />
     <ClCompile Include="IFLUFFIMessageHandler.cpp" />
     <ClCompile Include="IWorkerThreadStateBuilder.cpp" />
     <ClCompile Include="KillInstanceRequestHandler.cpp" />

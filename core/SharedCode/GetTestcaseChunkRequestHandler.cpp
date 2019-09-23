@@ -10,8 +10,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Michael Kraus, Abian Blome
 */
 
-§§#include "stdafx.h"
-§§#include "GetTestcaseChunkRequestHandler.h"
+#include "stdafx.h"
+#include "GetTestcaseChunkRequestHandler.h"
 #include "FluffiTestcaseID.h"
 #include "Util.h"
 #include "GarbageCollectorWorker.h"
@@ -20,14 +20,14 @@ GetTestcaseChunkRequestHandler::GetTestcaseChunkRequestHandler(std::string testc
 	m_testcaseDir(testcaseDir),
 	m_deleteFileOnLastChunk(deleteFileOnLastChunk),
 	m_garbageCollectorWorker(garbageCollectorWorker)
-§§
-§§{
-§§}
-§§
-§§GetTestcaseChunkRequestHandler::~GetTestcaseChunkRequestHandler()
-§§{
-§§}
-§§
+
+{
+}
+
+GetTestcaseChunkRequestHandler::~GetTestcaseChunkRequestHandler()
+{
+}
+
 void GetTestcaseChunkRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp) {
 	(void)(workerThreadState); //avoid unused parameter warning
 
@@ -42,10 +42,10 @@ void GetTestcaseChunkRequestHandler::handleFLUFFIMessage(WorkerThreadState* work
 		m_garbageCollectorWorker->markFileForDelete(testfile);
 	}
 
-§§	// Build Response with loaded Testcase
-§§	GetTestCaseChunkResponse* TcResp = new GetTestCaseChunkResponse();
-§§	TcResp->set_chunkid(req->gettestcasechunkrequest().chunkid());
-§§	TcResp->set_islastchunk(isLastChunk);
+	// Build Response with loaded Testcase
+	GetTestCaseChunkResponse* TcResp = new GetTestCaseChunkResponse();
+	TcResp->set_chunkid(req->gettestcasechunkrequest().chunkid());
+	TcResp->set_islastchunk(isLastChunk);
 	TcResp->set_testcasechunk(data);
-§§	resp->set_allocated_gettestcasechunkresponse(TcResp);
+	resp->set_allocated_gettestcasechunkresponse(TcResp);
 }

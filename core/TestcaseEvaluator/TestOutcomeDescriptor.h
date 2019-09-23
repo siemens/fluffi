@@ -10,24 +10,24 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Michael Kraus, Abian Blome
 */
 
-§§#pragma once
+#pragma once
 #include "FluffiTestResult.h"
 #include "FluffiTestcaseID.h"
 
-§§class TestOutcomeDescriptor
-§§{
-§§public:
+class TestOutcomeDescriptor
+{
+public:
 	TestOutcomeDescriptor(const FluffiTestcaseID id, const FluffiTestcaseID parentId, const FluffiTestResult testResult);
-§§	~TestOutcomeDescriptor();
-§§
+	~TestOutcomeDescriptor();
+
 	const FluffiTestcaseID getId();
 	const FluffiTestcaseID getparentId();
 	const FluffiTestResult getTestResult();
-§§
-§§private:
+
+private:
 
 	FluffiTestcaseID m_id;
 	FluffiTestcaseID m_parentId;
 	FluffiTestResult m_testResult;
 	std::string m_pathAndFileName;
-§§};
+};

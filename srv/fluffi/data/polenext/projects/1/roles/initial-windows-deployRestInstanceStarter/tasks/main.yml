@@ -8,19 +8,19 @@
 # 
 # Author(s): Michael Kraus, Thomas Riedmaier, Pascal Eckmann
 
-§§- name: Set file path to fetch
-§§  set_fact:
-§§    filePathToFetchFromFTP: "{{ftpserverURL}}/{{ftpRestStarterPath}}"
-§§    
+- name: Set file path to fetch
+  set_fact:
+    filePathToFetchFromFTP: "{{ftpserverURL}}/{{ftpRestStarterPath}}"
+    
 §§- name: Create a FLUFFI directory
-§§  win_file:
-§§    path: "{{restStarterdeploymentPath}}"
-§§    state: directory
-§§    
+  win_file:
+    path: "{{restStarterdeploymentPath}}"
+    state: directory
+    
 §§- name: Fetch Rest-Instance-Starter from "{{filePathToFetchFromFTP}}"
-§§  win_get_url: 
-§§    url: "{{filePathToFetchFromFTP}}"
-§§    dest: "{{restStarterdeploymentPath}}\\main.py"
+  win_get_url: 
+    url: "{{filePathToFetchFromFTP}}"
+    dest: "{{restStarterdeploymentPath}}\\main.py"
 §§
 §§- name: Fetch Rest-Instance-Starter-Autostart from "{{ftpserverURL}}/restStarter/restInstanceAutostart.bat"
 §§  win_get_url: 

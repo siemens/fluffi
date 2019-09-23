@@ -31,7 +31,7 @@ std::string TRGetStatusRequestHandler::generateStatus() {
 	std::stringstream ss;
 	ss << generateGeneralStatus() << " TestcasesSinceLastStatusRequest " << *m_numberOfProcessedTestcasesSinceLastStatusRequest << " |";
 
-§§	// Reset counter of processed testcases
+	// Reset counter of processed testcases
 	*m_numberOfProcessedTestcasesSinceLastStatusRequest = 0;
 
 	return ss.str().c_str();

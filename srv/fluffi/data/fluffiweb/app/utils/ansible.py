@@ -13,7 +13,7 @@ import requests, json
 class AnsibleRESTConnector:
 
     def __init__(self, ansibleURL, username, password):
-§§        self.SHOWN_GROUPS = {"windows", "linux", "odroids"}
+        self.SHOWN_GROUPS = {"windows", "linux", "odroids"}
         self.ansibleURL = ansibleURL
         self.auth = (username, password)
 
@@ -70,77 +70,77 @@ class AnsibleRESTConnector:
 
         return system
 
-§§    # calls Polemarch REST API to add a new linked system to fluffi network
-§§    # must assign to a group (linux or windows)
-§§    def addNewSystem(self, hostname, group):
-§§        url = self.ansibleURL + "group/"+group+"/host/"
-§§        data = {}
-§§        data['name'] = "dev-" + hostname
-§§        data['type'] = "HOST"
-§§
-§§        result = ""
-§§
-§§        try:   
-§§            # Sending post request to execute playbook to add new system
+    # calls Polemarch REST API to add a new linked system to fluffi network
+    # must assign to a group (linux or windows)
+    def addNewSystem(self, hostname, group):
+        url = self.ansibleURL + "group/"+group+"/host/"
+        data = {}
+        data['name'] = "dev-" + hostname
+        data['type'] = "HOST"
+
+        result = ""
+
+        try:   
+            # Sending post request to execute playbook to add new system
 §§            response = requests.post(url, json = data, auth = self.auth)
-§§            jsonResult = json.loads(response.text)
-§§            print(jsonResult)
-§§
-§§            # get id of newly created host
-§§            newHostId = jsonResult['id']
-§§
-§§            # Add variable to host
-§§            url = self.ansibleURL + "group/"+group+"/host/"+str(newHostId)+"/variables/"
-§§            data = {}
-§§            data['key'] = "ansible_ssh_host"
-§§            data['value'] = hostname + ".fluffi"
-§§            response = requests.post(url, json = data, auth=self.auth)
-§§            jsonResult = json.loads(response.text)
-§§
-§§        except Exception as e:
-§§            print("Exception: Cannot add new host. Check host name.")
-§§            return False
-§§        
-§§        return True
-§§
-§§    # calls Polemarch REST API to remove a self created dev system to fluffi network
-§§    def removeDevSystem(self, hostId):
+            jsonResult = json.loads(response.text)
+            print(jsonResult)
+
+            # get id of newly created host
+            newHostId = jsonResult['id']
+
+            # Add variable to host
+            url = self.ansibleURL + "group/"+group+"/host/"+str(newHostId)+"/variables/"
+            data = {}
+            data['key'] = "ansible_ssh_host"
+            data['value'] = hostname + ".fluffi"
+            response = requests.post(url, json = data, auth=self.auth)
+            jsonResult = json.loads(response.text)
+
+        except Exception as e:
+            print("Exception: Cannot add new host. Check host name.")
+            return False
+        
+        return True
+
+    # calls Polemarch REST API to remove a self created dev system to fluffi network
+    def removeDevSystem(self, hostId):
 §§        url = self.ansibleURL + "host/" + hostId + "/"
-§§        data = {}
-§§
-§§        try:                                              
-§§            # Sending post request to execute playbook to add new system
+        data = {}
+
+        try:                                              
+            # Sending post request to execute playbook to add new system
 §§            response = requests.delete(url, json = data, auth = self.auth)
-§§            return True            
-§§            
-§§        except Exception as e:
-§§            return False
-§§
+            return True            
+            
+        except Exception as e:
+            return False
+
     def getHostAliveState(self):
         #self.executePlaybook("checkHostAlive.yml", "all")
         url = self.ansibleURL + "history/?mode=checkHostAlive.yml"
-§§        requests.session().close()
-§§        response = requests.get(url, auth=self.auth, headers={'Connection':'close'}) # Should already be sorted
+        requests.session().close()
+        response = requests.get(url, auth=self.auth, headers={'Connection':'close'}) # Should already be sorted
         jsonResults = json.loads(response.text)
         lastHostCheckResultURL = ""
         for result in jsonResults['results']:
-§§            if result['status'].lower() not in {"run", "running", "delay"}: # --> filter out some states, because no result available
+            if result['status'].lower() not in {"run", "running", "delay"}: # --> filter out some states, because no result available
 §§                lastHostCheckResultURL = self.ansibleURL + "history/" + str(result['id'])
                 break
-§§
+
         response = requests.get(lastHostCheckResultURL, auth=self.auth)
         jsonResults = json.loads(response.text)
         getResultURL = jsonResults['raw_stdout']# --> get result
 §§        response = requests.get(getResultURL, auth = self.auth, headers = {'User-Agent':'Python', 'Connection':'close'})
 
         hosts = []
-§§        resultHostData = response.text.split("PLAY")
-§§        aliveProtocol = 0
-§§        for p in resultHostData:
-§§            if "RECAP" in p:
-§§                break
-§§            aliveProtocol+=1
-§§        for i, line in enumerate(resultHostData[aliveProtocol].split("\n")):
+        resultHostData = response.text.split("PLAY")
+        aliveProtocol = 0
+        for p in resultHostData:
+            if "RECAP" in p:
+                break
+            aliveProtocol+=1
+        for i, line in enumerate(resultHostData[aliveProtocol].split("\n")):
             line = line.strip()
             parts = line.split()
             host = type('', (), {})()
@@ -185,7 +185,7 @@ class AnsibleRESTConnector:
                         host.Name = h['name']
                         host.Type = h['type']
 §§                        host.URL = self.ansibleURL + 'host/' + str(host.Id)
-§§                        host.Location = ""
+                        host.Location = ""
                         for singleHost in hosts:
                             if singleHost.Name == host.Name:
                                 if singleHost.Ok == True:
@@ -195,8 +195,8 @@ class AnsibleRESTConnector:
                                 else:
                                     host.Status = "Failed"
                         group.hosts.append(host)
-§§            response.close()
-§§            res.close()
-§§            resHosts.close()
-§§            requests.session().close()
+            response.close()
+            res.close()
+            resHosts.close()
+            requests.session().close()
             return groups

@@ -10,16 +10,16 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Abian Blome, Michael Kraus
 */
 
-§§#include "stdafx.h"
-§§#include "TGTestcaseManager.h"
+#include "stdafx.h"
+#include "TGTestcaseManager.h"
 #include "GarbageCollectorWorker.h"
-§§
+
 TGTestcaseManager::TGTestcaseManager(GarbageCollectorWorker* garbageCollectorWorker) :
 	m_garbageCollectorWorker(garbageCollectorWorker),
 	m_mutex_()
 {}
-§§
-§§TGTestcaseManager::~TGTestcaseManager()
+
+TGTestcaseManager::~TGTestcaseManager()
 {
 	for (auto&& it : m_pendingTestcaseQueue)
 	{
@@ -31,14 +31,14 @@ TGTestcaseManager::TGTestcaseManager(GarbageCollectorWorker* garbageCollectorWor
 		it.deleteFile(m_garbageCollectorWorker);
 	}
 }
-§§
+
 void TGTestcaseManager::pushNewGeneratedTestcase(TestcaseDescriptor newTestcase)
-§§{
+{
 	std::unique_lock<std::mutex> mlock(m_mutex_);
 	m_pendingTestcaseQueue.push_back(newTestcase);
 	LOG(DEBUG) << "Pushed a new generated Testcase into the Testcase Queue for pending Testcases.";
-§§}
-§§
+}
+
 void TGTestcaseManager::pushNewGeneratedTestcases(std::deque<TestcaseDescriptor> newTestcases)
 {
 	std::unique_lock<std::mutex> mlock(m_mutex_);
@@ -47,9 +47,9 @@ void TGTestcaseManager::pushNewGeneratedTestcases(std::deque<TestcaseDescriptor>
 }
 
 TestcaseDescriptor TGTestcaseManager::popPendingTCForProcessing()
-§§{
+{
 	std::unique_lock<std::mutex> mlock(m_mutex_);
-§§
+
 	if (!m_pendingTestcaseQueue.empty()) {
 		// Get next TestcaseDescriptor from pendingTestcaseQueue, then remove
 		TestcaseDescriptor testcase = m_pendingTestcaseQueue.front();
@@ -57,23 +57,23 @@ TestcaseDescriptor TGTestcaseManager::popPendingTCForProcessing()
 
 		//Increase number of processing attempts
 		testcase.increaseNumOfProcessingAttempts();
-§§
+
 		//Update the timestamp of when the testcase was last sent
 		testcase.updateTimeOfLastSend();
 
-§§		// Move testcase from pending to waitForEvaluation set
+		// Move testcase from pending to waitForEvaluation set
 		m_sentButNotEvaluatedTestcaseSet.push_back(testcase);
-§§
-§§		return testcase;
-§§	}
-§§
+
+		return testcase;
+	}
+
 	throw std::runtime_error("No pending testcases");
-§§}
-§§
+}
+
 void TGTestcaseManager::removeEvaluatedTestcases(const google::protobuf::RepeatedPtrField<TestcaseID>  evaluatedTestcases)
-§§{
+{
 	std::unique_lock<std::mutex> mlock(m_mutex_);
-§§
+
 	for (auto it = m_sentButNotEvaluatedTestcaseSet.begin(); it != m_sentButNotEvaluatedTestcaseSet.end(); )
 	{
 		if (std::find(evaluatedTestcases.begin(), evaluatedTestcases.end(), it->getId()) != evaluatedTestcases.end())
@@ -85,13 +85,13 @@ void TGTestcaseManager::removeEvaluatedTestcases(const google::protobuf::Repeate
 		else
 		{
 			++it;
-§§		}
-§§	}
+		}
+	}
 }
-§§
+
 size_t TGTestcaseManager::getPendingTestcaseQueueSize() {
 	return m_pendingTestcaseQueue.size();
-§§}
+}
 
 size_t TGTestcaseManager::getSentButNotEvaluatedTestcaseSetSize() {
 	return m_sentButNotEvaluatedTestcaseSet.size();

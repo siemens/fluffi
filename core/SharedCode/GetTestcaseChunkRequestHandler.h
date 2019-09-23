@@ -10,21 +10,21 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Michael Kraus, Abian Blome
 */
 
-§§#pragma once
-§§#include "IFLUFFIMessageHandler.h"
+#pragma once
+#include "IFLUFFIMessageHandler.h"
 
 class GarbageCollectorWorker;
-§§class GetTestcaseChunkRequestHandler :
-§§	public IFLUFFIMessageHandler
-§§{
-§§public:
+class GetTestcaseChunkRequestHandler :
+	public IFLUFFIMessageHandler
+{
+public:
 	GetTestcaseChunkRequestHandler(std::string testcaseDir, bool deleteFileOnLastChunk, GarbageCollectorWorker* garbageCollectorWorker);
-§§	virtual ~GetTestcaseChunkRequestHandler();
-§§
+	virtual ~GetTestcaseChunkRequestHandler();
+
 	void handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp);
-§§
-§§private:
+
+private:
 	std::string m_testcaseDir;
 	bool m_deleteFileOnLastChunk;
 	GarbageCollectorWorker* m_garbageCollectorWorker;
-§§};
+};

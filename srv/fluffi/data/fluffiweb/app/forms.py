@@ -18,17 +18,17 @@ class AddLocationProjectForm(FlaskForm):
 §§    project = SelectField('Project', choices = [])
 §§
 
-§§class TargetForm(FlaskForm):
-§§    # this forms is never exposed so we can user the non CSRF version
+class TargetForm(FlaskForm):
+    # this forms is never exposed so we can user the non CSRF version
 §§    target_moduleC = StringField('Target Module', validators = [DataRequired()])
-§§    target_module_pathC = StringField('Module Path')
+    target_module_pathC = StringField('Module Path')
+
 §§
-§§
-§§class OptionForm(FlaskForm):
-§§    # this forms is never exposed so we can user the non CSRF version
+class OptionForm(FlaskForm):
+    # this forms is never exposed so we can user the non CSRF version
 §§    option_moduleC = StringField('Option Module', validators = [DataRequired()])
-§§    option_module_pathC = StringField('Module Value')
-§§
+    option_module_pathC = StringField('Module Value')
+
 §§
 class CreateProjectForm(FlaskForm):
 §§    name = StringField("name", validators = [DataRequired()])
@@ -43,9 +43,9 @@ class CreateProjectForm(FlaskForm):
 §§    filename = FileField(validators = [FileRequired()])
 §§    targetfile = FileField(validators = [FileRequired()])
 §§    basicBlockFile = FileField()
-§§    targets = FieldList(FormField(TargetForm))
-§§    options = FieldList(FormField(OptionForm))
-§§
+    targets = FieldList(FormField(TargetForm))
+    options = FieldList(FormField(OptionForm))
+
 §§
 class CreateCustomProjectForm(FlaskForm):
 §§    name = StringField("name", validators = [DataRequired()])
@@ -68,8 +68,8 @@ class CreateProjectModuleForm(FlaskForm):
 class AddProjectLocationForm(FlaskForm):
 §§    location = SelectField('location', choices = [])
 §§
-§§
-§§class CreateLocationForm(FlaskForm):
+
+class CreateLocationForm(FlaskForm):
 §§    name = StringField("name", validators = [DataRequired()])
 §§
 
@@ -105,33 +105,33 @@ class StartFluffiComponentForm(FlaskForm):
 §§                                       ("4", "Local Manager")])
 §§    architecture = SelectField(label = "Architecture: ", choices = [])
 §§    numberOfComponents = IntegerField(label = 'Number: ', default = 1, validators = [DataRequired()])
-§§    execute_start_component = SubmitField('Start Additional Instances')
+    execute_start_component = SubmitField('Start Additional Instances')
+
 §§
-§§
-§§class AddNewSystemForm(FlaskForm):
+class AddNewSystemForm(FlaskForm):
 §§    hostname = StringField("Hostname:", validators = [DataRequired()])
 §§    hostgroup = SelectField(label = "Select group: ", choices = [("1", "windows"), ("2", "linux"), ("3", "odroids")])
-§§    add_host = SubmitField('Add')
-§§
+    add_host = SubmitField('Add')
+
 §§
 §§class ChangeAgentStarterModeForm(FlaskForm):
 §§    mode = SelectField(label = "Select mode: ", choices = [("active", "ACTIVE"), ("inactive", "INACTIVE"), ("kill", "KILL")])
 §§    execute_change_mode = SubmitField('Change')
 §§
 §§
-§§class ChangePXEForm(FlaskForm):
+class ChangePXEForm(FlaskForm):
 §§    pxesystem = SelectField(label = "PXE System: ", choices = [])
-§§    execute_change_pxe = SubmitField('Change')
+    execute_change_pxe = SubmitField('Change')
+
 §§
+class InstanceConfigForm(FlaskForm):
+    instance_count = StringField('Instance Count')
+
 §§
-§§class InstanceConfigForm(FlaskForm):
-§§    instance_count = StringField('Instance Count')
-§§
-§§
-§§class InstanceArchConfigForm(FlaskForm):
+class InstanceArchConfigForm(FlaskForm):
 §§    architecture = SelectField(label = "Architecture: ", choices = [])
 §§
-§§
-§§class SystemInstanceConfigForm(FlaskForm):
-§§    instances = FieldList(FormField(InstanceConfigForm))
-§§    architectures = FieldList(FormField(InstanceArchConfigForm))
+
+class SystemInstanceConfigForm(FlaskForm):
+    instances = FieldList(FormField(InstanceConfigForm))
+    architectures = FieldList(FormField(InstanceArchConfigForm))

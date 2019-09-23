@@ -364,7 +364,7 @@ bool GMDatabaseManager::setLMForLocationAndFuzzJob(std::string location, FluffiS
 	MYSQL_STMT* sql_stmt = mysql_stmt_init(getDBConnection());
 
 	const char* stmt = "INSERT INTO localmanagers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, Location, Fuzzjob) values (?, ?, (SELECT locations.id FROM locations WHERE locations.Name = ?), ?)";
-§§
+
 	mysql_stmt_prepare(sql_stmt, stmt, static_cast<unsigned long>(strlen(stmt)));
 
 	//params
@@ -581,7 +581,7 @@ long GMDatabaseManager::getFuzzJobWithoutLM(std::string location)
 	unsigned long locationLength = static_cast<unsigned long>(location.length());
 
 	MYSQL_STMT* sql_stmt = mysql_stmt_init(getDBConnection());
-§§	const char* stmt = "SELECT location_fuzzjobs.Fuzzjob FROM location_fuzzjobs LEFT JOIN locations ON location_fuzzjobs.Location=locations.id WHERE locations.Name = ? AND location_fuzzjobs.Fuzzjob NOT IN (SELECT FuzzJob FROM localmanagers WHERE Location = locations.id) LIMIT 1";
+	const char* stmt = "SELECT location_fuzzjobs.Fuzzjob FROM location_fuzzjobs LEFT JOIN locations ON location_fuzzjobs.Location=locations.id WHERE locations.Name = ? AND location_fuzzjobs.Fuzzjob NOT IN (SELECT FuzzJob FROM localmanagers WHERE Location = locations.id) LIMIT 1";
 	mysql_stmt_prepare(sql_stmt, stmt, static_cast<unsigned long>(strlen(stmt)));
 
 	//params
@@ -704,11 +704,11 @@ std::string GMDatabaseManager::EXECUTE_TEST_STATEMENT(const std::string query) {
 		return "";
 	}
 
-§§	if (row[0] == NULL) {
-§§		mysql_free_result(result);
-§§		return "";
-§§	}
-§§
+	if (row[0] == NULL) {
+		mysql_free_result(result);
+		return "";
+	}
+
 	std::string re = row[0];
 	mysql_free_result(result);
 

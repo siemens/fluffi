@@ -56,5 +56,5 @@ nav = Nav()
 §§        Subgroup('Locations', *locationsLinks),
 §§        Subgroup('Fuzzjobs', *fuzzjobLinks),
 §§        View('Commands', '.commands'),
-§§        View('Systems', '.systems')
+        View('Systems', '.systems')
 §§    ))

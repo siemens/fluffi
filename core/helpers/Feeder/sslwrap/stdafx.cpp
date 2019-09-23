@@ -9,9 +9,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 Author(s): Thomas Riedmaier, Michael Kraus
 */
-§§
-§§#include "stdafx.h"
-§§
+
+#include "stdafx.h"
+
 
 FILE _iob[] = { *stdin, *stdout, *stderr };
 FILE * __cdecl __iob_func(void) { return _iob; }

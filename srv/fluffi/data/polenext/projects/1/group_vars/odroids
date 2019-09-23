@@ -9,23 +9,23 @@
 # Author(s): Michael Kraus, Thomas Riedmaier, Pascal Eckmann
 
 §§# File path where FLUFFI will be deployed
-§§deploymentPath: "/home/{{ansible_ssh_user}}/fluffi/persistent/"
-§§
-§§# File path where SUT will be desployed
-§§SUTPath: "/home/{{ansible_ssh_user}}/fluffi/persistent/SUT"
-§§
+deploymentPath: "/home/{{ansible_ssh_user}}/fluffi/persistent/"
+
+# File path where SUT will be desployed
+SUTPath: "/home/{{ansible_ssh_user}}/fluffi/persistent/SUT"
+
 §§# File path where FLUFFI will be executed in ramdisk
-§§ramdiskPath: "/home/{{ansible_ssh_user}}/fluffi/ramdisk/"
-§§
-§§# File path where initial ansible files are located on the FTP server
-§§initialAnsibleFTPPath: "initial/linux/ansible"
-§§
+ramdiskPath: "/home/{{ansible_ssh_user}}/fluffi/ramdisk/"
+
+# File path where initial ansible files are located on the FTP server
+initialAnsibleFTPPath: "initial/linux/ansible"
+
 §§# File path where initial install files are located on the FTP server
-§§initialInstallPackages: "initial/linux/activePackages"
-§§
-§§SUTRamdiskPath : "/home/{{ansible_ssh_user}}/fluffi/ramdisk/SUT"
-§§
-§§remoteUtilitiesFilePath: "/home/{{ansible_ssh_user}}/utils"
-§§
+initialInstallPackages: "initial/linux/activePackages"
+
+SUTRamdiskPath : "/home/{{ansible_ssh_user}}/fluffi/ramdisk/SUT"
+
+remoteUtilitiesFilePath: "/home/{{ansible_ssh_user}}/utils"
+
 §§# Remote path to store the Rest-Instance-Starter python script
 restStarterdeploymentPath: "/home/{{ansible_ssh_user}}/fluffi/persistent/restStarter"

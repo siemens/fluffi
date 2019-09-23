@@ -47,12 +47,12 @@ Author(s): Thomas Riedmaier, Michael Kraus
     <ClInclude Include="TEMainWorker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-§§    <ClInclude Include="TETestResultManager.h">
-§§      <Filter>Header Files</Filter>
-§§    </ClInclude>
-§§    <ClInclude Include="TestOutcomeDescriptor.h">
-§§      <Filter>Header Files</Filter>
-§§    </ClInclude>
+    <ClInclude Include="TETestResultManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TestOutcomeDescriptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="CoveragePullerWorker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -85,12 +85,12 @@ Author(s): Thomas Riedmaier, Michael Kraus
     <ClCompile Include="TEMainWorker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-§§    <ClCompile Include="TETestResultManager.cpp">
-§§      <Filter>Source Files</Filter>
-§§    </ClCompile>
-§§    <ClCompile Include="TestOutcomeDescriptor.cpp">
-§§      <Filter>Source Files</Filter>
-§§    </ClCompile>
+    <ClCompile Include="TETestResultManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TestOutcomeDescriptor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="CoveragePullerWorker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

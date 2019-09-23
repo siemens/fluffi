@@ -31,16 +31,16 @@ ansible_ssh_pass=fluffi_linux_pw
 ansible_sudo_pass=fluffi_linux_pw
 
 §§
-§§[odroids]
+[odroids]
 fluffi_odroid1 ansible_ssh_host=fluffi_odroid1.fluffi
 fluffi_odroid2 ansible_ssh_host=fluffi_odroid2.fluffi
-§§
-§§[odroids:vars]
-§§ansible_connection=ssh
+
+[odroids:vars]
+ansible_connection=ssh
 ansible_ssh_user=fluffi_odroid_user
 ansible_ssh_pass=fluffi_odroid_pw
 ansible_sudo_pass=fluffi_odroid_pw
-§§
+
 §§
 [dashboard]
 dashboard-right ansible_ssh_host=fluffi-right-dashboard.fluffi

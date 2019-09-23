@@ -10,5 +10,5 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Michael Kraus
 -->
 
-§§Simple python server that is used to synchronize the 2 displays of the dashboard.
+Simple python server that is used to synchronize the 2 displays of the dashboard.
 Runs on dashsync.fluffi in own docker container.

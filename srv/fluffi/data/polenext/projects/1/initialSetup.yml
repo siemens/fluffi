@@ -23,7 +23,7 @@
     - initial-linux-crashNotifiers
     - initial-linux-cpuScaling
     - initial-linux-installPackages
-§§    - initial-linux-deployRestInstanceStarter
+    - initial-linux-deployRestInstanceStarter
 
 - hosts: windows
   roles:
@@ -38,4 +38,4 @@
     - { role: initial-windows-VCRedistributables, architecture: "x64"}
     - initial-windows-installPackages
     - initial-windows-installDrivers
-§§    - initial-windows-deployRestInstanceStarter
+    - initial-windows-deployRestInstanceStarter

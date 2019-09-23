@@ -10,8 +10,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Michael Kraus, Abian Blome
 */
 
-§§#include "stdafx.h"
-§§#include "PutTestResultRequestHandler.h"
+#include "stdafx.h"
+#include "PutTestResultRequestHandler.h"
 #include "FluffiTestcaseID.h"
 #include "FluffiTestResult.h"
 #include "TestOutcomeDescriptor.h"
@@ -24,16 +24,16 @@ PutTestResultRequestHandler::PutTestResultRequestHandler(std::string testcaseDir
 	m_comm(commPtr),
 	m_teTestResultManager(teTestResultManager),
 	m_garbageCollectorWorker(garbageCollectorWorker)
-§§{
-§§}
-§§
-§§PutTestResultRequestHandler::~PutTestResultRequestHandler()
-§§{
-§§}
-§§
+{
+}
+
+PutTestResultRequestHandler::~PutTestResultRequestHandler()
+{
+}
+
 void PutTestResultRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp) {
 	const PutTestResultRequest* receivedPutTestResultRequest = &req->puttestresultrequest();
-§§
+
 	FluffiTestcaseID testcaseId{ receivedPutTestResultRequest->id() };
 	FluffiTestcaseID parentTestcaseId{ receivedPutTestResultRequest->parentid() };
 	FluffiTestResult testResult{ receivedPutTestResultRequest->result() };
@@ -54,10 +54,10 @@ void PutTestResultRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerT
 			LOG(ERROR) << "PutTestResultRequestHandler failed to store a testcase on disk and isThereAlreadyAToDFor returned false!";
 		}
 	}
-§§
-§§	// Build Response
-§§	PutTestResultResponse* PutTcResp = new PutTestResultResponse();
+
+	// Build Response
+	PutTestResultResponse* PutTcResp = new PutTestResultResponse();
 	PutTcResp->set_success(success);
-§§
-§§	resp->set_allocated_puttestresultresponse(PutTcResp);
+
+	resp->set_allocated_puttestresultresponse(PutTcResp);
 }

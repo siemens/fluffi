@@ -32,12 +32,12 @@ Author(s): Thomas Riedmaier, Abian Blome, Michael Kraus, Roman Bendt
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-§§    <ClInclude Include="GetTestcaseRequestHandler.h">
-§§      <Filter>Header Files</Filter>
-§§    </ClInclude>
-§§    <ClInclude Include="TestcaseDescriptor.h">
-§§      <Filter>Header Files</Filter>
-§§    </ClInclude>
+    <ClInclude Include="GetTestcaseRequestHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TestcaseDescriptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="TGWorkerThreadStateBuilder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -53,9 +53,9 @@ Author(s): Thomas Riedmaier, Abian Blome, Michael Kraus, Roman Bendt
     <ClInclude Include="QueueFillerWorker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-§§    <ClInclude Include="TGTestcaseManager.h">
-§§      <Filter>Header Files</Filter>
-§§    </ClInclude>
+    <ClInclude Include="TGTestcaseManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="RadamsaMutator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -85,12 +85,12 @@ Author(s): Thomas Riedmaier, Abian Blome, Michael Kraus, Roman Bendt
     <ClCompile Include="TestcaseGenerator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-§§    <ClCompile Include="GetTestcaseRequestHandler.cpp">
-§§      <Filter>Source Files</Filter>
-§§    </ClCompile>
-§§    <ClCompile Include="TestcaseDescriptor.cpp">
-§§      <Filter>Source Files</Filter>
-§§    </ClCompile>
+    <ClCompile Include="GetTestcaseRequestHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TestcaseDescriptor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="TGWorkerThreadStateBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -103,9 +103,9 @@ Author(s): Thomas Riedmaier, Abian Blome, Michael Kraus, Roman Bendt
     <ClCompile Include="QueueFillerWorker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-§§    <ClCompile Include="TGTestcaseManager.cpp">
-§§      <Filter>Source Files</Filter>
-§§    </ClCompile>
+    <ClCompile Include="TGTestcaseManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="RadamsaMutator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

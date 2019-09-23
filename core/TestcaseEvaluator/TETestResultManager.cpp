@@ -10,8 +10,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Michael Kraus, Abian Blome
 */
 
-§§#include "stdafx.h"
-§§#include "TETestResultManager.h"
+#include "stdafx.h"
+#include "TETestResultManager.h"
 #include "TestOutcomeDescriptor.h"
 #include "Util.h"
 #include "GarbageCollectorWorker.h"
@@ -22,26 +22,26 @@ TETestResultManager::TETestResultManager(std::string testcaseDir, GarbageCollect
 	m_mutex_(),
 	m_testcaseDir(testcaseDir),
 	m_garbageCollectorWorker(garbageCollectorWorker)
-§§{
-§§}
-§§
-§§TETestResultManager::~TETestResultManager()
-§§{
+{
+}
+
+TETestResultManager::~TETestResultManager()
+{
 	while (!m_testOutcomeQueue.empty()) {
 		std::string filename = Util::generateTestcasePathAndFilename(m_testOutcomeQueue.front()->getId(), m_testcaseDir);
 		m_garbageCollectorWorker->markFileForDelete(filename);
 		delete m_testOutcomeQueue.front();
 		m_testOutcomeQueue.pop_front();
-§§	}
-§§}
-§§
+	}
+}
+
 void TETestResultManager::pushNewTestOutcomeFromTCRunner(TestOutcomeDescriptor* newTestcaseOutcome)
-§§{
+{
 	std::unique_lock<std::mutex> mlock(m_mutex_);
 	m_testOutcomeQueue.push_back(newTestcaseOutcome);
 	LOG(DEBUG) << "Pushed a new received TestcaseOutcome from TestcaseRunner into the TestcaseOutcomeQueue";
-§§}
-§§
+}
+
 bool TETestResultManager::isThereAlreadyAToDFor(FluffiTestcaseID id) {
 	std::unique_lock<std::mutex> mlock(m_mutex_);
 
@@ -54,21 +54,21 @@ bool TETestResultManager::isThereAlreadyAToDFor(FluffiTestcaseID id) {
 }
 
 TestOutcomeDescriptor* TETestResultManager::popTestOutcomeForEvaluation()
-§§{
+{
 	std::unique_lock<std::mutex> mlock(m_mutex_);
-§§
+
 	if (!m_testOutcomeQueue.empty()) {
 		// Get next TestOutcomeDescriptor from testOutcomeQueue, then remove
 		TestOutcomeDescriptor* testcase = m_testOutcomeQueue.front();
 		m_testOutcomeQueue.pop_front();
-§§
-§§		return testcase;
-§§	}
-§§
-§§	return nullptr;
-§§}
-§§
-§§size_t TETestResultManager::getTestOutcomeDequeSize()
-§§{
+
+		return testcase;
+	}
+
+	return nullptr;
+}
+
+size_t TETestResultManager::getTestOutcomeDequeSize()
+{
 	return m_testOutcomeQueue.size();
 }

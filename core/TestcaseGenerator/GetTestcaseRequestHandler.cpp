@@ -10,29 +10,29 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Michael Kraus, Abian Blome
 */
 
-§§#include "stdafx.h"
-§§#include "GetTestcaseRequestHandler.h"
+#include "stdafx.h"
+#include "GetTestcaseRequestHandler.h"
 #include "TestcaseDescriptor.h"
 #include "TGTestcaseManager.h"
 #include "Util.h"
-§§
+
 GetTestcaseRequestHandler::GetTestcaseRequestHandler(TGTestcaseManager*  testcaseManager, std::string testcaseDir, CommInt* commInt)
-§§{
+{
 	this->m_testcaseManager = testcaseManager;
 	this->m_testcaseDir = testcaseDir;
 	this->m_CommInt = commInt;
-§§}
-§§
-§§GetTestcaseRequestHandler::~GetTestcaseRequestHandler()
-§§{
-§§}
-§§
+}
+
+GetTestcaseRequestHandler::~GetTestcaseRequestHandler()
+{
+}
+
 void GetTestcaseRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp) {
 	(void)(workerThreadState); //avoid unused parameter warning
 	(void)(req); //avoid unused parameter warning
 
 	GetTestcaseResponse* TcResp = new GetTestcaseResponse();
-§§
+
 	// Get next TestcaseDescriptor from TestcaseQueue
 	try {
 		TestcaseDescriptor testcase = m_testcaseManager->popPendingTCForProcessing();
@@ -41,10 +41,10 @@ void GetTestcaseRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThr
 
 		TestcaseID* mutableIdParent = new TestcaseID();
 		mutableIdParent->CopyFrom(testcase.getparentId().getProtobuf());
-§§
+
 		bool isLastChunk;
 		std::string data = Util::loadTestcaseChunkInMemory(testcase.getId(), m_testcaseDir, 0, &isLastChunk);
-§§
+
 		// Build Response with loaded Testcase
 		TcResp->set_allocated_id(mutableId);
 		TcResp->set_allocated_parentid(mutableIdParent);
@@ -59,5 +59,5 @@ void GetTestcaseRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThr
 		TcResp->set_success(false);
 	}
 
-§§	resp->set_allocated_gettestcaseresponse(TcResp);
+	resp->set_allocated_gettestcaseresponse(TcResp);
 }

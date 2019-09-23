@@ -8,21 +8,21 @@
 # 
 # Author(s): Michael Kraus, Thomas Riedmaier, Junes Najah
 
-§§from flask import Flask, render_template
+from flask import Flask, render_template
 §§from flask_socketio import SocketIO, emit
-§§
-§§# initialize Flask
-§§app = Flask(__name__)
-§§socketio = SocketIO(app)
-§§
-§§@app.route('/')
-§§def index():
-§§    """Serve the index HTML"""
-§§    return render_template('index.html')
-§§	
-§§
-§§@socketio.on('syncProject')
-§§def on_syncProject(data):
+
+# initialize Flask
+app = Flask(__name__)
+socketio = SocketIO(app)
+
+@app.route('/')
+def index():
+    """Serve the index HTML"""
+    return render_template('index.html')
+	
+
+@socketio.on('syncProject')
+def on_syncProject(data):
 §§    send=data['send']
 §§    project=data['project']
 §§    time=data['time']
@@ -30,5 +30,5 @@
 §§    
 §§    emit('syncevent', {'send': send, 'project': project, 'time': time, 'time2': time2}, broadcast=True)
 §§
-§§if __name__ == '__main__':
+if __name__ == '__main__':
     socketio.run(app, debug=True, host='0.0.0.0', port=4000)

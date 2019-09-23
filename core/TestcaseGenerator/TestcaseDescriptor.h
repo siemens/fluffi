@@ -10,16 +10,16 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Michael Kraus, Abian Blome
 */
 
-§§#pragma once
+#pragma once
 #include "FluffiTestcaseID.h"
 
 class GarbageCollectorWorker;
-§§class TestcaseDescriptor
-§§{
-§§public:
+class TestcaseDescriptor
+{
+public:
 	TestcaseDescriptor(FluffiTestcaseID id, FluffiTestcaseID parentId, std::string pathAndFileName, bool forceFullCoverage);
-§§	~TestcaseDescriptor();
-§§
+	~TestcaseDescriptor();
+
 	FluffiTestcaseID getId() const;
 	FluffiTestcaseID getparentId() const;
 	int getNumOfProcessingAttempts() const;
@@ -29,11 +29,11 @@ class GarbageCollectorWorker;
 	void deleteFile(GarbageCollectorWorker* garbageCollectorWorker);
 	bool getForceFullCoverage() const;
 
-§§private:
+private:
 	FluffiTestcaseID m_id;
 	FluffiTestcaseID m_parentId;
 	std::string m_pathAndFileName;
 	int m_numOfProcessingAttempts;
 	std::chrono::time_point<std::chrono::steady_clock> m_timeOfLastSend = std::chrono::steady_clock::time_point();
 	bool m_forceFullCoverage;
-§§};
+};

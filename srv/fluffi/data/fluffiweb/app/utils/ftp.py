@@ -27,38 +27,38 @@ class FTPConnector:
         self.ftpClient.quit()
 §§
         return tupelsOfLS
+
+    def getListOfArchitecturesOnFTPServer(self, path, group):
+        self.ftpClient.connect(self.ftpURL)
+        self.ftpClient.login()
+        self.ftpClient.cwd(path)
+        ls = []
+        ls = self.ftpClient.nlst()
 §§
-§§    def getListOfArchitecturesOnFTPServer(self, path, group):
-§§        self.ftpClient.connect(self.ftpURL)
-§§        self.ftpClient.login()
-§§        self.ftpClient.cwd(path)
-§§        ls = []
-§§        ls = self.ftpClient.nlst()
-§§
-§§        for i, w in enumerate(ls):
+        for i, w in enumerate(ls):
 §§            ls[i] = group + "-" + w
-§§
+
 §§        tupelsOfLS = zip(ls, ls)
-§§        self.ftpClient.quit()
+        self.ftpClient.quit()
 §§
-§§        return tupelsOfLS
-§§
-§§    def saveTargetFileOnFTPServer(self, targetFileData, name):
-§§        # ftplib storbinary is programmed to read file from disk before sending to ftp server
-§§        # solution is to extend the lib and rewrite storbinary...
-§§        # https://stackoverflow.com/questions/2671118/can-i-upload-an-object-in-memory-to-ftp-using-python 
-§§        # workaround: write file to disk
-§§        # .....
-§§        path = 'tmp.zip'
-§§        target = open(path, 'wb')
-§§        target.write(targetFileData)
-§§        target.close()
-§§        self.ftpClient.connect(self.ftpURL)
-§§        self.ftpClient.login()
-§§        f = open('tmp.zip', 'rb')
+        return tupelsOfLS
+
+    def saveTargetFileOnFTPServer(self, targetFileData, name):
+        # ftplib storbinary is programmed to read file from disk before sending to ftp server
+        # solution is to extend the lib and rewrite storbinary...
+        # https://stackoverflow.com/questions/2671118/can-i-upload-an-object-in-memory-to-ftp-using-python 
+        # workaround: write file to disk
+        # .....
+        path = 'tmp.zip'
+        target = open(path, 'wb')
+        target.write(targetFileData)
+        target.close()
+        self.ftpClient.connect(self.ftpURL)
+        self.ftpClient.login()
+        f = open('tmp.zip', 'rb')
 §§        self.ftpClient.storbinary("STOR /SUT/" + name.split('.', 1)[0] + ".zip", f)
-§§        self.ftpClient.quit()
-§§
+        self.ftpClient.quit()
+
 §§        return True
 §§
 §§    def saveArchivedProjectOnFTPServer(self, fileName):

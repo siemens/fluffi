@@ -10,32 +10,32 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Michael Kraus, Thomas Riedmaier, Junes Najah
 -->
 
-§§{% extends "base.html" %}
-§§
-§§{% block content %}
-§§
-§§<div class="container">
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container">
 §§    <h1>Add new Location:</h1>
-§§</div>
-§§
+</div>
+
 §§<hr>
-§§
-§§<div class="jumbotron">
-§§    <div class="container"></div>
-§§</div>
-§§
-§§</br>
-§§
-§§<div class="container">
-§§    <form action="" method="POST" name="addLocation">
-§§        {{ form.hidden_tag() }}
+
+<div class="jumbotron">
+    <div class="container"></div>
+</div>
+
+</br>
+
+<div class="container">
+    <form action="" method="POST" name="addLocation">
+        {{ form.hidden_tag() }}
 §§        <label for="name">Name:</label>
 §§        {{ form.name(class_="form-control") }}<br>
 §§
 §§        <input class="btn btn-primary" type="submit" value="Add location"/>
-§§    </form>
-§§
-§§</div>
-§§
-§§{% endblock %}
-§§
+    </form>
+
+</div>
+
+{% endblock %}
+

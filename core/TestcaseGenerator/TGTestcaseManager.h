@@ -10,16 +10,16 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Abian Blome, Michael Kraus
 */
 
-§§#pragma once
+#pragma once
 #include "TestcaseDescriptor.h"
-§§
+
 class GarbageCollectorWorker;
-§§class TGTestcaseManager
-§§{
-§§public:
+class TGTestcaseManager
+{
+public:
 	TGTestcaseManager(GarbageCollectorWorker* garbageCollectorWorker);
-§§	~TGTestcaseManager();
-§§
+	~TGTestcaseManager();
+
 	size_t getPendingTestcaseQueueSize();
 	size_t getSentButNotEvaluatedTestcaseSetSize();
 	std::vector<TestcaseDescriptor> handMeAllTestcasesWithTooManyRetries(int maxRetriesBeforeReport);
@@ -28,11 +28,11 @@ class GarbageCollectorWorker;
 	void pushNewGeneratedTestcases(std::deque<TestcaseDescriptor>  newTestcases);
 	void reinsertTestcasesHavingNoAnswerSince(std::chrono::time_point<std::chrono::steady_clock> timeBeforeWhichShouldBeReinserted);
 	void removeEvaluatedTestcases(const google::protobuf::RepeatedPtrField<TestcaseID>  evaluatedTestcases);
-§§
+
 private:
 	GarbageCollectorWorker* m_garbageCollectorWorker;
 
 	std::deque<TestcaseDescriptor> m_pendingTestcaseQueue;
 	std::mutex m_mutex_;
 	std::vector<TestcaseDescriptor> m_sentButNotEvaluatedTestcaseSet;
-§§};
+};

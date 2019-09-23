@@ -10,26 +10,26 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Michael Kraus, Abian Blome
 */
 
-§§#pragma once
-§§
+#pragma once
+
 class TestOutcomeDescriptor;
 class GarbageCollectorWorker;
 class FluffiTestcaseID;
-§§class TETestResultManager
-§§{
-§§public:
+class TETestResultManager
+{
+public:
 	TETestResultManager(std::string testcaseDir, GarbageCollectorWorker* garbageCollectorWorker);
-§§	~TETestResultManager();
-§§
+	~TETestResultManager();
+
 	bool isThereAlreadyAToDFor(FluffiTestcaseID id);
-§§	void pushNewTestOutcomeFromTCRunner(TestOutcomeDescriptor* newTestcaseOutcome);
-§§	TestOutcomeDescriptor* popTestOutcomeForEvaluation();
-§§
-§§	size_t getTestOutcomeDequeSize();
-§§
-§§private:
+	void pushNewTestOutcomeFromTCRunner(TestOutcomeDescriptor* newTestcaseOutcome);
+	TestOutcomeDescriptor* popTestOutcomeForEvaluation();
+
+	size_t getTestOutcomeDequeSize();
+
+private:
 	std::deque<TestOutcomeDescriptor*> m_testOutcomeQueue;
 	std::mutex m_mutex_;
 	std::string m_testcaseDir;
 	GarbageCollectorWorker* m_garbageCollectorWorker;
-§§};
+};

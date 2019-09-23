@@ -267,16 +267,16 @@ exit 0</Command>
   <ItemGroup>
     <ClCompile Include="AbstractionLayerTester.cpp" />
     <ClCompile Include="AFLMutatorTester.cpp" />
-§§    <ClCompile Include="BlockCoverageCacheTester.cpp" />
+    <ClCompile Include="BlockCoverageCacheTester.cpp" />
     <ClCompile Include="CommIntTester.cpp" />
-§§    <ClCompile Include="CommPartnerManagerTester.cpp" />
+    <ClCompile Include="CommPartnerManagerTester.cpp" />
     <ClCompile Include="ExternalMutatorTester.cpp" />
     <ClCompile Include="ExternalProcessTester.cpp" />
     <ClCompile Include="GarbageCollectorWorkerTester.cpp" />
     <ClCompile Include="GetStatusRequestHandlerTester.cpp" />
     <ClCompile Include="HonggfuzzMutatorTester.cpp" />
     <ClCompile Include="LMDatabaseManagerTester.cpp" />
-§§    <ClCompile Include="GMDatabaseManagerTester.cpp" />
+    <ClCompile Include="GMDatabaseManagerTester.cpp" />
     <ClCompile Include="GMWorkerThreadStateBuilderTester.cpp" />
     <ClCompile Include="LMWorkerThreadStateBuilderTester.cpp" />
     <ClCompile Include="RegisterAtLMRequestHandlerTester.cpp" />
@@ -293,13 +293,13 @@ exit 0</Command>
     <ClCompile Include="TestExecutorDynRioMultiTester.cpp" />
     <ClCompile Include="TestExecutorDynRioSingleTester.cpp" />
     <ClCompile Include="TestExecutorGDBTester.cpp" />
-§§    <ClCompile Include="TETestResultManagerTester.cpp" />
+    <ClCompile Include="TETestResultManagerTester.cpp" />
     <ClCompile Include="TEWorkerThreadStateBuilderTester.cpp" />
-§§    <ClCompile Include="TGTestcaseManagerTester.cpp" />
+    <ClCompile Include="TGTestcaseManagerTester.cpp" />
     <ClCompile Include="TGWorkerThreadStateBuilderTester.cpp" />
     <ClCompile Include="TRWorkerThreadStateBuilderTester.cpp" />
     <ClCompile Include="utilTester.cpp" />
-§§    <ClCompile Include="WorkerWeightCalculatorTester.cpp" />
+    <ClCompile Include="WorkerWeightCalculatorTester.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LocalManager\LocalManager.vcxproj">

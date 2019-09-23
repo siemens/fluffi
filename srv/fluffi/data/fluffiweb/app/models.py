@@ -9,11 +9,11 @@
 # Author(s): Michael Kraus, Junes Najah, Abian Blome, Thomas Riedmaier
 
 from app import db
-§§from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey
 
 §§
 class Fuzzjob(db.Model):
-§§    __tablename__ = 'fuzzjob'
+    __tablename__ = 'fuzzjob'
 §§    id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String(256))
     DBHost = db.Column(db.String(256))
@@ -26,23 +26,23 @@ class Fuzzjob(db.Model):
 §§
 
 class Locations(db.Model):
-§§    __tablename__ = 'locations'
+    __tablename__ = 'locations'
 §§    id = db.Column(db.Integer, primary_key = True)
-§§    Name = db.Column(db.String(256))
+    Name = db.Column(db.String(256))
 
     def __repr__(self):
 §§        return '<Location %r>' % self.Name
 §§
 
-§§class Systems(db.Model):
-§§    __tablename__ = 'systems'
+class Systems(db.Model):
+    __tablename__ = 'systems'
 §§    id = db.Column(db.Integer, primary_key = True)
-§§    Name = db.Column(db.String(256))
-§§
-§§    def __repr__(self):
+    Name = db.Column(db.String(256))
+
+    def __repr__(self):
 §§        return '<System %r>' % self.Name
 §§
-§§
+
 class Localmanagers(db.Model):
     __tablename__ = 'localmanagers'
 §§    Servicedescriptorguid = db.Column(db.String(50), primary_key = True)
@@ -71,72 +71,72 @@ class Workers(db.Model):
     Timeoflastrequest = db.Column(db.DateTime)
     Agenttype = db.Column(db.Integer)
     Agentsubtypes = db.Column(db.String(1000))
+
 §§
-§§
-§§class LocationFuzzjobs(db.Model):
-§§    __tablename__ = 'location_fuzzjobs'
+class LocationFuzzjobs(db.Model):
+    __tablename__ = 'location_fuzzjobs'
 §§    Location = db.Column(ForeignKey('locations.id'), primary_key = True)
 §§    Fuzzjob = db.Column(ForeignKey('fuzzjob.id'), primary_key = True)
-§§
-§§    def __repr__(self):
+
+    def __repr__(self):
 §§        return '<LocationFuzzJob %r>' % self.Location
 §§
-§§
-§§class CommandQueue(db.Model):
+
+class CommandQueue(db.Model):
     __tablename__ = 'command_queue'
 §§    Id = db.Column(db.Integer, primary_key = True)
-§§    Command = db.Column(db.String(256))
-§§    Argument = db.Column(db.String(4096))
-§§    CreationDate = db.Column(db.DateTime)
-§§    Done = db.Column(db.Integer)
-§§    Error = db.Column(db.String(4096))
+    Command = db.Column(db.String(256))
+    Argument = db.Column(db.String(4096))
+    CreationDate = db.Column(db.DateTime)
+    Done = db.Column(db.Integer)
+    Error = db.Column(db.String(4096))
+
 §§
-§§
-§§class DeploymentPackages(db.Model):
-§§    __tablename__ = 'deployment_packages'
+class DeploymentPackages(db.Model):
+    __tablename__ = 'deployment_packages'
 §§    id = db.Column(db.Integer, primary_key = True)
-§§    name = db.Column(db.String(150))
-§§
-§§    def __repr__(self):
+    name = db.Column(db.String(150))
+
+    def __repr__(self):
 §§        return '<DeploymentPackage %r>' % self.name
 §§
-§§
-§§class FuzzjobDeploymentPackages(db.Model):
-§§    __tablename__ = 'fuzzjob_deployment_packages'
+
+class FuzzjobDeploymentPackages(db.Model):
+    __tablename__ = 'fuzzjob_deployment_packages'
 §§    Fuzzjob = db.Column(ForeignKey('fuzzjob.id'), primary_key = True)
 §§    DeploymentPackage = db.Column(ForeignKey('deployment_packages.id'), primary_key = True)
-§§
-§§    def __repr__(self):
+
+    def __repr__(self):
 §§        return '<FuzzjobDeploymentPackage %r>' % self.DeploymentPackage
 §§
-§§
-§§class SystemsLocation(db.Model):
-§§    __tablename__ = 'systems_location'
+
+class SystemsLocation(db.Model):
+    __tablename__ = 'systems_location'
 §§    System = db.Column(ForeignKey('systems.id'), primary_key = True)
 §§    Location = db.Column(ForeignKey('locations.id'), ForeignKey('location_fuzzjobs.Location'), primary_key = False)
-§§
-§§    def __repr__(self):
+
+    def __repr__(self):
 §§        return '<SystemsLocation %r>' % self.System
 §§
-§§
+
 §§class GmOptions(db.Model):
 §§    __tablename__ = 'gm_options'
 §§    id = db.Column(db.Integer, primary_key = True)
 §§    setting = db.Column(db.String(150))
 §§    value = db.Column(db.String(150))
-§§
-§§    def __repr__(self):
+
+    def __repr__(self):
 §§        return '<gmOptions %r>' % self.name
 §§
-§§
-§§class SystemFuzzjobInstances(db.Model):
-§§    __tablename__ = 'system_fuzzjob_instances'
+
+class SystemFuzzjobInstances(db.Model):
+    __tablename__ = 'system_fuzzjob_instances'
 §§    id = db.Column(db.Integer, primary_key = True)
-§§    System = db.Column(ForeignKey('systems.id'))
-§§    Fuzzjob = db.Column(ForeignKey('fuzzjob.id'))
-§§    AgentType = db.Column(db.Integer)
-§§    InstanceCount = db.Column(db.Integer)
-§§    Architecture = db.Column(db.String(10))
-§§
-§§    def __repr__(self):
+    System = db.Column(ForeignKey('systems.id'))
+    Fuzzjob = db.Column(ForeignKey('fuzzjob.id'))
+    AgentType = db.Column(db.Integer)
+    InstanceCount = db.Column(db.Integer)
+    Architecture = db.Column(db.String(10))
+
+    def __repr__(self):
 §§        return '<SystemFuzzjobInstance %r>' % self.System

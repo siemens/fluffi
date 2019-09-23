@@ -10,16 +10,16 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Michael Kraus, Pascal Eckmann
 */
 
-§§#pragma once
-§§
-§§#ifdef SSLWRAP_EXPORTS
-§§#define SSLWRAP_API __declspec(dllexport)
-§§#else
-§§#define SSLWRAP_API __declspec(dllimport)
-§§#endif
-§§
-§§#define NOCRYPT
-§§
+#pragma once
+
+#ifdef SSLWRAP_EXPORTS
+#define SSLWRAP_API __declspec(dllexport)
+#else
+#define SSLWRAP_API __declspec(dllimport)
+#endif
+
+#define NOCRYPT
+
 §§extern "C" SSLWRAP_API int sendByteBufOnce(char* dstIP, int port, char* msg, int msgSize);
-§§
+
 §§extern "C" SSLWRAP_API int sendByteBufWithResponse(char* dstIP, int port, char* msg, int msgSize, char* response, int responseSize);

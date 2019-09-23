@@ -25,7 +25,7 @@ initialInstallPackages: "initial/linux/activePackages"
 
 SUTRamdiskPath : "/home/{{ansible_ssh_user}}/fluffi/ramdisk/SUT"
 
-§§remoteUtilitiesFilePath: "/home/{{ansible_ssh_user}}/utils"
-§§
+remoteUtilitiesFilePath: "/home/{{ansible_ssh_user}}/utils"
+
 §§# Remote path to store the Rest-Instance-Starter python script
 restStarterdeploymentPath: "/home/{{ansible_ssh_user}}/fluffi/persistent/restStarter"

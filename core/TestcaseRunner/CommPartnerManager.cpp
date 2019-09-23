@@ -10,30 +10,30 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Michael Kraus, Abian Blome
 */
 
-§§#include "stdafx.h"
-§§#include "CommPartnerManager.h"
-§§
-§§CommPartnerManager::CommPartnerManager()
+#include "stdafx.h"
+#include "CommPartnerManager.h"
+
+CommPartnerManager::CommPartnerManager()
 	: m_weigthSum(0), m_gen(m_rd())
 {
 }
-§§
-§§CommPartnerManager::~CommPartnerManager()
+
+CommPartnerManager::~CommPartnerManager()
 {}
-§§
-§§// Calculates the next communication partner from the set with cumulative probabilities
-§§std::string CommPartnerManager::getNextPartner()
-§§{
+
+// Calculates the next communication partner from the set with cumulative probabilities
+std::string CommPartnerManager::getNextPartner()
+{
 	std::unique_lock<std::mutex> mlock(m_mutex_);
 
 	if (m_weigthSum == 0) {
 		LOG(INFO) << "Next CommPartner calculation for TE or TG failed! Sum of weigths null! CommPartner Set may be empty!";
-§§		return "";
-§§	}
-§§
+		return "";
+	}
+
 	std::uniform_int_distribution<uint64_t> dist(1, m_weigthSum);
 	uint64_t randNum = dist(m_gen);
-§§
+
 	uint64_t cummulativeProbability = 0;
 
 	for (auto && it : m_commDescriptorSet)
@@ -45,32 +45,32 @@ Author(s): Thomas Riedmaier, Michael Kraus, Abian Blome
 			LOG(ERROR) << "CommPartner calculation failed! Sum of weights was overflowed! Reached uint32.MAX clients! -> Abian der Weise sprach: Eine elegante Lösung mit Normierung auf Double Werte ... die einzig wahre Lösung ist! <-";
 			google::protobuf::ShutdownProtobufLibrary();
 			_exit(EXIT_FAILURE); //make compiler happy;
-§§		}
+		}
 
 		cummulativeProbability += it.m_weight;
-§§		if (cummulativeProbability >= randNum) {
+		if (cummulativeProbability >= randNum) {
 			return it.m_serviceDescriptor.m_serviceHostAndPort;
-§§		}
-§§	}
-§§
+		}
+	}
+
 	LOG(INFO) << "Next CommPartner calculation for TE or TG failed! It looks like we don't have CommPartners yet!";
-§§	return "";
-§§}
-§§
-§§// Saves the new received communication partners in the set, meanwhile calculates the total weight
-§§int CommPartnerManager::updateCommPartners(google::protobuf::RepeatedPtrField<ServiceAndWeigth>* partners)
-§§{
+	return "";
+}
+
+// Saves the new received communication partners in the set, meanwhile calculates the total weight
+int CommPartnerManager::updateCommPartners(google::protobuf::RepeatedPtrField<ServiceAndWeigth>* partners)
+{
 	std::unique_lock<std::mutex> mlock(m_mutex_);
 	m_commDescriptorSet.clear();
 	m_weigthSum = 0;
-§§
+
 	uint32_t numberOfInsertedPartners = 0;
 	for (auto&& it : *partners)
 	{
 		m_commDescriptorSet.push_back((FluffiServiceAndWeight(it)));
 		m_weigthSum += it.weight();
-§§		numberOfInsertedPartners++;
-§§	}
-§§
-§§	return numberOfInsertedPartners;
+		numberOfInsertedPartners++;
+	}
+
+	return numberOfInsertedPartners;
 }

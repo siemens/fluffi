@@ -10,24 +10,24 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier
 -->
 
-§§{% extends "base.html" %}
-§§
-§§{% block content %}
-§§
-§§<div class="container">
-§§    <h1><u>Command Queue:</u></h1>
-§§</div>
-§§
-§§<hr/>
-§§<div class="jumbotron">
-§§    <div class="container"></div>
-§§</div>
-§§
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container">
+    <h1><u>Command Queue:</u></h1>
+</div>
+
+<hr/>
+<div class="jumbotron">
+    <div class="container"></div>
+</div>
+
 §§<br>
-§§
+
 §§<br>
-§§
-§§<div class="container">
+
+<div class="container">
 §§    <table class="table">
 §§        <thead>
 §§            <tr>
@@ -55,8 +55,8 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier
 §§            {% endfor %}
 §§        </tbody>
 §§    </table>
-§§</div>
-§§
-§§
-§§{% endblock %}
-§§
+</div>
+
+
+{% endblock %}
+

@@ -13,61 +13,61 @@ Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
 §§.dl-horizontal dt {
 §§    text-align: left;
 §§}
-§§
-§§.jumbotron {
-§§    margin-bottom: 0px;
+
+.jumbotron {
+    margin-bottom: 0px;
 §§    background-image: url(/static/images/ci2.jpeg);
-§§    background-position: 0% 25%;
-§§    background-size: cover;
-§§    background-repeat: no-repeat;
-§§    color: black;
-§§    text-shadow: 0 0 1px #fff,
-§§    0 0 2px #fff,
-§§    0 0 3px #fff,
-§§    0 0 4px #fff,
-§§    0 0 7px #fff,
-§§    0 0 8px #fff,
-§§    0 0 10px #fff,
-§§    0 0 15px #fff;
-§§}
-§§
+    background-position: 0% 25%;
+    background-size: cover;
+    background-repeat: no-repeat;
+    color: black;
+    text-shadow: 0 0 1px #fff,
+    0 0 2px #fff,
+    0 0 3px #fff,
+    0 0 4px #fff,
+    0 0 7px #fff,
+    0 0 8px #fff,
+    0 0 10px #fff,
+    0 0 15px #fff;
+}
+
 §§#infobox1 {
 §§    visibility: hidden;
 §§}
-§§
+
 §§#infobox2 {
 §§    visibility: hidden;
 §§}
-§§
+
 §§.hasTooltip span {
-§§    display: none;
-§§    color: #000;
-§§    text-decoration: none;
-§§    padding: 3px;
-§§}
-§§
-§§.hasTooltip:hover span {
-§§    display: block;
-§§    position: absolute;
-§§    background-color: #FFF;
-§§    border: 1px solid #CCC;
-§§    margin: 2px 10px;
-§§}
-§§
-§§.embed-container {
-§§    padding-bottom: 56.25%; /* ratio 16x9 */
-§§    height: 0; 
-§§    overflow: hidden; 
-§§    width: 100%;
-§§    height: auto;
+    display: none;
+    color: #000;
+    text-decoration: none;
+    padding: 3px;
+}
+
+.hasTooltip:hover span {
+    display: block;
+    position: absolute;
+    background-color: #FFF;
+    border: 1px solid #CCC;
+    margin: 2px 10px;
+}
+
+.embed-container {
+    padding-bottom: 56.25%; /* ratio 16x9 */
+    height: 0; 
+    overflow: hidden; 
+    width: 100%;
+    height: auto;
 §§}
 §§
 §§.embed-container iframe {
-§§    position: absolute; 
-§§    top: 0; 
-§§    left: 0; 
-§§    width: 100%; 
-§§    height: 100%; 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
 §§}
 §§
 §§.heading {
@@ -139,28 +139,28 @@ Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
 §§
 §§/* ratio 4x3 */
 §§.embed-container.ratio4x3 {
-§§    padding-bottom: 75%;
+    padding-bottom: 75%;
 §§}
-§§
+
 §§.odd {
 §§    background-color: green;
 §§}
-§§
+
 §§.even {
 §§    background-color: red;
 §§}
 §§
 §§.icon-inactive {
-§§    color: #98989b;
-§§}
-§§
-§§#cy {
-§§    width: 100%;
-§§    height: 100%;
-§§    position: absolute;
-§§    left: 0;
-§§    top: 0;
-§§    z-index: 999;
+    color: #98989b;
+}
+
+#cy {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 999;
 §§}
 §§
 §§#icontainer {

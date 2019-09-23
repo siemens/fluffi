@@ -12,18 +12,18 @@ Author(s): Thomas Riedmaier, Michael Kraus, Roman Bendt, Abian Blome
 
 #pragma once
 #include "IFLUFFIMessageHandler.h"
-§§
+
 class CommPartnerManager;
 class SetTGsAndTEsRequestHandler :
 	public IFLUFFIMessageHandler
 {
 public:
-§§	SetTGsAndTEsRequestHandler(CommPartnerManager* tGManager, CommPartnerManager* tEManager);
+	SetTGsAndTEsRequestHandler(CommPartnerManager* tGManager, CommPartnerManager* tEManager);
 	~SetTGsAndTEsRequestHandler();
 
 	void handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp);
-§§
-§§private:
+
+private:
 	CommPartnerManager* m_tEManager = nullptr;
 	CommPartnerManager* m_tGManager = nullptr;
 };

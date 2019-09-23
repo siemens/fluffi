@@ -11,7 +11,7 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier
 -->
 
 §§<!DOCTYPE html>
-§§<html>
+<html>
 §§<head>
 §§    <title>Fluffi Grafana Dashboard</title>
 §§    <meta charset="UTF-8">
@@ -22,28 +22,28 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier
 §§    <script src="/static/3rdParty/socket.io-client/socket.io.slim.js"></script>
 §§</head>
 §§<body>
-§§
-§§{% block content %}
-§§
-§§<script language="JavaScript">
+
+{% block content %}
+
+<script language="JavaScript">
 §§  //Grafana Dashboard
-§§  var socket;
+  var socket;
 §§  var id = "#icontainer";
 §§  var i = 0;
-§§
+
 §§  var send = "";
 §§  var myProjectID = "";
 §§  var myTime = "";
 §§  var myTime2 = "";
-§§
+
 §§  $(function () {
     var socket = io.connect('http://dashsync.fluffi:4000' );    
-§§    // verify our websocket connection is established
-§§    socket.on('connect', function() {
-§§        console.log('Websocket connected!');
-§§    });
-§§
-§§    socket.on('syncevent', function(data) {
+    // verify our websocket connection is established
+    socket.on('connect', function() {
+        console.log('Websocket connected!');
+    });
+
+    socket.on('syncevent', function(data) {
 §§        
 §§        console.log("websocket data: ", data['send'], data['project'], data['time'], data["time2"]); 
 §§        send = data['send'];
@@ -76,10 +76,10 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier
 §§        } 
 §§
 §§      } else { console.log("Data of websocket is empty or undefined..."); }           
-§§    });
+    });
 §§
-§§  });
-§§
+  });
+
 §§  function getURL(myProjectName, from, to){
 §§    if(myProjectName == 'grafana1'){      
 §§      return "http://mon.fluffi/d/MAzsmLaik/fluffi-1?orgId=1&refresh=5s&kiosk";
@@ -89,19 +89,19 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier
 §§    }    
 §§    
     return "http://mon.fluffi/dashboard/script/scripted.js?fuzzjobname=" + myProjectName + "&from=" + from + "&to=" + to + "&orgId=1&kiosk";
-§§  }
+  }
+
 §§
 §§
 §§
-§§
-§§</script>
-§§
+</script>
+
 §§<div class="container">
 §§    <div class="embed-container" id="icontainer0" style="visibility: hidden"></div>
 §§    <div class="embed-container" id="icontainer1" style="visibility: hidden"></div>
-§§</div>
-§§
-§§{% endblock %}
-§§
-§§</body>
+</div>
+
+{% endblock %}
+
+</body>
 </html>

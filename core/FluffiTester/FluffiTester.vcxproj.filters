@@ -76,30 +76,30 @@ Author(s): Thomas Riedmaier, Abian Blome, Michael Kraus
     <ClCompile Include="AbstractionLayerTester.cpp">
       <Filter>Source Files\SharedCode</Filter>
     </ClCompile>
-§§    <ClCompile Include="TGTestcaseManagerTester.cpp">
-§§      <Filter>Source Files\TestcaseGenerator</Filter>
-§§    </ClCompile>
-§§    <ClCompile Include="TETestResultManagerTester.cpp">
-§§      <Filter>Source Files\TestcaseEvaluator</Filter>
-§§    </ClCompile>
+    <ClCompile Include="TGTestcaseManagerTester.cpp">
+      <Filter>Source Files\TestcaseGenerator</Filter>
+    </ClCompile>
+    <ClCompile Include="TETestResultManagerTester.cpp">
+      <Filter>Source Files\TestcaseEvaluator</Filter>
+    </ClCompile>
     <ClCompile Include="GMWorkerThreadStateBuilderTester.cpp">
       <Filter>Source Files\GlobalManager</Filter>
     </ClCompile>
     <ClCompile Include="TestExecutorDynRioSingleTester.cpp">
       <Filter>Source Files\TestcaseRunner</Filter>
     </ClCompile>
-§§    <ClCompile Include="CommPartnerManagerTester.cpp">
-§§      <Filter>Source Files\TestcaseRunner</Filter>
-§§    </ClCompile>
-§§    <ClCompile Include="BlockCoverageCacheTester.cpp">
-§§      <Filter>Source Files\TestcaseEvaluator</Filter>
-§§    </ClCompile>
-§§    <ClCompile Include="WorkerWeightCalculatorTester.cpp">
-§§      <Filter>Source Files\LocalManager</Filter>
-§§    </ClCompile>
-§§    <ClCompile Include="GMDatabaseManagerTester.cpp">
-§§      <Filter>Source Files\GlobalManager</Filter>
-§§    </ClCompile>
+    <ClCompile Include="CommPartnerManagerTester.cpp">
+      <Filter>Source Files\TestcaseRunner</Filter>
+    </ClCompile>
+    <ClCompile Include="BlockCoverageCacheTester.cpp">
+      <Filter>Source Files\TestcaseEvaluator</Filter>
+    </ClCompile>
+    <ClCompile Include="WorkerWeightCalculatorTester.cpp">
+      <Filter>Source Files\LocalManager</Filter>
+    </ClCompile>
+    <ClCompile Include="GMDatabaseManagerTester.cpp">
+      <Filter>Source Files\GlobalManager</Filter>
+    </ClCompile>
     <ClCompile Include="LMDatabaseManagerTester.cpp">
       <Filter>Source Files\LocalManager</Filter>
     </ClCompile>

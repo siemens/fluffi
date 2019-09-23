@@ -13,11 +13,11 @@
     - deployment-windows-fluffi
     - general-windows-syncToRamdisk
     - initial-windows-deployRestInstanceStarter
-§§    - start-windows-restInstanceStarter
+    - start-windows-restInstanceStarter
 
 §§- hosts: linux, odroids
   roles:
     - deployment-linux-fluffi
-§§    - general-linux-syncToRamdisk
+    - general-linux-syncToRamdisk
     - initial-linux-deployRestInstanceStarter
     - start-linux-restInstanceStarter

@@ -13,15 +13,15 @@ Author(s): Thomas Riedmaier, Michael Kraus, Abian Blome
 #pragma once
 #include "FluffiServiceAndWeight.h"
 
-§§class CommPartnerManager
-§§{
-§§public:
-§§	CommPartnerManager();
-§§	~CommPartnerManager();
-§§
-§§	std::string getNextPartner();
-§§	int updateCommPartners(google::protobuf::RepeatedPtrField<ServiceAndWeigth>* partners);
-§§
+class CommPartnerManager
+{
+public:
+	CommPartnerManager();
+	~CommPartnerManager();
+
+	std::string getNextPartner();
+	int updateCommPartners(google::protobuf::RepeatedPtrField<ServiceAndWeigth>* partners);
+
 private:
 	uint64_t m_weigthSum = 0;
 	std::mutex m_mutex_;
@@ -29,4 +29,4 @@ private:
 
 	std::random_device m_rd;  //Will be used to obtain a seed for the random number engine
 	std::mt19937 m_gen; //Standard mersenne_twister_engine seeded with rd()
-§§};
+};

@@ -59,9 +59,9 @@ Author(s): Thomas Riedmaier, Abian Blome, Michael Kraus
     <ClInclude Include="Util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-§§    <ClInclude Include="GetTestcaseChunkRequestHandler.h">
-§§      <Filter>Header Files</Filter>
-§§    </ClInclude>
+    <ClInclude Include="GetTestcaseChunkRequestHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="WorkerThreadState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -136,9 +136,9 @@ Author(s): Thomas Riedmaier, Abian Blome, Michael Kraus
     <ClCompile Include="Util.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-§§    <ClCompile Include="GetTestcaseChunkRequestHandler.cpp">
-§§      <Filter>Source Files</Filter>
-§§    </ClCompile>
+    <ClCompile Include="GetTestcaseChunkRequestHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="WorkerThreadState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

@@ -18,7 +18,7 @@ Author(s): Thomas Riedmaier, Abian Blome, Michael Kraus, Roman Bendt
 #include <thread>
 #include <deque>
 #include <sstream>
-§§#include <mutex>
+#include <mutex>
 #include <random>
 #include <experimental/filesystem>
 

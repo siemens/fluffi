@@ -10,19 +10,19 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Michael Kraus, Thomas Riedmaier, Junes Najah
 */
 
-§§function removeInstances(url, counterId) {
-§§    var changeUrl = url;
-§§
-§§    $.ajax({
-§§        url: changeUrl,
-§§        type: 'POST',
-§§        data: JSON.stringify(''),
-§§        contentType: 'application/json; charset=utf-8',
-§§        dataType: 'json',
-§§        async: false,
-§§        success: function(response) {
-§§            if(response["status"] == "OK")
-§§                document.getElementById(counterId).innerHTML = "0";
-§§        }
-§§    });
+function removeInstances(url, counterId) {
+    var changeUrl = url;
+
+    $.ajax({
+        url: changeUrl,
+        type: 'POST',
+        data: JSON.stringify(''),
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        async: false,
+        success: function(response) {
+            if(response["status"] == "OK")
+                document.getElementById(counterId).innerHTML = "0";
+        }
+    });
 }

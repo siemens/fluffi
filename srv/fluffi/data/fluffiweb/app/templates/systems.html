@@ -10,30 +10,30 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
 -->
 
-§§{% extends "base.html" %}
-§§
-§§{% block scripts  %}
+{% extends "base.html" %}
+
+{% block scripts  %}
 §§<script src="{{ url_for('static', filename = 'javascript/modifySystemLocation.js') }}"
 §§        type="text/javascript"></script>
-§§{{super()}}
-§§{% endblock %}
-§§
-§§{% block content %}
-§§
-§§<div class="container">
+{{super()}}
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
 §§    <h1>Systems in FluffiNET</h1>
 §§    <hr>
 §§    {{ flashMessages() }}
-§§</div>
+</div>
 §§
-§§
-§§<div class="jumbotron">
-§§    <div class="container"></div>
-§§</div>
-§§
+
+<div class="jumbotron">
+    <div class="container"></div>
+</div>
+
 §§<br>
-§§
-§§<div class="container">
+
+<div class="container">
 §§    <button class="btn btn-info btn-lg" data-target="#modalAddSystem" data-toggle="modal" type="button">Add System
 §§    </button>
 §§    <button class="btn btn-info btn-lg" data-target="#modalLemmingLair" data-toggle="modal" type="button">LEMMINGS LAIR
@@ -45,8 +45,8 @@ Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
 §§    </button>
 §§    <button class="btn btn-info btn-lg" data-target="#modalSettings" data-toggle="modal" type="button">Settings
 §§    </button>
-§§    <!-- Modal -->
-§§    <div class="modal fade" id="modalAddSystem" role="dialog">
+    <!-- Modal -->
+    <div class="modal fade" id="modalAddSystem" role="dialog">
 §§        <div class="modal-dialog">
 §§
 §§            <!-- Modal content-->
@@ -75,10 +75,10 @@ Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
 §§                    <button class="btn btn-danger" data-dismiss="modal" type="button">Close</button>
 §§                </div>
 §§            </div>
-§§        </div>
-§§    </div>
-§§    <div class="modal fade" id="modalLemmingLair" role="dialog">
-§§        <div class="modal-dialog">
+        </div>
+    </div>
+    <div class="modal fade" id="modalLemmingLair" role="dialog">
+        <div class="modal-dialog">
 §§
 §§            <!-- Modal content-->
 §§            <div class="modal-content">
@@ -111,8 +111,8 @@ Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
 §§                <div class="modal-footer">
 §§                    <button class="btn btn-default" data-dismiss="modal" type="button">Close</button>
 §§                </div>
-§§            </div>
-§§        </div>
+            </div>
+        </div>
 §§    </div>
 §§    <div class="modal fade" id="modalSettings" role="dialog">
 §§        <div class="modal-dialog">
@@ -182,11 +182,11 @@ Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
 §§            </div>
 §§        </div>
 §§    </div>
-§§</div>
-§§
+</div>
+
 §§<hr>
-§§
-§§<div class="container">
+
+<div class="container">
 §§    {% for group in systems %}
 §§    <h2>Group: <a href="/systems/view/{{ group.Name }}/{{ group.Name }}">{{ group.Name }}</a></h2>
 §§    <div class="container" style="padding-left: 50px">
@@ -246,6 +246,6 @@ Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
 §§        </table>
 §§    </div>
 §§    {% endfor %}
-§§</div>
-§§
-§§{% endblock %}
+</div>
+
+{% endblock %}

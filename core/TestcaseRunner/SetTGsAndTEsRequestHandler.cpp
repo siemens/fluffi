@@ -14,7 +14,7 @@ Author(s): Thomas Riedmaier, Michael Kraus, Abian Blome
 #include "SetTGsAndTEsRequestHandler.h"
 #include "CommPartnerManager.h"
 
-§§SetTGsAndTEsRequestHandler::SetTGsAndTEsRequestHandler(CommPartnerManager* tGManager, CommPartnerManager* tEManager)
+SetTGsAndTEsRequestHandler::SetTGsAndTEsRequestHandler(CommPartnerManager* tGManager, CommPartnerManager* tEManager)
 {
 	this->m_tGManager = tGManager;
 	this->m_tEManager = tEManager;
@@ -27,14 +27,14 @@ SetTGsAndTEsRequestHandler::~SetTGsAndTEsRequestHandler()
 void SetTGsAndTEsRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp) {
 	(void)(workerThreadState); //avoid unused parameter warning
 
-§§	const SetTGsAndTEsRequest* setTGsAndTEsReqest = &req->settgsandtesrequest();
-§§	google::protobuf::RepeatedPtrField<ServiceAndWeigth> tgs = setTGsAndTEsReqest->tgs();
-§§	google::protobuf::RepeatedPtrField<ServiceAndWeigth> tes = setTGsAndTEsReqest->tes();
-§§
-§§	// Update datastructure of registered TGs and TEs for TestcaseRunner
+	const SetTGsAndTEsRequest* setTGsAndTEsReqest = &req->settgsandtesrequest();
+	google::protobuf::RepeatedPtrField<ServiceAndWeigth> tgs = setTGsAndTEsReqest->tgs();
+	google::protobuf::RepeatedPtrField<ServiceAndWeigth> tes = setTGsAndTEsReqest->tes();
+
+	// Update datastructure of registered TGs and TEs for TestcaseRunner
 	int newTGs = m_tGManager->updateCommPartners(&tgs);
 	LOG(DEBUG) << "Registered " << newTGs << " new TestcaseGenerators!";
-§§
+
 	int newTEs = m_tEManager->updateCommPartners(&tes);
 	LOG(DEBUG) << "Registered " << newTEs << " new TestcaseEvaluators!";
 

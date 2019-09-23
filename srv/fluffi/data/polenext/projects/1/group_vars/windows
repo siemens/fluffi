@@ -17,9 +17,9 @@ deploymentDirName: "FLUFFI"
 # SUT directory name
 SUTBaseDirName: "SUT"
 
-§§# RestStarter directory name
-§§RestStarterDirName: "restStarter"
-§§
+# RestStarter directory name
+RestStarterDirName: "restStarter"
+
 §§# Path where FLUFFI will be deployed
 deploymentPath: "C:\\{{deploymentDirName}}"
 
@@ -33,7 +33,7 @@ initialAnsibleFTPPath: "initial/windows/ansible"
 SUTPath: C:\\{{deploymentDirName}}\{{SUTBaseDirName}}
 
 # Remote path to store the necessary utilities
-§§remoteUtilitiesFilePath: c:\utils\
-§§
+remoteUtilitiesFilePath: c:\utils\
+
 §§# Remote path to store the Rest-Instance-Starter python script
-§§restStarterdeploymentPath: "C:\\{{deploymentDirName}}\\{{RestStarterDirName}}"
+restStarterdeploymentPath: "C:\\{{deploymentDirName}}\\{{RestStarterDirName}}"

@@ -13,7 +13,7 @@ Author(s): Thomas Riedmaier, Abian Blome, Michael Kraus, Roman Bendt
 #include "stdafx.h"
 #include "CommInt.h"
 #include "TEWorkerThreadStateBuilder.h"
-§§#include "PutTestResultRequestHandler.h"
+#include "PutTestResultRequestHandler.h"
 #include "TEGetStatusRequestHandler.h"
 #include "GetTestcaseChunkRequestHandler.h"
 #include "KillInstanceRequestHandler.h"
@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
 	int intervallBetweenTwoCollectionRoundsInMillisec = 3 * 60 * 1000;
 	int delayToWaitUntilConfigIsCompleteInMS = 1000;
 	unsigned long maxAllowedTimeOfManagerInactivityMS = 10 * 60 * 1000;
-§§
+
 	//The garbage collector needs to be initialized as early as possible and deleted as late as possible
 	GarbageCollectorWorker* garbageCollectorWorker = new GarbageCollectorWorker(intervallBetweenTwoCollectionRoundsInMillisec);
 
@@ -99,7 +99,7 @@ int main(int argc, char* argv[])
 	// ################## Registering Message Handler  ##################
 	PutTestResultRequestHandler* m_putTestResultRequestHandler = new PutTestResultRequestHandler(testcaseDir, comm, trestresultManager, garbageCollectorWorker);
 	comm->registerFLUFFIMessageHandler(m_putTestResultRequestHandler, FLUFFIMessage::FluffCase::kPutTestResultRequest);
-§§
+
 	TEGetStatusRequestHandler* m_getStatusRequestHandler = new TEGetStatusRequestHandler(comm, trestresultManager);
 	comm->registerFLUFFIMessageHandler(m_getStatusRequestHandler, FLUFFIMessage::FluffCase::kGetStatusRequest);
 

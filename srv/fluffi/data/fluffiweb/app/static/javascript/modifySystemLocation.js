@@ -10,22 +10,22 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Michael Kraus, Thomas Riedmaier
 */
 
-§§function updateSystemLocation(projName, locationId) {
-§§    var changeUrl = "/systems/" + projName + "/updateSystemLocation/" + locationId;
-§§
-§§
-§§    $.ajax({
-§§        url: changeUrl,
-§§        type: 'POST',
-§§        data: JSON.stringify(""),
-§§        contentType: 'application/json; charset=utf-8',
-§§        dataType: 'json',
-§§        async: false,
-§§        success: function(response) {
-§§            if(response["status"] == "OK")
-§§                console.log("OK")
-§§        }
-§§    });
-§§
-§§    location.reload(true);
-§§}
+function updateSystemLocation(projName, locationId) {
+    var changeUrl = "/systems/" + projName + "/updateSystemLocation/" + locationId;
+
+
+    $.ajax({
+        url: changeUrl,
+        type: 'POST',
+        data: JSON.stringify(""),
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        async: false,
+        success: function(response) {
+            if(response["status"] == "OK")
+                console.log("OK")
+        }
+    });
+
+    location.reload(true);
+}

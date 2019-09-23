@@ -8,21 +8,21 @@
 # 
 # Author(s): Pascal Eckmann, Thomas Riedmaier, Michael Kraus
 
-§§- name: Set file path to fetch
-§§  set_fact:
-§§    filePathToFetchFromFTP: "{{ftpserverURL}}/{{ftpRestStarterPath}}"
-§§    
-§§- name: Creating new directory for deploying fluffi rest starter
-§§  file:
-§§    dest: "{{restStarterdeploymentPath}}" 
-§§    mode: 00777 
-§§    state: directory
-§§    owner: "{{ansible_ssh_user}}"
-§§    group: "{{ansible_ssh_user}}"
-§§
+- name: Set file path to fetch
+  set_fact:
+    filePathToFetchFromFTP: "{{ftpserverURL}}/{{ftpRestStarterPath}}"
+    
+- name: Creating new directory for deploying fluffi rest starter
+  file:
+    dest: "{{restStarterdeploymentPath}}" 
+    mode: 00777 
+    state: directory
+    owner: "{{ansible_ssh_user}}"
+    group: "{{ansible_ssh_user}}"
+
 §§- name: Fetch Rest-Instance-Starter from "{{filePathToFetchFromFTP}}"
-§§  get_url: 
-§§    url: "{{filePathToFetchFromFTP}}"
+  get_url: 
+    url: "{{filePathToFetchFromFTP}}"
 §§    dest: "{{restStarterdeploymentPath}}/main.py"
     force: yes
 §§    

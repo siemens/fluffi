@@ -23,7 +23,7 @@ executableNames:
 ftpserverURL: ftp://ftp.fluffi
 
 §§# Path where the ISOs are located on the FTP server
-§§isosPathName: isos
-§§
+isosPathName: isos
+
 §§# File path where to find Rest-Instance-Starter on FTP server
 ftpRestStarterPath: "restStarter/main.py"

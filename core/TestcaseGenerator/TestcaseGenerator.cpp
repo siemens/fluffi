@@ -12,10 +12,10 @@ Author(s): Thomas Riedmaier, Abian Blome, Michael Kraus, Roman Bendt
 
 #include "stdafx.h"
 #include "CommInt.h"
-§§#include "GetTestcaseRequestHandler.h"
-§§#include "TestcaseDescriptor.h"
+#include "GetTestcaseRequestHandler.h"
+#include "TestcaseDescriptor.h"
 #include "TGWorkerThreadStateBuilder.h"
-§§#include "GetTestcaseChunkRequestHandler.h"
+#include "GetTestcaseChunkRequestHandler.h"
 #include "KillInstanceRequestHandler.h"
 #include "TGGetStatusRequestHandler.h"
 #include "QueueCleanerWorker.h"
@@ -90,24 +90,24 @@ int main(int argc, char* argv[])
 	TGWorkerThreadStateBuilder* workerStateBuilder = new TGWorkerThreadStateBuilder();
 	CommInt* comm = new CommInt(workerStateBuilder, 10, 10);
 	LOG(INFO) << std::endl << "Hey! I am TestcaseGenerator " << comm->getMyGUID() << std::endl << "My location: " << location << std::endl << "My Host and Port: " << comm->getOwnServiceDescriptor().m_serviceHostAndPort << std::endl << "I was built on: " << __DATE__;
-§§
+
 	// Specify path to testcase directory, preferable relative
 	std::string testcaseDir = "." + Util::pathSeperator + "testcaseFiles" + Util::pathSeperator + comm->getMyGUID();
 	std::string queueFillerTempDir = testcaseDir + Util::pathSeperator + "queueFillerTempDir";
 	Util::createFolderAndParentFolders(queueFillerTempDir);
 
-§§	// Queue for managing testcases
+	// Queue for managing testcases
 	TGTestcaseManager* testcaseManager = new TGTestcaseManager(garbageCollectorWorker);
-§§
+
 	// ################## End of Define / Build global objects  ##################
 
 	// ################## Registering Message Handler  ##################
 	GetTestcaseRequestHandler* m_getTestcaseRequestHandler = new GetTestcaseRequestHandler(testcaseManager, testcaseDir, comm);
 	comm->registerFLUFFIMessageHandler(m_getTestcaseRequestHandler, FLUFFIMessage::FluffCase::kGetTestcaseRequest);
-§§
+
 	GetTestcaseChunkRequestHandler* m_getTestcaseChunkRequestHandler = new GetTestcaseChunkRequestHandler(testcaseDir, false, garbageCollectorWorker);
 	comm->registerFLUFFIMessageHandler(m_getTestcaseChunkRequestHandler, FLUFFIMessage::FluffCase::kGetTestCaseChunkRequest);
-§§
+
 	TGGetStatusRequestHandler* m_getStatusRequestHandler = new TGGetStatusRequestHandler(comm, testcaseManager);
 	comm->registerFLUFFIMessageHandler(m_getStatusRequestHandler, FLUFFIMessage::FluffCase::kGetStatusRequest);
 
@@ -216,7 +216,7 @@ int main(int argc, char* argv[])
 	//Freeing the testcase Queue
 	delete testcaseManager;
 	testcaseManager = nullptr;
-§§
+
 	delete workerStateBuilder;
 	workerStateBuilder = nullptr;
 

@@ -10,24 +10,24 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Michael Kraus, Abian Blome
 */
 
-§§#pragma once
-§§#include "IFLUFFIMessageHandler.h"
-§§
+#pragma once
+#include "IFLUFFIMessageHandler.h"
+
 class CommInt;
 class TETestResultManager;
 class GarbageCollectorWorker;
-§§class PutTestResultRequestHandler :
-§§	public IFLUFFIMessageHandler
-§§{
-§§public:
+class PutTestResultRequestHandler :
+	public IFLUFFIMessageHandler
+{
+public:
 	PutTestResultRequestHandler(std::string testcaseDir, CommInt* commPtr, TETestResultManager* teTestResultManager, GarbageCollectorWorker* garbageCollectorWorker);
-§§	virtual ~PutTestResultRequestHandler();
-§§
+	virtual ~PutTestResultRequestHandler();
+
 	void handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp);
-§§
-§§private:
+
+private:
 	std::string m_testcaseDir;
 	CommInt* m_comm;
 	TETestResultManager* m_teTestResultManager;
 	GarbageCollectorWorker* m_garbageCollectorWorker;
-§§};
+};

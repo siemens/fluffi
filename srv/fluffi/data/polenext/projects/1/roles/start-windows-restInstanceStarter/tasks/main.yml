@@ -19,6 +19,6 @@
 
 §§- name: Start Rest-Instance-Starter python server
   win_shell: "{{PsExecLocation}}PsExec{{architecture}}.exe -accepteula -nobanner -u {{ ansible_user }} -p {{ ansible_password }} -d -i {{sessidOut.stdout}} python {{restStarterdeploymentPath}}\\main.py {{deploymentPath}}"
-§§  args:
-§§     executable: cmd
-§§  ignore_errors: True
+  args:
+     executable: cmd
+  ignore_errors: True

@@ -10,30 +10,30 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Michael Kraus, Thomas Riedmaier, Abian Blome
 */
 
-§§#include "stdafx.h"
-§§#include "TestOutcomeDescriptor.h"
-§§
+#include "stdafx.h"
+#include "TestOutcomeDescriptor.h"
+
 TestOutcomeDescriptor::TestOutcomeDescriptor(const FluffiTestcaseID id, const FluffiTestcaseID parentId, const FluffiTestResult testResult)
 	: m_id(id),
 	m_parentId(parentId),
 	m_testResult(testResult)
 {}
-§§
-§§TestOutcomeDescriptor::~TestOutcomeDescriptor()
-§§{
-§§}
-§§
+
+TestOutcomeDescriptor::~TestOutcomeDescriptor()
+{
+}
+
 const FluffiTestcaseID TestOutcomeDescriptor::getId()
-§§{
-§§	return m_id;
-§§}
-§§
+{
+	return m_id;
+}
+
 const FluffiTestcaseID TestOutcomeDescriptor::getparentId()
-§§{
-§§	return m_parentId;
-§§}
-§§
+{
+	return m_parentId;
+}
+
 const FluffiTestResult TestOutcomeDescriptor::getTestResult()
-§§{
-§§	return m_testResult;
+{
+	return m_testResult;
 }

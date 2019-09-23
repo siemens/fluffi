@@ -16,7 +16,7 @@ Author(s): Thomas Riedmaier, Roman Bendt, Abian Blome, Michael Kraus
 
 #include <thread>
 #include <sstream>
-§§#include <mutex>
+#include <mutex>
 #include <condition_variable>
 #include <deque>
 #include <experimental/filesystem>

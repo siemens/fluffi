@@ -35,11 +35,11 @@ Author(s): Thomas Riedmaier, Abian Blome, Michael Kraus
 //Protobuf
 #include <FLUFFI.pb.h>
 
-§§// File streams
-§§#include <fstream>
-§§#include <iostream>
-§§#include <limits>
-§§
+// File streams
+#include <fstream>
+#include <iostream>
+#include <limits>
+
 //MariaDB
 #include <mysql.h>
 

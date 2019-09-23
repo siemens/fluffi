@@ -16,8 +16,8 @@ Author(s): Abian Blome, Junes Najah, Thomas Riedmaier, Michael Kraus
 
 <script language="JavaScript">
 
-§§function deleteProject(projId, locId) {
-§§    var delUrl = "/locations/" + locId + "/delProject/" + projId;
+function deleteProject(projId, locId) {
+    var delUrl = "/locations/" + locId + "/delProject/" + projId;
     window.location.replace(delUrl);
 }
 
@@ -34,7 +34,7 @@ function assignWorker(guid) {
         async: false,
         success: function(msg) {}
     });
-§§    location.reload();
+    location.reload();
 }
 </script>
 
@@ -44,13 +44,13 @@ function assignWorker(guid) {
 §§{{ flashMessages() }}
 §§<hr>
 
-§§<div class="jumbotron">
-§§    <div class="container"></div>
-§§</div>
-§§
+<div class="jumbotron">
+    <div class="container"></div>
+</div>
+
 <div class="container">
     <h2>Projects</h2>
-§§    <div><a href="/locations/{{ location.id }}/addProject">Add Project</a></div>
+    <div><a href="/locations/{{ location.id }}/addProject">Add Project</a></div>
     <table class="table">
         <thead>
 §§        <tr>

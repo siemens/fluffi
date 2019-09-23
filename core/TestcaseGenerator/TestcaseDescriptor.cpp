@@ -10,11 +10,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Michael Kraus, Abian Blome
 */
 
-§§#include "stdafx.h"
-§§#include "TestcaseDescriptor.h"
+#include "stdafx.h"
+#include "TestcaseDescriptor.h"
 #include "Util.h"
 #include "GarbageCollectorWorker.h"
-§§
+
 TestcaseDescriptor::TestcaseDescriptor(FluffiTestcaseID id, FluffiTestcaseID parentId, std::string pathAndFileName, bool forceFullCoverage)
 	: m_id(id.m_serviceDescriptor, id.m_localID),
 	m_parentId(parentId.m_serviceDescriptor, parentId.m_localID),
@@ -22,28 +22,28 @@ TestcaseDescriptor::TestcaseDescriptor(FluffiTestcaseID id, FluffiTestcaseID par
 	m_numOfProcessingAttempts(0),
 	m_forceFullCoverage(forceFullCoverage)
 {}
-§§
-§§TestcaseDescriptor::~TestcaseDescriptor()
+
+TestcaseDescriptor::~TestcaseDescriptor()
 {}
-§§
+
 bool TestcaseDescriptor::getForceFullCoverage() const {
 	return m_forceFullCoverage;
 }
 
 FluffiTestcaseID TestcaseDescriptor::getId() const
-§§{
+{
 	return m_id;
-§§}
-§§
+}
+
 FluffiTestcaseID TestcaseDescriptor::getparentId() const
-§§{
+{
 	return m_parentId;
-§§}
-§§
+}
+
 void TestcaseDescriptor::increaseNumOfProcessingAttempts() {
 	m_numOfProcessingAttempts++;
 }
-§§
+
 int TestcaseDescriptor::getNumOfProcessingAttempts() const {
 	return m_numOfProcessingAttempts;
 }
