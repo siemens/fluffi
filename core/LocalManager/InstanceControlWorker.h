@@ -7,7 +7,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-§§Author(s): Thomas Riedmaier, Abian Blome
+Author(s): Thomas Riedmaier, Abian Blome
 */
 
 #pragma once
@@ -19,7 +19,7 @@ class LMWorkerThreadState;
 class InstanceControlWorker
 {
 public:
-§§	InstanceControlWorker(CommInt* commInt, LMWorkerThreadStateBuilder* workerThreadStateBuilder, int loopIntervalMS, std::string location);
+	InstanceControlWorker(CommInt* commInt, LMWorkerThreadStateBuilder* workerThreadStateBuilder, int loopIntervalMS, std::string location);
 	virtual ~InstanceControlWorker();
 
 	void workerMain();
@@ -28,9 +28,9 @@ public:
 	std::thread* m_thread = nullptr;
 
 private:
-§§	CommInt* m_commInt = nullptr;
-§§	IWorkerThreadStateBuilder* m_workerThreadStateBuilder = nullptr;
-§§	LMWorkerThreadState* m_workerThreadState = nullptr;
+	CommInt* m_commInt = nullptr;
+	IWorkerThreadStateBuilder* m_workerThreadStateBuilder = nullptr;
+	LMWorkerThreadState* m_workerThreadState = nullptr;
 	int m_loopIntervalMS;
 	std::string m_location;
 

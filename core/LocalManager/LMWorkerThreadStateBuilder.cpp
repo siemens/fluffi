@@ -7,7 +7,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-§§Author(s): Thomas Riedmaier, Abian Blome
+Author(s): Thomas Riedmaier, Abian Blome
 */
 
 #include "stdafx.h"
@@ -17,7 +17,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #include "LMWorkerThreadState.h"
 #include "GarbageCollectorWorker.h"
 
-§§LMWorkerThreadStateBuilder::LMWorkerThreadStateBuilder(GarbageCollectorWorker* garbageCollectorWorker) :
+LMWorkerThreadStateBuilder::LMWorkerThreadStateBuilder(GarbageCollectorWorker* garbageCollectorWorker) :
 	m_garbageCollectorWorker(garbageCollectorWorker)
 {
 }
@@ -26,14 +26,14 @@ LMWorkerThreadStateBuilder::~LMWorkerThreadStateBuilder()
 {
 }
 
-§§WorkerThreadState* LMWorkerThreadStateBuilder::constructState() {
-§§	LMWorkerThreadState* state = new LMWorkerThreadState();
+WorkerThreadState* LMWorkerThreadStateBuilder::constructState() {
+	LMWorkerThreadState* state = new LMWorkerThreadState();
 	state->dbManager = new LMDatabaseManager(m_garbageCollectorWorker);
 
 	return state;
 }
 
-§§void LMWorkerThreadStateBuilder::destructState(WorkerThreadState* theState) {
+void LMWorkerThreadStateBuilder::destructState(WorkerThreadState* theState) {
 	LMWorkerThreadState* lmWorkerThreadState = dynamic_cast<LMWorkerThreadState*>(theState);
 	if (lmWorkerThreadState == nullptr) {
 		LOG(ERROR) << "LMWorkerThreadStateBuilder::destructState - theState cannot be accessed";

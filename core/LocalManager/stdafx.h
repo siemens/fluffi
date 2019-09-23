@@ -17,13 +17,13 @@ Author(s): Thomas Riedmaier, Abian Blome, Roman Bendt
 #include <thread>
 #include <sstream>
 #include <deque>
-§§#include <map>
+#include <map>
 #include <mutex>
 #include <experimental/filesystem>
 
 //Easylogging
 #include "easylogging++.h"
-§§
+
 //ZeroMQ
 #include <zmq.hpp>
 #include <zmq_addon.hpp>

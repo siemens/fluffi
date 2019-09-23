@@ -17,7 +17,7 @@ Author(s): Thomas Riedmaier, Abian Blome
 #include "TETestResultManager.h"
 #include "CommInt.h"
 
-§§TEGetStatusRequestHandler::TEGetStatusRequestHandler(CommInt* comm, TETestResultManager* teTestResultManager) :
+TEGetStatusRequestHandler::TEGetStatusRequestHandler(CommInt* comm, TETestResultManager* teTestResultManager) :
 	GetStatusRequestHandler(comm),
 	m_teTestResultManager(teTestResultManager)
 {

@@ -8,12 +8,12 @@
 # 
 # Author(s): Junes Najah, Thomas Riedmaier, Abian Blome, Michael Kraus
 
-§§from flask_nav import Nav
+from flask_nav import Nav
 §§from flask_nav.elements import Link, Navbar, Separator, Subgroup, View
 §§
 §§from app import db, models
-§§
-§§nav = Nav()
+
+nav = Nav()
 §§
 §§
 §§def createLocationsNav(listLinks):

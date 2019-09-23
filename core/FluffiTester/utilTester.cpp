@@ -10,8 +10,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Michael Kraus, Thomas Riedmaier, Abian Blome, Pascal Eckmann
 */
 
-§§#include "stdafx.h"
-§§#include "CppUnitTest.h"
+#include "stdafx.h"
+#include "CppUnitTest.h"
 #include "Util.h"
 #include "CommInt.h"
 #include "FluffiServiceDescriptor.h"
@@ -20,14 +20,14 @@ Author(s): Michael Kraus, Thomas Riedmaier, Abian Blome, Pascal Eckmann
 #include "GarbageCollectorWorker.h"
 #include "TRWorkerThreadStateBuilder.h"
 #include "WorkerThreadState.h"
-§§
-§§using namespace Microsoft::VisualStudio::CppUnitTestFramework;
-§§
-§§namespace FluffiTester
+
+using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+
+namespace FluffiTester
 {
-§§	TEST_CLASS(UtilTest)
-§§	{
-§§	public:
+	TEST_CLASS(UtilTest)
+	{
+	public:
 §§
 		TEST_METHOD_INITIALIZE(ModuleInitialize)
 		{
@@ -54,26 +54,26 @@ Author(s): Michael Kraus, Thomas Riedmaier, Abian Blome, Pascal Eckmann
 
 		TEST_METHOD(Util_testsplitString)
 §§		{
-§§			std::vector<std::string> v = Util::splitString("", "asdf");
-§§			std::vector<std::string> emptyStringVector{ "" };
-§§			std::vector<std::string> asdfStringVector{ "asdf" };
+			std::vector<std::string> v = Util::splitString("", "asdf");
+			std::vector<std::string> emptyStringVector{ "" };
+			std::vector<std::string> asdfStringVector{ "asdf" };
+
+			bool is_equal = false;
+			if (v.size() == emptyStringVector.size())
+				is_equal = std::equal(v.begin(), v.end(), emptyStringVector.begin());
 §§
-§§			bool is_equal = false;
-§§			if (v.size() == emptyStringVector.size())
-§§				is_equal = std::equal(v.begin(), v.end(), emptyStringVector.begin());
-§§
-§§			Assert::IsTrue(is_equal, L"splitString(\"\", \"asdf\") does not return an empty String Vector");
-§§
-§§			is_equal = false;
-§§			v = Util::splitString("asdf", "");
-§§			if (v.size() == asdfStringVector.size())
-§§				is_equal = std::equal(v.begin(), v.end(), asdfStringVector.begin());
-§§			Assert::IsTrue(is_equal, L"splitString(\"asdf\", \"\") does not return an asdf String Vector");
-§§
-§§			v = Util::splitString("asdf asdf asdf qwer", " ");
-§§			Assert::AreEqual(v.size(), (size_t)4, L"Correct separation of spaces");
-§§		}
-§§
+			Assert::IsTrue(is_equal, L"splitString(\"\", \"asdf\") does not return an empty String Vector");
+
+			is_equal = false;
+			v = Util::splitString("asdf", "");
+			if (v.size() == asdfStringVector.size())
+				is_equal = std::equal(v.begin(), v.end(), asdfStringVector.begin());
+			Assert::IsTrue(is_equal, L"splitString(\"asdf\", \"\") does not return an asdf String Vector");
+
+			v = Util::splitString("asdf asdf asdf qwer", " ");
+			Assert::AreEqual(v.size(), (size_t)4, L"Correct separation of spaces");
+		}
+
 		TEST_METHOD(Util_attemptDeletePathRecursive)
 §§		{
 §§			for (int i = 0; i < 10; i++) {
@@ -217,10 +217,10 @@ Author(s): Michael Kraus, Thomas Riedmaier, Abian Blome, Pascal Eckmann
 			}
 §§
 			// File exists, first chunk, but not last chunk
-§§			for (int i = 0; i < 2; i++) {
+			for (int i = 0; i < 2; i++) {
 				std::string testcaseDir = ".\\241244550e8400-114567123456789999\\550e8400-1113465467989999";
-§§				Assert::IsFalse(std::experimental::filesystem::exists(testcaseDir),
-§§					L"Error checking the existence of folder in file system: (loadTestcaseChunkInMemory)");
+				Assert::IsFalse(std::experimental::filesystem::exists(testcaseDir),
+					L"Error checking the existence of folder in file system: (loadTestcaseChunkInMemory)");
 §§				Util::createFolderAndParentFolders(testcaseDir);
 §§				Assert::IsTrue(std::experimental::filesystem::exists(testcaseDir), L"Error checking the existence of folder in file system: (loadTestcaseChunkInMemory)");
 §§
@@ -321,7 +321,7 @@ Author(s): Michael Kraus, Thomas Riedmaier, Abian Blome, Pascal Eckmann
 §§		{
 			GarbageCollectorWorker garbageCollector(0);
 §§			TRWorkerThreadStateBuilder workerStateBuilder;
-§§			WorkerThreadState* state = workerStateBuilder.constructState();
+			WorkerThreadState* state = workerStateBuilder.constructState();
 
 §§			// file not exists, only 1 chunk
 			{
@@ -525,8 +525,8 @@ Author(s): Michael Kraus, Thomas Riedmaier, Abian Blome, Pascal Eckmann
 §§
 		TEST_METHOD(Util_attemptRenameFile)
 §§		{
-§§			// We need to clean up after other testcases
-§§			Util::attemptDeletePathRecursive(".\\647241244550e8400-114567123456789999\\");
+			// We need to clean up after other testcases
+			Util::attemptDeletePathRecursive(".\\647241244550e8400-114567123456789999\\");
 §§			// File does not exist
 §§			for (int i = 0; i < 3; i++) {
 				std::string testcaseDir = ".\\647241244550e8400-114567123456789999\\550e8400-1113465467989999";
@@ -535,7 +535,7 @@ Author(s): Michael Kraus, Thomas Riedmaier, Abian Blome, Pascal Eckmann
 §§				// Test Method
 §§				Assert::AreEqual(Util::attemptRenameFile(testcaseDir + "\\notExists.txt", testcaseDir + "\\eigentlichehwurst.txt"), false, L"Error in renaming file method, renaming should not work: (attemptRenameFile)");
 §§
-§§				Assert::IsFalse(std::experimental::filesystem::exists(testcaseDir), L"Error in renaming file method, folder should not exist: (attemptRenameFile)");
+				Assert::IsFalse(std::experimental::filesystem::exists(testcaseDir), L"Error in renaming file method, folder should not exist: (attemptRenameFile)");
 §§			}
 §§
 §§			// File exists -> no problems
@@ -571,40 +571,40 @@ Author(s): Michael Kraus, Thomas Riedmaier, Abian Blome, Pascal Eckmann
 §§			}
 §§
 §§			// Try to rename file that is currently used -> Error -> 100 failed attempts
-§§			std::string testcaseDir = ".\\647241244550e8400-114567123456789999\\550e8400-1113465467989999";
-§§			Assert::IsFalse(std::experimental::filesystem::exists(testcaseDir), L"Error in renaming file method, folder should not exist: (attemptRenameFile)");
-§§			Util::createFolderAndParentFolders(testcaseDir);
-§§			Assert::IsTrue(std::experimental::filesystem::exists(testcaseDir), L"Error checking the existence of folder in file system: (attemptRenameFile)");
-§§			Assert::IsFalse(std::experimental::filesystem::exists(testcaseDir + "\\testcaseNOTrenamed"), L"Error checking the existence of file in file system: (attemptRenameFile)");
+			std::string testcaseDir = ".\\647241244550e8400-114567123456789999\\550e8400-1113465467989999";
+			Assert::IsFalse(std::experimental::filesystem::exists(testcaseDir), L"Error in renaming file method, folder should not exist: (attemptRenameFile)");
+			Util::createFolderAndParentFolders(testcaseDir);
+			Assert::IsTrue(std::experimental::filesystem::exists(testcaseDir), L"Error checking the existence of folder in file system: (attemptRenameFile)");
+			Assert::IsFalse(std::experimental::filesystem::exists(testcaseDir + "\\testcaseNOTrenamed"), L"Error checking the existence of file in file system: (attemptRenameFile)");
 §§
-§§			std::ofstream testFile;
-§§			testFile.open("647241244550e8400-114567123456789999\\550e8400-1113465467989999\\testcaseNOTrenamed");
-§§			testFile << "AAAAAAAAAABBBBBBBBBBCCCCCCCCCC";
+			std::ofstream testFile;
+			testFile.open("647241244550e8400-114567123456789999\\550e8400-1113465467989999\\testcaseNOTrenamed");
+			testFile << "AAAAAAAAAABBBBBBBBBBCCCCCCCCCC";
 §§
-§§			// Test Method
-§§			Assert::AreEqual(Util::attemptRenameFile(testcaseDir + "\\testcaseNOTrenamed", testcaseDir + "\\testcaseRenamed"), false, L"Error in renaming file method, should not be able to rename file in use: (attemptRenameFile)");
+			// Test Method
+			Assert::AreEqual(Util::attemptRenameFile(testcaseDir + "\\testcaseNOTrenamed", testcaseDir + "\\testcaseRenamed"), false, L"Error in renaming file method, should not be able to rename file in use: (attemptRenameFile)");
 §§
-§§			testFile << "AAAAAAAAAABBBBBBBBBBCCCCCCCCCC2";
-§§			testFile.close();
-§§			Assert::IsTrue(std::experimental::filesystem::exists(testcaseDir + "\\testcaseNOTrenamed"), L"Error in renaming file method, file must exist: (attemptRenameFile)");
-§§			Assert::IsFalse(std::experimental::filesystem::exists(testcaseDir + "\\testcaseRenamed"), L"Error in renaming file method, renamed file should not exist: (attemptRenameFile)");
+			testFile << "AAAAAAAAAABBBBBBBBBBCCCCCCCCCC2";
+			testFile.close();
+			Assert::IsTrue(std::experimental::filesystem::exists(testcaseDir + "\\testcaseNOTrenamed"), L"Error in renaming file method, file must exist: (attemptRenameFile)");
+			Assert::IsFalse(std::experimental::filesystem::exists(testcaseDir + "\\testcaseRenamed"), L"Error in renaming file method, renamed file should not exist: (attemptRenameFile)");
 §§
-§§			// Clean up
-§§			Util::attemptDeletePathRecursive(".\\647241244550e8400-114567123456789999\\");
-§§			Assert::IsFalse(std::experimental::filesystem::exists(".\\647241244550e8400-114567123456789999\\"), L"Error checking the existence of folder in file system: (storeTestcaseFileOnDisk)");
+			// Clean up
+			Util::attemptDeletePathRecursive(".\\647241244550e8400-114567123456789999\\");
+			Assert::IsFalse(std::experimental::filesystem::exists(".\\647241244550e8400-114567123456789999\\"), L"Error checking the existence of folder in file system: (storeTestcaseFileOnDisk)");
 §§
 §§			// Try to rename current folder (.) -> Error -> 100 failed attempts
-§§			testcaseDir = ".\\647241244550e8400-114567123456789999\\550e8400-1113465467989999";
-§§			Assert::IsFalse(std::experimental::filesystem::exists(testcaseDir), L"Error in renaming file method, folder should not exist: (attemptRenameFile)");
-§§			Util::createFolderAndParentFolders(testcaseDir);
-§§			Assert::IsTrue(std::experimental::filesystem::exists(testcaseDir), L"Error checking the existence of folder in file system: (attemptRenameFile)");
+			testcaseDir = ".\\647241244550e8400-114567123456789999\\550e8400-1113465467989999";
+			Assert::IsFalse(std::experimental::filesystem::exists(testcaseDir), L"Error in renaming file method, folder should not exist: (attemptRenameFile)");
+			Util::createFolderAndParentFolders(testcaseDir);
+			Assert::IsTrue(std::experimental::filesystem::exists(testcaseDir), L"Error checking the existence of folder in file system: (attemptRenameFile)");
 §§
-§§			// Test Method
-§§			Assert::AreEqual(Util::attemptRenameFile(testcaseDir + "\\.", testcaseDir + "\\.."), false, L"Error in renaming file method, should not be able to rename .: (attemptRenameFile)");
+			// Test Method
+			Assert::AreEqual(Util::attemptRenameFile(testcaseDir + "\\.", testcaseDir + "\\.."), false, L"Error in renaming file method, should not be able to rename .: (attemptRenameFile)");
 §§
-§§			// Clean up
-§§			Util::attemptDeletePathRecursive(".\\647241244550e8400-114567123456789999\\");
-§§			Assert::IsFalse(std::experimental::filesystem::exists(".\\647241244550e8400-114567123456789999\\"), L"Error checking the existence of folder in file system: (storeTestcaseFileOnDisk)");
+			// Clean up
+			Util::attemptDeletePathRecursive(".\\647241244550e8400-114567123456789999\\");
+			Assert::IsFalse(std::experimental::filesystem::exists(".\\647241244550e8400-114567123456789999\\"), L"Error checking the existence of folder in file system: (storeTestcaseFileOnDisk)");
 §§		}
 
 		TEST_METHOD(Util_stringHasEnding)
@@ -640,5 +640,5 @@ Author(s): Michael Kraus, Thomas Riedmaier, Abian Blome, Pascal Eckmann
 			Util::replaceAll(test, "aa", "b");
 			Assert::IsTrue(test == "b", L"5");
 		}
-§§	};
+	};
 }

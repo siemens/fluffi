@@ -28,7 +28,7 @@ Author(s): Michael Kraus, Thomas Riedmaier, Abian Blome, Pascal Eckmann
 §§	public:
 §§
 §§		WorkerWeightCalculator* weightCalculator = nullptr;
-§§		LMDatabaseManager* dbman = nullptr;
+		LMDatabaseManager* dbman = nullptr;
 		GarbageCollectorWorker* garbageCollector = nullptr;
 §§
 §§		TEST_METHOD_INITIALIZE(ModuleInitialize)

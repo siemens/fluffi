@@ -14,21 +14,21 @@ Author(s): Michael Kraus, Thomas Riedmaier, Abian Blome
 §§#include "TestOutcomeDescriptor.h"
 §§
 TestOutcomeDescriptor::TestOutcomeDescriptor(const FluffiTestcaseID id, const FluffiTestcaseID parentId, const FluffiTestResult testResult)
-§§	: m_id(id),
-§§	m_parentId(parentId),
+	: m_id(id),
+	m_parentId(parentId),
 	m_testResult(testResult)
-§§{}
+{}
 §§
 §§TestOutcomeDescriptor::~TestOutcomeDescriptor()
 §§{
 §§}
 §§
-§§const FluffiTestcaseID TestOutcomeDescriptor::getId()
+const FluffiTestcaseID TestOutcomeDescriptor::getId()
 §§{
 §§	return m_id;
 §§}
 §§
-§§const FluffiTestcaseID TestOutcomeDescriptor::getparentId()
+const FluffiTestcaseID TestOutcomeDescriptor::getparentId()
 §§{
 §§	return m_parentId;
 §§}

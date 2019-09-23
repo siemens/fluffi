@@ -19,7 +19,7 @@ Author(s): Thomas Riedmaier, Michael Kraus, Abian Blome
 #include "TETestResultManager.h"
 #include "GarbageCollectorWorker.h"
 
-§§PutTestResultRequestHandler::PutTestResultRequestHandler(std::string testcaseDir, CommInt* commPtr, TETestResultManager* teTestResultManager, GarbageCollectorWorker* garbageCollectorWorker) :
+PutTestResultRequestHandler::PutTestResultRequestHandler(std::string testcaseDir, CommInt* commPtr, TETestResultManager* teTestResultManager, GarbageCollectorWorker* garbageCollectorWorker) :
 	m_testcaseDir(testcaseDir),
 	m_comm(commPtr),
 	m_teTestResultManager(teTestResultManager),
@@ -31,17 +31,17 @@ Author(s): Thomas Riedmaier, Michael Kraus, Abian Blome
 §§{
 §§}
 §§
-§§void PutTestResultRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp) {
+void PutTestResultRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp) {
 	const PutTestResultRequest* receivedPutTestResultRequest = &req->puttestresultrequest();
 §§
-§§	FluffiTestcaseID testcaseId{ receivedPutTestResultRequest->id() };
-§§	FluffiTestcaseID parentTestcaseId{ receivedPutTestResultRequest->parentid() };
+	FluffiTestcaseID testcaseId{ receivedPutTestResultRequest->id() };
+	FluffiTestcaseID parentTestcaseId{ receivedPutTestResultRequest->parentid() };
 	FluffiTestResult testResult{ receivedPutTestResultRequest->result() };
-§§
+
 	bool success = Util::storeTestcaseFileOnDisk(testcaseId, m_testcaseDir, &receivedPutTestResultRequest->testcasefirstchunk(), receivedPutTestResultRequest->islastchunk(), receivedPutTestResultRequest->sdofrunner().servicehostandport(), m_comm, workerThreadState, m_garbageCollectorWorker);
 
 	if (success) {
-§§		TestOutcomeDescriptor* outcomeDesc = new TestOutcomeDescriptor(testcaseId, parentTestcaseId, testResult);
+		TestOutcomeDescriptor* outcomeDesc = new TestOutcomeDescriptor(testcaseId, parentTestcaseId, testResult);
 
 		m_teTestResultManager->pushNewTestOutcomeFromTCRunner(outcomeDesc);
 	}

@@ -36,7 +36,7 @@ bool GetStatusRequestHandler::wasManagerReplaced() {
 	return m_ManagerWasReplaced;
 }
 
-§§void GetStatusRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp) {
+void GetStatusRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp) {
 	(void)(workerThreadState); //avoid unused parameter warning
 
 	FluffiServiceDescriptor requesterServiceDescriptor = FluffiServiceDescriptor(req->getstatusrequest().requesterservicedescriptor());
@@ -45,9 +45,9 @@ bool GetStatusRequestHandler::wasManagerReplaced() {
 		m_ManagerWasReplaced = true;
 	}
 
-§§	m_timeOfLastManagerRequest = std::chrono::steady_clock::now();
+	m_timeOfLastManagerRequest = std::chrono::steady_clock::now();
 
-§§	GetStatusResponse* statusResponse = new GetStatusResponse();
+	GetStatusResponse* statusResponse = new GetStatusResponse();
 	statusResponse->set_status(generateStatus());
 	resp->set_allocated_getstatusresponse(statusResponse);
 }

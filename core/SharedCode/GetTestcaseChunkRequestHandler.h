@@ -18,13 +18,13 @@ class GarbageCollectorWorker;
 §§	public IFLUFFIMessageHandler
 §§{
 §§public:
-§§	GetTestcaseChunkRequestHandler(std::string testcaseDir, bool deleteFileOnLastChunk, GarbageCollectorWorker* garbageCollectorWorker);
+	GetTestcaseChunkRequestHandler(std::string testcaseDir, bool deleteFileOnLastChunk, GarbageCollectorWorker* garbageCollectorWorker);
 §§	virtual ~GetTestcaseChunkRequestHandler();
 §§
-§§	void handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp);
+	void handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp);
 §§
 §§private:
 	std::string m_testcaseDir;
 	bool m_deleteFileOnLastChunk;
-§§	GarbageCollectorWorker* m_garbageCollectorWorker;
+	GarbageCollectorWorker* m_garbageCollectorWorker;
 §§};

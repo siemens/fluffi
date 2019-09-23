@@ -32,7 +32,7 @@ void RegisterAtLMRequestHandler::setMyFuzzjob(const std::string myfuzzjob) {
 	m_myfuzzjob = myfuzzjob;
 }
 
-§§void RegisterAtLMRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp) {
+void RegisterAtLMRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp) {
 	LMWorkerThreadState* lmWorkerThreadState = dynamic_cast<LMWorkerThreadState*>(workerThreadState);
 	if (lmWorkerThreadState == nullptr) {
 		LOG(ERROR) << "RegisterAtLMRequestHandler::handleFLUFFIMessage - workerThreadState cannot be accessed";
@@ -51,7 +51,7 @@ void RegisterAtLMRequestHandler::setMyFuzzjob(const std::string myfuzzjob) {
 	std::string subtypes = oss.str();
 	FluffiServiceDescriptor fsd(req->registeratlmrequest().servicedescriptor());
 	bool success;
-§§	LOG(DEBUG) << "Incoming registration";
+	LOG(DEBUG) << "Incoming registration";
 	LOG(DEBUG) << "Type=" << Util::agentTypeToString(type);
 	LOG(DEBUG) << "SubTypes=" << subtypes;
 	LOG(DEBUG) << "ServiceDescriptor=" << fsd.m_serviceHostAndPort;
@@ -107,15 +107,15 @@ void RegisterAtLMRequestHandler::setMyFuzzjob(const std::string myfuzzjob) {
 	resp->set_allocated_registeratlmresponse(registerResponse);
 }
 
-§§std::string RegisterAtLMRequestHandler::decideSubAgentType(LMDatabaseManager* dbManager, AgentType type, const google::protobuf::RepeatedPtrField<std::string> implementedSubtypes) {
+std::string RegisterAtLMRequestHandler::decideSubAgentType(LMDatabaseManager* dbManager, AgentType type, const google::protobuf::RepeatedPtrField<std::string> implementedSubtypes) {
 	std::vector<std::pair<std::string, int>> desiredSubTypes;
 	std::deque<FluffiSetting> settings = dbManager->getAllSettings();
 	switch (type) {
 	case AgentType::TestcaseGenerator:
-§§		for (auto& setting : settings) {
-§§			if (setting.m_settingName == "generatorTypes") {
+		for (auto& setting : settings) {
+			if (setting.m_settingName == "generatorTypes") {
 				//generatorTypes is of format "A=50|B=50"
-§§				std::vector<std::string> acceptedGenTypesAndPercentages = Util::splitString(setting.m_settingValue, "|");
+				std::vector<std::string> acceptedGenTypesAndPercentages = Util::splitString(setting.m_settingValue, "|");
 				for (size_t i = 0; i < acceptedGenTypesAndPercentages.size(); i++) {
 					std::vector<std::string> acceptedGenTypesAndPercentagesAsVector = Util::splitString(acceptedGenTypesAndPercentages[i], "=");
 					if (acceptedGenTypesAndPercentagesAsVector.size() == 2) {
@@ -134,10 +134,10 @@ void RegisterAtLMRequestHandler::setMyFuzzjob(const std::string myfuzzjob) {
 		}
 		break;
 	case AgentType::TestcaseEvaluator:
-§§		for (auto& setting : settings) {
-§§			if (setting.m_settingName == "evaluatorTypes") {
+		for (auto& setting : settings) {
+			if (setting.m_settingName == "evaluatorTypes") {
 				//evaluatorTypes is of format "A=50|B=50"
-§§				std::vector<std::string> acceptedEvalTypesAndPercentages = Util::splitString(setting.m_settingValue, "|");
+				std::vector<std::string> acceptedEvalTypesAndPercentages = Util::splitString(setting.m_settingValue, "|");
 				for (size_t i = 0; i < acceptedEvalTypesAndPercentages.size(); i++) {
 					std::vector<std::string> acceptedEvalTypesAndPercentagesAsVector = Util::splitString(acceptedEvalTypesAndPercentages[i], "=");
 					if (acceptedEvalTypesAndPercentagesAsVector.size() == 2) {
@@ -156,9 +156,9 @@ void RegisterAtLMRequestHandler::setMyFuzzjob(const std::string myfuzzjob) {
 		}
 		break;
 	case AgentType::TestcaseRunner:
-§§		for (auto& setting : settings) {
-§§			if (setting.m_settingName == "runnerType") {
-§§				desiredSubTypes.push_back(std::make_pair(setting.m_settingValue, 100));
+		for (auto& setting : settings) {
+			if (setting.m_settingName == "runnerType") {
+				desiredSubTypes.push_back(std::make_pair(setting.m_settingValue, 100));
 				break;
 			}
 		}
@@ -176,12 +176,12 @@ void RegisterAtLMRequestHandler::setMyFuzzjob(const std::string myfuzzjob) {
 	//normalize desiredSubTypes to 100
 	{
 		int sumOfAllSubtypes = 0;
-§§		for (auto& subType : desiredSubTypes) {
-§§			sumOfAllSubtypes += subType.second;
+		for (auto& subType : desiredSubTypes) {
+			sumOfAllSubtypes += subType.second;
 		}
 
-§§		for (auto& subType : desiredSubTypes) {
-§§			subType.second = subType.second * 100 / sumOfAllSubtypes;
+		for (auto& subType : desiredSubTypes) {
+			subType.second = subType.second * 100 / sumOfAllSubtypes;
 		}
 	}
 

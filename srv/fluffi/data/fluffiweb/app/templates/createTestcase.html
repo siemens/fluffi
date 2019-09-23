@@ -10,9 +10,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Junes Najah, Abian Blome
 -->
 
-§§{% extends "base.html" %}
-§§
-§§{% block content %}
+{% extends "base.html" %}
+
+{% block content %}
 §§<h1>Upload Testcase(s)</h1>
 §§<form action="" enctype="multipart/form-data" method="POST" name="createProject">
 §§    {{ form.hidden_tag() }}
@@ -22,5 +22,5 @@ Author(s): Thomas Riedmaier, Junes Najah, Abian Blome
 §§    </p>
 §§    <p><input type="submit" value="Upload testcase"/></p>
 §§</form>
-§§
-§§{% endblock %}
+
+{% endblock %}

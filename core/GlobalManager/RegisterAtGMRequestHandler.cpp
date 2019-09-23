@@ -10,33 +10,33 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Abian Blome, Pascal Eckmann
 */
 
-§§#include "stdafx.h"
-§§#include "RegisterAtGMRequestHandler.h"
+#include "stdafx.h"
+#include "RegisterAtGMRequestHandler.h"
 #include "CommInt.h"
 #include "Util.h"
 #include "GMDatabaseManager.h"
 #include "GMWorkerThreadState.h"
 #include "FluffiLMConfiguration.h"
-§§
+
 RegisterAtGMRequestHandler::RegisterAtGMRequestHandler(CommInt* commPtr) :
 	m_comm(commPtr)
-§§{
-§§}
-§§
-§§RegisterAtGMRequestHandler::~RegisterAtGMRequestHandler()
-§§{
-§§}
-§§
-§§void RegisterAtGMRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp)
-§§{
+{
+}
+
+RegisterAtGMRequestHandler::~RegisterAtGMRequestHandler()
+{
+}
+
+void RegisterAtGMRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp)
+{
 	GMWorkerThreadState* gmWorkerThreadState = dynamic_cast<GMWorkerThreadState*>(workerThreadState);
 	if (gmWorkerThreadState == nullptr) {
 		LOG(ERROR) << "RegisterAtGMRequestHandler::handleFLUFFIMessage - workerThreadState cannot be accessed";
 		return;
 	}
 
-§§	AgentType type = req->registeratgmrequest().type();
-§§	std::string location = req->registeratgmrequest().location();
+	AgentType type = req->registeratgmrequest().type();
+	std::string location = req->registeratgmrequest().location();
 	google::protobuf::RepeatedPtrField< std::string > sts = req->registeratgmrequest().implementedagentsubtypes();
 	std::stringstream oss;
 	for (int i = 0; i < sts.size(); i++) {
@@ -46,23 +46,23 @@ RegisterAtGMRequestHandler::RegisterAtGMRequestHandler(CommInt* commPtr) :
 		oss << sts.Get(i);
 	}
 	std::string subtypes = oss.str();
-§§	FluffiServiceDescriptor fsd(req->registeratgmrequest().servicedescriptor());
+	FluffiServiceDescriptor fsd(req->registeratgmrequest().servicedescriptor());
 	GMDatabaseManager* dbManager = gmWorkerThreadState->dbManager;
-§§	LOG(DEBUG) << "Incoming registration";
+	LOG(DEBUG) << "Incoming registration";
 	LOG(DEBUG) << "Type=" << Util::agentTypeToString(type);
 	LOG(DEBUG) << "SubTypes=" << subtypes;
 	LOG(DEBUG) << "ServiceHAP=" << fsd.m_serviceHostAndPort;
 	LOG(DEBUG) << "ServiceGUID=" << fsd.m_guid;
-§§	LOG(DEBUG) << "Location=" << location;
-§§
-§§	RegisterAtGMResponse* registerResponse = new RegisterAtGMResponse();
-§§	FluffiServiceDescriptor lmServiceDescriptor = FluffiServiceDescriptor::getNullObject();
+	LOG(DEBUG) << "Location=" << location;
 
-§§	switch (type)
-§§	{
-§§	case TestcaseGenerator:
-§§	case TestcaseRunner:
-§§	case TestcaseEvaluator:
+	RegisterAtGMResponse* registerResponse = new RegisterAtGMResponse();
+	FluffiServiceDescriptor lmServiceDescriptor = FluffiServiceDescriptor::getNullObject();
+
+	switch (type)
+	{
+	case TestcaseGenerator:
+	case TestcaseRunner:
+	case TestcaseEvaluator:
 
 		//Frist check, if the user assigned a lm by hand
 		lmServiceDescriptor = dbManager->getLMServiceDescriptorForWorker(fsd);//returns NullObject upon error
@@ -75,7 +75,7 @@ RegisterAtGMRequestHandler::RegisterAtGMRequestHandler(CommInt* commPtr) :
 				dbManager->removeWorkerFromDatabase(fsd); //remove it, if it was already in the db. It will be added later with "no fuzzjob" and will therefore re-appear in the GUI
 			}
 		}
-§§
+
 		//if it is decided, what the agent should do: tell it about it
 		if (!lmServiceDescriptor.isNullObject())
 		{
@@ -83,9 +83,9 @@ RegisterAtGMRequestHandler::RegisterAtGMRequestHandler(CommInt* commPtr) :
 			ptrToServiceDescriptor->CopyFrom(lmServiceDescriptor.getProtobuf());
 			registerResponse->set_allocated_lmservicedescriptor(ptrToServiceDescriptor);
 			LOG(DEBUG) << "Sending message with LMServiceDescriptor" << lmServiceDescriptor.m_guid << "/" << lmServiceDescriptor.m_serviceHostAndPort;
-§§		}
+		}
 		else
-§§		{
+		{
 			//store the worker in the database and let the user decide by hand
 			bool success = dbManager->addWorkerToDatabase(fsd, type, subtypes, location);
 			if (!success)
@@ -93,18 +93,18 @@ RegisterAtGMRequestHandler::RegisterAtGMRequestHandler(CommInt* commPtr) :
 				LOG(ERROR) << "Could not register worker in DB";
 			}
 
-§§			registerResponse->set_retrylater(true);
+			registerResponse->set_retrylater(true);
 			LOG(DEBUG) << "Sending message with retryLater";
-§§		}
+		}
 
-§§		break;
-§§	case LocalManager:
-§§		try
-§§		{
-§§			// Check if we still need a local manager
+		break;
+	case LocalManager:
+		try
+		{
+			// Check if we still need a local manager
 			int fuzzjob = static_cast<int>(dbManager->getFuzzJobWithoutLM(location));
-§§			if (fuzzjob == -1)
-§§			{
+			if (fuzzjob == -1)
+			{
 				//Store LocalManager in database so we know which idle local managers there are
 				bool success = dbManager->addWorkerToDatabase(fsd, type, subtypes, location);
 				if (!success)
@@ -112,42 +112,42 @@ RegisterAtGMRequestHandler::RegisterAtGMRequestHandler(CommInt* commPtr) :
 					LOG(ERROR) << "Could not register worker in DB";
 				}
 
-§§				LOG(DEBUG) << "Sending message with retryLater";
-§§				registerResponse->set_retrylater(true);
-§§			}
-§§			else
-§§			{
+				LOG(DEBUG) << "Sending message with retryLater";
+				registerResponse->set_retrylater(true);
+			}
+			else
+			{
 				//A race condition could happen here, if multiple LocalManagers request at the same time. Currently the last one wins due to constraints in the database
-§§				FluffiLMConfiguration lmConfiguration = dbManager->getLMConfigurationForFuzzJob(fuzzjob);
+				FluffiLMConfiguration lmConfiguration = dbManager->getLMConfigurationForFuzzJob(fuzzjob);
 §§				LMConfiguration* ptrToLMConfiguration = new LMConfiguration();
-§§				ptrToLMConfiguration->CopyFrom(lmConfiguration.getProtobuf());
-§§				registerResponse->set_allocated_lmconfiguration(ptrToLMConfiguration);
-§§				LOG(DEBUG) << "Sending message with LMConfiguration";
+				ptrToLMConfiguration->CopyFrom(lmConfiguration.getProtobuf());
+				registerResponse->set_allocated_lmconfiguration(ptrToLMConfiguration);
+				LOG(DEBUG) << "Sending message with LMConfiguration";
 				gmWorkerThreadState->dbManager->setLMForLocationAndFuzzJob(location, req->registeratgmrequest().servicedescriptor(), fuzzjob);
-§§				LOG(DEBUG) << "Registering LM";
-§§			}
-§§		}
+				LOG(DEBUG) << "Registering LM";
+			}
+		}
 		catch (std::exception &e)
-§§		{
-§§			registerResponse->set_retrylater(true);
+		{
+			registerResponse->set_retrylater(true);
 			LOG(ERROR) << "An error occured while trying to get a configuration for the local manager" << e.what();
-§§		}
-§§		break;
-§§	case GlobalManager:
-§§	default:
-§§		registerResponse->set_retrylater(true);
+		}
+		break;
+	case GlobalManager:
+	default:
+		registerResponse->set_retrylater(true);
 		LOG(ERROR) << "An invalid agent type tried to register at the global manager";
-§§		break;
-§§	}
-§§
-§§	resp->set_allocated_registeratgmresponse(registerResponse);
+		break;
+	}
+
+	resp->set_allocated_registeratgmresponse(registerResponse);
 }
 
-§§bool RegisterAtGMRequestHandler::agentIsWelcomedAt(WorkerThreadState* workerThreadState,
-§§	AgentType type,
-§§	const google::protobuf::RepeatedPtrField<std::string> sts,
-§§	const FluffiServiceDescriptor lmServiceDescriptor
-§§) {
+bool RegisterAtGMRequestHandler::agentIsWelcomedAt(WorkerThreadState* workerThreadState,
+	AgentType type,
+	const google::protobuf::RepeatedPtrField<std::string> sts,
+	const FluffiServiceDescriptor lmServiceDescriptor
+) {
 	FLUFFIMessage req;
 	FLUFFIMessage resp;
 	IsAgentWelcomedRequest* isAgentWelcomedRequest = new IsAgentWelcomedRequest();

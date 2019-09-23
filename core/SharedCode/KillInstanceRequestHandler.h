@@ -10,17 +10,17 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Abian Blome, Thomas Riedmaier
 */
 
-§§#pragma once
-§§#include "IFLUFFIMessageHandler.h"
-§§class KillInstanceRequestHandler :
-§§	public IFLUFFIMessageHandler
-§§{
-§§public:
-§§	KillInstanceRequestHandler();
-§§	virtual ~KillInstanceRequestHandler();
-§§	void handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp);
-§§	bool shouldCommitSuicide();
-§§
-§§private:
-§§	bool m_commitSuicide = false;
-§§};
+#pragma once
+#include "IFLUFFIMessageHandler.h"
+class KillInstanceRequestHandler :
+	public IFLUFFIMessageHandler
+{
+public:
+	KillInstanceRequestHandler();
+	virtual ~KillInstanceRequestHandler();
+	void handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp);
+	bool shouldCommitSuicide();
+
+private:
+	bool m_commitSuicide = false;
+};

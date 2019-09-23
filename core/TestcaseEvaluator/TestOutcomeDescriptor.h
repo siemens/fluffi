@@ -20,14 +20,14 @@ Author(s): Thomas Riedmaier, Michael Kraus, Abian Blome
 	TestOutcomeDescriptor(const FluffiTestcaseID id, const FluffiTestcaseID parentId, const FluffiTestResult testResult);
 §§	~TestOutcomeDescriptor();
 §§
-§§	const FluffiTestcaseID getId();
-§§	const FluffiTestcaseID getparentId();
+	const FluffiTestcaseID getId();
+	const FluffiTestcaseID getparentId();
 	const FluffiTestResult getTestResult();
 §§
 §§private:
 
-§§	FluffiTestcaseID m_id;
-§§	FluffiTestcaseID m_parentId;
+	FluffiTestcaseID m_id;
+	FluffiTestcaseID m_parentId;
 	FluffiTestResult m_testResult;
 	std::string m_pathAndFileName;
 §§};

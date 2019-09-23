@@ -10,68 +10,68 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Abian Blome, Thomas Riedmaier
 */
 
-§§#include "stdafx.h"
-§§#include "CppUnitTest.h"
+#include "stdafx.h"
+#include "CppUnitTest.h"
 #include "Util.h"
 #include "FluffiServiceDescriptor.h"
 #include "RadamsaMutator.h"
 #include "FluffiTestcaseID.h"
 #include "TestcaseDescriptor.h"
 #include "GarbageCollectorWorker.h"
-§§
-§§using namespace Microsoft::VisualStudio::CppUnitTestFramework;
-§§
-§§namespace FluffiTester
-§§{
+
+using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+
+namespace FluffiTester
+{
 	TEST_CLASS(RadamsaMutatorTest)
-§§	{
-§§	public:
-§§
+	{
+	public:
+
 		TEST_METHOD_INITIALIZE(ModuleInitialize)
 		{
 			Util::setDefaultLogOptions("logs" + Util::pathSeperator + "Test.log");
 		}
 
 		TEST_METHOD(RadamsaMutator_RadamsaMutator)
-§§		{
-§§			std::string tempDir = "c:\\windows\\temp";
-§§
-§§			// Clean up
-§§			for (int i = 0; i < 100; ++i)
-§§			{
-§§				std::string filename = tempDir + Util::pathSeperator + "blub-" + std::to_string(i);
-§§				if (std::experimental::filesystem::exists(filename))
-§§				{
-§§					std::remove(filename.c_str());
-§§				}
-§§			}
-§§
-§§			FluffiServiceDescriptor svc{ "bla", "blub" };
-§§			RadamsaMutator rad{ svc, tempDir };
-§§
-§§			FluffiTestcaseID parent{ svc, 4242 };
-§§
-§§			std::ofstream fh;
+		{
+			std::string tempDir = "c:\\windows\\temp";
+
+			// Clean up
+			for (int i = 0; i < 100; ++i)
+			{
+				std::string filename = tempDir + Util::pathSeperator + "blub-" + std::to_string(i);
+				if (std::experimental::filesystem::exists(filename))
+				{
+					std::remove(filename.c_str());
+				}
+			}
+
+			FluffiServiceDescriptor svc{ "bla", "blub" };
+			RadamsaMutator rad{ svc, tempDir };
+
+			FluffiTestcaseID parent{ svc, 4242 };
+
+			std::ofstream fh;
 			std::string parentPathAndFileName = Util::generateTestcasePathAndFilename(parent, tempDir);
 			fh.open(parentPathAndFileName);
-§§			fh << "asdf";
-§§			fh.close();
-§§
+			fh << "asdf";
+			fh.close();
+
 			auto result = rad.batchMutate(0, parent, parentPathAndFileName);
-§§			Assert::AreEqual(result.size(), (size_t)0, L"Mutating with size 0 does not return empty vector");
-§§
+			Assert::AreEqual(result.size(), (size_t)0, L"Mutating with size 0 does not return empty vector");
+
 			result = rad.batchMutate(1, parent, parentPathAndFileName);
-§§			Assert::AreEqual(result.size(), (size_t)1, L"Mutating with size 1 does not return a vector with 1 element");
-§§			std::string path = Util::generateTestcasePathAndFilename(result[0].getId(), tempDir);
-§§			Assert::IsTrue(std::experimental::filesystem::exists(path), L"Radamsa file does not exist");
+			Assert::AreEqual(result.size(), (size_t)1, L"Mutating with size 1 does not return a vector with 1 element");
+			std::string path = Util::generateTestcasePathAndFilename(result[0].getId(), tempDir);
+			Assert::IsTrue(std::experimental::filesystem::exists(path), L"Radamsa file does not exist");
 			{
 				GarbageCollectorWorker garbageCollector(0);
 				result[0].deleteFile(&garbageCollector);
 			}
-§§
+
 			result = rad.batchMutate(75, parent, parentPathAndFileName);
-§§			Assert::AreEqual(result.size(), (size_t)75, L"Mutating with size 75 does not return a vector with 75 elements");
-§§			{
+			Assert::AreEqual(result.size(), (size_t)75, L"Mutating with size 75 does not return a vector with 75 elements");
+			{
 				GarbageCollectorWorker garbageCollector(0);
 				for (auto&& it : result)
 				{
@@ -79,19 +79,19 @@ Author(s): Abian Blome, Thomas Riedmaier
 					Assert::IsTrue(std::experimental::filesystem::exists(path), L"Radamsa files do not exist");
 					it.deleteFile(&garbageCollector);
 				}
-§§			}
-§§
-§§			// We delete our parent and try again, expecting an exception
+			}
+
+			// We delete our parent and try again, expecting an exception
 			std::remove(parentPathAndFileName.c_str());
-§§			try
-§§			{
+			try
+			{
 				rad.batchMutate(1, parent, parentPathAndFileName);
-§§				Assert::Fail(L"Mutating non-existing parent did not throw exception");
-§§			}
+				Assert::Fail(L"Mutating non-existing parent did not throw exception");
+			}
 			catch (std::runtime_error & e)
-§§			{
+			{
 				LOG(ERROR) << "batchMutate failed:" << e.what();
-§§			}
-§§		}
-§§	};
+			}
+		}
+	};
 }

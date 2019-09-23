@@ -32,12 +32,12 @@ Author(s): Thomas Riedmaier, Abian Blome
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-§§    <ClInclude Include="http.h">
-§§      <Filter>Header Files</Filter>
-§§    </ClInclude>
-§§    <ClInclude Include="utils.h">
-§§      <Filter>Header Files</Filter>
-§§    </ClInclude>
+    <ClInclude Include="http.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -46,11 +46,11 @@ Author(s): Thomas Riedmaier, Abian Blome
     <ClCompile Include="TCPFeeder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-§§    <ClCompile Include="http.cpp">
-§§      <Filter>Source Files</Filter>
-§§    </ClCompile>
-§§    <ClCompile Include="utils.cpp">
-§§      <Filter>Source Files</Filter>
-§§    </ClCompile>
+    <ClCompile Include="http.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

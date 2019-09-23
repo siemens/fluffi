@@ -10,34 +10,34 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Abian Blome, Thomas Riedmaier
 */
 
-§§#include "stdafx.h"
-§§#include "FluffiTestcaseID.h"
-§§
+#include "stdafx.h"
+#include "FluffiTestcaseID.h"
+
 FluffiTestcaseID::FluffiTestcaseID(const FluffiServiceDescriptor serviceDescriptor, uint64_t localID)
-§§	: m_serviceDescriptor(serviceDescriptor),
-§§	m_localID(localID)
-§§{}
-§§
-§§FluffiTestcaseID::FluffiTestcaseID(const TestcaseID& testcaseID)
-§§	: m_serviceDescriptor(testcaseID.servicedescriptor()),
-§§	m_localID(testcaseID.localid())
-§§{
-§§	if (!testcaseID.has_servicedescriptor())
-§§	{
-§§		LOG(ERROR) << "Attempting to abstract an invalid testcaseID";
-§§	}
-§§}
-§§
-§§FluffiTestcaseID::~FluffiTestcaseID()
-§§{}
-§§
-§§TestcaseID FluffiTestcaseID::getProtobuf() const
-§§{
-§§	TestcaseID protoTestcaseID{};
-§§	ServiceDescriptor* protoServiceDescriptor = new ServiceDescriptor();
-§§	protoServiceDescriptor->CopyFrom(m_serviceDescriptor.getProtobuf());
-§§	protoTestcaseID.set_allocated_servicedescriptor(protoServiceDescriptor);
+	: m_serviceDescriptor(serviceDescriptor),
+	m_localID(localID)
+{}
+
+FluffiTestcaseID::FluffiTestcaseID(const TestcaseID& testcaseID)
+	: m_serviceDescriptor(testcaseID.servicedescriptor()),
+	m_localID(testcaseID.localid())
+{
+	if (!testcaseID.has_servicedescriptor())
+	{
+		LOG(ERROR) << "Attempting to abstract an invalid testcaseID";
+	}
+}
+
+FluffiTestcaseID::~FluffiTestcaseID()
+{}
+
+TestcaseID FluffiTestcaseID::getProtobuf() const
+{
+	TestcaseID protoTestcaseID{};
+	ServiceDescriptor* protoServiceDescriptor = new ServiceDescriptor();
+	protoServiceDescriptor->CopyFrom(m_serviceDescriptor.getProtobuf());
+	protoTestcaseID.set_allocated_servicedescriptor(protoServiceDescriptor);
 	protoTestcaseID.set_localid(m_localID);
-§§
-§§	return protoTestcaseID;
+
+	return protoTestcaseID;
 }

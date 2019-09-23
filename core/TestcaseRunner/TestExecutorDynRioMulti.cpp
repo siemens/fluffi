@@ -201,8 +201,8 @@ std::string TestExecutorDynRioMulti::getDrCovOutputFile(int iterationNumMod2) {
 	ss << "." << std::setw(5) << std::setfill('0') << m_targetProcessID << "." << std::setw(4) << std::setfill('0') << iterationNumMod2 << ".proc.log";
 	std::string targetFileEnd = ss.str();
 
-§§	struct dirent* dp;
-§§	DIR* dirp = opendir(m_testcaseDir.c_str());
+	struct dirent* dp;
+	DIR* dirp = opendir(m_testcaseDir.c_str());
 	while ((dp = readdir(dirp)) != NULL)
 		if (Util::stringHasEnding(dp->d_name, targetFileEnd)) {
 			std::string re = m_testcaseDir + Util::pathSeperator + dp->d_name;
@@ -250,8 +250,8 @@ dr_config_status_t TestExecutorDynRioMulti::m_dr_nudge_pid(process_id_t process_
 #endif
 
 bool TestExecutorDynRioMulti::attemptStartTargetAndFeeder(bool use_dyn_rio) {
-§§	std::chrono::time_point<std::chrono::steady_clock> routineEntryTimeStamp = std::chrono::steady_clock::now();
-§§	std::chrono::time_point<std::chrono::steady_clock> latestRoutineExitTimeStamp = routineEntryTimeStamp + std::chrono::milliseconds(m_initializationTimeoutMS);
+	std::chrono::time_point<std::chrono::steady_clock> routineEntryTimeStamp = std::chrono::steady_clock::now();
+	std::chrono::time_point<std::chrono::steady_clock> latestRoutineExitTimeStamp = routineEntryTimeStamp + std::chrono::milliseconds(m_initializationTimeoutMS);
 	LOG(DEBUG) << "Attempting to start target and feeder";
 
 	/*Design decission: Target is ALWAYS started before feeder.
@@ -274,7 +274,7 @@ bool TestExecutorDynRioMulti::attemptStartTargetAndFeeder(bool use_dyn_rio) {
 		m_iterationNumMod2 = 0;
 		std::string nextRunDrcovLogFile = getDrCovOutputFile(m_iterationNumMod2);
 		int deletionAttemtps = 0;
-§§		while (std::experimental::filesystem::exists(nextRunDrcovLogFile) && std::chrono::steady_clock::now() < latestRoutineExitTimeStamp) {
+		while (std::experimental::filesystem::exists(nextRunDrcovLogFile) && std::chrono::steady_clock::now() < latestRoutineExitTimeStamp) {
 			//It needs to be ensured, that the first dynamorio log file does not yet exist.
 			if (deletionAttemtps > 0) {
 				LOG(WARNING) << "Performance warning: TestExecurotDynRioMulti is waiting for the GarbageCollector (1). We are waiting for the deletion of " << nextRunDrcovLogFile;
@@ -458,7 +458,7 @@ bool TestExecutorDynRioMulti::attemptStartTargetAndFeeder(bool use_dyn_rio) {
 	int nbytes = 0;
 	ioctl(m_SharedMemIPCInterruptFD[0], FIONREAD, &nbytes);
 	if (nbytes > 0) {
-§§		char* buff = new char[nbytes];
+		char* buff = new char[nbytes];
 		ssize_t bytesRead = read(m_SharedMemIPCInterruptFD[0], buff, nbytes);
 		delete[] buff;
 		if (bytesRead == nbytes) {
@@ -479,12 +479,12 @@ bool TestExecutorDynRioMulti::attemptStartTargetAndFeeder(bool use_dyn_rio) {
 	return true;
 }
 
-§§bool TestExecutorDynRioMulti::setDynamoRioRegistration(bool active, const std::string dynrioPipeName, std::string* errormsg) {
+bool TestExecutorDynRioMulti::setDynamoRioRegistration(bool active, const std::string dynrioPipeName, std::string* errormsg) {
 #if defined(_WIN32) || defined(_WIN64)
 	//get procNameAndPath from targetCMDLine
 	std::wstring wtargetCMDLine = std::wstring(m_targetCMDline.begin(), m_targetCMDline.end());
 	int numOfBlocks;
-§§	LPWSTR* szArglist = CommandLineToArgvW(wtargetCMDLine.c_str(), &numOfBlocks); //for some reasons this does not exist for Ascii :(
+	LPWSTR* szArglist = CommandLineToArgvW(wtargetCMDLine.c_str(), &numOfBlocks); //for some reasons this does not exist for Ascii :(
 	if (NULL == szArglist || numOfBlocks < 1) {
 		*errormsg = "targetCMDLine  invalid";
 		return false;
@@ -654,7 +654,7 @@ bool TestExecutorDynRioMulti::isSetupFunctionable() {
 #if defined(_WIN32) || defined(_WIN64)
 		std::wstring wfeedercmdline = std::wstring(m_feederCmdline.begin(), m_feederCmdline.end());
 		int numOfBlocks;
-§§		LPWSTR* szArglist = CommandLineToArgvW(wfeedercmdline.c_str(), &numOfBlocks); //for some reasons this does not exist for Ascii :(
+		LPWSTR* szArglist = CommandLineToArgvW(wfeedercmdline.c_str(), &numOfBlocks); //for some reasons this does not exist for Ascii :(
 		if (NULL == szArglist || numOfBlocks < 1) {
 			LOG(ERROR) << "feeder command line invalid";
 			return false;
@@ -701,7 +701,7 @@ bool TestExecutorDynRioMulti::isSetupFunctionable() {
 #if defined(_WIN32) || defined(_WIN64)
 		std::wstring wstartercmdline = std::wstring(m_starterCmdline.begin(), m_starterCmdline.end());
 		int numOfBlocks;
-§§		LPWSTR* szArglist = CommandLineToArgvW(wstartercmdline.c_str(), &numOfBlocks); //for some reasons this does not exist for Ascii :(
+		LPWSTR* szArglist = CommandLineToArgvW(wstartercmdline.c_str(), &numOfBlocks); //for some reasons this does not exist for Ascii :(
 		if (NULL == szArglist || numOfBlocks < 1) {
 			LOG(ERROR) << "starter command line invalid";
 			return false;
@@ -844,7 +844,7 @@ bool TestExecutorDynRioMulti::isSetupFunctionable() {
 		bool usesUser32 = false;
 		for (; pImportDescriptor->Name != 0; pImportDescriptor++)
 		{
-§§			char* dllName = (char*)(dwRawOffset + (pImportDescriptor->Name - pSectionHeader->VirtualAddress));
+			char* dllName = (char*)(dwRawOffset + (pImportDescriptor->Name - pSectionHeader->VirtualAddress));
 
 			if (_stricmp(dllName, "user32.dll") == 0) {
 				LOG(DEBUG) << "The target application links staticly against user32.dll. This is required by dynamorio";
@@ -1002,13 +1002,13 @@ std::shared_ptr<DebugExecutionOutput> TestExecutorDynRioMulti::execute(const Flu
 }
 
 void TestExecutorDynRioMulti::waitForDebuggerToTerminate() {
-§§	std::chrono::time_point<std::chrono::steady_clock> routineEntryTimeStamp = std::chrono::steady_clock::now();
-§§	std::chrono::time_point<std::chrono::steady_clock> timestampToKillTheTarget = routineEntryTimeStamp + std::chrono::milliseconds(m_hangTimeoutMS);
+	std::chrono::time_point<std::chrono::steady_clock> routineEntryTimeStamp = std::chrono::steady_clock::now();
+	std::chrono::time_point<std::chrono::steady_clock> timestampToKillTheTarget = routineEntryTimeStamp + std::chrono::milliseconds(m_hangTimeoutMS);
 	bool targetKilled = false;
 	LOG(DEBUG) << "Waiting for the debugger thread to terminate.";
 	while (!m_exOutput_FROM_TARGET_DEBUGGING->m_debuggerThreadDone) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
-§§		if (!targetKilled && std::chrono::steady_clock::now() > timestampToKillTheTarget) {
+		if (!targetKilled && std::chrono::steady_clock::now() > timestampToKillTheTarget) {
 			LOG(DEBUG) << "Waiting sucks - killing the target.";
 			m_debuggeeProcess->die(); //In case the crash is not reproducible, make sure the target dies!
 			targetKilled = true;
@@ -1069,8 +1069,8 @@ void TestExecutorDynRioMulti::debuggerThreadMain(std::shared_ptr<DebugExecutionO
 }
 
 bool TestExecutorDynRioMulti::waitForDynRioInitialization(int timeoutMS) {
-§§	std::chrono::time_point<std::chrono::steady_clock> routineEntryTimeStamp = std::chrono::steady_clock::now();
-§§	std::chrono::time_point<std::chrono::steady_clock> latestRoutineExitTimeStamp = routineEntryTimeStamp + std::chrono::milliseconds(timeoutMS);
+	std::chrono::time_point<std::chrono::steady_clock> routineEntryTimeStamp = std::chrono::steady_clock::now();
+	std::chrono::time_point<std::chrono::steady_clock> latestRoutineExitTimeStamp = routineEntryTimeStamp + std::chrono::milliseconds(timeoutMS);
 
 #if defined(_WIN32) || defined(_WIN64)
 	DWORD  numBytesRead = 0;
@@ -1078,7 +1078,7 @@ bool TestExecutorDynRioMulti::waitForDynRioInitialization(int timeoutMS) {
 	ssize_t  numBytesRead = 0;
 #endif
 
-§§	while (numBytesRead != sizeof(process_id_t) && std::chrono::steady_clock::now() < latestRoutineExitTimeStamp) {
+	while (numBytesRead != sizeof(process_id_t) && std::chrono::steady_clock::now() < latestRoutineExitTimeStamp) {
 #if defined(_WIN32) || defined(_WIN64)
 		ReadFile(m_pipe_to_dynrio, &m_targetProcessID, sizeof(process_id_t), &numBytesRead, NULL);
 #else
@@ -1104,7 +1104,7 @@ bool TestExecutorDynRioMulti::waitForDynRioInitialization(int timeoutMS) {
 	LOG(DEBUG) << "Process Id delivered via dynamo rio pipe: " << m_targetProcessID;
 
 	numBytesRead = 0;
-§§	while (numBytesRead != sizeof(client_id_t) && std::chrono::steady_clock::now() < latestRoutineExitTimeStamp) {
+	while (numBytesRead != sizeof(client_id_t) && std::chrono::steady_clock::now() < latestRoutineExitTimeStamp) {
 #if defined(_WIN32) || defined(_WIN64)
 		ReadFile(m_pipe_to_dynrio, &m_dynrio_clientID, sizeof(client_id_t), &numBytesRead, NULL);
 #else
@@ -1130,7 +1130,7 @@ bool TestExecutorDynRioMulti::waitForDynRioInitialization(int timeoutMS) {
 	std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
 	dr_config_status_t nudgePIDResult = DR_NUDGE_TIMEOUT;
-§§	while (std::chrono::steady_clock::now() < latestRoutineExitTimeStamp) {
+	while (std::chrono::steady_clock::now() < latestRoutineExitTimeStamp) {
 		nudgePIDResult = m_dr_nudge_pid(m_targetProcessID, m_dynrio_clientID, NUDGE_NOOP, 100);
 		if (nudgePIDResult == DR_SUCCESS) {
 			return true;
@@ -1146,15 +1146,15 @@ bool TestExecutorDynRioMulti::waitForDynRioInitialization(int timeoutMS) {
 }
 
 bool TestExecutorDynRioMulti::runSingleTestcase(const FluffiTestcaseID testcaseId, std::shared_ptr<DebugExecutionOutput> exResult, bool use_dyn_rio) {
-§§	std::chrono::time_point<std::chrono::steady_clock> routineEntryTimeStamp = std::chrono::steady_clock::now();
-§§	std::chrono::time_point<std::chrono::steady_clock> latestRoutineExitTimeStamp = routineEntryTimeStamp + std::chrono::milliseconds(m_hangTimeoutMS);
+	std::chrono::time_point<std::chrono::steady_clock> routineEntryTimeStamp = std::chrono::steady_clock::now();
+	std::chrono::time_point<std::chrono::steady_clock> latestRoutineExitTimeStamp = routineEntryTimeStamp + std::chrono::milliseconds(m_hangTimeoutMS);
 	LOG(DEBUG) << "runSingleTestcase:" << testcaseId;
 
 	//first part: Make sure the next log file does not exist, Reset Coverage, Send "Go" to Feeder, Wait for "Done" from feeder, and get Coverage from dynrio plugin
 	if (use_dyn_rio) {
 		std::string nextRunDrcovLogFile = getDrCovOutputFile((m_iterationNumMod2 + 1) % 2);
 		int deletionAttemtps = 0;
-§§		while (std::experimental::filesystem::exists(nextRunDrcovLogFile) && std::chrono::steady_clock::now() < latestRoutineExitTimeStamp) {
+		while (std::experimental::filesystem::exists(nextRunDrcovLogFile) && std::chrono::steady_clock::now() < latestRoutineExitTimeStamp) {
 			//dumping the coverage later will trigger the switch to a new log file. It needs to be ensured, that that file does not yet exist.
 			//this is done before reseting the coverage in order not to spoil the block coverage by waiting
 			if (deletionAttemtps > 0) {
@@ -1185,7 +1185,7 @@ bool TestExecutorDynRioMulti::runSingleTestcase(const FluffiTestcaseID testcaseI
 		ssize_t  numBytesRead = 0;
 #endif
 		char resp = 0;
-§§		while (numBytesRead < 1 && std::chrono::steady_clock::now() < latestRoutineExitTimeStamp) {
+		while (numBytesRead < 1 && std::chrono::steady_clock::now() < latestRoutineExitTimeStamp) {
 #if defined(_WIN32) || defined(_WIN64)
 			ReadFile(m_pipe_to_dynrio, &resp, sizeof(resp), &numBytesRead, NULL);
 #else
@@ -1202,8 +1202,8 @@ bool TestExecutorDynRioMulti::runSingleTestcase(const FluffiTestcaseID testcaseI
 		}
 		if (resp != 'R') {
 			exResult->m_terminationType = DebugExecutionOutput::PROCESS_TERMINATION_TYPE::ERR;
-§§			exResult->m_terminationDescription = std::string("Problem while communicating with dynamoRio (1)!") +
-§§				((std::chrono::steady_clock::now() < latestRoutineExitTimeStamp) ? "no timeout" : "timeout");
+			exResult->m_terminationDescription = std::string("Problem while communicating with dynamoRio (1)!") +
+				((std::chrono::steady_clock::now() < latestRoutineExitTimeStamp) ? "no timeout" : "timeout");
 			return false;
 		}
 	}
@@ -1220,8 +1220,8 @@ bool TestExecutorDynRioMulti::runSingleTestcase(const FluffiTestcaseID testcaseI
 	//wait for "done" from feeder
 	SharedMemMessage responseFromFeeder;
 #if defined(_WIN32) || defined(_WIN64)
-§§	m_sharedMemIPC_toFeeder->waitForNewMessageToServer(&responseFromFeeder,
-§§		(DWORD)std::chrono::duration_cast<std::chrono::milliseconds>(latestRoutineExitTimeStamp - std::chrono::steady_clock::now()).count(), m_SharedMemIPCInterruptEvent);
+	m_sharedMemIPC_toFeeder->waitForNewMessageToServer(&responseFromFeeder,
+		(DWORD)std::chrono::duration_cast<std::chrono::milliseconds>(latestRoutineExitTimeStamp - std::chrono::steady_clock::now()).count(), m_SharedMemIPCInterruptEvent);
 #else
 	m_sharedMemIPC_toFeeder->waitForNewMessageToServer(&responseFromFeeder, static_cast<unsigned long>(std::chrono::duration_cast<std::chrono::milliseconds>(latestRoutineExitTimeStamp - std::chrono::steady_clock::now()).count()), m_SharedMemIPCInterruptFD[0]);
 #endif
@@ -1254,7 +1254,7 @@ bool TestExecutorDynRioMulti::runSingleTestcase(const FluffiTestcaseID testcaseI
 
 	if (use_dyn_rio) {
 		//get coverage
-§§		dr_config_status_t nudgePIDResult = m_dr_nudge_pid(m_targetProcessID, m_dynrio_clientID, NUDGE_DUMP_CURRENT_COVERAGE,
+		dr_config_status_t nudgePIDResult = m_dr_nudge_pid(m_targetProcessID, m_dynrio_clientID, NUDGE_DUMP_CURRENT_COVERAGE,
 			static_cast<uint>(std::chrono::duration_cast<std::chrono::milliseconds>(latestRoutineExitTimeStamp - std::chrono::steady_clock::now()).count()));
 		if (DR_SUCCESS != nudgePIDResult) {
 			exResult->m_terminationType = DebugExecutionOutput::PROCESS_TERMINATION_TYPE::ERR;
@@ -1269,7 +1269,7 @@ bool TestExecutorDynRioMulti::runSingleTestcase(const FluffiTestcaseID testcaseI
 		ssize_t  numBytesRead = 0;
 #endif
 		char resp = 0;
-§§		while (numBytesRead < 1 && std::chrono::steady_clock::now() < latestRoutineExitTimeStamp) {
+		while (numBytesRead < 1 && std::chrono::steady_clock::now() < latestRoutineExitTimeStamp) {
 #if defined(_WIN32) || defined(_WIN64)
 			ReadFile(m_pipe_to_dynrio, &resp, sizeof(resp), &numBytesRead, NULL);
 #else
@@ -1286,8 +1286,8 @@ bool TestExecutorDynRioMulti::runSingleTestcase(const FluffiTestcaseID testcaseI
 		}
 		if (resp != 'D') {
 			exResult->m_terminationType = DebugExecutionOutput::PROCESS_TERMINATION_TYPE::ERR;
-§§			exResult->m_terminationDescription = std::string("Problem while communicating with dynamoRio (2)!") +
-§§				((std::chrono::steady_clock::now() < latestRoutineExitTimeStamp) ? "no timeout" : "timeout");
+			exResult->m_terminationDescription = std::string("Problem while communicating with dynamoRio (2)!") +
+				((std::chrono::steady_clock::now() < latestRoutineExitTimeStamp) ? "no timeout" : "timeout");
 			return false;
 		}
 	}

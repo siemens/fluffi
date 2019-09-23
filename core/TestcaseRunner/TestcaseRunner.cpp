@@ -7,7 +7,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-§§Author(s): Roman Bendt, Thomas Riedmaier, Abian Blome
+Author(s): Roman Bendt, Thomas Riedmaier, Abian Blome
 */
 §§
 §§#include "stdafx.h"
@@ -39,7 +39,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 §§	_CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
 §§	_CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDOUT);
 §§
-§§	char* b = new char[14]{ "LEAK DETECTOR" };  //Trigger a memory leak for NEW
+	char* b = new char[14]{ "LEAK DETECTOR" };  //Trigger a memory leak for NEW
 §§#endif
 §§
 §§	// ################## Define / Build global objects  ##################
@@ -98,13 +98,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 	unsigned long maxAllowedTimeOfManagerInactivityMS = 10 * 60 * 1000;
 §§
 §§	//The garbage collector needs to be initialized as early as possible and deleted as late as possible
-§§	GarbageCollectorWorker* garbageCollectorWorker = new GarbageCollectorWorker(intervallBetweenTwoCollectionRoundsInMillisec);
+	GarbageCollectorWorker* garbageCollectorWorker = new GarbageCollectorWorker(intervallBetweenTwoCollectionRoundsInMillisec);
 §§
-§§	CommPartnerManager* tGManager = new CommPartnerManager();
-§§	CommPartnerManager* tEManager = new CommPartnerManager();
+	CommPartnerManager* tGManager = new CommPartnerManager();
+	CommPartnerManager* tEManager = new CommPartnerManager();
 §§
-§§	TRWorkerThreadStateBuilder* workerStateBuilder = new TRWorkerThreadStateBuilder();
-§§	CommInt* comm = new CommInt(workerStateBuilder, 1, 1);
+	TRWorkerThreadStateBuilder* workerStateBuilder = new TRWorkerThreadStateBuilder();
+	CommInt* comm = new CommInt(workerStateBuilder, 1, 1);
 §§	LOG(INFO) << std::endl << "Hey! I am TestcaseRunner " << comm->getMyGUID() << std::endl << "My location: " << location << std::endl << "My Host and Port: " << comm->getOwnServiceDescriptor().m_serviceHostAndPort << std::endl << "I was built on: " << __DATE__;
 §§
 §§	// Specify path to testcase directory, preferable relative
@@ -116,16 +116,16 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 §§	// ################## End of Define / Build global objects  ##################
 §§
 §§	// ################## Registering Message Handler  ##################
-§§	TRGetStatusRequestHandler* m_getStatusRequestHandler = new TRGetStatusRequestHandler(comm, &numberOfProcessedTestcases);
+	TRGetStatusRequestHandler* m_getStatusRequestHandler = new TRGetStatusRequestHandler(comm, &numberOfProcessedTestcases);
 §§	comm->registerFLUFFIMessageHandler(m_getStatusRequestHandler, FLUFFIMessage::FluffCase::kGetStatusRequest);
 §§
-§§	GetTestcaseChunkRequestHandler* m_getTestcaseChunkRequestHandler = new GetTestcaseChunkRequestHandler(testcaseDir, true, garbageCollectorWorker);
+	GetTestcaseChunkRequestHandler* m_getTestcaseChunkRequestHandler = new GetTestcaseChunkRequestHandler(testcaseDir, true, garbageCollectorWorker);
 §§	comm->registerFLUFFIMessageHandler(m_getTestcaseChunkRequestHandler, FLUFFIMessage::FluffCase::kGetTestCaseChunkRequest);
 §§
-§§	SetTGsAndTEsRequestHandler* m_setTGsAndTEsRequestHandler = new SetTGsAndTEsRequestHandler(tGManager, tEManager);
+	SetTGsAndTEsRequestHandler* m_setTGsAndTEsRequestHandler = new SetTGsAndTEsRequestHandler(tGManager, tEManager);
 §§	comm->registerFLUFFIMessageHandler(m_setTGsAndTEsRequestHandler, FLUFFIMessage::FluffCase::kSetTGsAndTEsRequest);
 §§
-§§	KillInstanceRequestHandler* m_killInstanceRequestHandler = new KillInstanceRequestHandler();
+	KillInstanceRequestHandler* m_killInstanceRequestHandler = new KillInstanceRequestHandler();
 §§	comm->registerFLUFFIMessageHandler(m_killInstanceRequestHandler, FLUFFIMessage::FluffCase::kKillInstanceRequest);
 §§
 §§	// ################## End of Registering Message Handler  ##################
@@ -161,7 +161,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 §§
 §§		// The TRMainWorker thread
 §§		LOG(DEBUG) << "Starting TRMainWorker Thread";
-§§		TRMainWorker* trMainWorker = new TRMainWorker(comm, workerStateBuilder, delayToWaitUntilConfigIsCompleteInMS, tGManager, tEManager, testcaseDir, &numberOfProcessedTestcases, myAgentSubTypes, garbageCollectorWorker);
+		TRMainWorker* trMainWorker = new TRMainWorker(comm, workerStateBuilder, delayToWaitUntilConfigIsCompleteInMS, tGManager, tEManager, testcaseDir, &numberOfProcessedTestcases, myAgentSubTypes, garbageCollectorWorker);
 §§		trMainWorker->m_thread = new std::thread(&TRMainWorker::workerMain, trMainWorker);
 §§
 §§		// Wait for a keypress or a kill message
@@ -196,7 +196,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 §§
 §§		trMainWorker->m_thread->join();
 §§		delete trMainWorker;
-§§		trMainWorker = nullptr;
+		trMainWorker = nullptr;
 §§		garbageCollectorWorker->m_thread->join();
 §§		//delete garbageCollectorWorker IS NOT DONE HERE ON PURPOSE. It is done at the very end as it's destructor is supposed to remove all files
 §§	}

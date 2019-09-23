@@ -32,7 +32,7 @@ Author(s): Roman Bendt, Thomas Riedmaier, Abian Blome
 §§	UUID uuid;
 §§	RPC_STATUS success = UuidCreate(&uuid);
 §§
-§§	unsigned char* str;
+	unsigned char* str;
 §§	success = UuidToStringA(&uuid, &str);
 §§
 §§	std::string s((char*)str);
@@ -217,7 +217,7 @@ bool Util::enableDebugPrivilege()
 §§	}
 §§}
 §§
-§§bool Util::appendRemainingChunks(FILE* outstream, const FluffiTestcaseID testcaseID, const std::string sourceHAP, CommInt* commPtr, WorkerThreadState* workerThreadState) {
+bool Util::appendRemainingChunks(FILE* outstream, const FluffiTestcaseID testcaseID, const std::string sourceHAP, CommInt* commPtr, WorkerThreadState* workerThreadState) {
 §§	bool testcaseComplete = false;
 §§	int chunkID = 1;
 §§
@@ -226,7 +226,7 @@ bool Util::enableDebugPrivilege()
 §§		FLUFFIMessage req;
 §§		GetTestCaseChunkRequest* nextChunkRequest = new GetTestCaseChunkRequest();
 §§
-§§		TestcaseID* mutableTestcaseID = new TestcaseID();
+		TestcaseID* mutableTestcaseID = new TestcaseID();
 §§		mutableTestcaseID->CopyFrom(testcaseID.getProtobuf());
 §§
 §§		nextChunkRequest->set_allocated_id(mutableTestcaseID);
@@ -285,7 +285,7 @@ bool Util::enableDebugPrivilege()
 §§
 §§	// Load Testcase into memory
 §§
-§§	char* buffer = new char[static_cast<unsigned int>(size)];
+	char* buffer = new char[static_cast<unsigned int>(size)];
 	ifs.read(buffer, static_cast<std::streamsize>(size));
 §§	std::string data = std::string(buffer, static_cast<unsigned int>(size));
 §§
@@ -314,7 +314,7 @@ bool Util::enableDebugPrivilege()
 §§
 §§	// Load Testcase into memory
 §§
-§§	char* buffer = new char[static_cast<unsigned int>(completeFilelength)];
+	char* buffer = new char[static_cast<unsigned int>(completeFilelength)];
 	ifs.read(buffer, static_cast<std::streamsize>(completeFilelength));
 §§	std::string data = std::string(buffer, static_cast<unsigned int>(completeFilelength));
 §§
@@ -325,7 +325,7 @@ bool Util::enableDebugPrivilege()
 §§	return data;
 §§}
 §§
-§§void Util::markAllFilesOfTypeInPathForDeletion(const std::string path, const std::string type, GarbageCollectorWorker* garbageCollectorWorker) {
+void Util::markAllFilesOfTypeInPathForDeletion(const std::string path, const std::string type, GarbageCollectorWorker* garbageCollectorWorker) {
 §§	// find all files matching *.type
 §§	for (auto& p : std::experimental::filesystem::directory_iterator(path)) {
 §§		if (std::experimental::filesystem::is_regular_file(p.status())) {
@@ -337,15 +337,15 @@ bool Util::enableDebugPrivilege()
 §§	}
 §§}
 §§
-§§bool Util::storeTestcaseFileOnDisk(const FluffiTestcaseID testcaseId,
-§§	const std::string testcaseDir,
-§§	const std::string* firstChunk,
-§§	bool isLastChunk,
-§§	const std::string sourceHAP,
-§§	CommInt* commPtr,
-§§	WorkerThreadState* workerThreadState,
-§§	GarbageCollectorWorker* garbageCollectorWorker
-§§) {
+bool Util::storeTestcaseFileOnDisk(const FluffiTestcaseID testcaseId,
+	const std::string testcaseDir,
+	const std::string* firstChunk,
+	bool isLastChunk,
+	const std::string sourceHAP,
+	CommInt* commPtr,
+	WorkerThreadState* workerThreadState,
+	GarbageCollectorWorker* garbageCollectorWorker
+) {
 §§	std::string filename = Util::generateTestcasePathAndFilename(testcaseId, testcaseDir);
 §§
 §§	if (std::experimental::filesystem::exists(filename)) {
@@ -376,7 +376,7 @@ bool Util::enableDebugPrivilege()
 §§
 §§	// Write received testcase into filesystem
 §§	//apparently, fwrite performs much better than ofstream
-§§	FILE* testcaseFile;
+	FILE* testcaseFile;
 §§	if (0 != fopen_s(&testcaseFile, filename.c_str(), "wb")) {
 §§		LOG(ERROR) << "Util::storeTestcaseFileOnDisk failed to open the file " << filename;
 §§		return false;
@@ -447,7 +447,7 @@ bool Util::enableDebugPrivilege()
 §§
 §§std::vector<char> Util::readAllBytesFromFile(const std::string filename)
 §§{
-§§	FILE* inputFile;
+	FILE* inputFile;
 §§	if (0 != fopen_s(&inputFile, filename.c_str(), "rb")) {
 §§		LOG(ERROR) << "Util::readAllBytesFromFile failed to open the file " << filename;
 §§		return{};
@@ -479,7 +479,7 @@ bool Util::enableDebugPrivilege()
 §§	std::error_code ec;
 §§	if (!std::experimental::filesystem::exists(from, ec)) {
 §§		LOG(WARNING) << "Util::attemptRenameFile is supposed to rename the non-existant file " << from << " (" << ec.message() << ")";
-§§		return false;
+		return false;
 §§	}
 §§
 §§	const unsigned int timesToRetry = 100;

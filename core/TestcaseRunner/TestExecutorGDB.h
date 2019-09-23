@@ -41,7 +41,7 @@ private:
 	int m_initializationTimeoutMS;
 	int m_forceRestartAfterXTCs;
 	int m_executionsSinceLastRestart;
-§§	SharedMemIPC* m_sharedMemIPC_toFeeder;
+	SharedMemIPC* m_sharedMemIPC_toFeeder;
 	std::shared_ptr<ExternalProcess> m_feederProcess;
 	std::shared_ptr<GDBThreadCommunication> m_gDBThreadCommunication;
 	std::set<FluffiBasicBlock> m_blocksToCover;
@@ -68,17 +68,17 @@ private:
 
 	void waitForDebuggerToTerminate();
 
-§§	static bool consumeGDBOutputQueue(std::shared_ptr<GDBThreadCommunication> gDBThreadCommunication, std::set<FluffiBasicBlock>* blocksCoveredSinceLastReset, std::map<uint64_t, GDBBreakpoint>* allBreakpoints, int bpInstrBytes);
+	static bool consumeGDBOutputQueue(std::shared_ptr<GDBThreadCommunication> gDBThreadCommunication, std::set<FluffiBasicBlock>* blocksCoveredSinceLastReset, std::map<uint64_t, GDBBreakpoint>* allBreakpoints, int bpInstrBytes);
 	static void gdbDebug(std::shared_ptr<GDBThreadCommunication> gDBThreadCommunication, const std::set<Module> modulesToCover, const std::set<FluffiBasicBlock> blocksToCover, uint32_t bpInstr, int bpInstrBytes);
 	static void gdbLinereaderThread(std::shared_ptr<GDBThreadCommunication> gDBThreadCommunication, HANDLETYPE inputHandleFromGdb, ExternalProcess::CHILD_OUTPUT_TYPE child_output_mode);
-§§	static bool gdbPrepareForDebug(std::shared_ptr<GDBThreadCommunication> gDBThreadCommunication, const std::set<Module> modulesToCover, const std::set<FluffiBasicBlock> blocksToCover, std::map<uint64_t, GDBBreakpoint>* allBreakpoints, int bpInstrBytes);
+	static bool gdbPrepareForDebug(std::shared_ptr<GDBThreadCommunication> gDBThreadCommunication, const std::set<Module> modulesToCover, const std::set<FluffiBasicBlock> blocksToCover, std::map<uint64_t, GDBBreakpoint>* allBreakpoints, int bpInstrBytes);
 	static std::string generateEnableAllCommand(std::map<uint64_t, GDBBreakpoint>&  allBreakpoints, uint32_t bpInstr, int bpInstrBytes);
-§§	static bool getBaseAddressesAndSizes(std::vector<tModuleAddressesAndSizes>& baseAddressesAndSizes, std::string parseInfoOutput);
-§§	static bool getBaseAddressesForModules(std::map<int, uint64_t>* modmap, const std::set<Module> modulesToCover, std::string parseInfoOutput);
+	static bool getBaseAddressesAndSizes(std::vector<tModuleAddressesAndSizes>& baseAddressesAndSizes, std::string parseInfoOutput);
+	static bool getBaseAddressesForModules(std::map<int, uint64_t>* modmap, const std::set<Module> modulesToCover, std::string parseInfoOutput);
 	static std::string getCrashRVA(std::vector<tModuleAddressesAndSizes>& baseAddressesAndSizes, uint64_t signalAddress);
-§§	static bool handleSignal(std::shared_ptr<GDBThreadCommunication> gDBThreadCommunication, std::string signalmessage, std::map<uint64_t, GDBBreakpoint>* allBreakpoints, std::set<FluffiBasicBlock>* blocksCoveredSinceLastReset, int bpInstrBytes);
-§§	static bool parseInfoFiles(std::vector<tModuleInformation>& loadedFiles, std::string parseInfoOutput);
-§§	static bool sendCommandToGDBAndWaitForResponse(const std::string command, std::string* response, std::shared_ptr<GDBThreadCommunication> gDBThreadCommunication, bool sendCtrlZ = false);
+	static bool handleSignal(std::shared_ptr<GDBThreadCommunication> gDBThreadCommunication, std::string signalmessage, std::map<uint64_t, GDBBreakpoint>* allBreakpoints, std::set<FluffiBasicBlock>* blocksCoveredSinceLastReset, int bpInstrBytes);
+	static bool parseInfoFiles(std::vector<tModuleInformation>& loadedFiles, std::string parseInfoOutput);
+	static bool sendCommandToGDBAndWaitForResponse(const std::string command, std::string* response, std::shared_ptr<GDBThreadCommunication> gDBThreadCommunication, bool sendCtrlZ = false);
 	static bool waitUntilTargetIsBeingDebugged(std::shared_ptr<GDBThreadCommunication> gDBThreadCommunication, int timeoutMS);
 	static bool waitUntilCoverageState(std::shared_ptr<GDBThreadCommunication> gDBThreadCommunication, GDBThreadCommunication::COVERAGE_STATE desiredState, int timeoutMS);
 };

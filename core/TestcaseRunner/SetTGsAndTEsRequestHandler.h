@@ -21,7 +21,7 @@ public:
 §§	SetTGsAndTEsRequestHandler(CommPartnerManager* tGManager, CommPartnerManager* tEManager);
 	~SetTGsAndTEsRequestHandler();
 
-§§	void handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp);
+	void handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp);
 §§
 §§private:
 	CommPartnerManager* m_tEManager = nullptr;

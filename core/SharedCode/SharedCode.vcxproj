@@ -28,14 +28,14 @@ Author(s): Thomas Riedmaier, Abian Blome, Michael Kraus
       <Configuration>Release</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-§§    <ProjectConfiguration Include="Test|Win32">
-§§      <Configuration>Test</Configuration>
-§§      <Platform>Win32</Platform>
-§§    </ProjectConfiguration>
-§§    <ProjectConfiguration Include="Test|x64">
-§§      <Configuration>Test</Configuration>
-§§      <Platform>x64</Platform>
-§§    </ProjectConfiguration>
+    <ProjectConfiguration Include="Test|Win32">
+      <Configuration>Test</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Test|x64">
+      <Configuration>Test</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{1EA38259-AE82-4D2D-ADDB-919DE63C3824}</ProjectGuid>
@@ -50,12 +50,12 @@ Author(s): Thomas Riedmaier, Abian Blome, Michael Kraus
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
-§§  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test|Win32'" Label="Configuration">
-§§    <ConfigurationType>StaticLibrary</ConfigurationType>
-§§    <UseDebugLibraries>true</UseDebugLibraries>
-§§    <PlatformToolset>v140</PlatformToolset>
-§§    <CharacterSet>MultiByte</CharacterSet>
-§§  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
@@ -69,12 +69,12 @@ Author(s): Thomas Riedmaier, Abian Blome, Michael Kraus
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
-§§  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'" Label="Configuration">
-§§    <ConfigurationType>StaticLibrary</ConfigurationType>
-§§    <UseDebugLibraries>true</UseDebugLibraries>
-§§    <PlatformToolset>v140</PlatformToolset>
-§§    <CharacterSet>MultiByte</CharacterSet>
-§§  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
@@ -90,18 +90,18 @@ Author(s): Thomas Riedmaier, Abian Blome, Michael Kraus
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-§§  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Test|Win32'" Label="PropertySheets">
-§§    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-§§  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Test|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-§§  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'" Label="PropertySheets">
-§§    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-§§  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -114,26 +114,26 @@ Author(s): Thomas Riedmaier, Abian Blome, Michael Kraus
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <TargetName>$(ProjectName)d</TargetName>
   </PropertyGroup>
-§§  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">
-§§    <LinkIncremental>true</LinkIncremental>
-§§    <IntDir>$(Platform)\$(Configuration)\</IntDir>
-§§    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IncludePath>$(SolutionDir)\dependencies\libprotoc\include\siemens\cpp;$(SolutionDir)\dependencies\libprotoc\include;$(SolutionDir)\dependencies\easylogging\include;$(SolutionDir)\dependencies\zeromq\include;$(IncludePath)</IncludePath>
-§§    <LibraryPath>$(LibraryPath)</LibraryPath>
-§§    <TargetName>$(ProjectName)d</TargetName>
-§§  </PropertyGroup>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+    <TargetName>$(ProjectName)d</TargetName>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>;$(SolutionDir)\dependencies\easylogging\include;$(SolutionDir)\dependencies\zeromq\include;$(SolutionDir)\dependencies\libprotoc\include\siemens\cpp;$(SolutionDir)\dependencies\libprotoc\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <TargetName>$(ProjectName)d</TargetName>
   </PropertyGroup>
-§§  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'">
-§§    <LinkIncremental>true</LinkIncremental>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'">
+    <LinkIncremental>true</LinkIncremental>
     <IncludePath>;$(SolutionDir)\dependencies\easylogging\include;$(SolutionDir)\dependencies\zeromq\include;$(SolutionDir)\dependencies\libprotoc\include\siemens\cpp;$(SolutionDir)\dependencies\libprotoc\include;$(IncludePath)</IncludePath>
-§§    <LibraryPath>$(LibraryPath)</LibraryPath>
-§§    <TargetName>$(ProjectName)d</TargetName>
-§§  </PropertyGroup>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+    <TargetName>$(ProjectName)d</TargetName>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(SolutionDir)\dependencies\libprotoc\include\siemens\cpp;$(SolutionDir)\dependencies\libprotoc\include;$(SolutionDir)\dependencies\easylogging\include;$(SolutionDir)\dependencies\zeromq\include;$(IncludePath)</IncludePath>
@@ -170,20 +170,20 @@ exit 1
 exit 0</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
-§§  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">
-§§    <ClCompile>
-§§      <PrecompiledHeader>Use</PrecompiledHeader>
-§§      <WarningLevel>Level3</WarningLevel>
-§§      <Optimization>Disabled</Optimization>
-§§      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-§§      <SDLCheck>true</SDLCheck>
-§§      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalOptions>/wd4146</AdditionalOptions>
-§§    </ClCompile>
-§§    <Link>
-§§      <SubSystem>Windows</SubSystem>
-§§      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-§§    </Link>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
     <PostBuildEvent>
       <Command>robocopy "$(SolutionDir)dependencies\zeromq\bin\x86" "$(TargetDir)." libzmq-v140-mt-gd-4*
 if errorlevel 4 goto BuildEventFailed
@@ -193,7 +193,7 @@ exit 1
 :end echo FILECOPY for $(ProjectName) COMPLETED OK
 exit 0</Command>
     </PostBuildEvent>
-§§  </ItemDefinitionGroup>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -218,20 +218,20 @@ exit 1
 exit 0</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
-§§  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'">
-§§    <ClCompile>
-§§      <PrecompiledHeader>Use</PrecompiledHeader>
-§§      <WarningLevel>Level3</WarningLevel>
-§§      <Optimization>Disabled</Optimization>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_VSTEST;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-§§      <SDLCheck>true</SDLCheck>
-§§      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalOptions>/wd4146</AdditionalOptions>
-§§    </ClCompile>
-§§    <Link>
-§§      <SubSystem>Windows</SubSystem>
-§§      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-§§    </Link>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
     <PostBuildEvent>
       <Command>robocopy "$(SolutionDir)dependencies\zeromq\bin\x64" "$(TargetDir)." libzmq-v140-mt-gd-4*
 if errorlevel 4 goto BuildEventFailed
@@ -241,7 +241,7 @@ exit 1
 :end echo FILECOPY for $(ProjectName) COMPLETED OK
 exit 0</Command>
     </PostBuildEvent>
-§§  </ItemDefinitionGroup>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -306,11 +306,11 @@ exit 0</Command>
     <ClInclude Include="DebugExecutionOutput.h" />
     <ClInclude Include="ExternalProcess.h" />
     <ClInclude Include="FluffiBasicBlock.h" />
-§§    <ClInclude Include="FluffiModuleNameToID.h" />
-§§    <ClInclude Include="FluffiServiceDescriptor.h" />
-§§    <ClInclude Include="FluffiServiceAndWeight.h" />
+    <ClInclude Include="FluffiModuleNameToID.h" />
+    <ClInclude Include="FluffiServiceDescriptor.h" />
+    <ClInclude Include="FluffiServiceAndWeight.h" />
     <ClInclude Include="FluffiSetting.h" />
-§§    <ClInclude Include="FluffiTestcaseID.h" />
+    <ClInclude Include="FluffiTestcaseID.h" />
     <ClInclude Include="FluffiTestResult.h" />
     <ClInclude Include="GarbageCollectorWorker.h" />
     <ClInclude Include="GetStatusRequestHandler.h" />
@@ -318,7 +318,7 @@ exit 0</Command>
     <ClInclude Include="IFLUFFIMessageHandler.h" />
     <ClInclude Include="IWorkerThreadStateBuilder.h" />
     <ClInclude Include="FluffiLMConfiguration.h" />
-§§    <ClInclude Include="KillInstanceRequestHandler.h" />
+    <ClInclude Include="KillInstanceRequestHandler.h" />
     <ClInclude Include="NotImplementedHandler.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -330,9 +330,9 @@ exit 0</Command>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-§§      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-§§      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="CommInt.cpp" />
     <ClCompile Include="CommProxyWorker.cpp" />
@@ -341,24 +341,24 @@ exit 0</Command>
     <ClCompile Include="ExternalProcess.cpp" />
     <ClCompile Include="FluffiBasicBlock.cpp" />
     <ClCompile Include="FluffiLMConfiguration.cpp" />
-§§    <ClCompile Include="FluffiModuleNameToID.cpp" />
-§§    <ClCompile Include="FluffiServiceAndWeight.cpp" />
-§§    <ClCompile Include="FluffiServiceDescriptor.cpp" />
+    <ClCompile Include="FluffiModuleNameToID.cpp" />
+    <ClCompile Include="FluffiServiceAndWeight.cpp" />
+    <ClCompile Include="FluffiServiceDescriptor.cpp" />
     <ClCompile Include="FluffiSetting.cpp" />
-§§    <ClCompile Include="FluffiTestcaseID.cpp" />
+    <ClCompile Include="FluffiTestcaseID.cpp" />
     <ClCompile Include="FluffiTestResult.cpp" />
     <ClCompile Include="GarbageCollectorWorker.cpp" />
     <ClCompile Include="GetStatusRequestHandler.cpp" />
 §§    <ClCompile Include="GetTestcaseChunkRequestHandler.cpp" />
     <ClCompile Include="IFLUFFIMessageHandler.cpp" />
     <ClCompile Include="IWorkerThreadStateBuilder.cpp" />
-§§    <ClCompile Include="KillInstanceRequestHandler.cpp" />
+    <ClCompile Include="KillInstanceRequestHandler.cpp" />
     <ClCompile Include="NotImplementedHandler.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-§§      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-§§      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>

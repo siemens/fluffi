@@ -7,7 +7,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-§§Author(s): Roman Bendt, Thomas Riedmaier, Abian Blome
+Author(s): Roman Bendt, Thomas Riedmaier, Abian Blome
 */
 
 §§#include "stdafx.h"
@@ -18,9 +18,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 §§#include "ExternalProcess.h"
 §§#include "GarbageCollectorWorker.h"
 §§
-§§TestExecutorQemuUserSingle::TestExecutorQemuUserSingle(const std::string targetCMDline, int hangTimeoutMS, const std::set<Module> modulesToCover,
-§§	const std::string testcaseDir, ExternalProcess::CHILD_OUTPUT_TYPE child_output_mode, GarbageCollectorWorker* garbageCollectorWorker,
-§§	bool treatAnyAccessViolationAsFatal, const std::string rootfs)
+TestExecutorQemuUserSingle::TestExecutorQemuUserSingle(const std::string targetCMDline, int hangTimeoutMS, const std::set<Module> modulesToCover,
+	const std::string testcaseDir, ExternalProcess::CHILD_OUTPUT_TYPE child_output_mode, GarbageCollectorWorker* garbageCollectorWorker,
+	bool treatAnyAccessViolationAsFatal, const std::string rootfs)
 	: FluffiTestExecutor(targetCMDline, hangTimeoutMS, modulesToCover, testcaseDir, child_output_mode, "", garbageCollectorWorker), //Environment parameters are handled by QEMU's -E switch
 	m_treatAnyAccessViolationAsFatal(treatAnyAccessViolationAsFatal),
 §§	m_rootfs(rootfs),

@@ -10,26 +10,26 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Abian Blome, Thomas Riedmaier
 */
 
-§§#pragma once
+#pragma once
 #include "StatusOfInstance.h"
-§§
+
 class LMDatabaseManager;
-§§class WorkerWeightCalculator
-§§{
-§§public:
-§§	WorkerWeightCalculator(LMDatabaseManager* dbManager, std::string location);
-§§	~WorkerWeightCalculator();
-§§
-§§	void updateStatusInformation();
-§§	std::vector<StatusOfInstance> getGeneratorStatus();
-§§	std::vector<StatusOfInstance> getEvaluatorStatus();
-§§
-§§private:
+class WorkerWeightCalculator
+{
+public:
+	WorkerWeightCalculator(LMDatabaseManager* dbManager, std::string location);
+	~WorkerWeightCalculator();
+
+	void updateStatusInformation();
+	std::vector<StatusOfInstance> getGeneratorStatus();
+	std::vector<StatusOfInstance> getEvaluatorStatus();
+
+private:
 	uint32_t calculateGeneratorWeight(StatusOfInstance status);
 	uint32_t calculateEvaluatorWeight(StatusOfInstance status);
-§§
-§§	LMDatabaseManager* m_dbManager;
-§§	std::vector<StatusOfInstance> m_generatorStatus;
-§§	std::vector<StatusOfInstance> m_evaluatorStatus;
+
+	LMDatabaseManager* m_dbManager;
+	std::vector<StatusOfInstance> m_generatorStatus;
+	std::vector<StatusOfInstance> m_evaluatorStatus;
 	std::string m_location;
-§§};
+};

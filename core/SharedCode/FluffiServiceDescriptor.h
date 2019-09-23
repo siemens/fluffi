@@ -10,22 +10,22 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Abian Blome
 */
 
-§§#pragma once
-§§
-§§class FluffiServiceDescriptor
-§§{
-§§public:
+#pragma once
+
+class FluffiServiceDescriptor
+{
+public:
 	FluffiServiceDescriptor(const std::string serviceHostAndPort, const std::string guid);
-§§	FluffiServiceDescriptor(const ServiceDescriptor& serviceDescriptor);
-§§	virtual ~FluffiServiceDescriptor();
-§§
-§§	ServiceDescriptor getProtobuf() const;
-§§	static FluffiServiceDescriptor getNullObject();
-§§	bool isNullObject();
-§§
+	FluffiServiceDescriptor(const ServiceDescriptor& serviceDescriptor);
+	virtual ~FluffiServiceDescriptor();
+
+	ServiceDescriptor getProtobuf() const;
+	static FluffiServiceDescriptor getNullObject();
+	bool isNullObject();
+
 	std::string m_serviceHostAndPort;
 	std::string m_guid;
-§§
+
 	inline friend bool operator==(const FluffiServiceDescriptor& lhs, const FluffiServiceDescriptor& rhs) {
 		return (lhs.m_serviceHostAndPort == rhs.m_serviceHostAndPort) && (lhs.m_guid == rhs.m_guid);
 	}
@@ -37,8 +37,8 @@ Author(s): Thomas Riedmaier, Abian Blome
 		return this->m_serviceHostAndPort < rhs.m_serviceHostAndPort;
 	}
 
-§§private:
-§§	FluffiServiceDescriptor();
-§§
-§§	bool m_isNull = false;
-§§};
+private:
+	FluffiServiceDescriptor();
+
+	bool m_isNull = false;
+};

@@ -14,7 +14,7 @@
 §§import shutil
 §§import subprocess
 §§from base64 import b64encode
-§§from os import system, unlink
+from os import system, unlink
 §§
 §§from flask import abort
 §§from sqlalchemy import *
@@ -33,14 +33,14 @@
 §§    sqlFile = open(os.path.join(app.root_path, config.DBFILE), "r")
 §§    sqlFileData = sqlFile.read()
 §§    sqlFile.close()
-§§    encodedDbName = b64encode(bytes(dbName, 'utf-8')).decode("utf-8").replace('=', '')
+    encodedDbName = b64encode(bytes(dbName, 'utf-8')).decode("utf-8").replace('=', '')
 §§    # replace names
 §§    sqlFileData = sqlFileData.replace("fluffi", dbName)
 §§
 §§    if not os.path.exists("/tmp"):
 §§        os.makedirs("/tmp")
-§§    with open("/tmp/create_%s" % encodedDbName, 'w') as tempDBFile:
-§§        tempDBFile.write(sqlFileData)
+    with open("/tmp/create_%s" % encodedDbName, 'w') as tempDBFile:
+        tempDBFile.write(sqlFileData)
 §§
 §§    # if os is windows (test dev)
 §§    if os.name == 'nt':
@@ -53,8 +53,8 @@
 §§            fluffiResolve(config.DBHOST), config.DBUSER, config.DBPASS, encodedDbName)
 §§        if system(mysqlCommand) != 0:
 §§            print('Could not execute mysql command')
-§§
-§§    unlink("/tmp/create_%s" % encodedDbName)
+
+    unlink("/tmp/create_%s" % encodedDbName)
 §§    project = models.Fuzzjob(name = name, DBHost = config.DBHOST, DBUser = config.DBUSER, DBPass = config.DBPASS,
 §§                             DBName = dbName)
 §§
@@ -1101,31 +1101,31 @@
 §§            testcase["niceNameMI"] = "{}:{}".format(row["NiceNameMI"], row["CreatorLocalID"]) if row[
 §§                "NiceNameMI"] else ""
 §§            testcase["parent"] = "%s-%d" % (row["ParentServiceDescriptorGUID"], row["ParentLocalID"])
-§§            testcase["type"] = "%d" % row["TestCaseType"]
+            testcase["type"] = "%d" % row["TestCaseType"]
 §§            nodes.append(testcase)
 §§            edge = {"parent": testcase["parent"], "child": testcase["cyId"], "label": 0}
-§§            edges.append(edge)
+            edges.append(edge)
 §§
 §§        result = connection.execute(GET_CRASH_DETAILS)
 §§
-§§        for row in result:
-§§            if row["CrashFootprint"]:
+        for row in result:
+            if row["CrashFootprint"]:
 §§                footprintNode = dict()
-§§                footprintNode["cyId"] = row["CrashFootprint"]
+                footprintNode["cyId"] = row["CrashFootprint"]
 §§                footprintNode["realId"] = ""
-§§                footprintNode["crashFootprint"] = row["CrashFootprint"]
-§§                footprintNode["parent"] = "N/A"
-§§                nodes.append(footprintNode)
+                footprintNode["crashFootprint"] = row["CrashFootprint"]
+                footprintNode["parent"] = "N/A"
+                nodes.append(footprintNode)
 §§
 §§                crashParentResult = connection.execute(text(GET_CRASH_PARENTS),
 §§                                                       {"CrashFootprint": row["CrashFootprint"]})
-§§
-§§                for crashParentRow in crashParentResult:
+
+                for crashParentRow in crashParentResult:
 §§                    parentCyID = "%s-%d" % (
 §§                        crashParentRow["ParentServiceDescriptorGUID"], crashParentRow["ParentLocalID"])
-§§                    numEdges = crashParentRow["NumberEdges"]
+                    numEdges = crashParentRow["NumberEdges"]
 §§                    edge = {"parent": parentCyID, "child": footprintNode["cyId"], "label": numEdges}
-§§                    edges.append(edge)
+                    edges.append(edge)
 §§
 §§    except Exception as e:
 §§        print(e)

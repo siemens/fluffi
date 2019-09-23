@@ -18,7 +18,7 @@ Author(s): Thomas Riedmaier, Abian Blome
 #include "LMWorkerThreadState.h"
 #include "GarbageCollectorWorker.h"
 
-§§ReportTestcaseWithNoResultRequestHandler::ReportTestcaseWithNoResultRequestHandler(std::string testcaseDir, CommInt* commPtr, GarbageCollectorWorker* garbageCollectorWorker) :
+ReportTestcaseWithNoResultRequestHandler::ReportTestcaseWithNoResultRequestHandler(std::string testcaseDir, CommInt* commPtr, GarbageCollectorWorker* garbageCollectorWorker) :
 	m_testcaseDir(testcaseDir),
 	m_commPtr(commPtr),
 	m_garbageCollectorWorker(garbageCollectorWorker)
@@ -29,7 +29,7 @@ ReportTestcaseWithNoResultRequestHandler::~ReportTestcaseWithNoResultRequestHand
 {
 }
 
-§§void ReportTestcaseWithNoResultRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp)
+void ReportTestcaseWithNoResultRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp)
 {
 	LMWorkerThreadState* lmWorkerThreadState = dynamic_cast<LMWorkerThreadState*>(workerThreadState);
 	if (lmWorkerThreadState == nullptr) {
@@ -53,7 +53,7 @@ ReportTestcaseWithNoResultRequestHandler::~ReportTestcaseWithNoResultRequestHand
 	}
 
 	// Build Response
-§§	ReportTestcaseWithNoResultResponse* reportTestcaseWithNoResultResponse = new ReportTestcaseWithNoResultResponse();
+	ReportTestcaseWithNoResultResponse* reportTestcaseWithNoResultResponse = new ReportTestcaseWithNoResultResponse();
 	reportTestcaseWithNoResultResponse->set_success(success);
 	resp->set_allocated_reporttestcasewithnoresultresponse(reportTestcaseWithNoResultResponse);
 }

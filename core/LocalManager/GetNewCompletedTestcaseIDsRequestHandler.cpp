@@ -23,7 +23,7 @@ GetNewCompletedTestcaseIDsRequestHandler::~GetNewCompletedTestcaseIDsRequestHand
 {
 }
 
-§§void GetNewCompletedTestcaseIDsRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp)
+void GetNewCompletedTestcaseIDsRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp)
 {
 	LMWorkerThreadState* lmWorkerThreadState = dynamic_cast<LMWorkerThreadState*>(workerThreadState);
 	if (lmWorkerThreadState == nullptr) {

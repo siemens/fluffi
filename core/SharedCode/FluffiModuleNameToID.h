@@ -10,18 +10,18 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Abian Blome
 */
 
-§§#pragma once
-§§
-§§class FluffiModuleNameToID
-§§{
-§§public:
+#pragma once
+
+class FluffiModuleNameToID
+{
+public:
 	FluffiModuleNameToID(std::string moduleName, std::string modulePath, uint32_t moduleID);
-§§	FluffiModuleNameToID(const ModuleNameToID& moduleNameToID);
-§§	virtual ~FluffiModuleNameToID();
-§§
-§§	ModuleNameToID getProtobuf() const;
-§§
-§§	std::string m_moduleName;
-§§	std::string m_modulePath;
+	FluffiModuleNameToID(const ModuleNameToID& moduleNameToID);
+	virtual ~FluffiModuleNameToID();
+
+	ModuleNameToID getProtobuf() const;
+
+	std::string m_moduleName;
+	std::string m_modulePath;
 	uint32_t m_moduleID;
-§§};
+};

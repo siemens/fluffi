@@ -10,8 +10,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Junes Najah, Thomas Riedmaier, Abian Blome
 */
 
-§§function getPopulationGraph(projId) {
-§§    var changeUrl = "/projects/" + projId + "/testcaseGraph";
+function getPopulationGraph(projId) {
+    var changeUrl = "/projects/" + projId + "/testcaseGraph";
 §§    nodes = [];
 §§    edges = [];
 §§    
@@ -83,7 +83,7 @@ Author(s): Junes Najah, Thomas Riedmaier, Abian Blome
 §§                window.location = '/projects/' + projId + '/getTestcase/' + nodeData["downloadId"];                
 §§            }        
 §§        });
-§§
+
 §§        cy.on('tap', 'node', function(evt){
 §§            var nodeData = evt.target.data();
 §§            

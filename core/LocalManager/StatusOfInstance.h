@@ -10,15 +10,15 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Abian Blome
 */
 
-§§#pragma once
-§§
+#pragma once
+
 class StatusOfInstance
-§§{
+{
 public:
-§§	std::string serviceDescriptorHostAndPort;
-§§	std::string serviceDescriptorGUID;
-§§	AgentType type;
+	std::string serviceDescriptorHostAndPort;
+	std::string serviceDescriptorGUID;
+	AgentType type;
 	time_t lastStatusUpdate;
-§§	std::map<std::string, std::string> status;
-§§	unsigned int weight;
-§§};
+	std::map<std::string, std::string> status;
+	unsigned int weight;
+};

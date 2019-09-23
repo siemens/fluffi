@@ -18,7 +18,7 @@ public:
 	WorkerThreadState();
 	virtual ~WorkerThreadState();
 
-§§	zmq::socket_t* getSocketFor(zmq::context_t* zeroMQContext, const std::string targetHAP, int timeoutMS);
+	zmq::socket_t* getSocketFor(zmq::context_t* zeroMQContext, const std::string targetHAP, int timeoutMS);
 	void clearSocketFor(const std::string targetHAP, int timeoutMS);
 
 	bool m_stopRequested;
@@ -27,8 +27,8 @@ public:
 private:
 #endif //_VSTEST
 
-§§	std::chrono::time_point<std::chrono::steady_clock> m_resetClock;
-§§	std::map<std::pair<std::string, int>, zmq::socket_t*>* m_zeroMQSockets;
+	std::chrono::time_point<std::chrono::steady_clock> m_resetClock;
+	std::map<std::pair<std::string, int>, zmq::socket_t*>* m_zeroMQSockets;
 
 	void clearSocketCache();
 };

@@ -10,31 +10,31 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Abian Blome, Thomas Riedmaier
 */
 
-§§#include "stdafx.h"
-§§#include "KillInstanceRequestHandler.h"
-§§
-§§KillInstanceRequestHandler::KillInstanceRequestHandler()
-§§{
-§§}
-§§
-§§KillInstanceRequestHandler::~KillInstanceRequestHandler()
-§§{
-§§}
-§§
-§§void KillInstanceRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp)
-§§{
+#include "stdafx.h"
+#include "KillInstanceRequestHandler.h"
+
+KillInstanceRequestHandler::KillInstanceRequestHandler()
+{
+}
+
+KillInstanceRequestHandler::~KillInstanceRequestHandler()
+{
+}
+
+void KillInstanceRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp)
+{
 	(void)(workerThreadState); //avoid unused parameter warning
 	(void)(req); //avoid unused parameter warning
 
-§§	m_commitSuicide = true;
-§§
-§§	// Build Response (normal ack)
-§§	KillInstanceResponse* KillResp = new KillInstanceResponse();
-§§	KillResp->set_success(true);
-§§	resp->set_allocated_killinstanceresponse(KillResp);
-§§}
-§§
-§§bool KillInstanceRequestHandler::shouldCommitSuicide()
-§§{
-§§	return m_commitSuicide;
+	m_commitSuicide = true;
+
+	// Build Response (normal ack)
+	KillInstanceResponse* KillResp = new KillInstanceResponse();
+	KillResp->set_success(true);
+	resp->set_allocated_killinstanceresponse(KillResp);
+}
+
+bool KillInstanceRequestHandler::shouldCommitSuicide()
+{
+	return m_commitSuicide;
 }

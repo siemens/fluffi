@@ -27,7 +27,7 @@ GetFuzzJobConfigurationRequestHandler::~GetFuzzJobConfigurationRequestHandler()
 {
 }
 
-§§void GetFuzzJobConfigurationRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp)
+void GetFuzzJobConfigurationRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp)
 {
 	LMWorkerThreadState* lmWorkerThreadState = dynamic_cast<LMWorkerThreadState*>(workerThreadState);
 	if (lmWorkerThreadState == nullptr) {
@@ -35,24 +35,24 @@ GetFuzzJobConfigurationRequestHandler::~GetFuzzJobConfigurationRequestHandler()
 		return;
 	}
 
-§§	GetFuzzJobConfigurationResponse* getFuzzJobConfigurationResponse = new GetFuzzJobConfigurationResponse();
+	GetFuzzJobConfigurationResponse* getFuzzJobConfigurationResponse = new GetFuzzJobConfigurationResponse();
 
 	//Get target modules
 	for (auto& targetModule : lmWorkerThreadState->dbManager->getTargetModules()) {
-§§		ModuleNameToID* nextModule = getFuzzJobConfigurationResponse->add_targetmodules();
-§§		nextModule->CopyFrom(targetModule.getProtobuf());
+		ModuleNameToID* nextModule = getFuzzJobConfigurationResponse->add_targetmodules();
+		nextModule->CopyFrom(targetModule.getProtobuf());
 	}
 
 	//Get target blocks
 	for (auto& basicBlock : lmWorkerThreadState->dbManager->getTargetBlocks()) {
-§§		BasicBlock* newblock = getFuzzJobConfigurationResponse->add_targetblocks();
-§§		newblock->CopyFrom(basicBlock.getProtobuf());
+		BasicBlock* newblock = getFuzzJobConfigurationResponse->add_targetblocks();
+		newblock->CopyFrom(basicBlock.getProtobuf());
 	}
 
 	//Get generic settings
 	for (auto& setting : lmWorkerThreadState->dbManager->getAllSettings()) {
-§§		Setting* nextSetting = getFuzzJobConfigurationResponse->add_settings();
-§§		nextSetting->CopyFrom(setting.getProtobuf());
+		Setting* nextSetting = getFuzzJobConfigurationResponse->add_settings();
+		nextSetting->CopyFrom(setting.getProtobuf());
 	}
 §§
 	//Add agent specific settings
@@ -64,7 +64,7 @@ GetFuzzJobConfigurationRequestHandler::~GetFuzzJobConfigurationRequestHandler()
 	else {
 		LOG(DEBUG) << "GetFuzzJobConfigurationRequestHandler::selectedSubType " << selectedSubType << " was chosen for " << fsd.m_guid;
 	}
-§§	Setting* subTypeSetting = getFuzzJobConfigurationResponse->add_settings();
+	Setting* subTypeSetting = getFuzzJobConfigurationResponse->add_settings();
 	subTypeSetting->CopyFrom(FluffiSetting("chosenSubtype", selectedSubType).getProtobuf());
 
 	resp->set_allocated_getfuzzjobconfigurationresponse(getFuzzJobConfigurationResponse);

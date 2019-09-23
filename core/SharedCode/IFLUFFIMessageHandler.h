@@ -19,5 +19,5 @@ public:
 	IFLUFFIMessageHandler();
 	virtual ~IFLUFFIMessageHandler();
 
-§§	virtual void handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp) = 0;
+	virtual void handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp) = 0;
 };

@@ -462,7 +462,7 @@ namespace ExternalProcessTester
 
 			std::string mytestString = "myteststring\r\n";
 			DWORD nBytesWritten = 0;
-§§			WriteFile(ep1.getStdInHandle(), mytestString.c_str(), (DWORD)mytestString.length(), &nBytesWritten, NULL);
+			WriteFile(ep1.getStdInHandle(), mytestString.c_str(), (DWORD)mytestString.length(), &nBytesWritten, NULL);
 			Assert::IsTrue(nBytesWritten == mytestString.length(), (std::wstring(L"Failed to write the test input to the target's stdin:") + std::to_wstring(GetLastError())).c_str());
 
 			std::this_thread::sleep_for(std::chrono::milliseconds(200));
@@ -477,7 +477,7 @@ namespace ExternalProcessTester
 
 			mytestString = "myteststring2\r\n";
 			nBytesWritten = 0;
-§§			WriteFile(ep1.getStdInHandle(), mytestString.c_str(), (DWORD)mytestString.length(), &nBytesWritten, NULL);
+			WriteFile(ep1.getStdInHandle(), mytestString.c_str(), (DWORD)mytestString.length(), &nBytesWritten, NULL);
 			Assert::IsTrue(nBytesWritten == mytestString.length(), (std::wstring(L"Failed to write the second test input to the target's stdin:") + std::to_wstring(GetLastError())).c_str());
 
 			std::this_thread::sleep_for(std::chrono::milliseconds(200));
@@ -499,8 +499,8 @@ namespace ExternalProcessTester
 			success = ep1.run();
 			Assert::IsTrue(success, L"Failed to run the target process");
 
-§§			std::istream* is = ep1.getStdOutIstream();
-§§			std::ostream* os = ep1.getStdInOstream();
+			std::istream* is = ep1.getStdOutIstream();
+			std::ostream* os = ep1.getStdInOstream();
 
 			std::string mytestString = "myteststring\r\n";
 
@@ -608,8 +608,8 @@ namespace ExternalProcessTester
 					success = ep1.run();
 					Assert::IsTrue(success, L"Failed to run the target process");
 
-§§					std::istream* is = ep1.getStdOutIstream();
-§§					std::ostream* os = ep1.getStdInOstream();
+					std::istream* is = ep1.getStdOutIstream();
+					std::ostream* os = ep1.getStdInOstream();
 				}
 
 				//ProcessHandle count is extremely fluctuating. Idea: If there is a leak, it should occour every time ;)

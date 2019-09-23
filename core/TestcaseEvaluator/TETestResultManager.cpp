@@ -17,7 +17,7 @@ Author(s): Thomas Riedmaier, Michael Kraus, Abian Blome
 #include "GarbageCollectorWorker.h"
 #include "FluffiTestcaseID.h"
 
-§§TETestResultManager::TETestResultManager(std::string testcaseDir, GarbageCollectorWorker* garbageCollectorWorker) :
+TETestResultManager::TETestResultManager(std::string testcaseDir, GarbageCollectorWorker* garbageCollectorWorker) :
 	m_testOutcomeQueue(),
 	m_mutex_(),
 	m_testcaseDir(testcaseDir),
@@ -35,25 +35,25 @@ Author(s): Thomas Riedmaier, Michael Kraus, Abian Blome
 §§	}
 §§}
 §§
-§§void TETestResultManager::pushNewTestOutcomeFromTCRunner(TestOutcomeDescriptor* newTestcaseOutcome)
+void TETestResultManager::pushNewTestOutcomeFromTCRunner(TestOutcomeDescriptor* newTestcaseOutcome)
 §§{
 	std::unique_lock<std::mutex> mlock(m_mutex_);
 	m_testOutcomeQueue.push_back(newTestcaseOutcome);
-§§	LOG(DEBUG) << "Pushed a new received TestcaseOutcome from TestcaseRunner into the TestcaseOutcomeQueue";
+	LOG(DEBUG) << "Pushed a new received TestcaseOutcome from TestcaseRunner into the TestcaseOutcomeQueue";
 §§}
 §§
 bool TETestResultManager::isThereAlreadyAToDFor(FluffiTestcaseID id) {
 	std::unique_lock<std::mutex> mlock(m_mutex_);
 
-§§	for (auto& testOutcome : m_testOutcomeQueue) {
-§§		if (testOutcome->getId() == id) {
+	for (auto& testOutcome : m_testOutcomeQueue) {
+		if (testOutcome->getId() == id) {
 			return true;
 		}
 	}
 	return false;
 }
 
-§§TestOutcomeDescriptor* TETestResultManager::popTestOutcomeForEvaluation()
+TestOutcomeDescriptor* TETestResultManager::popTestOutcomeForEvaluation()
 §§{
 	std::unique_lock<std::mutex> mlock(m_mutex_);
 §§

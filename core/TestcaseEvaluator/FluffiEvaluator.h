@@ -7,7 +7,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-§§Author(s): Thomas Riedmaier, Abian Blome
+Author(s): Thomas Riedmaier, Abian Blome
 */
 
 #pragma once
@@ -20,17 +20,17 @@ class GarbageCollectorWorker;
 class FluffiEvaluator
 {
 public:
-§§	FluffiEvaluator(std::string testcaseDir, BlockCoverageCache* localBlockCoverageCache, GarbageCollectorWorker* garbageCollectorWorker, CommInt* commInt, TEWorkerThreadState* workerThreadState);
+	FluffiEvaluator(std::string testcaseDir, BlockCoverageCache* localBlockCoverageCache, GarbageCollectorWorker* garbageCollectorWorker, CommInt* commInt, TEWorkerThreadState* workerThreadState);
 	virtual ~FluffiEvaluator();
 
 	virtual bool isSetupFunctionable() = 0;
-§§	virtual void processTestOutcomeDescriptor(TestOutcomeDescriptor* tod) = 0;
+	virtual void processTestOutcomeDescriptor(TestOutcomeDescriptor* tod) = 0;
 
 protected:
 
 	std::string m_testcaseDir;
-§§	BlockCoverageCache* m_localBlockCoverageCache;
-§§	GarbageCollectorWorker* m_garbageCollectorWorker;
-§§	CommInt* m_commInt;
-§§	TEWorkerThreadState* m_workerThreadState;
+	BlockCoverageCache* m_localBlockCoverageCache;
+	GarbageCollectorWorker* m_garbageCollectorWorker;
+	CommInt* m_commInt;
+	TEWorkerThreadState* m_workerThreadState;
 };

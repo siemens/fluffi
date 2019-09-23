@@ -7,7 +7,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-§§Author(s): Thomas Riedmaier, Abian Blome
+Author(s): Thomas Riedmaier, Abian Blome
 */
 
 #include "stdafx.h"
@@ -25,14 +25,14 @@ IsAgentWelcomedRequestHandler::~IsAgentWelcomedRequestHandler()
 {
 }
 
-§§void IsAgentWelcomedRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp) {
+void IsAgentWelcomedRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp) {
 	LMWorkerThreadState* lmWorkerThreadState = dynamic_cast<LMWorkerThreadState*>(workerThreadState);
 	if (lmWorkerThreadState == nullptr) {
 		LOG(ERROR) << "IsAgentWelcomedRequestHandler::handleFLUFFIMessage - workerThreadState cannot be accessed";
 		return;
 	}
 
-§§	IsAgentWelcomedResponse* isAgentWelcomedResponse = new IsAgentWelcomedResponse();
+	IsAgentWelcomedResponse* isAgentWelcomedResponse = new IsAgentWelcomedResponse();
 
 	google::protobuf::RepeatedPtrField< std::string > implementedSubtypes = req->isagentwelcomedrequest().implementedagentsubtypes();
 	std::string subtypes;
@@ -54,10 +54,10 @@ IsAgentWelcomedRequestHandler::~IsAgentWelcomedRequestHandler()
 	std::set<std::string> acceptedAgentSubTypes;
 	switch (req->isagentwelcomedrequest().type()) {
 	case AgentType::TestcaseGenerator:
-§§		for (auto& setting : settings) {
-§§			if (setting.m_settingName == "generatorTypes") {
+		for (auto& setting : settings) {
+			if (setting.m_settingName == "generatorTypes") {
 				//generatorTypes is of format "A=50|B=50"
-§§				std::vector<std::string> acceptedGenTypesAndPercentages = Util::splitString(setting.m_settingValue, "|");
+				std::vector<std::string> acceptedGenTypesAndPercentages = Util::splitString(setting.m_settingValue, "|");
 				for (size_t i = 0; i < acceptedGenTypesAndPercentages.size(); i++) {
 					acceptedAgentSubTypes.insert(Util::splitString(acceptedGenTypesAndPercentages[i], "=")[0]);
 				}
@@ -66,18 +66,18 @@ IsAgentWelcomedRequestHandler::~IsAgentWelcomedRequestHandler()
 		}
 		break;
 	case AgentType::TestcaseRunner:
-§§		for (auto& setting : settings) {
-§§			if (setting.m_settingName == "runnerType") {
-§§				acceptedAgentSubTypes.insert(setting.m_settingValue);
+		for (auto& setting : settings) {
+			if (setting.m_settingName == "runnerType") {
+				acceptedAgentSubTypes.insert(setting.m_settingValue);
 				break;
 			}
 		}
 		break;
 	case AgentType::TestcaseEvaluator:
-§§		for (auto& setting : settings) {
-§§			if (setting.m_settingName == "evaluatorTypes") {
+		for (auto& setting : settings) {
+			if (setting.m_settingName == "evaluatorTypes") {
 				//evaluatorTypes is of format "A=50|B=50"
-§§				std::vector<std::string> acceptedEvalTypesAndPercentages = Util::splitString(setting.m_settingValue, "|");
+				std::vector<std::string> acceptedEvalTypesAndPercentages = Util::splitString(setting.m_settingValue, "|");
 				for (size_t i = 0; i < acceptedEvalTypesAndPercentages.size(); i++) {
 					acceptedAgentSubTypes.insert(Util::splitString(acceptedEvalTypesAndPercentages[i], "=")[0]);
 				}
@@ -96,14 +96,14 @@ IsAgentWelcomedRequestHandler::~IsAgentWelcomedRequestHandler()
 	{
 		std::stringstream oss;
 		bool isFirst = true;
-§§		for (auto& subtype : acceptedAgentSubTypes) {
+		for (auto& subtype : acceptedAgentSubTypes) {
 			if (!isFirst) {
 				oss << "|";
 			}
 			else {
 				isFirst = false;
 			}
-§§			oss << subtype;
+			oss << subtype;
 		}
 		acceptedSubTypes = oss.str();
 	}

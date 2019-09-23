@@ -137,87 +137,87 @@ CREATE TABLE IF NOT EXISTS fluffi.billing (
 
 INSERT IGNORE INTO fluffi.billing (Resource) VALUES ('RunnerSeconds');
 INSERT IGNORE INTO fluffi.billing (Resource) VALUES ('RunTestcasesNoLongerListed');
-§§
-§§DELIMITER //
-§§CREATE OR REPLACE PROCEDURE fluffi.populationMinimization()
-§§LANGUAGE SQL
-§§NOT DETERMINISTIC
-§§CONTAINS SQL
-§§SQL SECURITY DEFINER
-§§BEGIN
-§§	DECLARE done INT DEFAULT FALSE;
+
+DELIMITER //
+CREATE OR REPLACE PROCEDURE fluffi.populationMinimization()
+LANGUAGE SQL
+NOT DETERMINISTIC
+CONTAINS SQL
+SQL SECURITY DEFINER
+BEGIN
+	DECLARE done INT DEFAULT FALSE;
 	DECLARE c, c2 BIGINT;
-§§	DECLARE t, t2, t3 INT;
-§§	DECLARE e INT;
+	DECLARE t, t2, t3 INT;
+	DECLARE e INT;
 	DECLARE cur1 CURSOR FOR SELECT ID FROM interesting_testcases WHERE TestCaseType = 0;
 	DECLARE cur2 CURSOR FOR SELECT ID FROM interesting_testcases WHERE TestCaseType = 0;
-§§	DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-§§		
-§§	OPEN cur1;
-§§	
-§§	SET e = 0;
-§§	SELECT LCASE(SettingValue)="true" INTO e FROM settings WHERE SettingName = "populationMinimization";
-§§	
-§§	pop_loop: LOOP
+	DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+		
+	OPEN cur1;
+	
+	SET e = 0;
+	SELECT LCASE(SettingValue)="true" INTO e FROM settings WHERE SettingName = "populationMinimization";
+	
+	pop_loop: LOOP
 		FETCH cur1 INTO c;
-§§
-§§		IF done OR e = 0 THEN
-§§			LEAVE pop_loop;
-§§		END IF;
-§§		
-§§		OPEN cur2;
-§§		less_loop: LOOP
+
+		IF done OR e = 0 THEN
+			LEAVE pop_loop;
+		END IF;
+		
+		OPEN cur2;
+		less_loop: LOOP
 			FETCH cur2 into c2;
-§§			
-§§			IF done THEN
-§§				LEAVE less_loop;
-§§			END IF;
-§§			
-§§			IF c2 > c THEN
-§§					SET t = 42;
-§§					SET t2 = 0;
-§§					SET t3 = 0;
-§§					
-§§					SELECT DISTINCT COUNT(*) INTO t2 FROM covered_blocks
+			
+			IF done THEN
+				LEAVE less_loop;
+			END IF;
+			
+			IF c2 > c THEN
+					SET t = 42;
+					SET t2 = 0;
+					SET t3 = 0;
+					
+					SELECT DISTINCT COUNT(*) INTO t2 FROM covered_blocks
 						WHERE CreatorTestcaseID = c;
-§§						
-§§					SELECT DISTINCT COUNT(*) INTO t3 FROM covered_blocks
+						
+					SELECT DISTINCT COUNT(*) INTO t3 FROM covered_blocks
 						WHERE CreatorTestcaseID = c2;
-§§						
-§§					
-§§					IF t2 > 0 AND t3 > 0  AND t2 = t3 THEN
-§§						SELECT DISTINCT COUNT(*) INTO t FROM 
-§§							(SELECT Offset, ModuleID FROM covered_blocks
+						
+					
+					IF t2 > 0 AND t3 > 0  AND t2 = t3 THEN
+						SELECT DISTINCT COUNT(*) INTO t FROM 
+							(SELECT Offset, ModuleID FROM covered_blocks
 							WHERE CreatorTestcaseID = c
-§§							UNION ALL
-§§								SELECT Offset, ModuleID FROM covered_blocks
+							UNION ALL
+								SELECT Offset, ModuleID FROM covered_blocks
 								WHERE CreatorTestcaseID = c2) AS merged
-§§							GROUP BY Offset, ModuleID HAVING count(*) = 1;
-§§						
-§§						IF t = 42 THEN
+							GROUP BY Offset, ModuleID HAVING count(*) = 1;
+						
+						IF t = 42 THEN
 							UPDATE interesting_testcases SET TestCaseType = 5 WHERE ID = c2;
-§§						END IF;
-§§					END IF;
-§§					
-§§					SET done = FALSE;
-§§			END IF;
-§§		
-§§		END LOOP;
-§§		CLOSE cur2;
-§§		SET done = FALSE;
-§§		
-§§		
-§§	END LOOP;
-§§	
-§§	CLOSE cur1;
-§§END//
-§§DELIMITER ;
-§§
-§§CREATE EVENT IF NOT EXISTS fluffi.CallPopulationMinimization
-§§	ON SCHEDULE EVERY 3 HOUR
-§§	STARTS CURRENT_TIMESTAMP
-§§	ON COMPLETION NOT PRESERVE
-§§	ENABLE
-§§	DO CALL fluffi.populationMinimization();
-§§
-§§
+						END IF;
+					END IF;
+					
+					SET done = FALSE;
+			END IF;
+		
+		END LOOP;
+		CLOSE cur2;
+		SET done = FALSE;
+		
+		
+	END LOOP;
+	
+	CLOSE cur1;
+END//
+DELIMITER ;
+
+CREATE EVENT IF NOT EXISTS fluffi.CallPopulationMinimization
+	ON SCHEDULE EVERY 3 HOUR
+	STARTS CURRENT_TIMESTAMP
+	ON COMPLETION NOT PRESERVE
+	ENABLE
+	DO CALL fluffi.populationMinimization();
+
+

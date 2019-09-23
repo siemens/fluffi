@@ -21,42 +21,42 @@ TestcaseDescriptor::TestcaseDescriptor(FluffiTestcaseID id, FluffiTestcaseID par
 	m_pathAndFileName(pathAndFileName),
 	m_numOfProcessingAttempts(0),
 	m_forceFullCoverage(forceFullCoverage)
-§§{}
+{}
 §§
 §§TestcaseDescriptor::~TestcaseDescriptor()
-§§{}
+{}
 §§
 bool TestcaseDescriptor::getForceFullCoverage() const {
 	return m_forceFullCoverage;
 }
 
-§§FluffiTestcaseID TestcaseDescriptor::getId() const
+FluffiTestcaseID TestcaseDescriptor::getId() const
 §§{
-§§	return m_id;
+	return m_id;
 §§}
 §§
-§§FluffiTestcaseID TestcaseDescriptor::getparentId() const
+FluffiTestcaseID TestcaseDescriptor::getparentId() const
 §§{
-§§	return m_parentId;
+	return m_parentId;
 §§}
 §§
 void TestcaseDescriptor::increaseNumOfProcessingAttempts() {
 	m_numOfProcessingAttempts++;
 }
 §§
-§§int TestcaseDescriptor::getNumOfProcessingAttempts() const {
+int TestcaseDescriptor::getNumOfProcessingAttempts() const {
 	return m_numOfProcessingAttempts;
 }
 
 void TestcaseDescriptor::updateTimeOfLastSend() {
-§§	m_timeOfLastSend = std::chrono::steady_clock::now();
+	m_timeOfLastSend = std::chrono::steady_clock::now();
 }
 
-§§void TestcaseDescriptor::deleteFile(GarbageCollectorWorker* garbageCollectorWorker)
+void TestcaseDescriptor::deleteFile(GarbageCollectorWorker* garbageCollectorWorker)
 {
 	garbageCollectorWorker->markFileForDelete(m_pathAndFileName);
-§§}
-§§
-§§std::chrono::time_point<std::chrono::steady_clock> TestcaseDescriptor::getTimeOfLastSend() const {
+}
+
+std::chrono::time_point<std::chrono::steady_clock> TestcaseDescriptor::getTimeOfLastSend() const {
 	return m_timeOfLastSend;
 }

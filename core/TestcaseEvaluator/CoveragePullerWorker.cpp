@@ -18,7 +18,7 @@ Author(s): Thomas Riedmaier, Abian Blome
 #include "TEWorkerThreadState.h"
 #include "FluffiBasicBlock.h"
 
-§§CoveragePullerWorker::CoveragePullerWorker(CommInt* commInt, TEWorkerThreadStateBuilder* workerThreadStateBuilder, int intervallBetweenTwoPullingRoundsInMillisec, BlockCoverageCache* localBlockCoverageCache)
+CoveragePullerWorker::CoveragePullerWorker(CommInt* commInt, TEWorkerThreadStateBuilder* workerThreadStateBuilder, int intervallBetweenTwoPullingRoundsInMillisec, BlockCoverageCache* localBlockCoverageCache)
 	: m_commInt(commInt),
 	m_workerThreadStateBuilder(workerThreadStateBuilder),
 	m_intervallBetweenTwoPullingRoundsInMillisec(intervallBetweenTwoPullingRoundsInMillisec),
@@ -62,28 +62,28 @@ void CoveragePullerWorker::workerMain() {
 }
 
 void CoveragePullerWorker::pullCoverageFromLM() {
-§§	LOG(DEBUG) << "Pulling current coverage from LM";
+	LOG(DEBUG) << "Pulling current coverage from LM";
 
 	// Build and send message for GetTestcaseRequest
 	FLUFFIMessage req;
 	FLUFFIMessage resp;
 
-§§	GetCurrentBlockCoverageRequest* getCurrentBlockCoverageRequest = new GetCurrentBlockCoverageRequest();
+	GetCurrentBlockCoverageRequest* getCurrentBlockCoverageRequest = new GetCurrentBlockCoverageRequest();
 
 	req.set_allocated_getcurrentblockcoveragerequest(getCurrentBlockCoverageRequest);
 
 	bool respReceived = m_commInt->sendReqAndRecvResp(&req, &resp, m_workerThreadState, m_commInt->getMyLMServiceDescriptor().m_serviceHostAndPort, CommInt::timeoutNormalMessage);
 	if (respReceived) {
-§§		LOG(DEBUG) << "GetCurrentBlockCoverageResponse successfully received!";
+		LOG(DEBUG) << "GetCurrentBlockCoverageResponse successfully received!";
 	}
 	else {
-§§		LOG(ERROR) << "No GetCurrentBlockCoverageResponse received!";
+		LOG(ERROR) << "No GetCurrentBlockCoverageResponse received!";
 		return;
 	}
 
 	const GetCurrentBlockCoverageResponse* receivedTestcase = &(resp.getcurrentblockcoverageresponse());
 
-§§	LOG(DEBUG) << "Adding " << receivedTestcase->blocks().size() << " new basic blocks";
+	LOG(DEBUG) << "Adding " << receivedTestcase->blocks().size() << " new basic blocks";
 	std::set<FluffiBasicBlock> blocksAsSet;
 	for (int i = 0; i < receivedTestcase->blocks().size(); i++) {
 		blocksAsSet.insert(FluffiBasicBlock(receivedTestcase->blocks().Get(i)));

@@ -20,10 +20,10 @@
 §§
 §§import json, io, os, shutil
 §§import requests
-§§
-§§@app.route("/")
-§§@app.route("/index")
-§§def index():
+
+@app.route("/")
+@app.route("/index")
+def index():
 §§    fuzzjobs = listFuzzJobs()
 §§    inactivefuzzjobs = []
 §§    activefuzzjobs = []
@@ -38,7 +38,7 @@
 §§            inactivefuzzjobs.append(project)
 §§
 §§    locations = getLocations()
-§§    user = {"nickname": "amb"}
+    user = {"nickname": "amb"}
 §§ 
 §§    return renderTemplate("index.html",
 §§                           title = "Home",
@@ -49,22 +49,22 @@
 §§                           footer = FOOTER_SIEMENS)
 §§
 §§
-§§@app.route("/projects")
-§§def projects():
+@app.route("/projects")
+def projects():
 §§    projects = getProjects()
-§§
+
 §§    return renderTemplate("projects.html",
 §§                           title = "Projects",
 §§                           projects = projects)
 §§
 §§
 §§@app.route("/projects/delete/<int:projId>", methods = ["GET", "POST"])
-§§def removeProject(projId):
+def removeProject(projId):
 §§    msg, category = deleteFuzzjob(projId)
 §§    flash(msg, category)
 §§
-§§    return redirect(url_for("projects"))
-§§
+    return redirect(url_for("projects"))
+
 §§
 §§@app.route("/projects/archive/<int:projId>", methods = ["POST"])
 §§def archiveProject(projId):
@@ -90,21 +90,21 @@
 §§
 §§@app.route("/locations/<int:locId>/delProject/<int:projId>")
 §§def locationRemoveProject(locId, projId):
-§§    try:
+    try:
 §§        location = models.LocationFuzzjobs.query.filter_by(Location = locId, Fuzzjob = projId).first()
-§§        if location is not None:
-§§            db.session.delete(location)
-§§            db.session.commit()
-§§        else:
+        if location is not None:
+            db.session.delete(location)
+            db.session.commit()
+        else:
 §§            flash("Project in location not found", "error")
 §§            return redirect("/locations/view/%s" % locId)
-§§    except HTTPException as error:
-§§        return error("")
+    except HTTPException as error:
+        return error("")
 §§
 §§    flash("Project deleted from location deleted", "success")
 §§
 §§    return redirect("/locations/view/%s" % locId)
-§§
+
 §§
 §§@app.route("/projects/<int:projId>/addSetting", methods = ["GET", "POST"])
 §§def createSetting(projId):
@@ -170,7 +170,7 @@
 §§
 §§
 §§@app.route("/projects/<int:projId>/addModule", methods = ["GET", "POST"])
-§§def createProjectModule(projId):
+def createProjectModule(projId):
 §§    moduleForm = CreateProjectModuleForm()
 §§
 §§    if request.method == "POST" and moduleForm.is_submitted:
@@ -192,23 +192,23 @@
 §§
 §§@app.route("/locations/<int:locId>/addProject", methods = ["GET", "POST"])
 §§def addLocationProject(locId):
-§§    projects = []
+    projects = []
 §§
-§§    for project in models.Fuzzjob.query.all():
+    for project in models.Fuzzjob.query.all():
 §§        if models.LocationFuzzjobs.query.filter_by(Location = locId, Fuzzjob = project.id).first() is None:
-§§            data = (project.id, project.name)
-§§            projects.append(data)
+            data = (project.id, project.name)
+            projects.append(data)
 §§
-§§    form = AddLocationProjectForm()
-§§    form.project.choices = projects
+    form = AddLocationProjectForm()
+    form.project.choices = projects
 §§
-§§    if request.method == 'POST':
+    if request.method == 'POST':
 §§        location = models.LocationFuzzjobs(Location = locId, Fuzzjob = form.project.data)
-§§        db.session.add(location)
-§§        db.session.commit()
+        db.session.add(location)
+        db.session.commit()
 §§        flash("Added project to location", "success")
 §§        return redirect("/locations/view/%s" % locId)
-§§
+
 §§    return renderTemplate("addLocationProject.html",
 §§                           title = "Add new project to location",
 §§                           form = form)
@@ -245,13 +245,13 @@
 §§    return redirect("/locations")
 §§
 §§
-§§@app.route("/projects/<int:projId>/population")
-§§def viewPopulation(projId):
+@app.route("/projects/<int:projId>/population")
+def viewPopulation(projId):
 §§    data = getGeneralInformationData(projId, getITQueryOfTypeNoRaw(TESTCASE_TYPES["population"]))
 §§    data.name = "Population"
 §§    data.redirect = "population"
 §§    data.downloadName = "downloadPopulation"
-§§
+
 §§    return renderTemplate("viewTCsTempl.html",
 §§                           title = "View Population",
 §§                           data = data)
@@ -464,7 +464,7 @@
 §§def getTestcase(projId, testcaseId):
 §§    byteIO, filename = createByteIOTestcase(projId, testcaseId)
 §§
-§§    return send_file(byteIO,
+    return send_file(byteIO,
 §§                     attachment_filename = filename,
 §§                     as_attachment = True)
 §§
@@ -576,8 +576,8 @@
 §§            db.session.add(location_fuzzjob)
 §§            db.session.commit()
 §§        flash("Added location(s)", "success")
-§§        return redirect("/projects/view/%d" % projId)
-§§
+        return redirect("/projects/view/%d" % projId)
+
 §§    project = getProject(projId)
 §§    moduleForm = CreateProjectModuleForm()
 §§    settingForm = CreateProjectSettingForm()
@@ -600,33 +600,33 @@
 §§    else:
 §§        flash("Please select files to add ...", "error")
 §§        return redirect("/projects/{}/population".format(projId))
-§§
+
 §§
 §§@app.route("/locations/assignWorker/<string:workerID>", methods=["POST"])
 §§def assignWorker(workerID):
 §§    message = ""
 §§
-§§    if not request.json:
-§§        abort(400)
+    if not request.json:
+        abort(400)
 §§
-§§    try:
-§§        worker = models.Workers.query.filter_by(Servicedescriptorguid=workerID).first()
-§§        worker.Fuzzjob = request.json["ProjectID"]
-§§        db.session.commit()
-§§    except Exception as e:
-§§        print(e)
+    try:
+        worker = models.Workers.query.filter_by(Servicedescriptorguid=workerID).first()
+        worker.Fuzzjob = request.json["ProjectID"]
+        db.session.commit()
+    except Exception as e:
+        print(e)
 §§        message = "Could not assign worker"
 §§
 §§    return json.dumps({"message": message})
 §§
 §§
 §§@app.route("/projects/<int:projId>/changeSetting/<int:settingId>", methods = ["POST"])
-§§def changeProjectSetting(projId, settingId):
-§§    if not request.json:
+def changeProjectSetting(projId, settingId):
+    if not request.json:
 §§        abort(400)
 §§
 §§    message, status = updateSettings(projId, settingId, request.json["SettingValue"])
-§§
+
 §§    return json.dumps({"message": message, "status": status})
 §§
 §§
@@ -635,11 +635,11 @@
 §§    location = models.Locations.query.filter_by(Name = locName).first()
 §§    location_fuzzjob = models.LocationFuzzjobs.query.filter_by(Fuzzjob = projId, Location = location.id).first()
 §§    db.session.delete(location_fuzzjob)
-§§    db.session.commit()
+    db.session.commit()
 §§    flash("Location deleted", "success")
 §§
-§§    return redirect("/projects/view/%d" % projId)
-§§
+    return redirect("/projects/view/%d" % projId)
+
 §§
 §§@app.route("/projects/<int:projId>/delTestcase/<string:testcaseId>/<string:tcType>", methods = ["GET"])
 §§def removeProjectTestcase(projId, testcaseId, tcType):
@@ -648,27 +648,27 @@
 §§    flash(msg, category)
 §§
 §§    return redirect("/projects/{}/{}".format(projId, tcType))
-§§
+
 §§
 §§@app.route("/projects/<int:projId>/delModule/<int:moduleId>", methods = ["GET"])
-§§def removeProjectModule(projId, moduleId):
+def removeProjectModule(projId, moduleId):
 §§    msg, category = deleteElement(projId, "Module", DELETE_MODULE_BY_ID, {"Id": moduleId})
 §§    flash(msg, category)
 §§
-§§    return redirect("/projects/view/%d" % projId)
-§§
+    return redirect("/projects/view/%d" % projId)
+
 §§
 §§@app.route("/projects/<int:projId>/delSetting/<int:settingId>", methods = ["GET"])
-§§def removeProjectSetting(projId, settingId):
+def removeProjectSetting(projId, settingId):
 §§    msg, category = deleteElement(projId, "Setting", DELETE_SETTING_BY_ID, {"Id": settingId})
 §§    flash(msg, category)
 §§
-§§    return redirect("/projects/view/%d" % projId)
-§§
+    return redirect("/projects/view/%d" % projId)
+
 §§
 §§@app.route("/projects/createProject", methods = ["GET", "POST"])
-§§def createProject():
-§§    form = CreateProjectForm()
+def createProject():
+    form = CreateProjectForm()
 §§    # msg, category = "", ""
 §§
 §§    if request.method == 'POST' and form.is_submitted:
@@ -697,17 +697,17 @@
 §§
 §§
 §§@app.route("/projects/createCustomProject", methods = ["GET", "POST"])
-§§def createCustomProject():
-§§    form = CreateCustomProjectForm()
+def createCustomProject():
+    form = CreateCustomProjectForm()
 §§
-§§    if form.validate_on_submit():
+    if form.validate_on_submit():
 §§        project = models.Fuzzjob(name = form.name.data, DBHost = form.DBHost.data, DBUser = form.DBUser.data,
 §§                                 DBPass = form.DBPass.data, DBName = form.DBName.data)
-§§        db.session.add(project)
-§§        db.session.commit()
+        db.session.add(project)
+        db.session.commit()
 §§        flash("Created new project", "success")
-§§        return redirect(url_for("projects"))
-§§
+        return redirect(url_for("projects"))
+
 §§    return renderTemplate("createCustomProject.html",
 §§                           title = "Create custom project",
 §§                           form = form)
@@ -724,11 +724,11 @@
 §§
 §§
 §§@app.route("/projects/<int:projId>/testcaseGraph", methods = ["GET"])
-§§def viewTestcaseGraph(projId):
+def viewTestcaseGraph(projId):
 §§    graphdata = getGraphData(projId)
 §§
 §§    return json.dumps(graphdata)
-§§
+
 §§
 §§@app.route("/locations/view/<int:locId>")
 §§def viewLocation(locId):
@@ -738,9 +738,9 @@
 §§                           title = "Location details",
 §§                           location = location)
 §§
-§§
-§§@app.route("/projects/view/<int:projId>")
-§§def viewProject(projId):
+
+@app.route("/projects/view/<int:projId>")
+def viewProject(projId):
 §§    project = getProject(projId)
 §§    locationForm = getLocationFormWithChoices(projId, AddProjectLocationForm())
 §§    settingForm = CreateProjectSettingForm()
@@ -755,15 +755,15 @@
 §§                           )
 §§
 §§
-§§@app.route("/locations")
-§§def locations():
+@app.route("/locations")
+def locations():
 §§    locations = models.Locations.query.all()
 §§
 §§    return renderTemplate("locations.html",
 §§                           title = "Locations",
 §§                           locations = locations)
 §§
-§§
+
 §§@app.route("/commands")
 §§def commands():
 §§    commands = models.CommandQueue.query.all()

@@ -21,7 +21,7 @@ NotImplementedHandler::~NotImplementedHandler()
 {
 }
 
-§§void NotImplementedHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp) {
+void NotImplementedHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp) {
 	(void)(workerThreadState); //avoid unused parameter warning
 	(void)(req); //avoid unused parameter warning
 	resp->set_allocated_requesttypenotimplementedresponse(new RequestTypeNotImplementedResponse());

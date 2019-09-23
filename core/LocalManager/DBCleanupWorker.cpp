@@ -7,7 +7,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-§§Author(s): Thomas Riedmaier, Abian Blome
+Author(s): Thomas Riedmaier, Abian Blome
 */
 
 #include "stdafx.h"
@@ -16,7 +16,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #include "FluffiServiceDescriptor.h"
 #include "LMWorkerThreadState.h"
 
-§§DBCleanupWorker::DBCleanupWorker(CommInt* commInt, LMWorkerThreadStateBuilder* workerThreadStateBuilder, int timeBetweenTwoCleanupRoundsInMS, std::string location) :
+DBCleanupWorker::DBCleanupWorker(CommInt* commInt, LMWorkerThreadStateBuilder* workerThreadStateBuilder, int timeBetweenTwoCleanupRoundsInMS, std::string location) :
 	m_commInt(commInt), m_workerThreadStateBuilder(workerThreadStateBuilder), m_timeBetweenTwoCleanupRoundsInMS(timeBetweenTwoCleanupRoundsInMS), m_location(location)
 {
 }
@@ -70,7 +70,7 @@ void DBCleanupWorker::workerMain() {
 
 void DBCleanupWorker::updateRunnerSeconds() {
 	unsigned int activeRunners = static_cast<unsigned int>(m_workerThreadState->dbManager->getRegisteredInstancesOfAgentType(AgentType::TestcaseRunner, m_location).size());
-§§	m_workerThreadState->dbManager->addRunnerSeconds(activeRunners* m_timeBetweenTwoCleanupRoundsInMS / 1000);
+	m_workerThreadState->dbManager->addRunnerSeconds(activeRunners* m_timeBetweenTwoCleanupRoundsInMS / 1000);
 }
 
 void DBCleanupWorker::updateRunTestcasesNoLongerShowing() {
@@ -79,8 +79,8 @@ void DBCleanupWorker::updateRunTestcasesNoLongerShowing() {
 }
 
 void DBCleanupWorker::dropCrashesThatAppearedMoreThanXTimes(int times) {
-§§	for (auto& crashFootprint : m_workerThreadState->dbManager->getAllCrashFootprints()) {
-§§		m_workerThreadState->dbManager->dropTestcaseIfCrashFootprintAppearedMoreThanXTimes(times, crashFootprint);
+	for (auto& crashFootprint : m_workerThreadState->dbManager->getAllCrashFootprints()) {
+		m_workerThreadState->dbManager->dropTestcaseIfCrashFootprintAppearedMoreThanXTimes(times, crashFootprint);
 	}
 }
 

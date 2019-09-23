@@ -63,9 +63,9 @@ public:
 	int getExitStatus();
 	int getProcessID();
 	HANDLETYPE getStdInHandle();
-§§	std::ostream* getStdInOstream();
+	std::ostream* getStdInOstream();
 	HANDLETYPE getStdOutHandle();
-§§	std::istream* getStdOutIstream();
+	std::istream* getStdOutIstream();
 	bool initProcess();
 	bool run();
 	bool runAndWaitForCompletion(unsigned long timeoutMilliseconds);
@@ -93,12 +93,12 @@ private:
 	CHILD_OUTPUT_TYPE m_child_output_mode;
 	HANDLETYPE m_inputPipe[2]; //[1] is the writing end - [0] the reading end
 	HANDLETYPE m_outputPipe[2];//[1] is the writing end - [0] the reading end
-§§	bool m_hasBeenRun;
-§§	bool m_hasBeenInitialized;
-§§	bool m_isBeingDebugged;
+	bool m_hasBeenRun;
+	bool m_hasBeenInitialized;
+	bool m_isBeingDebugged;
 	int m_exitStatus;
-§§	std::ostream* m_stdInOstream;
-§§	std::istream* m_stdOutIstream;
+	std::ostream* m_stdInOstream;
+	std::istream* m_stdOutIstream;
 
 	static std::atomic<TIMETYPE> s_allTimeSpent;
 	static std::unordered_set<ExternalProcess*> s_runningProcessSet;
@@ -114,7 +114,7 @@ private:
 
 	static std::string addrToRVAString(PROCESS_INFORMATION pi, std::uintptr_t addr);
 	static BOOL CreateProcessInJob(HANDLE hJob, LPCSTR lpApplicationName, LPSTR lpCommandLine, LPSECURITY_ATTRIBUTES lpProcessAttributes, LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles, DWORD dwCreationFlags, LPVOID lpEnvironment, LPCSTR lpCurrentDirectory, LPSTARTUPINFOA lpStartupInfo, LPPROCESS_INFORMATION ppi);
-§§	static bool fillInMainThread(PROCESS_INFORMATION* m_pi); //needed when attach to process is used to set the main thread
+	static bool fillInMainThread(PROCESS_INFORMATION* m_pi); //needed when attach to process is used to set the main thread
 	static DWORD getPIDForProcessName(std::string processName);
 
 #else
@@ -129,16 +129,16 @@ private:
 	sigset_t m_debugSignalMask;
 	int m_fd_pipe[2];  // Used to store two ends of  pipe
 	bool m_targetIsSentNudges;
-§§	__gnu_cxx::stdio_filebuf<char>* m_stdInOstream_buf;
-§§	__gnu_cxx::stdio_filebuf<char>* m_stdOutIstream_buf;
+	__gnu_cxx::stdio_filebuf<char>* m_stdInOstream_buf;
+	__gnu_cxx::stdio_filebuf<char>* m_stdOutIstream_buf;
 
 	static std::string addrToRVAString(pid_t childPID, std::uintptr_t addr);
 	static pid_t getPIDForProcessName(std::string processName);
 #endif
 
 	void updateTimeSpent();
-§§	static void addToRunningProcessesSet(ExternalProcess* thisp);
-§§	static void removeFromRunningProcessesSet(ExternalProcess* thisp);
+	static void addToRunningProcessesSet(ExternalProcess* thisp);
+	static void removeFromRunningProcessesSet(ExternalProcess* thisp);
 	static void updateTimeSpentOnAllInRunningProcessesSet();
 	static bool isInRunningProcessesSet(int pid);
 };

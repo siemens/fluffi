@@ -301,7 +301,7 @@ Author(s): Michael Kraus, Thomas Riedmaier, Pascal Eckmann, Abian Blome
 §§			Assert::AreEqual(testcaseManager->getPendingTestcaseQueueSize(), (size_t)0, L"Error popping TestcaseS from pendingTestcaseQueue into sentButNotEvaluatedSet: (reinsertTestcasesHavingNoAnswerSince)");
 §§			Assert::AreEqual(testcaseManager->getSentButNotEvaluatedTestcaseSetSize(), (size_t)2, L"Error popping TestcaseS from pendingTestcaseQueue into sentButNotEvaluatedSet: (reinsertTestcasesHavingNoAnswerSince)");
 
-§§			std::chrono::time_point<std::chrono::steady_clock> timeBeforeWhichShouldBeReinserted = std::chrono::steady_clock::now() + std::chrono::milliseconds(100);
+			std::chrono::time_point<std::chrono::steady_clock> timeBeforeWhichShouldBeReinserted = std::chrono::steady_clock::now() + std::chrono::milliseconds(100);
 
 §§			// Test Method
 §§			testcaseManager->reinsertTestcasesHavingNoAnswerSince(timeBeforeWhichShouldBeReinserted);
@@ -339,7 +339,7 @@ Author(s): Michael Kraus, Thomas Riedmaier, Pascal Eckmann, Abian Blome
 §§			Assert::AreEqual(testcaseManager->getPendingTestcaseQueueSize(), (size_t)0, L"Error popping TestcaseS from pendingTestcaseQueue into sentButNotEvaluatedSet: (handMeAllTestcasesWithTooManyRetries)");
 §§			Assert::AreEqual(testcaseManager->getSentButNotEvaluatedTestcaseSetSize(), (size_t)2, L"Error popping TestcaseS from pendingTestcaseQueue into sentButNotEvaluatedSet: (handMeAllTestcasesWithTooManyRetries)");
 §§
-§§			std::chrono::time_point<std::chrono::steady_clock> timeBeforeWhichShouldBeReinserted = std::chrono::steady_clock::now() + std::chrono::milliseconds(100);
+			std::chrono::time_point<std::chrono::steady_clock> timeBeforeWhichShouldBeReinserted = std::chrono::steady_clock::now() + std::chrono::milliseconds(100);
 §§
 §§			testcaseManager->reinsertTestcasesHavingNoAnswerSince(timeBeforeWhichShouldBeReinserted);
 §§
@@ -349,7 +349,7 @@ Author(s): Michael Kraus, Thomas Riedmaier, Pascal Eckmann, Abian Blome
 §§			testcaseManager->popPendingTCForProcessing();
 §§			Assert::AreEqual(testcaseManager->getPendingTestcaseQueueSize(), (size_t)1, L"Error popping TestcaseS from pendingTestcaseQueue into sentButNotEvaluatedSet: (handMeAllTestcasesWithTooManyRetries)");
 §§			Assert::AreEqual(testcaseManager->getSentButNotEvaluatedTestcaseSetSize(), (size_t)1, L"Error popping TestcaseS from pendingTestcaseQueue into sentButNotEvaluatedSet: (handMeAllTestcasesWithTooManyRetries)");
-§§			timeBeforeWhichShouldBeReinserted = std::chrono::steady_clock::now() + std::chrono::milliseconds(1000);
+			timeBeforeWhichShouldBeReinserted = std::chrono::steady_clock::now() + std::chrono::milliseconds(1000);
 §§			testcaseManager->reinsertTestcasesHavingNoAnswerSince(timeBeforeWhichShouldBeReinserted);
 §§
 §§			testcaseManager->popPendingTCForProcessing();

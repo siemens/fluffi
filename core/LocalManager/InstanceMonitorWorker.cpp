@@ -62,13 +62,13 @@ void InstanceMonitorWorker::workerMain() {
 		m_workerThreadState->dbManager->deleteManagedInstanceStatusOlderThanXSec(60);
 
 		// call get Status to all registered instances
-§§		for (auto& managedInstance : m_workerThreadState->dbManager->getAllRegisteredInstances(m_location)) {
+		for (auto& managedInstance : m_workerThreadState->dbManager->getAllRegisteredInstances(m_location)) {
 			//Allow termination
 			if (m_workerThreadState->m_stopRequested) {
 				break;
 			}
 
-§§			LOG(DEBUG) << "Sending getStatus to: " << managedInstance.first.m_guid << " - " << managedInstance.first.m_serviceHostAndPort;
+			LOG(DEBUG) << "Sending getStatus to: " << managedInstance.first.m_guid << " - " << managedInstance.first.m_serviceHostAndPort;
 
 			FLUFFIMessage req;
 			FLUFFIMessage resp;
@@ -80,22 +80,22 @@ void InstanceMonitorWorker::workerMain() {
 
 			req.set_allocated_getstatusrequest(statusRequest);
 
-§§			if (!m_commInt->sendReqAndRecvResp(&req, &resp, m_workerThreadState, managedInstance.first.m_serviceHostAndPort, CommInt::timeoutNormalMessage)) {
+			if (!m_commInt->sendReqAndRecvResp(&req, &resp, m_workerThreadState, managedInstance.first.m_serviceHostAndPort, CommInt::timeoutNormalMessage)) {
 				//delete no longer responding instances
-§§				LOG(INFO) << managedInstance.first.m_guid << " - " << managedInstance.first.m_serviceHostAndPort << " does not respond! Deleting it!";
-§§				m_workerThreadState->dbManager->removeManagedInstance(managedInstance.first.m_guid, m_location);
+				LOG(INFO) << managedInstance.first.m_guid << " - " << managedInstance.first.m_serviceHostAndPort << " does not respond! Deleting it!";
+				m_workerThreadState->dbManager->removeManagedInstance(managedInstance.first.m_guid, m_location);
 				continue;
 			}
 
 			if (resp.fluff_case() != FLUFFIMessage::FluffCase::kGetStatusResponse) {
-§§				LOG(ERROR) << "A getStatus request was not answered with a getStatus response";
+				LOG(ERROR) << "A getStatus request was not answered with a getStatus response";
 				continue;
 			}
 
 			std::string statusToStore = resp.getstatusresponse().status();
 
 			//Transform total executions into exections / sec
-§§			if (managedInstance.second == AgentType::TestcaseRunner) {
+			if (managedInstance.second == AgentType::TestcaseRunner) {
 				std::vector<std::string> statusElements = Util::splitString(statusToStore, "|");
 
 				statusToStore = "";
@@ -122,7 +122,7 @@ void InstanceMonitorWorker::workerMain() {
 				}
 			}
 
-§§			m_workerThreadState->dbManager->addNewManagedInstanceStatus(managedInstance.first.m_guid, statusToStore);
+			m_workerThreadState->dbManager->addNewManagedInstanceStatus(managedInstance.first.m_guid, statusToStore);
 		}
 	}
 

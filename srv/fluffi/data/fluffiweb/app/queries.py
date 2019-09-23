@@ -168,11 +168,11 @@
 §§
 §§GET_CRASH_DETAILS = (
 §§    "SELECT DISTINCT cd.CrashFootprint FROM crash_descriptions as cd;")
-§§
+
 §§GET_CRASH_PARENTS = (
-§§    "SELECT it.ParentServiceDescriptorGUID, it.ParentLocalID, COUNT(*) AS NumberEdges FROM interesting_testcases as it "
+    "SELECT it.ParentServiceDescriptorGUID, it.ParentLocalID, COUNT(*) AS NumberEdges FROM interesting_testcases as it "
     "JOIN crash_descriptions as cd ON it.ID = cd.CreatorTestcaseID "
-§§    "WHERE cd.CrashFootprint = :CrashFootprint AND (it.TestCaseType=3 OR it.TestCaseType=2) "
+    "WHERE cd.CrashFootprint = :CrashFootprint AND (it.TestCaseType=3 OR it.TestCaseType=2) "
 §§    "GROUP BY it.ParentServiceDescriptorGUID, it.ParentLocalID;")
 §§
 §§GET_NN_TESTCASE_RAWBYTES = (

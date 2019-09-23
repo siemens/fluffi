@@ -8,32 +8,32 @@
 # 
 # Author(s): Michael Kraus, Junes Najah, Abian Blome, Thomas Riedmaier
 
-§§from app import db
+from app import db
 §§from sqlalchemy import ForeignKey
+
 §§
-§§
-§§class Fuzzjob(db.Model):
+class Fuzzjob(db.Model):
 §§    __tablename__ = 'fuzzjob'
 §§    id = db.Column(db.Integer, primary_key = True)
-§§    name = db.Column(db.String(256))
-§§    DBHost = db.Column(db.String(256))
-§§    DBUser = db.Column(db.String(256))
-§§    DBPass = db.Column(db.String(256))
-§§    DBName = db.Column(db.String(256))
-§§
-§§    def __repr__(self):
+    name = db.Column(db.String(256))
+    DBHost = db.Column(db.String(256))
+    DBUser = db.Column(db.String(256))
+    DBPass = db.Column(db.String(256))
+    DBName = db.Column(db.String(256))
+
+    def __repr__(self):
 §§        return '<FuzzJob %r>' % self.name
 §§
-§§
-§§class Locations(db.Model):
+
+class Locations(db.Model):
 §§    __tablename__ = 'locations'
 §§    id = db.Column(db.Integer, primary_key = True)
 §§    Name = db.Column(db.String(256))
-§§
-§§    def __repr__(self):
+
+    def __repr__(self):
 §§        return '<Location %r>' % self.Name
 §§
-§§
+
 §§class Systems(db.Model):
 §§    __tablename__ = 'systems'
 §§    id = db.Column(db.Integer, primary_key = True)
@@ -43,33 +43,33 @@
 §§        return '<System %r>' % self.Name
 §§
 §§
-§§class Localmanagers(db.Model):
+class Localmanagers(db.Model):
     __tablename__ = 'localmanagers'
 §§    Servicedescriptorguid = db.Column(db.String(50), primary_key = True)
-§§    Servicedescriptorhostandport = db.Column(db.String(256))
-§§    Location = db.Column(db.String(256))
-§§    Fuzzjob = db.Column(db.Integer)
-§§
-§§    def __repr__(self):
+    Servicedescriptorhostandport = db.Column(db.String(256))
+    Location = db.Column(db.String(256))
+    Fuzzjob = db.Column(db.Integer)
+
+    def __repr__(self):
 §§        return '<Localmanager %r>' % self.Servicedescriptorguid
 §§
-§§
-§§class LocalmanagersStatuses(db.Model):
+
+class LocalmanagersStatuses(db.Model):
     __tablename__ = 'localmanagers_statuses'
 §§    Id = db.Column(db.Integer, primary_key = True)
-§§    Servicedescriptorguid = db.Column(db.String(50))
-§§    Timeofstatus = db.Column(db.DateTime)
-§§    Status = db.Column(db.String(1000))
+    Servicedescriptorguid = db.Column(db.String(50))
+    Timeofstatus = db.Column(db.DateTime)
+    Status = db.Column(db.String(1000))
+
 §§
-§§
-§§class Workers(db.Model):
+class Workers(db.Model):
     __tablename__ = 'workers'
 §§    Servicedescriptorguid = db.Column(db.String(50), primary_key = True)
     ServiceDescriptorhostandport = db.Column(db.String(50))
-§§    Fuzzjob = db.Column(db.Integer)
+    Fuzzjob = db.Column(db.Integer)
     Location = db.Column(db.Integer)
-§§    Timeoflastrequest = db.Column(db.DateTime)
-§§    Agenttype = db.Column(db.Integer)
+    Timeoflastrequest = db.Column(db.DateTime)
+    Agenttype = db.Column(db.Integer)
     Agentsubtypes = db.Column(db.String(1000))
 §§
 §§

@@ -10,32 +10,32 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Abian Blome, Thomas Riedmaier
 */
 
-§§#include "stdafx.h"
-§§#include "FluffiServiceAndWeight.h"
-§§
+#include "stdafx.h"
+#include "FluffiServiceAndWeight.h"
+
 FluffiServiceAndWeight::FluffiServiceAndWeight(const FluffiServiceDescriptor serviceDescriptor, uint32_t weight) :
 	m_serviceDescriptor(serviceDescriptor), m_weight(weight)
-§§{
-§§}
-§§
+{
+}
+
 FluffiServiceAndWeight::FluffiServiceAndWeight(const ServiceAndWeigth& serviceAndWeight) :
 	m_serviceDescriptor(FluffiServiceDescriptor(serviceAndWeight.servicedescriptor())), m_weight(serviceAndWeight.weight())
-§§{
-§§}
-§§
-§§FluffiServiceAndWeight::~FluffiServiceAndWeight()
-§§{
-§§}
-§§
-§§ServiceAndWeigth FluffiServiceAndWeight::getProtobuf() const
-§§{
-§§	ServiceAndWeigth serviceAndWeight = ServiceAndWeigth();
-§§
-§§	ServiceDescriptor* protoServiceDescriptor = new ServiceDescriptor();
+{
+}
+
+FluffiServiceAndWeight::~FluffiServiceAndWeight()
+{
+}
+
+ServiceAndWeigth FluffiServiceAndWeight::getProtobuf() const
+{
+	ServiceAndWeigth serviceAndWeight = ServiceAndWeigth();
+
+	ServiceDescriptor* protoServiceDescriptor = new ServiceDescriptor();
 	protoServiceDescriptor->CopyFrom(m_serviceDescriptor.getProtobuf());
-§§
-§§	serviceAndWeight.set_allocated_servicedescriptor(protoServiceDescriptor);
+
+	serviceAndWeight.set_allocated_servicedescriptor(protoServiceDescriptor);
 	serviceAndWeight.set_weight(m_weight);
 
-§§	return serviceAndWeight;
+	return serviceAndWeight;
 }

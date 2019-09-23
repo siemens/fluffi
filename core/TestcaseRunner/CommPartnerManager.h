@@ -25,7 +25,7 @@ Author(s): Thomas Riedmaier, Michael Kraus, Abian Blome
 private:
 	uint64_t m_weigthSum = 0;
 	std::mutex m_mutex_;
-§§	std::vector<FluffiServiceAndWeight> m_commDescriptorSet;
+	std::vector<FluffiServiceAndWeight> m_commDescriptorSet;
 
 	std::random_device m_rd;  //Will be used to obtain a seed for the random number engine
 	std::mt19937 m_gen; //Standard mersenne_twister_engine seeded with rd()

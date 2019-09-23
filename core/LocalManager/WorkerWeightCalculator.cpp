@@ -10,103 +10,103 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Abian Blome, Thomas Riedmaier
 */
 
-§§#include "stdafx.h"
-§§#include "WorkerWeightCalculator.h"
+#include "stdafx.h"
+#include "WorkerWeightCalculator.h"
 #include "LMDatabaseManager.h"
-§§
-§§WorkerWeightCalculator::WorkerWeightCalculator(LMDatabaseManager* dbManager, std::string location)
+
+WorkerWeightCalculator::WorkerWeightCalculator(LMDatabaseManager* dbManager, std::string location)
 	: m_dbManager(dbManager),
-§§	m_location(location)
-§§{}
-§§
-§§WorkerWeightCalculator::~WorkerWeightCalculator()
-§§{}
-§§
-§§void WorkerWeightCalculator::updateStatusInformation()
-§§{
+	m_location(location)
+{}
+
+WorkerWeightCalculator::~WorkerWeightCalculator()
+{}
+
+void WorkerWeightCalculator::updateStatusInformation()
+{
 	std::vector<StatusOfInstance> statusVector = m_dbManager->getStatusOfManagedInstances(m_location);
-§§
-§§	m_generatorStatus.clear();
-§§	m_evaluatorStatus.clear();
-§§
+
+	m_generatorStatus.clear();
+	m_evaluatorStatus.clear();
+
 	if (statusVector.empty())
 	{
 		LOG(INFO) << "Retrieval of status information from DB failed! It looks like there are no agents in my location! ";
 		return;
 	}
 
-§§	while (!statusVector.empty())
-§§	{
-§§		StatusOfInstance status = statusVector.back();
-§§		statusVector.pop_back();
-§§
-§§		switch (status.type)
-§§		{
-§§		case(AgentType::TestcaseGenerator):
-§§			status.weight = calculateGeneratorWeight(status);
-§§			m_generatorStatus.push_back(status);
-§§			break;
-§§		case(AgentType::TestcaseEvaluator):
-§§			status.weight = calculateEvaluatorWeight(status);
-§§			m_evaluatorStatus.push_back(status);
-§§			break;
+	while (!statusVector.empty())
+	{
+		StatusOfInstance status = statusVector.back();
+		statusVector.pop_back();
+
+		switch (status.type)
+		{
+		case(AgentType::TestcaseGenerator):
+			status.weight = calculateGeneratorWeight(status);
+			m_generatorStatus.push_back(status);
+			break;
+		case(AgentType::TestcaseEvaluator):
+			status.weight = calculateEvaluatorWeight(status);
+			m_evaluatorStatus.push_back(status);
+			break;
 		default:
 			//we are only interested in TGs and TEs
 			break;
-§§		}
-§§	}
-§§}
-§§
-§§std::vector<StatusOfInstance> WorkerWeightCalculator::getGeneratorStatus()
-§§{
-§§	return m_generatorStatus;
-§§}
-§§
-§§std::vector<StatusOfInstance> WorkerWeightCalculator::getEvaluatorStatus()
-§§{
-§§	return m_evaluatorStatus;
-§§}
-§§
+		}
+	}
+}
+
+std::vector<StatusOfInstance> WorkerWeightCalculator::getGeneratorStatus()
+{
+	return m_generatorStatus;
+}
+
+std::vector<StatusOfInstance> WorkerWeightCalculator::getEvaluatorStatus()
+{
+	return m_evaluatorStatus;
+}
+
 uint32_t WorkerWeightCalculator::calculateGeneratorWeight(StatusOfInstance status)
-§§{
-§§	// Current heuristic: The more cases are in the queue, the better.
+{
+	// Current heuristic: The more cases are in the queue, the better.
 	uint32_t score = 100;
-§§
-§§	std::map<std::string, std::string>::iterator it = status.status.find("TestCasesQueueSize");
-§§	if (it != status.status.end())
-§§	{
+
+	std::map<std::string, std::string>::iterator it = status.status.find("TestCasesQueueSize");
+	if (it != status.status.end())
+	{
 		try {
 			score += std::stoi(it->second);
 		}
 		catch (...) {
 			LOG(WARNING) << "calculateGeneratorWeight: std::stoi failed";
 		}
-§§	}
-§§	else
-§§	{
+	}
+	else
+	{
 		LOG(ERROR) << "Status of TG does not contain a TestCasesQueueSize: Using default weight of 100";
-§§	}
-§§	return score;
-§§}
-§§
+	}
+	return score;
+}
+
 uint32_t WorkerWeightCalculator::calculateEvaluatorWeight(StatusOfInstance status)
-§§{
-§§	// Current heuristic: The fewer cases are in the queue, the better
+{
+	// Current heuristic: The fewer cases are in the queue, the better
 	uint32_t score = 100;
-§§
-§§	std::map<std::string, std::string>::iterator it = status.status.find("TestEvaluationsQueueSize");
-§§	if (it != status.status.end())
-§§	{
+
+	std::map<std::string, std::string>::iterator it = status.status.find("TestEvaluationsQueueSize");
+	if (it != status.status.end())
+	{
 		try {
 			score = std::max(100, 1000 - std::stoi(it->second));
 		}
 		catch (...) {
 			LOG(WARNING) << "calculateEvaluatorWeight: std::stoi failed";
 		}
-§§	}
-§§	else
-§§	{
+	}
+	else
+	{
 		LOG(ERROR) << "Status of TG does not contain a TestCasesQueueSize: Using default weight of 100";
-§§	}
-§§	return score;
+	}
+	return score;
 }

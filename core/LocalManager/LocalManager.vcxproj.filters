@@ -59,24 +59,24 @@ Author(s): Thomas Riedmaier, Abian Blome
     <ClInclude Include="GetCurrentBlockCoverageRequestHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-§§    <ClInclude Include="GetFuzzJobConfigurationRequestHandler.h">
-§§      <Filter>Header Files</Filter>
-§§    </ClInclude>
-§§    <ClInclude Include="WorkerWeightCalculator.h">
-§§      <Filter>Header Files</Filter>
-§§    </ClInclude>
-§§    <ClInclude Include="StatusOfInstance.h">
-§§      <Filter>Header Files</Filter>
-§§    </ClInclude>
+    <ClInclude Include="GetFuzzJobConfigurationRequestHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WorkerWeightCalculator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StatusOfInstance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="RegisterAtLMRequestHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LMDatabaseManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-§§    <ClInclude Include="LMGetStatusRequestHandler.h">
-§§      <Filter>Header Files</Filter>
-§§    </ClInclude>
+    <ClInclude Include="LMGetStatusRequestHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="IsAgentWelcomedRequestHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -118,21 +118,21 @@ Author(s): Thomas Riedmaier, Abian Blome
     <ClCompile Include="GetCurrentBlockCoverageRequestHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-§§    <ClCompile Include="GetFuzzJobConfigurationRequestHandler.cpp">
-§§      <Filter>Source Files</Filter>
-§§    </ClCompile>
-§§    <ClCompile Include="WorkerWeightCalculator.cpp">
-§§      <Filter>Source Files</Filter>
-§§    </ClCompile>
+    <ClCompile Include="GetFuzzJobConfigurationRequestHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WorkerWeightCalculator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="RegisterAtLMRequestHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="LMDatabaseManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-§§    <ClCompile Include="LMGetStatusRequestHandler.cpp">
-§§      <Filter>Source Files</Filter>
-§§    </ClCompile>
+    <ClCompile Include="LMGetStatusRequestHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="IsAgentWelcomedRequestHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

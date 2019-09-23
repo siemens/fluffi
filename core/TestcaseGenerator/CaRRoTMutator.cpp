@@ -85,7 +85,7 @@ Author(s): Roman Bendt, Thomas Riedmaier, Abian Blome
 §§		// As AVs love to lock the file, attempt to rename them several times
 §§		if (Util::attemptRenameFile(currentCaRRoTFile, pathAndFilename))
 §§		{
-§§			TestcaseDescriptor childTestcaseDescriptor{ testcaseID, parentID, pathAndFilename, false };
+			TestcaseDescriptor childTestcaseDescriptor{ testcaseID, parentID, pathAndFilename, false };
 §§			generatedMutations.push_back(childTestcaseDescriptor);
 §§		}
 §§		else

@@ -829,39 +829,39 @@ namespace FluffiTester
 
 		TEST_METHOD(TestExecutorDynRioMulti_crashReportedByFeeder)
 		{
-§§			std::string cmdline = "InstrumentedDebuggerTester.exe <RANDOM_SHAREDMEM>";
-§§			int hangTimeoutMS = 2000;
-§§			std::set<Module> modulesToCover({ Module("InstrumentedDebuggerTester.exe", "*", 0) });
-§§			std::string testcaseDir = "." + Util::pathSeperator + "tcdir1";
-§§			std::string feedercmdline = "ReportingCrashSharedMemFeeder.exe"; // Always reports a crash
-§§			int initializationTimeoutMS = 10000;
-§§
-§§			Util::createFolderAndParentFolders(testcaseDir);
-§§
-§§			{
-§§				GarbageCollectorWorker garbageCollector(0);
+			std::string cmdline = "InstrumentedDebuggerTester.exe <RANDOM_SHAREDMEM>";
+			int hangTimeoutMS = 2000;
+			std::set<Module> modulesToCover({ Module("InstrumentedDebuggerTester.exe", "*", 0) });
+			std::string testcaseDir = "." + Util::pathSeperator + "tcdir1";
+			std::string feedercmdline = "ReportingCrashSharedMemFeeder.exe"; // Always reports a crash
+			int initializationTimeoutMS = 10000;
+
+			Util::createFolderAndParentFolders(testcaseDir);
+
+			{
+				GarbageCollectorWorker garbageCollector(0);
 				TestExecutorDynRioMulti multiEx(cmdline, hangTimeoutMS, modulesToCover, testcaseDir, ExternalProcess::CHILD_OUTPUT_TYPE::OUTPUT, "", &garbageCollector, false, feedercmdline, "", initializationTimeoutMS, nullptr, false, -1);
-§§
-§§				Assert::IsTrue(multiEx.isSetupFunctionable(), L"Apparently the fuzzing setup is not working, although it should be.");
-§§
-§§				FluffiServiceDescriptor sd{ "hap","guid" };
-§§				FluffiTestcaseID tid{ sd,0 };
-§§				std::string testcaseFile = Util::generateTestcasePathAndFilename(tid, testcaseDir);
-§§
-§§				std::ofstream fout;
-§§				fout.open(testcaseFile, std::ios::binary | std::ios::out);
-§§				fout << (char)0;
-§§				fout.close();
-§§
+
+				Assert::IsTrue(multiEx.isSetupFunctionable(), L"Apparently the fuzzing setup is not working, although it should be.");
+
+				FluffiServiceDescriptor sd{ "hap","guid" };
+				FluffiTestcaseID tid{ sd,0 };
+				std::string testcaseFile = Util::generateTestcasePathAndFilename(tid, testcaseDir);
+
+				std::ofstream fout;
+				fout.open(testcaseFile, std::ios::binary | std::ios::out);
+				fout << (char)0;
+				fout.close();
+
 §§				std::shared_ptr<DebugExecutionOutput> exout = multiEx.execute(tid, true);
-§§				Assert::IsTrue(exout->m_terminationType == DebugExecutionOutput::EXCEPTION_OTHER, L"The expected crash reported by feeder was not detected");
-§§				Assert::IsTrue(exout->m_lastCrash == "FEEDER CLAIMS CRASH", L"The expected crash address was not the expected one");
-§§
-§§				garbageCollector.markFileForDelete(testcaseFile);
-§§			} //trigger TestExecutorDynRioMulti destructor
-§§
-§§			std::error_code errorcode;
-§§			Assert::IsTrue(std::experimental::filesystem::remove(testcaseDir, errorcode));
+				Assert::IsTrue(exout->m_terminationType == DebugExecutionOutput::EXCEPTION_OTHER, L"The expected crash reported by feeder was not detected");
+				Assert::IsTrue(exout->m_lastCrash == "FEEDER CLAIMS CRASH", L"The expected crash address was not the expected one");
+
+				garbageCollector.markFileForDelete(testcaseFile);
+			} //trigger TestExecutorDynRioMulti destructor
+
+			std::error_code errorcode;
+			Assert::IsTrue(std::experimental::filesystem::remove(testcaseDir, errorcode));
 		}
 	};
 }

@@ -14,7 +14,7 @@ Author(s): Thomas Riedmaier, Abian Blome, Roman Bendt
 #include "CommProxyWorker.h"
 #include "CommInt.h"
 
-§§CommProxyWorker::CommProxyWorker(CommInt* commInt) :
+CommProxyWorker::CommProxyWorker(CommInt* commInt) :
 	m_commInt(commInt),
 	m_isready(false),
 	m_worker_queue()
@@ -32,7 +32,7 @@ bool CommProxyWorker::isReady() {
 }
 
 //adapted from zmsg.hpp
-§§void CommProxyWorker::wrap(zmq::multipart_t* mmsg, const std::string* address, const std::string* delim) {
+void CommProxyWorker::wrap(zmq::multipart_t* mmsg, const std::string* address, const std::string* delim) {
 	if (delim) {
 		mmsg->pushstr(*delim);
 	}
@@ -40,7 +40,7 @@ bool CommProxyWorker::isReady() {
 }
 
 //adapted from zmsg.hpp
-§§std::string CommProxyWorker::unwrap(zmq::multipart_t* mmsg) {
+std::string CommProxyWorker::unwrap(zmq::multipart_t* mmsg) {
 	if (mmsg->size() == 0) {
 		errno = 0x182;
 §§		throw zmq::error_t();
@@ -53,7 +53,7 @@ bool CommProxyWorker::isReady() {
 }
 
 //adapted from zmq proxy_steerable(
-§§int CommProxyWorker::fluffi_proxy_steerable(zmq::socket_t* frontend_, zmq::socket_t* backend_, zmq::socket_t* control_)
+int CommProxyWorker::fluffi_proxy_steerable(zmq::socket_t* frontend_, zmq::socket_t* backend_, zmq::socket_t* control_)
 {
 	zmq_pollitem_t items[] = { { *frontend_, 0, ZMQ_POLLIN, 0 },
 	{ *backend_, 0, ZMQ_POLLIN, 0 },
@@ -101,7 +101,7 @@ bool CommProxyWorker::isReady() {
 		}
 
 		//  Process a reply
-§§		if (state == active && zmq::socket_ref(*frontend_) != zmq::socket_ref(*backend_) && items[1].revents & ZMQ_POLLIN && itemsout[0].revents & ZMQ_POLLOUT) {
+		if (state == active && zmq::socket_ref(*frontend_) != zmq::socket_ref(*backend_) && items[1].revents & ZMQ_POLLIN && itemsout[0].revents & ZMQ_POLLOUT) {
 			//LOG(DEBUG) << "fluffi_proxy_steerable: Process a reply";
 			zmq::multipart_t  mmsg;
 			mmsg.recv(*backend_);

@@ -7,7 +7,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-§§Author(s): Thomas Riedmaier, Abian Blome
+Author(s): Thomas Riedmaier, Abian Blome
 */
 
 #include "stdafx.h"
@@ -23,14 +23,14 @@ GMWorkerThreadStateBuilder::~GMWorkerThreadStateBuilder()
 {
 }
 
-§§WorkerThreadState* GMWorkerThreadStateBuilder::constructState() {
-§§	GMWorkerThreadState* state = new GMWorkerThreadState();
+WorkerThreadState* GMWorkerThreadStateBuilder::constructState() {
+	GMWorkerThreadState* state = new GMWorkerThreadState();
 	state->dbManager = new GMDatabaseManager();
 
 	return state;
 }
 
-§§void GMWorkerThreadStateBuilder::destructState(WorkerThreadState* theState) {
+void GMWorkerThreadStateBuilder::destructState(WorkerThreadState* theState) {
 	GMWorkerThreadState* gmWorkerThreadState = dynamic_cast<GMWorkerThreadState*>(theState);
 	if (gmWorkerThreadState == nullptr) {
 		LOG(ERROR) << "GMWorkerThreadStateBuilder::destructState - theState cannot be accessed";
@@ -39,5 +39,5 @@ GMWorkerThreadStateBuilder::~GMWorkerThreadStateBuilder()
 
 	delete gmWorkerThreadState->dbManager;
 	delete theState;
-§§	theState = nullptr;
+	theState = nullptr;
 }

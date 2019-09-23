@@ -7,7 +7,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-§§Author(s): Thomas Riedmaier, Abian Blome
+Author(s): Thomas Riedmaier, Abian Blome
 */
 
 #include "stdafx.h"
@@ -26,14 +26,14 @@ void GetLMConfigurationRequestHandler::setMyLMConfig(FluffiLMConfiguration theCo
 	m_myLMConfiguration = theConf;
 }
 
-§§void GetLMConfigurationRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp)
+void GetLMConfigurationRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp)
 {
 	(void)(workerThreadState); //avoid unused parameter warning
 	(void)(req); //avoid unused parameter warning
 
-§§	GetLMConfigurationResponse* getLMConfigurationResponse = new GetLMConfigurationResponse();
+	GetLMConfigurationResponse* getLMConfigurationResponse = new GetLMConfigurationResponse();
 
-§§	LMConfiguration* ptrToLMConfiguration = new LMConfiguration();
+	LMConfiguration* ptrToLMConfiguration = new LMConfiguration();
 	ptrToLMConfiguration->CopyFrom(m_myLMConfiguration.getProtobuf());
 	getLMConfigurationResponse->set_allocated_lmconfiguration(ptrToLMConfiguration);
 

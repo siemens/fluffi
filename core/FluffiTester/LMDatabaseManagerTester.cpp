@@ -31,8 +31,8 @@ namespace FluffiTester
 	{
 	public:
 
-§§		LMDatabaseManager* dbman = nullptr;
-§§		GarbageCollectorWorker* garbageCollector = nullptr;
+		LMDatabaseManager* dbman = nullptr;
+		GarbageCollectorWorker* garbageCollector = nullptr;
 
 		TEST_METHOD_INITIALIZE(ModuleInitialize)
 		{
@@ -520,7 +520,7 @@ namespace FluffiTester
 			uint64_t localid2 = 2;
 			FluffiTestcaseID ftid2{ sd2,localid2 };
 
-§§			std::string testfile = Util::generateTestcasePathAndFilename(ftid1, ".");
+			std::string testfile = Util::generateTestcasePathAndFilename(ftid1, ".");
 			std::ofstream fout;
 			fout.open(testfile, std::ios::binary | std::ios::out);
 			for (int i = 0; i < 256; i++) {
@@ -528,8 +528,8 @@ namespace FluffiTester
 			}
 			fout.close();
 
-§§			Assert::IsTrue(dbman->addEntryToInterestingTestcasesTable(ftid1, ftid1, 10, ".", LMDatabaseManager::TestCaseType::Population));
-§§			Assert::IsTrue(dbman->addEntryToInterestingTestcasesTable(ftid2, ftid1, 20, ".", LMDatabaseManager::TestCaseType::Hang));
+			Assert::IsTrue(dbman->addEntryToInterestingTestcasesTable(ftid1, ftid1, 10, ".", LMDatabaseManager::TestCaseType::Population));
+			Assert::IsTrue(dbman->addEntryToInterestingTestcasesTable(ftid2, ftid1, 20, ".", LMDatabaseManager::TestCaseType::Hang));
 
 			garbageCollector->collectGarbage();
 
@@ -590,14 +590,14 @@ namespace FluffiTester
 
 			dbman->addBlocksToCoveredBlocks(ftid1, &blocks);
 
-§§			GetCurrentBlockCoverageResponse* resp = dbman->generateGetCurrentBlockCoverageResponse();
+			GetCurrentBlockCoverageResponse* resp = dbman->generateGetCurrentBlockCoverageResponse();
 
 			//compare result with input
 			//1) Assert same size
 			Assert::IsTrue(blocks.size() == resp->blocks().size(),
-§§				L"Size of blocks sent to addBlocksToCoveredBlocks does not match generateGetCurrentBlockCoverageResponse");
+				L"Size of blocks sent to addBlocksToCoveredBlocks does not match generateGetCurrentBlockCoverageResponse");
 			Assert::IsTrue(blocks.size() == 3,
-§§				L"Size of blocks in database not equal to expected size");
+				L"Size of blocks in database not equal to expected size");
 
 			//2) Assert same content
 			BlockCoverageCache bcache1;
@@ -649,7 +649,7 @@ namespace FluffiTester
 			dbman->addEntryToCompletedTestcasesTable(ftid2);
 			dbman->addEntryToCompletedTestcasesTable(ftid3);
 
-§§			GetNewCompletedTestcaseIDsResponse* resp = dbman->generateGetNewCompletedTestcaseIDsResponse(0);
+			GetNewCompletedTestcaseIDsResponse* resp = dbman->generateGetNewCompletedTestcaseIDsResponse(0);
 			Assert::IsTrue(resp->ids().size() == 3);
 			Assert::IsTrue(resp->ids().Get(0).localid() == localid1 && resp->ids().Get(0).servicedescriptor().guid() == sd1.m_guid);
 			Assert::IsTrue(resp->ids().Get(1).localid() == localid2 && resp->ids().Get(1).servicedescriptor().guid() == sd1.m_guid);
@@ -686,7 +686,7 @@ namespace FluffiTester
 			GarbageCollectorWorker gc(200);
 §§			LMDatabaseManager local_lmdb(&gc);
 
-§§			GetTestcaseToMutateResponse* resp = local_lmdb.generateGetTestcaseToMutateResponse(".", 10);
+			GetTestcaseToMutateResponse* resp = local_lmdb.generateGetTestcaseToMutateResponse(".", 10);
 			Assert::IsTrue(!FluffiTestcaseID(resp->id()).m_serviceDescriptor.isNullObject() && FluffiTestcaseID(resp->id()).m_serviceDescriptor.m_guid != "", L"Multithreaded gettestcase failed");
 			delete resp;
 		}
@@ -707,7 +707,7 @@ namespace FluffiTester
 			uint64_t localid2 = 2;
 			FluffiTestcaseID ftid2{ sd2,localid2 };
 
-§§			std::string testfile = Util::generateTestcasePathAndFilename(ftid1, ".");
+			std::string testfile = Util::generateTestcasePathAndFilename(ftid1, ".");
 			std::ofstream fout;
 			fout.open(testfile, std::ios::binary | std::ios::out);
 			for (int i = 0; i < 256; i++) {
@@ -715,10 +715,10 @@ namespace FluffiTester
 			}
 			fout.close();
 
-§§			dbman->addEntryToInterestingTestcasesTable(ftid1, ftid1, 20, ".", LMDatabaseManager::TestCaseType::Population);
+			dbman->addEntryToInterestingTestcasesTable(ftid1, ftid1, 20, ".", LMDatabaseManager::TestCaseType::Population);
 
 			//Check that the returned response has the expected content
-§§			GetTestcaseToMutateResponse* resp = dbman->generateGetTestcaseToMutateResponse("", 10);
+			GetTestcaseToMutateResponse* resp = dbman->generateGetTestcaseToMutateResponse("", 10);
 			FluffiTestcaseID returnedFtid1(resp->id());
 			Assert::IsTrue(returnedFtid1.m_localID == ftid1.m_localID);
 			Assert::IsTrue(returnedFtid1.m_serviceDescriptor.m_guid == ftid1.m_serviceDescriptor.m_guid);
@@ -733,7 +733,7 @@ namespace FluffiTester
 			//Check that the rating is adapted correctly
 			Assert::IsTrue(10 == stoi(dbman->EXECUTE_TEST_STATEMENT("SELECT Rating FROM interesting_testcases")));
 
-§§			resp = dbman->generateGetTestcaseToMutateResponse(".", 20);
+			resp = dbman->generateGetTestcaseToMutateResponse(".", 20);
 			delete resp;
 
 			Assert::IsTrue(-10 == stoi(dbman->EXECUTE_TEST_STATEMENT("SELECT Rating FROM interesting_testcases")));
@@ -741,7 +741,7 @@ namespace FluffiTester
 			//Check that always the testcase with the highest rating is returned
 			dbman->addEntryToInterestingTestcasesTable(ftid2, ftid2, 20, ".", LMDatabaseManager::TestCaseType::Population);
 
-§§			resp = dbman->generateGetTestcaseToMutateResponse(".", 20);
+			resp = dbman->generateGetTestcaseToMutateResponse(".", 20);
 			FluffiTestcaseID returnedFtid2(resp->id());
 			Assert::IsTrue(returnedFtid2.m_localID == ftid2.m_localID);
 			Assert::IsTrue(returnedFtid2.m_serviceDescriptor.m_guid == ftid2.m_serviceDescriptor.m_guid);
@@ -983,7 +983,7 @@ namespace FluffiTester
 		const std::string testdbHost = "fluffiLMDBHost";
 		const std::string testdbName = "fluffi_test";
 
-§§		LMDatabaseManager* setupTestDB(GarbageCollectorWorker* garbageCollectorWorker) {
+		LMDatabaseManager* setupTestDB(GarbageCollectorWorker* garbageCollectorWorker) {
 			std::ifstream createDatabaseFile("..\\..\\..\\srv\\fluffi\\data\\fluffiweb\\app\\sql_files\\createLMDB.sql");
 			std::string dbCreateFileContent;
 
@@ -1022,7 +1022,7 @@ namespace FluffiTester
 
 			std::vector<std::string> SQLcommands = Util::splitString(dbCreateFileContent, ";");
 
-§§			LMDatabaseManager* dbman = new LMDatabaseManager(garbageCollectorWorker);
+			LMDatabaseManager* dbman = new LMDatabaseManager(garbageCollectorWorker);
 			LMDatabaseManager::setDBConnectionParameters(testdbHost, testdbUser, testdbPass, "information_schema");
 
 			dbman->EXECUTE_TEST_STATEMENT("DROP DATABASE IF EXISTS " + testdbName);

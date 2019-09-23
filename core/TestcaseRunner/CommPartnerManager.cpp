@@ -19,7 +19,7 @@ Author(s): Thomas Riedmaier, Michael Kraus, Abian Blome
 }
 §§
 §§CommPartnerManager::~CommPartnerManager()
-§§{}
+{}
 §§
 §§// Calculates the next communication partner from the set with cumulative probabilities
 §§std::string CommPartnerManager::getNextPartner()
@@ -44,7 +44,7 @@ Author(s): Thomas Riedmaier, Michael Kraus, Abian Blome
 		if (remainingSize <= it.m_weight) {
 			LOG(ERROR) << "CommPartner calculation failed! Sum of weights was overflowed! Reached uint32.MAX clients! -> Abian der Weise sprach: Eine elegante Lösung mit Normierung auf Double Werte ... die einzig wahre Lösung ist! <-";
 			google::protobuf::ShutdownProtobufLibrary();
-§§			_exit(EXIT_FAILURE); //make compiler happy;
+			_exit(EXIT_FAILURE); //make compiler happy;
 §§		}
 
 		cummulativeProbability += it.m_weight;
@@ -65,8 +65,8 @@ Author(s): Thomas Riedmaier, Michael Kraus, Abian Blome
 	m_weigthSum = 0;
 §§
 	uint32_t numberOfInsertedPartners = 0;
-§§	for (auto&& it : *partners)
-§§	{
+	for (auto&& it : *partners)
+	{
 		m_commDescriptorSet.push_back((FluffiServiceAndWeight(it)));
 		m_weigthSum += it.weight();
 §§		numberOfInsertedPartners++;

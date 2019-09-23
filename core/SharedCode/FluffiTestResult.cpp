@@ -39,14 +39,14 @@ TestResult FluffiTestResult::getProtobuf() const
 	tr.set_hasfullcoverage(m_hasFullCoverage);
 
 	for (auto const& block : m_blocks) {
-§§		BasicBlock* newblock = tr.add_blocks();
+		BasicBlock* newblock = tr.add_blocks();
 		newblock->CopyFrom(block.getProtobuf());
 	}
 
 	return tr;
 }
 
-§§void FluffiTestResult::setProtobuf(TestResult* tr) const
+void FluffiTestResult::setProtobuf(TestResult* tr) const
 {
 	tr->set_exittype(m_exitType);
 	tr->set_crashfootprint(m_crashFootprint);
@@ -54,7 +54,7 @@ TestResult FluffiTestResult::getProtobuf() const
 
 	tr->clear_blocks();
 	for (auto const& block : m_blocks) {
-§§		BasicBlock* newblock = tr->add_blocks();
+		BasicBlock* newblock = tr->add_blocks();
 		newblock->CopyFrom(block.getProtobuf());
 	}
 }

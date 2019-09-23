@@ -10,15 +10,15 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Michael Kraus, Junes Najah, Thomas Riedmaier, Abian Blome, Pascal Eckmann
 -->
 
-§§{% extends "base.html" %}
-§§
-§§{% block content %}
-§§
+{% extends "base.html" %}
+
+{% block content %}
+
 §§<div class="container">
 §§    <h1>Locations</h1>
 §§    {{ flashMessages() }}
 §§    <hr>
-§§</div>
+</div>
 §§
 §§
 §§<div class="jumbotron">
@@ -48,5 +48,5 @@ Author(s): Michael Kraus, Junes Najah, Thomas Riedmaier, Abian Blome, Pascal Eck
 §§        </tbody>
 §§    </table>
 §§</div>
-§§
-§§{% endblock %}
+
+{% endblock %}

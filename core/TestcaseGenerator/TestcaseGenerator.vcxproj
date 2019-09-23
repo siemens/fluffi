@@ -1,4 +1,4 @@
-§§﻿<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
 Copyright 2017-2019 Siemens AG
 
@@ -303,10 +303,10 @@ Author(s): Roman Bendt, Thomas Riedmaier, Abian Blome
 §§  <ItemGroup>
 §§    <ClInclude Include="AFLMutator.h" />
     <ClInclude Include="CaRRoTMutator.h" />
-§§    <ClInclude Include="ExternalMutator.h" />
+    <ClInclude Include="ExternalMutator.h" />
 §§    <ClInclude Include="FluffiMutator.h" />
 §§    <ClInclude Include="GetTestcaseRequestHandler.h" />
-§§    <ClInclude Include="HonggfuzzMutator.h" />
+    <ClInclude Include="HonggfuzzMutator.h" />
 §§    <ClInclude Include="OedipusMutator.h" />
 §§    <ClInclude Include="QueueCleanerWorker.h" />
 §§    <ClInclude Include="QueueFillerWorker.h" />
@@ -322,10 +322,10 @@ Author(s): Roman Bendt, Thomas Riedmaier, Abian Blome
 §§  <ItemGroup>
 §§    <ClCompile Include="AFLMutator.cpp" />
     <ClCompile Include="CaRRoTMutator.cpp" />
-§§    <ClCompile Include="ExternalMutator.cpp" />
+    <ClCompile Include="ExternalMutator.cpp" />
 §§    <ClCompile Include="FluffiMutator.cpp" />
 §§    <ClCompile Include="GetTestcaseRequestHandler.cpp" />
-§§    <ClCompile Include="HonggfuzzMutator.cpp" />
+    <ClCompile Include="HonggfuzzMutator.cpp" />
 §§    <ClCompile Include="OedipusMutator.cpp" />
 §§    <ClCompile Include="QueueCleanerWorker.cpp" />
 §§    <ClCompile Include="QueueFillerWorker.cpp" />

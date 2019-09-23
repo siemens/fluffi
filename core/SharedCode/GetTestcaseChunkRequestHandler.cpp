@@ -16,7 +16,7 @@ Author(s): Thomas Riedmaier, Michael Kraus, Abian Blome
 #include "Util.h"
 #include "GarbageCollectorWorker.h"
 
-§§GetTestcaseChunkRequestHandler::GetTestcaseChunkRequestHandler(std::string testcaseDir, bool deleteFileOnLastChunk, GarbageCollectorWorker* garbageCollectorWorker) :
+GetTestcaseChunkRequestHandler::GetTestcaseChunkRequestHandler(std::string testcaseDir, bool deleteFileOnLastChunk, GarbageCollectorWorker* garbageCollectorWorker) :
 	m_testcaseDir(testcaseDir),
 	m_deleteFileOnLastChunk(deleteFileOnLastChunk),
 	m_garbageCollectorWorker(garbageCollectorWorker)
@@ -28,13 +28,13 @@ Author(s): Thomas Riedmaier, Michael Kraus, Abian Blome
 §§{
 §§}
 §§
-§§void GetTestcaseChunkRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp) {
+void GetTestcaseChunkRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp) {
 	(void)(workerThreadState); //avoid unused parameter warning
 
 	bool isLastChunk;
-§§
-§§	FluffiTestcaseID testcaseID = FluffiTestcaseID(req->gettestcasechunkrequest().id());
-§§
+
+	FluffiTestcaseID testcaseID = FluffiTestcaseID(req->gettestcasechunkrequest().id());
+
 	std::string data = Util::loadTestcaseChunkInMemory(testcaseID, m_testcaseDir, req->gettestcasechunkrequest().chunkid(), &isLastChunk);
 	if (isLastChunk && m_deleteFileOnLastChunk) {
 		//If the last chunk was just read: delete the file on all systems but the testcase generator (as the files are only temporary files)

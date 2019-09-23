@@ -10,21 +10,21 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Abian Blome
 */
 
-§§#include "stdafx.h"
-§§#include "LMGetStatusRequestHandler.h"
+#include "stdafx.h"
+#include "LMGetStatusRequestHandler.h"
 #include "Util.h"
 #include "LMWorkerThreadState.h"
 #include "CommInt.h"
-§§
-§§LMGetStatusRequestHandler::LMGetStatusRequestHandler(CommInt* comm) :
+
+LMGetStatusRequestHandler::LMGetStatusRequestHandler(CommInt* comm) :
 	GetStatusRequestHandler(comm)
-§§{
-§§}
-§§
-§§LMGetStatusRequestHandler::~LMGetStatusRequestHandler()
-§§{
-§§}
-§§
+{
+}
+
+LMGetStatusRequestHandler::~LMGetStatusRequestHandler()
+{
+}
+
 std::string LMGetStatusRequestHandler::generateStatus() {
 	return generateGeneralStatus();
 }

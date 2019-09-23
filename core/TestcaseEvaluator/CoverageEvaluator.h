@@ -20,11 +20,11 @@ class CoverageEvaluator :
 	public FluffiEvaluator
 {
 public:
-§§	CoverageEvaluator(std::string testcaseDir, BlockCoverageCache* localBlockCoverageCache, GarbageCollectorWorker* garbageCollectorWorker, CommInt* commInt, TEWorkerThreadState* workerThreadState);
+	CoverageEvaluator(std::string testcaseDir, BlockCoverageCache* localBlockCoverageCache, GarbageCollectorWorker* garbageCollectorWorker, CommInt* commInt, TEWorkerThreadState* workerThreadState);
 	virtual ~CoverageEvaluator();
 
 	bool isSetupFunctionable();
-§§	void processTestOutcomeDescriptor(TestOutcomeDescriptor* tod);
+	void processTestOutcomeDescriptor(TestOutcomeDescriptor* tod);
 
 private:
 	int generateParentRatingDelta(ExitType exitType, bool hasNewBlocks, bool isSpecial);

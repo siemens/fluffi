@@ -10,18 +10,18 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Abian Blome
 */
 
-§§#pragma once
+#pragma once
 #include "FluffiServiceDescriptor.h"
-§§
-§§class FluffiServiceAndWeight
-§§{
-§§public:
+
+class FluffiServiceAndWeight
+{
+public:
 	FluffiServiceAndWeight(const FluffiServiceDescriptor serviceDescriptor, uint32_t weight);
-§§	FluffiServiceAndWeight(const ServiceAndWeigth& serviceAndWeight);
-§§	virtual ~FluffiServiceAndWeight();
-§§
-§§	ServiceAndWeigth getProtobuf() const;
-§§
+	FluffiServiceAndWeight(const ServiceAndWeigth& serviceAndWeight);
+	virtual ~FluffiServiceAndWeight();
+
+	ServiceAndWeigth getProtobuf() const;
+
 	FluffiServiceDescriptor m_serviceDescriptor;
 	uint32_t m_weight;
 
@@ -30,4 +30,4 @@ Author(s): Thomas Riedmaier, Abian Blome
 
 		return os;
 	}
-§§};
+};

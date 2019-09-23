@@ -10,18 +10,18 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Abian Blome
 */
 
-§§#pragma once
+#pragma once
 #include "GetStatusRequestHandler.h"
-§§
+
 class CommInt;
-§§class LMGetStatusRequestHandler :
+class LMGetStatusRequestHandler :
 	public GetStatusRequestHandler
-§§{
-§§public:
-§§	LMGetStatusRequestHandler(CommInt* comm);
-§§	~LMGetStatusRequestHandler();
+{
+public:
+	LMGetStatusRequestHandler(CommInt* comm);
+	~LMGetStatusRequestHandler();
 
 private:
 
 	std::string generateStatus();
-§§};
+};

@@ -15,7 +15,7 @@ Author(s): Thomas Riedmaier, Abian Blome
 
 WorkerThreadState::WorkerThreadState() :
 	m_stopRequested(false),
-§§	m_resetClock(std::chrono::steady_clock::now()),
+	m_resetClock(std::chrono::steady_clock::now()),
 	m_zeroMQSockets(new std::map<std::pair<std::string, int>, zmq::socket_t*>())
 {
 }
@@ -41,15 +41,15 @@ void  WorkerThreadState::clearSocketFor(const std::string targetHAP, int timeout
 	}
 }
 
-§§zmq::socket_t* WorkerThreadState::getSocketFor(zmq::context_t* zeroMQContext, const std::string targetHAP, int timeoutMS) {
+zmq::socket_t* WorkerThreadState::getSocketFor(zmq::context_t* zeroMQContext, const std::string targetHAP, int timeoutMS) {
 	//reset the socket cache every 10 minutes socket cache to get rid of no longer used connections
-§§	if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - m_resetClock).count() > 1000 * 10 * 60) {
+	if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - m_resetClock).count() > 1000 * 10 * 60) {
 		LOG(DEBUG) << "Resetting the socket cache!";
 		clearSocketCache();
-§§		m_resetClock = std::chrono::steady_clock::now();
+		m_resetClock = std::chrono::steady_clock::now();
 	}
 
-§§	zmq::socket_t* sock = nullptr;
+	zmq::socket_t* sock = nullptr;
 	std::pair<std::string, int> socketIdentifier(targetHAP, timeoutMS);
 	auto socketCacheEntry = m_zeroMQSockets->find(socketIdentifier);
 	if (socketCacheEntry != m_zeroMQSockets->end()) {

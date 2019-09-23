@@ -9,32 +9,32 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 Author(s): Thomas Riedmaier, Abian Blome, Michael Kraus
 */
-§§
-§§#pragma once
-§§
-§§#include "targetver.h"
-§§
-§§#include <map>
-§§#include <deque>
+
+#pragma once
+
+#include "targetver.h"
+
+#include <map>
+#include <deque>
 #include <iomanip>
 #include <mutex>
 #include <random>
 #include <future>
 #include <regex>
 #include <experimental/filesystem>
-§§
+
 #include "Ws2tcpip.h"
 
 //Easylogging
 #include "easylogging++.h"
-§§
-§§//ZeroMQ
-§§#include <zmq.hpp>
+
+//ZeroMQ
+#include <zmq.hpp>
 #include <zmq_addon.hpp>
-§§
-§§//Protobuf
-§§#include <FLUFFI.pb.h>
-§§
+
+//Protobuf
+#include <FLUFFI.pb.h>
+
 §§// File streams
 §§#include <fstream>
 §§#include <iostream>
@@ -43,5 +43,5 @@ Author(s): Thomas Riedmaier, Abian Blome, Michael Kraus
 //MariaDB
 #include <mysql.h>
 
-§§// Headers for CppUnitTest
-§§#include "CppUnitTest.h"
+// Headers for CppUnitTest
+#include "CppUnitTest.h"

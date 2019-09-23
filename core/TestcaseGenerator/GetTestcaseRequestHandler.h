@@ -7,7 +7,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-§§Author(s): Thomas Riedmaier, Michael Kraus, Abian Blome
+Author(s): Thomas Riedmaier, Michael Kraus, Abian Blome
 */
 
 §§#pragma once
@@ -19,13 +19,13 @@ class TGTestcaseManager;
 §§	public IFLUFFIMessageHandler
 §§{
 §§public:
-§§	GetTestcaseRequestHandler(TGTestcaseManager* testcaseManager, std::string testcaseDir, CommInt* commInt);
+	GetTestcaseRequestHandler(TGTestcaseManager* testcaseManager, std::string testcaseDir, CommInt* commInt);
 §§	virtual ~GetTestcaseRequestHandler();
 §§
-§§	void handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp);
+	void handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp);
 §§
 §§private:
-§§	CommInt* m_CommInt = nullptr;
+	CommInt* m_CommInt = nullptr;
 	std::string m_testcaseDir = "";
-§§	TGTestcaseManager* m_testcaseManager = nullptr;
+	TGTestcaseManager* m_testcaseManager = nullptr;
 §§};

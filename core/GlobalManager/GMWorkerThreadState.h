@@ -17,5 +17,5 @@ class GMDatabaseManager;
 class GMWorkerThreadState : public WorkerThreadState
 {
 public:
-§§	GMDatabaseManager* dbManager;
+	GMDatabaseManager* dbManager;
 };

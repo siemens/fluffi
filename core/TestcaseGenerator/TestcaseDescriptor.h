@@ -20,20 +20,20 @@ class GarbageCollectorWorker;
 	TestcaseDescriptor(FluffiTestcaseID id, FluffiTestcaseID parentId, std::string pathAndFileName, bool forceFullCoverage);
 §§	~TestcaseDescriptor();
 §§
-§§	FluffiTestcaseID getId() const;
-§§	FluffiTestcaseID getparentId() const;
-§§	int getNumOfProcessingAttempts() const;
-§§	std::chrono::time_point<std::chrono::steady_clock> getTimeOfLastSend() const;
+	FluffiTestcaseID getId() const;
+	FluffiTestcaseID getparentId() const;
+	int getNumOfProcessingAttempts() const;
+	std::chrono::time_point<std::chrono::steady_clock> getTimeOfLastSend() const;
 	void increaseNumOfProcessingAttempts();
 	void updateTimeOfLastSend();
-§§	void deleteFile(GarbageCollectorWorker* garbageCollectorWorker);
+	void deleteFile(GarbageCollectorWorker* garbageCollectorWorker);
 	bool getForceFullCoverage() const;
 
 §§private:
-§§	FluffiTestcaseID m_id;
-§§	FluffiTestcaseID m_parentId;
+	FluffiTestcaseID m_id;
+	FluffiTestcaseID m_parentId;
 	std::string m_pathAndFileName;
 	int m_numOfProcessingAttempts;
-§§	std::chrono::time_point<std::chrono::steady_clock> m_timeOfLastSend = std::chrono::steady_clock::time_point();
+	std::chrono::time_point<std::chrono::steady_clock> m_timeOfLastSend = std::chrono::steady_clock::time_point();
 	bool m_forceFullCoverage;
 §§};

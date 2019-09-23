@@ -63,7 +63,7 @@ void InstanceControlWorker::workerMain() {
 
 		//Actual loop body
 
-§§		LOG(DEBUG) << "Set TGs and TEs on all TRs!";
+		LOG(DEBUG) << "Set TGs and TEs on all TRs!";
 		setTGsAndTEsAtTRs();
 	}
 	m_workerThreadStateBuilder->destructState(m_workerThreadState);
@@ -72,32 +72,32 @@ void InstanceControlWorker::workerMain() {
 void InstanceControlWorker::setTGsAndTEsAtTRs()
 {
 	WorkerWeightCalculator weightCalculator = WorkerWeightCalculator(m_workerThreadState->dbManager, m_location);
-§§	weightCalculator.updateStatusInformation();
+	weightCalculator.updateStatusInformation();
 
 	FLUFFIMessage req;
 	FLUFFIMessage resp;
-§§
+
 	SetTGsAndTEsRequest* setTGsAndTEsReqest = new SetTGsAndTEsRequest();
 
 	//Gather all testcase evaluators and weight them
-§§	auto evaluators = weightCalculator.getEvaluatorStatus();
-§§	for (auto&& it : evaluators)
-§§	{
-§§		FluffiServiceDescriptor serviceDescriptor{ it.serviceDescriptorHostAndPort, it.serviceDescriptorGUID };
-§§		FluffiServiceAndWeight serviceAndWeight{ serviceDescriptor, it.weight };
-§§
-§§		ServiceAndWeigth* serviceAndWeightOfTE = setTGsAndTEsReqest->add_tes();
-§§		serviceAndWeightOfTE->CopyFrom(serviceAndWeight.getProtobuf());
+	auto evaluators = weightCalculator.getEvaluatorStatus();
+	for (auto&& it : evaluators)
+	{
+		FluffiServiceDescriptor serviceDescriptor{ it.serviceDescriptorHostAndPort, it.serviceDescriptorGUID };
+		FluffiServiceAndWeight serviceAndWeight{ serviceDescriptor, it.weight };
+
+		ServiceAndWeigth* serviceAndWeightOfTE = setTGsAndTEsReqest->add_tes();
+		serviceAndWeightOfTE->CopyFrom(serviceAndWeight.getProtobuf());
 	}
 
-§§	auto generators = weightCalculator.getGeneratorStatus();
-§§	for (auto&& it : generators)
-§§	{
-§§		FluffiServiceDescriptor serviceDescriptor{ it.serviceDescriptorHostAndPort, it.serviceDescriptorGUID };
-§§		FluffiServiceAndWeight serviceAndWeight{ serviceDescriptor, it.weight };
-§§
-§§		ServiceAndWeigth* serviceAndWeightOfTG = setTGsAndTEsReqest->add_tgs();
-§§		serviceAndWeightOfTG->CopyFrom(serviceAndWeight.getProtobuf());
+	auto generators = weightCalculator.getGeneratorStatus();
+	for (auto&& it : generators)
+	{
+		FluffiServiceDescriptor serviceDescriptor{ it.serviceDescriptorHostAndPort, it.serviceDescriptorGUID };
+		FluffiServiceAndWeight serviceAndWeight{ serviceDescriptor, it.weight };
+
+		ServiceAndWeigth* serviceAndWeightOfTG = setTGsAndTEsReqest->add_tgs();
+		serviceAndWeightOfTG->CopyFrom(serviceAndWeight.getProtobuf());
 	}
 
 	req.set_allocated_settgsandtesrequest(setTGsAndTEsReqest);
@@ -108,7 +108,7 @@ void InstanceControlWorker::setTGsAndTEsAtTRs()
 	//shuffle runners to improve performance when many runners are stopped and new are started in a short timeframe
 	std::random_shuffle(registeredTestcaseRunners.begin(), registeredTestcaseRunners.end());
 
-§§	for (auto&& it : registeredTestcaseRunners) {
+	for (auto&& it : registeredTestcaseRunners) {
 		//Allow termination
 		if (m_workerThreadState->m_stopRequested) {
 			break;

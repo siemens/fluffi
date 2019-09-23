@@ -7,7 +7,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-§§Author(s): Thomas Riedmaier, Abian Blome
+Author(s): Thomas Riedmaier, Abian Blome
 */
 
 #pragma once
@@ -20,7 +20,7 @@ class GarbageCollectorWorker;
 class QueueCleanerWorker
 {
 public:
-§§	QueueCleanerWorker(CommInt* commInt, TGWorkerThreadStateBuilder* workerThreadStateBuilder, int intervallBetweenTwoCleaningRoundsInMillisec, int maxRetriesBeforeReport, std::string testcaseDir, TGTestcaseManager* testcaseManager, GarbageCollectorWorker* garbageCollectorWorker);
+	QueueCleanerWorker(CommInt* commInt, TGWorkerThreadStateBuilder* workerThreadStateBuilder, int intervallBetweenTwoCleaningRoundsInMillisec, int maxRetriesBeforeReport, std::string testcaseDir, TGTestcaseManager* testcaseManager, GarbageCollectorWorker* garbageCollectorWorker);
 	virtual ~QueueCleanerWorker();
 
 	void workerMain();
@@ -33,15 +33,15 @@ private:
 	void removeCompletedTestcases();
 	void reportTestcasesWithMultipleNoResponse();
 
-§§	CommInt* m_commInt;
-§§	TGWorkerThreadStateBuilder* m_workerThreadStateBuilder;
+	CommInt* m_commInt;
+	TGWorkerThreadStateBuilder* m_workerThreadStateBuilder;
 	int m_intervallBetweenTwoCleaningRoundsInMillisec;
 	int m_intervallToWaitForReinsertionInMillisec;
 	int m_maxRetriesBeforeReport;
 	std::string m_testcaseDir;
-§§	TGTestcaseManager* m_testcaseManager;
+	TGTestcaseManager* m_testcaseManager;
 	uint64_t m_serverTimestampOfNewestEvaluationResult;
-§§	GarbageCollectorWorker* m_garbageCollectorWorker;
+	GarbageCollectorWorker* m_garbageCollectorWorker;
 
-§§	TGWorkerThreadState* m_workerThreadState = nullptr;
+	TGWorkerThreadState* m_workerThreadState = nullptr;
 };

@@ -10,25 +10,25 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Abian Blome, Thomas Riedmaier
 */
 
-§§#pragma once
-§§#include "FluffiMutator.h"
-§§
-§§#define HONGGFUZZ_MAXSIZE 1024*1024*200
-§§
-§§class TestcaseDescriptor;
-§§class FluffiTestcaseID;
-§§class FluffiServiceDescriptor;
-§§class HonggfuzzMutator :
-§§	public FluffiMutator
-§§{
-§§public:
-§§	HonggfuzzMutator(FluffiServiceDescriptor selfServiceDescriptor, std::string testcaseDirectory);
-§§	virtual ~HonggfuzzMutator();
-§§
-§§	bool isSetupFunctionable();
-§§	std::deque<TestcaseDescriptor> batchMutate(unsigned int numToGenerate, const FluffiTestcaseID parentID, const std::string parentPathAndFilename);
+#pragma once
+#include "FluffiMutator.h"
 
-§§#ifndef _VSTEST
-§§private:
-§§#endif //_VSTEST
-§§};
+#define HONGGFUZZ_MAXSIZE 1024*1024*200
+
+class TestcaseDescriptor;
+class FluffiTestcaseID;
+class FluffiServiceDescriptor;
+class HonggfuzzMutator :
+	public FluffiMutator
+{
+public:
+	HonggfuzzMutator(FluffiServiceDescriptor selfServiceDescriptor, std::string testcaseDirectory);
+	virtual ~HonggfuzzMutator();
+
+	bool isSetupFunctionable();
+	std::deque<TestcaseDescriptor> batchMutate(unsigned int numToGenerate, const FluffiTestcaseID parentID, const std::string parentPathAndFilename);
+
+#ifndef _VSTEST
+private:
+#endif //_VSTEST
+};

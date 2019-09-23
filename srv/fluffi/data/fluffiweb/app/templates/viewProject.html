@@ -10,8 +10,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Junes Najah, Abian Blome, Thomas Riedmaier, Michael Kraus, Pascal Eckmann
 -->
 
-§§{% extends "base.html" %}
-§§
+{% extends "base.html" %}
+
 §§{% block scripts  %}
 §§<script src="{{ url_for('static', filename = 'javascript/dynamicForm.js') }}" type="text/javascript"></script>
 §§<script src="{{ url_for('static', filename = 'javascript/modifyViewProject.js') }}" type="text/javascript"></script>
@@ -19,9 +19,9 @@ Author(s): Junes Najah, Abian Blome, Thomas Riedmaier, Michael Kraus, Pascal Eck
 §§<script src="{{ url_for('static', filename = 'javascript/inputValidator.js') }}" type="text/javascript"></script>
 §§{{super()}}
 §§{% endblock %}
-§§
+
 §§{% block content %}
-§§<div class="container">
+<div class="container">
 §§    <div class="row">
 §§        <div class="col-md-6 {{'alert-bg' if project.checkRating }}"><h1>{{ project.name }}</h1></div>
 §§        <div class="col-md-6" style="padding-top:25px">
@@ -30,22 +30,22 @@ Author(s): Junes Najah, Abian Blome, Thomas Riedmaier, Michael Kraus, Pascal Eck
 §§            </form>
 §§        </div>
 §§    </div>
-§§</div>
+</div>
 §§<div class="container">
 §§    <div class="row">
 §§        {{ flashMessages() }}
 §§    </div>
 §§</div>
 §§<hr>
-§§
-§§<div class="container">
+
+<div class="container">
 §§    <div class="row">
 §§        <div class="col-md-4">
 §§            <h2>General Information</h2>
 §§            <p>
 §§            <table class="table table-striped">
 §§                <thead>
-§§
+
 §§                </thead>
 §§                <tbody>
 §§                <tr>
@@ -146,18 +146,18 @@ Author(s): Junes Najah, Abian Blome, Thomas Riedmaier, Michael Kraus, Pascal Eck
 §§            </div>
 §§        </div>
 §§    </div>
-§§</div>
-§§
-§§<div class="container">
-§§    <h2>Locations</h2>
-§§    <table class="table">
-§§        <thead>
+</div>
+
+<div class="container">
+    <h2>Locations</h2>
+    <table class="table">
+        <thead>
 §§        <tr>
 §§            <th>Name</th>
 §§            <th>Operations</th>
 §§        </tr>
-§§        </thead>
-§§        <tbody>
+        </thead>
+        <tbody>
 §§        {% for location in project.locations %}
 §§        <tr>
 §§            <td><a href="/locations/view/{{ location.id }}">{{ location.Name }}</a></td>
@@ -166,8 +166,8 @@ Author(s): Junes Najah, Abian Blome, Thomas Riedmaier, Michael Kraus, Pascal Eck
 §§            </td>
 §§        </tr>
 §§        {% endfor %}
-§§        </tbody>
-§§    </table>
+        </tbody>
+    </table>
 §§    <button data-target="#addLocationModal" data-toggle="modal" type="button"><span
 §§            class="glyphicon glyphicon-plus"></span></button>
 §§    <!-- Modal -->
@@ -204,9 +204,9 @@ Author(s): Junes Najah, Abian Blome, Thomas Riedmaier, Michael Kraus, Pascal Eck
 §§        </div>
 §§    </div>
 §§
-§§</div>
-§§
-§§<div class="container">
+</div>
+
+<div class="container">
 §§    <h2>Settings</h2>
 §§    <div data-toggle="fieldset" id="option-fieldset">
 §§        <form action="{{ url_for('createSetting', projId=project.id) }}" method="POST" name="addSetting">
@@ -397,9 +397,9 @@ Author(s): Junes Najah, Abian Blome, Thomas Riedmaier, Michael Kraus, Pascal Eck
 §§        </form>
 §§    </div>
 §§</div> 
-§§
-§§<div class="container">
-§§    <h2>Target Modules</h2>
+
+<div class="container">
+    <h2>Target Modules</h2>
 §§    <div data-toggle="fieldset" id="phone-fieldset">
 §§        <form action="{{ url_for('createProjectModule', projId=project.id) }}" method="POST" name="addModule">
 §§            <table class="table">
@@ -434,8 +434,8 @@ Author(s): Junes Najah, Abian Blome, Thomas Riedmaier, Michael Kraus, Pascal Eck
 §§                </tbody>
 §§            </table>
 §§            <button data-target="#phone-fieldset" data-toggle="fieldset-add-row" type="button">
-§§                <span class="glyphicon glyphicon-plus"></span>
-§§            </button>
+                <span class="glyphicon glyphicon-plus"></span>
+            </button>
 §§            <div class="row" style="margin-bottom: 40px">
 §§                <div class="col-md-4">
 §§                    <p>Or select multiple Target Modules:</p>
@@ -448,8 +448,8 @@ Author(s): Junes Najah, Abian Blome, Thomas Riedmaier, Michael Kraus, Pascal Eck
 §§            </div>
 §§        </form>
 §§    </div>
-§§</div>
-§§
+</div>
+
 §§{% set glob = {} %}
 §§{% for setting in project.settings %}
 §§    {% if (setting.name == 'runnerType') and (setting.value == 'ALL_GDB') %} <!-- ALL_GDB coded in config.json -->
@@ -501,5 +501,5 @@ Author(s): Junes Najah, Abian Blome, Thomas Riedmaier, Michael Kraus, Pascal Eck
 §§    </div>
 §§</div>
 §§
-§§{% endblock %}
-§§
+{% endblock %}
+

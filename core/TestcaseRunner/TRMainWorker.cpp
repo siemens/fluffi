@@ -27,15 +27,15 @@ Author(s): Thomas Riedmaier, Abian Blome, Roman Bendt
 #include "TRWorkerThreadState.h"
 #include "GarbageCollectorWorker.h"
 §§
-§§TRMainWorker::TRMainWorker(CommInt* commInt,
-§§	TRWorkerThreadStateBuilder*  workerThreadStateBuilder,
+TRMainWorker::TRMainWorker(CommInt* commInt,
+	TRWorkerThreadStateBuilder*  workerThreadStateBuilder,
 	int delayToWaitUntilConfigIsCompleteInMS,
 §§	CommPartnerManager* tGManager,
 	CommPartnerManager* tEManager,
 	std::string testcaseDir,
 	int* numberOfProcessedTestcases,
 	std::set<std::string> myAgentSubTypes,
-§§	GarbageCollectorWorker* garbageCollectorWorker
+	GarbageCollectorWorker* garbageCollectorWorker
 )
 	:
 	m_gotConfigFromLM(false),
@@ -82,7 +82,7 @@ void TRMainWorker::workerMain() {
 
 	while (!m_workerThreadState->m_stopRequested)
 	{
-§§		std::chrono::time_point<std::chrono::steady_clock> p1 = std::chrono::steady_clock::now();// needed for performance waring calculation
+		std::chrono::time_point<std::chrono::steady_clock> p1 = std::chrono::steady_clock::now();// needed for performance waring calculation
 		if (!m_gotConfigFromLM) {
 			m_gotConfigFromLM = tryGetConfigFromLM();
 			if (!m_gotConfigFromLM) {
@@ -115,11 +115,11 @@ void TRMainWorker::workerMain() {
 		const GetTestcaseResponse* receivedTestcase = &(respMessage.gettestcaseresponse());
 
 		// Start Fuzzing testcase
-§§		FluffiTestcaseID testcaseID{ receivedTestcase->id() };
-§§		FluffiTestcaseID parentTestcaseID{ receivedTestcase->parentid() };
-§§		std::chrono::time_point<std::chrono::steady_clock> p2 = std::chrono::steady_clock::now(); // needed for performance waring calculation
+		FluffiTestcaseID testcaseID{ receivedTestcase->id() };
+		FluffiTestcaseID parentTestcaseID{ receivedTestcase->parentid() };
+		std::chrono::time_point<std::chrono::steady_clock> p2 = std::chrono::steady_clock::now(); // needed for performance waring calculation
 		FluffiTestResult testResult = fuzzTestCase(testcaseID, receivedTestcase->forcefullcoverage());
-§§		std::chrono::time_point<std::chrono::steady_clock> p3 = std::chrono::steady_clock::now(); // needed for performance waring calculation
+		std::chrono::time_point<std::chrono::steady_clock> p3 = std::chrono::steady_clock::now(); // needed for performance waring calculation
 		(*m_numberOfProcessedTestcases)++;
 
 		// Do not send internal errors to evaluator. The generator will detect this and will resend the testcase to somebody
@@ -142,7 +142,7 @@ void TRMainWorker::workerMain() {
 		}
 
 		//Performance waring calculation start
-§§		std::chrono::time_point<std::chrono::steady_clock> p4 = std::chrono::steady_clock::now();
+		std::chrono::time_point<std::chrono::steady_clock> p4 = std::chrono::steady_clock::now();
 		//std::cout << std::chrono::duration_cast<std::chrono::milliseconds>((p2 - p1)).count() << ":" << std::chrono::duration_cast<std::chrono::milliseconds>((p3 - p2)).count() << ":" << std::chrono::duration_cast<std::chrono::milliseconds>((p4 - p3)).count() << "(" << testResult.m_blocks.size() << ")" << std::endl;
 		bool warnPre = true;
 		bool warnPost = true;
@@ -168,14 +168,14 @@ void TRMainWorker::workerMain() {
 	m_workerThreadStateBuilder->destructState(m_workerThreadState);
 }
 
-§§bool TRMainWorker::getTestcaseFromGenerator(FLUFFIMessage* resp, std::string generatorHAP) {
+bool TRMainWorker::getTestcaseFromGenerator(FLUFFIMessage* resp, std::string generatorHAP) {
 	// Build and send message for GetTestcaseRequest
 	FLUFFIMessage req;
 	req.set_allocated_gettestcaserequest(new GetTestcaseRequest());
 
 	bool respReceived = m_commInt->sendReqAndRecvResp(&req, resp, m_workerThreadState, generatorHAP, CommInt::timeoutNormalMessage);
 	if (respReceived) {
-§§		LOG(DEBUG) << "GetTestcaseResponse successfully received (first part of Testcase)!";
+		LOG(DEBUG) << "GetTestcaseResponse successfully received (first part of Testcase)!";
 	}
 	else {
 §§		LOG(ERROR) << "No GetTestcaseResponse received, check timeout and the accessibility of the TestcaseGenerator!";
@@ -184,12 +184,12 @@ void TRMainWorker::workerMain() {
 
 	const GetTestcaseResponse* receivedTestcase = &(resp->gettestcaseresponse());
 	if (!receivedTestcase->success()) {
-§§		LOG(ERROR) << "Testcase generator appears to be overloaded!";
+		LOG(ERROR) << "Testcase generator appears to be overloaded!";
 		return false;
 	}
 
-§§	return Util::storeTestcaseFileOnDisk(receivedTestcase->id(), m_testcaseDir, &receivedTestcase->testcasefirstchunk(),
-§§		receivedTestcase->islastchunk(), receivedTestcase->id().servicedescriptor().servicehostandport(), m_commInt, m_workerThreadState, m_garbageCollectorWorker);
+	return Util::storeTestcaseFileOnDisk(receivedTestcase->id(), m_testcaseDir, &receivedTestcase->testcasefirstchunk(),
+		receivedTestcase->islastchunk(), receivedTestcase->id().servicedescriptor().servicehostandport(), m_commInt, m_workerThreadState, m_garbageCollectorWorker);
 }
 
 bool TRMainWorker::pushTestcaseWithResultsToEvaluator(std::string evaluatorTargetHAP, const FluffiTestResult testResult, const FluffiTestcaseID testcaseId, const FluffiTestcaseID parentId) {
@@ -201,21 +201,21 @@ bool TRMainWorker::pushTestcaseWithResultsToEvaluator(std::string evaluatorTarge
 		m_garbageCollectorWorker->markFileForDelete(testfile);
 	}
 
-§§	TestcaseID* mutableTestcaseId = new TestcaseID();
-§§	mutableTestcaseId->CopyFrom(testcaseId.getProtobuf());
+	TestcaseID* mutableTestcaseId = new TestcaseID();
+	mutableTestcaseId->CopyFrom(testcaseId.getProtobuf());
 
-§§	TestcaseID* mutableParentId = new TestcaseID();
-§§	mutableParentId->CopyFrom(parentId.getProtobuf());
+	TestcaseID* mutableParentId = new TestcaseID();
+	mutableParentId->CopyFrom(parentId.getProtobuf());
 
-§§	TestResult* mutableTestResult = new TestResult();
+	TestResult* mutableTestResult = new TestResult();
 	testResult.setProtobuf(mutableTestResult); // This one is potentially slow as it depends on the number of covered blocks
 
 	// Build PutTestResultRequest
 	FLUFFIMessage putTcReq;
 	PutTestResultRequest* putTcRequest = new PutTestResultRequest();
 
-§§	ServiceDescriptor* mySd = new ServiceDescriptor();
-§§	mySd->CopyFrom(m_commInt->getOwnServiceDescriptor().getProtobuf());
+	ServiceDescriptor* mySd = new ServiceDescriptor();
+	mySd->CopyFrom(m_commInt->getOwnServiceDescriptor().getProtobuf());
 
 	// Build Response with loaded Testcase
 	putTcRequest->set_allocated_id(mutableTestcaseId);
@@ -231,18 +231,18 @@ bool TRMainWorker::pushTestcaseWithResultsToEvaluator(std::string evaluatorTarge
 	bool respReceived = m_commInt->sendReqAndRecvResp(&putTcReq, &putTcResp, m_workerThreadState, evaluatorTargetHAP, CommInt::timeoutFileTransferMessage);
 	if (!respReceived)
 	{
-§§		LOG(ERROR) << "PutTestResultRequest failed, no response received! check timeout and the accessibility of the TestcaseEvaluator!";
+		LOG(ERROR) << "PutTestResultRequest failed, no response received! check timeout and the accessibility of the TestcaseEvaluator!";
 		return false;
 	}
 
 	bool success = putTcResp.puttestresultresponse().success();
 	if (success)
 	{
-§§		LOG(DEBUG) << "PutTestResultRequest successfull!";
+		LOG(DEBUG) << "PutTestResultRequest successfull!";
 	}
 	else
 	{
-§§		LOG(ERROR) << "PutTestResultRequest failed, TestcaseEvaluator has problems receiving the testcase!";
+		LOG(ERROR) << "PutTestResultRequest failed, TestcaseEvaluator has problems receiving the testcase!";
 		return false;
 	}
 
@@ -253,7 +253,7 @@ bool TRMainWorker::tryGetConfigFromLM() {
 	// get config from lm
 	FLUFFIMessage req;
 	FLUFFIMessage resp;
-§§	GetFuzzJobConfigurationRequest* getfuzzjobconfigurationrequest = new GetFuzzJobConfigurationRequest();
+	GetFuzzJobConfigurationRequest* getfuzzjobconfigurationrequest = new GetFuzzJobConfigurationRequest();
 	ServiceDescriptor* ptMySelfServiceDescriptor = new ServiceDescriptor();
 	ptMySelfServiceDescriptor->CopyFrom(m_commInt->getOwnServiceDescriptor().getProtobuf());
 	getfuzzjobconfigurationrequest->set_allocated_servicedescriptor(ptMySelfServiceDescriptor);
@@ -668,7 +668,7 @@ FluffiTestResult TRMainWorker::fuzzTestCase(const FluffiTestcaseID testcaseId, b
 		default:
 			LOG(ERROR) << "Observed non-implemented termination type!";
 			google::protobuf::ShutdownProtobufLibrary();
-§§			_exit(EXIT_FAILURE); //make compiler happy
+			_exit(EXIT_FAILURE); //make compiler happy
 §§		}
 §§	}
 }

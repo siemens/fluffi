@@ -10,22 +10,22 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Abian Blome
 */
 
-§§#pragma once
-§§#include "IFLUFFIMessageHandler.h"
+#pragma once
+#include "IFLUFFIMessageHandler.h"
 
 class CommInt;
 class FluffiServiceDescriptor;
-§§class RegisterAtGMRequestHandler :
-§§	public IFLUFFIMessageHandler
-§§{
-§§public:
+class RegisterAtGMRequestHandler :
+	public IFLUFFIMessageHandler
+{
+public:
 	RegisterAtGMRequestHandler(CommInt* commPtr);
-§§	virtual ~RegisterAtGMRequestHandler();
-§§
-§§	void handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp);
+	virtual ~RegisterAtGMRequestHandler();
+
+	void handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp);
 
 private:
 	CommInt* m_comm;
 
-§§	bool agentIsWelcomedAt(WorkerThreadState* workerThreadState, AgentType type, const google::protobuf::RepeatedPtrField< std::string > sts, const FluffiServiceDescriptor lmServiceDescriptor);
+	bool agentIsWelcomedAt(WorkerThreadState* workerThreadState, AgentType type, const google::protobuf::RepeatedPtrField< std::string > sts, const FluffiServiceDescriptor lmServiceDescriptor);
 };

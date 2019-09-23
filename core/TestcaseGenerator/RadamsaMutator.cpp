@@ -10,19 +10,19 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Abian Blome, Roman Bendt
 */
 
-§§#include "stdafx.h"
-§§#include "RadamsaMutator.h"
+#include "stdafx.h"
+#include "RadamsaMutator.h"
 #include "FluffiTestcaseID.h"
 #include "Util.h"
 #include "TestcaseDescriptor.h"
-§§
-§§RadamsaMutator::RadamsaMutator(FluffiServiceDescriptor serviceDescriptor, std::string testcaseDirectory)
+
+RadamsaMutator::RadamsaMutator(FluffiServiceDescriptor serviceDescriptor, std::string testcaseDirectory)
 	: FluffiMutator(serviceDescriptor, testcaseDirectory)
-§§{}
-§§
-§§RadamsaMutator::~RadamsaMutator()
-§§{}
-§§
+{}
+
+RadamsaMutator::~RadamsaMutator()
+{}
+
 bool RadamsaMutator::isSetupFunctionable() {
 	bool setupFunctionable = true;
 	//1) check if the radamsa executable exists
@@ -40,16 +40,16 @@ bool RadamsaMutator::isSetupFunctionable() {
 
 std::deque<TestcaseDescriptor> RadamsaMutator::batchMutate(unsigned int numToGenerate, const FluffiTestcaseID parentID, const std::string parentPathAndFilename)
 {
-§§	std::deque<TestcaseDescriptor> generatedMutations{};
-§§
+	std::deque<TestcaseDescriptor> generatedMutations{};
+
 	std::error_code ec;
 	if (!std::experimental::filesystem::exists(parentPathAndFilename, ec))
-§§	{
+	{
 		LOG(ERROR) << "Parent does not exist (" << ec.message() << ")";
-§§		throw std::runtime_error("Parent does not exist");
-§§	}
-§§
-§§	LOG(DEBUG) << "Executing radamsa.exe";
+		throw std::runtime_error("Parent does not exist");
+	}
+
+	LOG(DEBUG) << "Executing radamsa.exe";
 §§	std::string cmdline =
 §§#if defined(_WIN32) || defined(_WIN64)
 §§		"radamsa.exe --count "
@@ -58,7 +58,7 @@ std::deque<TestcaseDescriptor> RadamsaMutator::batchMutate(unsigned int numToGen
 §§#endif
 §§		+ std::to_string(numToGenerate) + " --output " + m_testcaseDir + Util::pathSeperator + "radamsa_%n " + parentPathAndFilename;
 	if (!executeProcessAndWaitForCompletion(cmdline, 60 * 1000))
-§§	{
+	{
 		if (!std::experimental::filesystem::exists(parentPathAndFilename))
 		{
 			LOG(ERROR) << "Could not generate testcases with radamsa (" << parentPathAndFilename << " does not exist)";
@@ -67,32 +67,32 @@ std::deque<TestcaseDescriptor> RadamsaMutator::batchMutate(unsigned int numToGen
 			LOG(ERROR) << "Could not generate testcases with radamsa (" << parentPathAndFilename << " exists)";
 		}
 
-§§		throw std::runtime_error("Could not generate testcase with radamsa");
-§§	}
-§§
-§§	for (unsigned int i = 1; i <= numToGenerate; ++i)
-§§	{
+		throw std::runtime_error("Could not generate testcase with radamsa");
+	}
+
+	for (unsigned int i = 1; i <= numToGenerate; ++i)
+	{
 		std::string currentRadamsaFile = m_testcaseDir + Util::pathSeperator + "radamsa_" + std::to_string(i);
 
-§§		FluffiTestcaseID testcaseID = genNewLocalFluffiTestcaseID();
-§§		std::string pathAndFilename = Util::generateTestcasePathAndFilename(testcaseID, m_testcaseDir);
+		FluffiTestcaseID testcaseID = genNewLocalFluffiTestcaseID();
+		std::string pathAndFilename = Util::generateTestcasePathAndFilename(testcaseID, m_testcaseDir);
 		if (!std::experimental::filesystem::exists(currentRadamsaFile)) {
 			//Sometimes radamsa fails to generate the desired amount of mutations. In order to avoid error message polution, we will simply break here and re-run radamsa
 			LOG(WARNING) << "Radamsa failed to generate the expected file " << pathAndFilename << ". We will break here.";
 			break;
 		}
 
-§§		// As AVs love to lock the file, attempt to rename them several times
+		// As AVs love to lock the file, attempt to rename them several times
 		if (Util::attemptRenameFile(currentRadamsaFile, pathAndFilename))
-§§		{
-§§			TestcaseDescriptor childTestcaseDescriptor{ testcaseID, parentID, pathAndFilename, false };
-§§			generatedMutations.push_back(childTestcaseDescriptor);
-§§		}
-§§		else
-§§		{
-§§			LOG(ERROR) << "Error renaming radamsa file: " << currentRadamsaFile;
-§§		}
-§§	}
-§§
-§§	return generatedMutations;
+		{
+			TestcaseDescriptor childTestcaseDescriptor{ testcaseID, parentID, pathAndFilename, false };
+			generatedMutations.push_back(childTestcaseDescriptor);
+		}
+		else
+		{
+			LOG(ERROR) << "Error renaming radamsa file: " << currentRadamsaFile;
+		}
+	}
+
+	return generatedMutations;
 }

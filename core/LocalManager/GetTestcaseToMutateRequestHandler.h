@@ -20,7 +20,7 @@ Author(s): Thomas Riedmaier, Fabian Russwurm, Abian Blome
 	GetTestcaseToMutateRequestHandler(std::string testcaseTempDir);
 §§	~GetTestcaseToMutateRequestHandler();
 §§
-§§	void handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp);
+	void handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp);
 
 private:
 	std::string m_testcaseTempDir;

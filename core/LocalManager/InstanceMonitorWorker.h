@@ -28,9 +28,9 @@ public:
 	std::thread* m_thread = nullptr;
 
 private:
-§§	CommInt* m_commInt = nullptr;
-§§	IWorkerThreadStateBuilder* m_workerThreadStateBuilder = nullptr;
-§§	LMWorkerThreadState* m_workerThreadState = nullptr;
+	CommInt* m_commInt = nullptr;
+	IWorkerThreadStateBuilder* m_workerThreadStateBuilder = nullptr;
+	LMWorkerThreadState* m_workerThreadState = nullptr;
 	int m_loopIntervalMS;
 	std::string m_location;
 };

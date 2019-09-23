@@ -24,12 +24,12 @@ Author(s): Thomas Riedmaier, Abian Blome, Michael Kraus
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-§§    <Filter Include="Source Files\AbstractionLayer">
-§§      <UniqueIdentifier>{067cd0f5-c88d-47c4-8764-f3f62c3abd6f}</UniqueIdentifier>
-§§    </Filter>
-§§    <Filter Include="Header Files\AbstractionLayer">
-§§      <UniqueIdentifier>{95e42605-c323-4bc6-8fa3-6fe5ec85419f}</UniqueIdentifier>
-§§    </Filter>
+    <Filter Include="Source Files\AbstractionLayer">
+      <UniqueIdentifier>{067cd0f5-c88d-47c4-8764-f3f62c3abd6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\AbstractionLayer">
+      <UniqueIdentifier>{95e42605-c323-4bc6-8fa3-6fe5ec85419f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -65,27 +65,27 @@ Author(s): Thomas Riedmaier, Abian Blome, Michael Kraus
     <ClInclude Include="WorkerThreadState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-§§    <ClInclude Include="FluffiTestcaseID.h">
-§§      <Filter>Header Files\AbstractionLayer</Filter>
-§§    </ClInclude>
+    <ClInclude Include="FluffiTestcaseID.h">
+      <Filter>Header Files\AbstractionLayer</Filter>
+    </ClInclude>
     <ClInclude Include="..\dependencies\libprotoc\include\siemens\cpp\FLUFFI.pb.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FluffiBasicBlock.h">
       <Filter>Header Files\AbstractionLayer</Filter>
     </ClInclude>
-§§    <ClInclude Include="FluffiServiceDescriptor.h">
-§§      <Filter>Header Files\AbstractionLayer</Filter>
-§§    </ClInclude>
-§§    <ClInclude Include="FluffiServiceAndWeight.h">
-§§      <Filter>Header Files\AbstractionLayer</Filter>
-§§    </ClInclude>
+    <ClInclude Include="FluffiServiceDescriptor.h">
+      <Filter>Header Files\AbstractionLayer</Filter>
+    </ClInclude>
+    <ClInclude Include="FluffiServiceAndWeight.h">
+      <Filter>Header Files\AbstractionLayer</Filter>
+    </ClInclude>
     <ClInclude Include="FluffiTestResult.h">
       <Filter>Header Files\AbstractionLayer</Filter>
     </ClInclude>
-§§    <ClInclude Include="FluffiModuleNameToID.h">
-§§      <Filter>Header Files\AbstractionLayer</Filter>
-§§    </ClInclude>
+    <ClInclude Include="FluffiModuleNameToID.h">
+      <Filter>Header Files\AbstractionLayer</Filter>
+    </ClInclude>
     <ClInclude Include="FluffiLMConfiguration.h">
       <Filter>Header Files\AbstractionLayer</Filter>
     </ClInclude>
@@ -95,9 +95,9 @@ Author(s): Thomas Riedmaier, Abian Blome, Michael Kraus
     <ClInclude Include="DebugExecutionOutput.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-§§    <ClInclude Include="KillInstanceRequestHandler.h">
-§§      <Filter>Header Files</Filter>
-§§    </ClInclude>
+    <ClInclude Include="KillInstanceRequestHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="FluffiSetting.h">
       <Filter>Header Files\AbstractionLayer</Filter>
     </ClInclude>
@@ -142,24 +142,24 @@ Author(s): Thomas Riedmaier, Abian Blome, Michael Kraus
     <ClCompile Include="WorkerThreadState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-§§    <ClCompile Include="FluffiTestcaseID.cpp">
-§§      <Filter>Source Files\AbstractionLayer</Filter>
-§§    </ClCompile>
+    <ClCompile Include="FluffiTestcaseID.cpp">
+      <Filter>Source Files\AbstractionLayer</Filter>
+    </ClCompile>
     <ClCompile Include="FluffiBasicBlock.cpp">
       <Filter>Source Files\AbstractionLayer</Filter>
     </ClCompile>
-§§    <ClCompile Include="FluffiServiceDescriptor.cpp">
-§§      <Filter>Source Files\AbstractionLayer</Filter>
-§§    </ClCompile>
-§§    <ClCompile Include="FluffiServiceAndWeight.cpp">
-§§      <Filter>Source Files\AbstractionLayer</Filter>
-§§    </ClCompile>
+    <ClCompile Include="FluffiServiceDescriptor.cpp">
+      <Filter>Source Files\AbstractionLayer</Filter>
+    </ClCompile>
+    <ClCompile Include="FluffiServiceAndWeight.cpp">
+      <Filter>Source Files\AbstractionLayer</Filter>
+    </ClCompile>
     <ClCompile Include="FluffiTestResult.cpp">
       <Filter>Source Files\AbstractionLayer</Filter>
     </ClCompile>
-§§    <ClCompile Include="FluffiModuleNameToID.cpp">
-§§      <Filter>Source Files\AbstractionLayer</Filter>
-§§    </ClCompile>
+    <ClCompile Include="FluffiModuleNameToID.cpp">
+      <Filter>Source Files\AbstractionLayer</Filter>
+    </ClCompile>
     <ClCompile Include="FluffiLMConfiguration.cpp">
       <Filter>Source Files\AbstractionLayer</Filter>
     </ClCompile>
@@ -169,9 +169,9 @@ Author(s): Thomas Riedmaier, Abian Blome, Michael Kraus
     <ClCompile Include="DebugExecutionOutput.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-§§    <ClCompile Include="KillInstanceRequestHandler.cpp">
-§§      <Filter>Source Files</Filter>
-§§    </ClCompile>
+    <ClCompile Include="KillInstanceRequestHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="FluffiSetting.cpp">
       <Filter>Source Files\AbstractionLayer</Filter>
     </ClCompile>

@@ -26,7 +26,7 @@ public:
 	GetStatusRequestHandler(CommInt* comm);
 	virtual ~GetStatusRequestHandler();
 
-§§	void handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp);
+	void handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp);
 
 	bool isManagerActive(unsigned long maxAllowedTimeOfInactivityMS);
 	bool wasManagerReplaced();
@@ -37,7 +37,7 @@ protected:
 public:
 #endif //_VSTEST
 	CommInt* m_comm;
-§§	std::chrono::time_point<std::chrono::steady_clock> m_timeOfLastManagerRequest;
+	std::chrono::time_point<std::chrono::steady_clock> m_timeOfLastManagerRequest;
 	bool m_ManagerWasReplaced;
 
 #if defined(_WIN32) || defined(_WIN64)

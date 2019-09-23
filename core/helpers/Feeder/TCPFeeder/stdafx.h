@@ -18,11 +18,11 @@ Author(s): Thomas Riedmaier, Abian Blome, Pascal Eckmann
 #include <vector>
 #include <iostream>
 #include <chrono>
-§§
-§§#include "SharedMemIPC.h"
-§§
-§§
-§§
+
+#include "SharedMemIPC.h"
+
+
+
 //#define USE_SSL
 #ifdef USE_SSL
 #include <applink.c>

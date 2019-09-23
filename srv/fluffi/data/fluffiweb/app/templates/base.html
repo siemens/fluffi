@@ -10,12 +10,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Junes Najah, Thomas Riedmaier, Abian Blome
 -->
 
-§§{%- extends "bootstrap/base.html" %}
-§§{% block title %}FLUFFI{% endblock %}
-§§
-§§{% import "bootstrap/fixes.html" as fixes %}
-§§
-§§{% block head %}
+{%- extends "bootstrap/base.html" %}
+{% block title %}FLUFFI{% endblock %}
+
+{% import "bootstrap/fixes.html" as fixes %}
+
+{% block head %}
 §§{{super()}}
 §§{{fixes.ie8()}}
 §§
@@ -25,11 +25,11 @@ Author(s): Junes Najah, Thomas Riedmaier, Abian Blome
 §§<script src="/static/3rdParty/socket.io-client/socket.io.slim.js"></script>
 §§
 §§{% endblock %}
-§§
-§§{% block navbar %}
-§§{{nav.frontend_top.render()}}
-§§{% endblock %}
-§§
+
+{% block navbar %}
+{{nav.frontend_top.render()}}
+{% endblock %}
+
 §§
 §§{% macro flashMessages() %}
 §§{% with messages = get_flashed_messages(with_categories=true) %}

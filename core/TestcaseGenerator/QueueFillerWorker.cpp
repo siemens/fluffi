@@ -23,29 +23,29 @@ Author(s): Thomas Riedmaier, Abian Blome, Roman Bendt
 #include "RadamsaMutator.h"
 §§#include "CaRRoTMutator.h"
 §§#include "OedipusMutator.h"
-§§#include "HonggfuzzMutator.h"
-§§#include "ExternalMutator.h"
+#include "HonggfuzzMutator.h"
+#include "ExternalMutator.h"
 #include "FluffiSetting.h"
 #include "FluffiMutator.h"
 #include "AFLMutator.h"
 
-§§QueueFillerWorker::QueueFillerWorker(CommInt* commInt, TGWorkerThreadStateBuilder* workerThreadStateBuilder, int delayToWaitUntilConfigIsCompleteInMS, size_t desiredQueueFillLevel, std::string testcaseDirectory, std::string queueFillerTempDir, TGTestcaseManager* testcaseManager, std::set<std::string> myAgentSubTypes, GarbageCollectorWorker* garbageCollectorWorker, int howManyWillBeGeneratedFromParent) :
+QueueFillerWorker::QueueFillerWorker(CommInt* commInt, TGWorkerThreadStateBuilder* workerThreadStateBuilder, int delayToWaitUntilConfigIsCompleteInMS, size_t desiredQueueFillLevel, std::string testcaseDirectory, std::string queueFillerTempDir, TGTestcaseManager* testcaseManager, std::set<std::string> myAgentSubTypes, GarbageCollectorWorker* garbageCollectorWorker, int howManyWillBeGeneratedFromParent) :
 	m_gotConfigFromLM(false),
 	m_commInt(commInt),
-§§	m_workerThreadStateBuilder(workerThreadStateBuilder),
-§§	m_desiredQueueFillLevel(desiredQueueFillLevel),
+	m_workerThreadStateBuilder(workerThreadStateBuilder),
+	m_desiredQueueFillLevel(desiredQueueFillLevel),
 	m_queueFillerTempDir(queueFillerTempDir),
-§§	m_testcaseManager(testcaseManager),
-§§	m_howManyWillBeGeneratedFromParent(howManyWillBeGeneratedFromParent),
-§§	m_mySelfServiceDescriptor(commInt->getOwnServiceDescriptor()),
+	m_testcaseManager(testcaseManager),
+	m_howManyWillBeGeneratedFromParent(howManyWillBeGeneratedFromParent),
+	m_mySelfServiceDescriptor(commInt->getOwnServiceDescriptor()),
 	m_workerThreadState(nullptr),
 	m_garbageCollectorWorker(garbageCollectorWorker),
 	m_testcaseDirectory(testcaseDirectory),
 	m_delayToWaitUntilConfigIsCompleteInMS(delayToWaitUntilConfigIsCompleteInMS),
 	m_myAgentSubTypes(myAgentSubTypes),
 	m_mutator(nullptr),
-§§	m_mutatorNeedsParents(true)
-§§{}
+	m_mutatorNeedsParents(true)
+{}
 
 QueueFillerWorker::~QueueFillerWorker()
 {
@@ -89,73 +89,73 @@ void QueueFillerWorker::workerMain() {
 		}
 
 		FluffiTestcaseID parentID{ FluffiServiceDescriptor{"",""},0 };
-§§		try
-§§		{
-§§			if (m_mutatorNeedsParents) {
-§§				parentID = getNewParent();
-§§			}
+		try
+		{
+			if (m_mutatorNeedsParents) {
+				parentID = getNewParent();
+			}
 		}
 		catch (const std::runtime_error& e) {
 			LOG(ERROR) << "Failed to get a new parent (" << e.what() << ") we'll try again!";
 			continue;
 		}
-§§
+
 		//from this point on there is a parent testcase file that we have to take care of!
 		std::string parentPathAndFileName = Util::generateTestcasePathAndFilename(parentID, m_queueFillerTempDir);
 
 		try
 		{
 			std::deque<TestcaseDescriptor> children = m_mutator->batchMutate(m_howManyWillBeGeneratedFromParent, parentID, parentPathAndFileName);
-§§
+
 			if (children.size() > 0)
-§§			{
-§§				m_testcaseManager->pushNewGeneratedTestcases(children);
-§§			}
-§§			else
-§§			{
-§§				LOG(DEBUG) << "Batch queue generation returned 0 elements";
-§§			}
-§§		}
-§§		catch (const std::runtime_error& e) {
+			{
+				m_testcaseManager->pushNewGeneratedTestcases(children);
+			}
+			else
+			{
+				LOG(DEBUG) << "Batch queue generation returned 0 elements";
+			}
+		}
+		catch (const std::runtime_error& e) {
 			LOG(ERROR) << "batchMutate failed (" << e.what() << ")!";
 		}
 
 		//delete the parent testcase file
-§§		if (m_mutatorNeedsParents) {
-§§			if (std::remove(parentPathAndFileName.c_str()) != 0) {
-§§				// mark the parent file for lazy delete
-§§				m_garbageCollectorWorker->markFileForDelete(parentPathAndFileName);
-§§				m_garbageCollectorWorker->collectNow();
-§§			}
-§§		}
+		if (m_mutatorNeedsParents) {
+			if (std::remove(parentPathAndFileName.c_str()) != 0) {
+				// mark the parent file for lazy delete
+				m_garbageCollectorWorker->markFileForDelete(parentPathAndFileName);
+				m_garbageCollectorWorker->collectNow();
+			}
+		}
 	}
-§§
+
 	m_workerThreadStateBuilder->destructState(m_workerThreadState);
-§§}
-§§
-§§FluffiTestcaseID QueueFillerWorker::getNewParent()
-§§{
-§§	FLUFFIMessage req;
-§§	GetTestcaseToMutateRequest* getTestcaseToMutateRequest = new GetTestcaseToMutateRequest();
+}
+
+FluffiTestcaseID QueueFillerWorker::getNewParent()
+{
+	FLUFFIMessage req;
+	GetTestcaseToMutateRequest* getTestcaseToMutateRequest = new GetTestcaseToMutateRequest();
 	getTestcaseToMutateRequest->set_howmanywillbegeneratedfromparent(m_howManyWillBeGeneratedFromParent);
 	req.set_allocated_gettestcasetomutaterequest(getTestcaseToMutateRequest);
-§§	FLUFFIMessage resp = FLUFFIMessage();
-§§
+	FLUFFIMessage resp = FLUFFIMessage();
+
 	bool respReceived = m_commInt->sendReqAndRecvResp(&req, &resp, m_workerThreadState, m_commInt->getMyLMServiceDescriptor().m_serviceHostAndPort, CommInt::timeoutNormalMessage);
 
-§§	if (respReceived)
-§§	{
-§§		const GetTestcaseToMutateResponse* receivedTestcase = &(resp.gettestcasetomutateresponse());
+	if (respReceived)
+	{
+		const GetTestcaseToMutateResponse* receivedTestcase = &(resp.gettestcasetomutateresponse());
 		LOG(DEBUG) << "GetTestcaseToMutateResponse successfully received (first part of Testcase): " << FluffiTestcaseID(receivedTestcase->id());
 
 		//parents are stored in the m_queueFillerTempDir and NOT in the m_testcaseDirectory as race conditions might mess everything up! ("attempting to delete no longer existing file" if a file is already inserted as interesting_tc but not yet cleaned from queue)
 		bool fileStored = Util::storeTestcaseFileOnDisk(receivedTestcase->id(), m_queueFillerTempDir, &receivedTestcase->testcasefirstchunk(), receivedTestcase->islastchunk(), m_commInt->getMyLMServiceDescriptor().m_serviceHostAndPort, m_commInt, m_workerThreadState, m_garbageCollectorWorker);
-§§		if (fileStored)
-§§		{
-§§			LOG(DEBUG) << "File successfully stored!";
-§§
+		if (fileStored)
+		{
+			LOG(DEBUG) << "File successfully stored!";
+
 			FluffiTestcaseID parentID{ receivedTestcase->id() };
-§§
+
 			//Check if the LM wants us to also run the unmodified (original) testcase
 			if (receivedTestcase->alsorunwithoutmutation()) {
 				//Careful: Time of check is not time of use! This works as long as there is only one queue filler thread!
@@ -173,22 +173,22 @@ void QueueFillerWorker::workerMain() {
 			}
 
 			return parentID;
-§§		}
-§§		else
-§§		{
-§§			LOG(ERROR) << "File storage of parent testcase from LM unsuccessful";
-§§			throw std::runtime_error("File storage unsuccesful");
-§§		}
-§§	}
+		}
+		else
+		{
+			LOG(ERROR) << "File storage of parent testcase from LM unsuccessful";
+			throw std::runtime_error("File storage unsuccesful");
+		}
+	}
 	LOG(ERROR) << "No GetTestcaseToMutateResponse received, we retry next cycle";
-§§	throw std::runtime_error("GetTestcase unsuccesful");
+	throw std::runtime_error("GetTestcase unsuccesful");
 }
 
 bool QueueFillerWorker::tryGetConfigFromLM() {
 	// get config from lm
 	FLUFFIMessage req;
 	FLUFFIMessage resp;
-§§	GetFuzzJobConfigurationRequest* getfuzzjobconfigurationrequest = new GetFuzzJobConfigurationRequest();
+	GetFuzzJobConfigurationRequest* getfuzzjobconfigurationrequest = new GetFuzzJobConfigurationRequest();
 	ServiceDescriptor* ptMySelfServiceDescriptor = new ServiceDescriptor();
 	ptMySelfServiceDescriptor->CopyFrom(m_commInt->getOwnServiceDescriptor().getProtobuf());
 	getfuzzjobconfigurationrequest->set_allocated_servicedescriptor(ptMySelfServiceDescriptor);
@@ -234,19 +234,19 @@ bool QueueFillerWorker::tryGetConfigFromLM() {
 §§	{
 §§		m_mutator = new CaRRoTMutator{ m_mySelfServiceDescriptor, m_testcaseDirectory };
 §§	}
-§§	else if (settings["chosenSubtype"] == "HonggfuzzMutator")
-§§	{
-§§		m_mutator = new HonggfuzzMutator{ m_mySelfServiceDescriptor, m_testcaseDirectory };
-§§	}
+	else if (settings["chosenSubtype"] == "HonggfuzzMutator")
+	{
+		m_mutator = new HonggfuzzMutator{ m_mySelfServiceDescriptor, m_testcaseDirectory };
+	}
 §§	else if (settings["chosenSubtype"] == "OedipusMutator")
 §§	{
 		m_mutator = new OedipusMutator{ m_mySelfServiceDescriptor, m_testcaseDirectory, m_commInt, m_workerThreadState };
 §§	}
-§§	else if (settings["chosenSubtype"] == "ExternalMutator")
-§§	{
-§§		m_mutator = new ExternalMutator{ m_mySelfServiceDescriptor, m_testcaseDirectory, settings["extGeneratorDirectory"], m_commInt, m_workerThreadState };
-§§		m_mutatorNeedsParents = false;
-§§	}
+	else if (settings["chosenSubtype"] == "ExternalMutator")
+	{
+		m_mutator = new ExternalMutator{ m_mySelfServiceDescriptor, m_testcaseDirectory, settings["extGeneratorDirectory"], m_commInt, m_workerThreadState };
+		m_mutatorNeedsParents = false;
+	}
 	else {
 		LOG(ERROR) << "The specified chosenSubtype/generatorType \"" << settings["chosenSubtype"] << "\" is not implemented but m_myAgentSubTypes.count(settings[\"chosenSubtype\"]) was >0. This should never happen!";
 		google::protobuf::ShutdownProtobufLibrary();

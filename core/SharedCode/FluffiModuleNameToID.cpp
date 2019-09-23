@@ -10,31 +10,31 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Abian Blome, Thomas Riedmaier
 */
 
-§§#include "stdafx.h"
-§§#include "FluffiModuleNameToID.h"
-§§
+#include "stdafx.h"
+#include "FluffiModuleNameToID.h"
+
 FluffiModuleNameToID::FluffiModuleNameToID(std::string moduleName, std::string modulePath, uint32_t moduleID) :
 	m_moduleName(moduleName), m_modulePath(modulePath), m_moduleID(moduleID)
-§§{
-§§}
-§§
-§§FluffiModuleNameToID::FluffiModuleNameToID(const ModuleNameToID & moduleNameToID)
-§§{
-§§	m_moduleID = moduleNameToID.moduleid();
-§§	m_moduleName = moduleNameToID.modulename();
-§§	m_modulePath = moduleNameToID.modulepath();
-§§}
-§§
-§§FluffiModuleNameToID::~FluffiModuleNameToID()
-§§{
-§§}
-§§
-§§ModuleNameToID FluffiModuleNameToID::getProtobuf() const
-§§{
-§§	ModuleNameToID moduleNameToID{};
-§§	moduleNameToID.set_moduleid(m_moduleID);
-§§	moduleNameToID.set_modulename(m_moduleName);
-§§	moduleNameToID.set_modulepath(m_modulePath);
-§§
-§§	return moduleNameToID;
+{
+}
+
+FluffiModuleNameToID::FluffiModuleNameToID(const ModuleNameToID & moduleNameToID)
+{
+	m_moduleID = moduleNameToID.moduleid();
+	m_moduleName = moduleNameToID.modulename();
+	m_modulePath = moduleNameToID.modulepath();
+}
+
+FluffiModuleNameToID::~FluffiModuleNameToID()
+{
+}
+
+ModuleNameToID FluffiModuleNameToID::getProtobuf() const
+{
+	ModuleNameToID moduleNameToID{};
+	moduleNameToID.set_moduleid(m_moduleID);
+	moduleNameToID.set_modulename(m_moduleName);
+	moduleNameToID.set_modulepath(m_modulePath);
+
+	return moduleNameToID;
 }

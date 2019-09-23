@@ -24,7 +24,7 @@ SetTGsAndTEsRequestHandler::~SetTGsAndTEsRequestHandler()
 {
 }
 
-§§void SetTGsAndTEsRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp) {
+void SetTGsAndTEsRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp) {
 	(void)(workerThreadState); //avoid unused parameter warning
 
 §§	const SetTGsAndTEsRequest* setTGsAndTEsReqest = &req->settgsandtesrequest();
@@ -33,11 +33,11 @@ SetTGsAndTEsRequestHandler::~SetTGsAndTEsRequestHandler()
 §§
 §§	// Update datastructure of registered TGs and TEs for TestcaseRunner
 	int newTGs = m_tGManager->updateCommPartners(&tgs);
-§§	LOG(DEBUG) << "Registered " << newTGs << " new TestcaseGenerators!";
+	LOG(DEBUG) << "Registered " << newTGs << " new TestcaseGenerators!";
 §§
 	int newTEs = m_tEManager->updateCommPartners(&tes);
-§§	LOG(DEBUG) << "Registered " << newTEs << " new TestcaseEvaluators!";
+	LOG(DEBUG) << "Registered " << newTEs << " new TestcaseEvaluators!";
 
-§§	SetTGsAndTEsResponse* setTGsAndTEsResponse = new SetTGsAndTEsResponse();
+	SetTGsAndTEsResponse* setTGsAndTEsResponse = new SetTGsAndTEsResponse();
 	resp->set_allocated_settgsandtesresponse(setTGsAndTEsResponse);
 }

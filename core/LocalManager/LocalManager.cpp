@@ -22,10 +22,10 @@ Author(s): Thomas Riedmaier, Abian Blome, Fabian Russwurm, Roman Bendt, Pascal E
 #include "InstanceMonitorWorker.h"
 #include "InstanceControlWorker.h"
 #include "GetTestcaseChunkRequestHandler.h"
-§§#include "KillInstanceRequestHandler.h"
+#include "KillInstanceRequestHandler.h"
 #include "GetFuzzJobConfigurationRequestHandler.h"
-§§#include "FluffiLMConfiguration.h"
-§§#include "LMGetStatusRequestHandler.h"
+#include "FluffiLMConfiguration.h"
+#include "LMGetStatusRequestHandler.h"
 #include "DBCleanupWorker.h"
 #include "IsAgentWelcomedRequestHandler.h"
 #include "CommProxyWorker.h"
@@ -34,8 +34,8 @@ Author(s): Thomas Riedmaier, Abian Blome, Fabian Russwurm, Roman Bendt, Pascal E
 #include "GarbageCollectorWorker.h"
 #include "GetLMConfigurationRequestHandler.h"
 §§
-§§INITIALIZE_EASYLOGGINGPP
-§§
+INITIALIZE_EASYLOGGINGPP
+
 int main(int argc, char* argv[])
 {
 #ifdef HUNTMEMLEAKS
@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
 	_CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
 	_CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDOUT);
 
-§§	char* b = new char[14]{ "LEAK DETECTOR" };  //Trigger a memory leak for NEW
+	char* b = new char[14]{ "LEAK DETECTOR" };  //Trigger a memory leak for NEW
 #endif
 
 	// ################## Define / Build global objects  ##################
@@ -74,11 +74,11 @@ int main(int argc, char* argv[])
 	unsigned long maxAllowedTimeOfManagerInactivityMS = 10 * 60 * 1000;
 
 	//The garbage collector needs to be initialized as early as possible and deleted as late as possible
-§§	GarbageCollectorWorker* garbageCollectorWorker = new GarbageCollectorWorker(intervallBetweenTwoCollectionRoundsInMillisec);
+	GarbageCollectorWorker* garbageCollectorWorker = new GarbageCollectorWorker(intervallBetweenTwoCollectionRoundsInMillisec);
 
-§§	LMWorkerThreadStateBuilder* workerStateBuilder = new LMWorkerThreadStateBuilder(garbageCollectorWorker);
+	LMWorkerThreadStateBuilder* workerStateBuilder = new LMWorkerThreadStateBuilder(garbageCollectorWorker);
 
-§§	CommInt* comm = new CommInt(workerStateBuilder, 10, 10);
+	CommInt* comm = new CommInt(workerStateBuilder, 10, 10);
 	LOG(INFO) << std::endl << "Hey! I am LocalManager " << comm->getMyGUID() << std::endl << "My location: " << location << std::endl << "My Host and Port: " << comm->getOwnServiceDescriptor().m_serviceHostAndPort << std::endl << "I was built on: " << __DATE__;
 
 	// Specify path to testcase directory, preferable relative
@@ -90,40 +90,40 @@ int main(int argc, char* argv[])
 	// ################## End of Define / Build global objects  ##################
 
 	// ################## Registering Message Handler  ##################
-§§	LMGetStatusRequestHandler* m_getStatusRequestHandler = new LMGetStatusRequestHandler(comm);
+	LMGetStatusRequestHandler* m_getStatusRequestHandler = new LMGetStatusRequestHandler(comm);
 	comm->registerFLUFFIMessageHandler(m_getStatusRequestHandler, FLUFFIMessage::FluffCase::kGetStatusRequest);
-§§
-§§	RegisterAtLMRequestHandler* m_RegisterRequestHandler = new RegisterAtLMRequestHandler(location);
+
+	RegisterAtLMRequestHandler* m_RegisterRequestHandler = new RegisterAtLMRequestHandler(location);
 	comm->registerFLUFFIMessageHandler(m_RegisterRequestHandler, FLUFFIMessage::FluffCase::kRegisterAtLMRequest);
 §§
-§§	GetTestcaseToMutateRequestHandler* m_GetTestcaseToMutateRequestHandler = new GetTestcaseToMutateRequestHandler(testcaseTempDir);
+	GetTestcaseToMutateRequestHandler* m_GetTestcaseToMutateRequestHandler = new GetTestcaseToMutateRequestHandler(testcaseTempDir);
 	comm->registerFLUFFIMessageHandler(m_GetTestcaseToMutateRequestHandler, FLUFFIMessage::FluffCase::kGetTestcaseToMutateRequest);
 §§
-§§	ReportTestcaseWithNoResultRequestHandler* m_GetReportWithNoResultRequestHandler = new ReportTestcaseWithNoResultRequestHandler(testcaseTempDir, comm, garbageCollectorWorker);
+	ReportTestcaseWithNoResultRequestHandler* m_GetReportWithNoResultRequestHandler = new ReportTestcaseWithNoResultRequestHandler(testcaseTempDir, comm, garbageCollectorWorker);
 	comm->registerFLUFFIMessageHandler(m_GetReportWithNoResultRequestHandler, FLUFFIMessage::FluffCase::kReportTestcaseWithNoResultRequest);
 §§
-§§	GetNewCompletedTestcaseIDsRequestHandler* m_GetNewCompletedTestcaseIDsHandler = new GetNewCompletedTestcaseIDsRequestHandler();
+	GetNewCompletedTestcaseIDsRequestHandler* m_GetNewCompletedTestcaseIDsHandler = new GetNewCompletedTestcaseIDsRequestHandler();
 	comm->registerFLUFFIMessageHandler(m_GetNewCompletedTestcaseIDsHandler, FLUFFIMessage::FluffCase::kGetNewCompletedTestcaseIDsRequest);
 
-§§	GetCurrentBlockCoverageRequestHandler* m_GetCurrentBlockCoverageHandler = new GetCurrentBlockCoverageRequestHandler();
+	GetCurrentBlockCoverageRequestHandler* m_GetCurrentBlockCoverageHandler = new GetCurrentBlockCoverageRequestHandler();
 	comm->registerFLUFFIMessageHandler(m_GetCurrentBlockCoverageHandler, FLUFFIMessage::FluffCase::kGetCurrentBlockCoverageRequest);
 §§
-§§	PutTestEvaluationRequestHandler* m_PutTestEvaluationHandler = new PutTestEvaluationRequestHandler(testcaseTempDir, comm, garbageCollectorWorker, forceCompletedTestcasesCacheFlushAfterMS);
+	PutTestEvaluationRequestHandler* m_PutTestEvaluationHandler = new PutTestEvaluationRequestHandler(testcaseTempDir, comm, garbageCollectorWorker, forceCompletedTestcasesCacheFlushAfterMS);
 	comm->registerFLUFFIMessageHandler(m_PutTestEvaluationHandler, FLUFFIMessage::FluffCase::kPutTestEvaluationRequest);
 §§
 §§	GetTestcaseChunkRequestHandler* m_getTestcaseChunkRequestHandler = new GetTestcaseChunkRequestHandler(testcaseTempDir, true, garbageCollectorWorker);
 	comm->registerFLUFFIMessageHandler(m_getTestcaseChunkRequestHandler, FLUFFIMessage::FluffCase::kGetTestCaseChunkRequest);
 
-§§	GetFuzzJobConfigurationRequestHandler* m_getFuzzJobConfigurationRequestHandler = new GetFuzzJobConfigurationRequestHandler();
+	GetFuzzJobConfigurationRequestHandler* m_getFuzzJobConfigurationRequestHandler = new GetFuzzJobConfigurationRequestHandler();
 	comm->registerFLUFFIMessageHandler(m_getFuzzJobConfigurationRequestHandler, FLUFFIMessage::FluffCase::kGetFuzzJobConfigurationRequest);
-§§
-§§	KillInstanceRequestHandler* m_killInstanceRequestHandler = new KillInstanceRequestHandler();
+
+	KillInstanceRequestHandler* m_killInstanceRequestHandler = new KillInstanceRequestHandler();
 	comm->registerFLUFFIMessageHandler(m_killInstanceRequestHandler, FLUFFIMessage::FluffCase::kKillInstanceRequest);
 
-§§	IsAgentWelcomedRequestHandler* m_isAgentWelcomedRequestHandler = new IsAgentWelcomedRequestHandler();
+	IsAgentWelcomedRequestHandler* m_isAgentWelcomedRequestHandler = new IsAgentWelcomedRequestHandler();
 	comm->registerFLUFFIMessageHandler(m_isAgentWelcomedRequestHandler, FLUFFIMessage::FluffCase::kIsAgentWelcomedRequest);
 
-§§	GetLMConfigurationRequestHandler* m_getLMConfigurationRequestHandler = new GetLMConfigurationRequestHandler();
+	GetLMConfigurationRequestHandler* m_getLMConfigurationRequestHandler = new GetLMConfigurationRequestHandler();
 	comm->registerFLUFFIMessageHandler(m_getLMConfigurationRequestHandler, FLUFFIMessage::FluffCase::kGetLMConfigurationRequest);
 	// ################## End of Registering Message Handler  ##################
 
@@ -136,11 +136,11 @@ int main(int argc, char* argv[])
 #endif
 
 	//Register at Global Manager
-§§	WorkerThreadState* workerForLMConfig = workerStateBuilder->constructState();
-§§	FluffiLMConfiguration* lmConfig = nullptr;
+	WorkerThreadState* workerForLMConfig = workerStateBuilder->constructState();
+	FluffiLMConfiguration* lmConfig = nullptr;
 	bool wasKeyPressed = false;
 	while (!wasKeyPressed)
-§§	{
+	{
 		bool isConfigAvailable = comm->getLMConfigFromGM(workerForLMConfig, location, CommInt::GlobalManagerHAP, &lmConfig);
 		if (isConfigAvailable)
 		{
@@ -154,9 +154,9 @@ int main(int argc, char* argv[])
 			Util::setConsoleWindowTitle("FLUFFI LM(32bit) - " + lmConfig->m_fuzzJobName);
 #endif
 			break;
-§§		}
+		}
 		else
-§§		{
+		{
 			LOG(INFO) << "Could not retrieve LM Configuration from GM, retrying in " << timeBetweenTwoAttemptsToGetConfigFromGMMS / 1000 << " seconds";
 			int checkAgainMS = 500;
 			int waitedMS = 0;
@@ -174,8 +174,8 @@ int main(int argc, char* argv[])
 					break;
 				}
 			}
-§§		}
-§§	}
+		}
+	}
 	if (lmConfig != nullptr) {
 		delete lmConfig;
 	}
@@ -191,23 +191,23 @@ int main(int argc, char* argv[])
 
 		// Thread for database cleanup (e.g. collection of billing information)
 		LOG(DEBUG) << "Starting Database Cleanup Thread";
-§§		DBCleanupWorker* dbCleanupWorker = new DBCleanupWorker(comm, workerStateBuilder, timeBetweenTwoCleanupRoundsInMS, location);
+		DBCleanupWorker* dbCleanupWorker = new DBCleanupWorker(comm, workerStateBuilder, timeBetweenTwoCleanupRoundsInMS, location);
 		dbCleanupWorker->m_thread = new std::thread(&DBCleanupWorker::workerMain, dbCleanupWorker);
 
 		// Thread for monitoring instances (TG, TR, TE)
 		LOG(DEBUG) << "Starting Thread for monitoring instances";
-§§		InstanceMonitorWorker* instanceMonitorWorker = new InstanceMonitorWorker(comm, workerStateBuilder, timeBetweenTwoStatusFetchRoundsinMS, location);
+		InstanceMonitorWorker* instanceMonitorWorker = new InstanceMonitorWorker(comm, workerStateBuilder, timeBetweenTwoStatusFetchRoundsinMS, location);
 		instanceMonitorWorker->m_thread = new std::thread(&InstanceMonitorWorker::workerMain, instanceMonitorWorker);
 
 		// Thread for controlling instances (TG, TR, TE)
 		LOG(DEBUG) << "Starting Thread for controlling instances";
-§§		InstanceControlWorker* instanceControlWorker = new InstanceControlWorker(comm, workerStateBuilder, timeBetweenTwoSetTGsAndTEsRoundsinMS, location);
+		InstanceControlWorker* instanceControlWorker = new InstanceControlWorker(comm, workerStateBuilder, timeBetweenTwoSetTGsAndTEsRoundsinMS, location);
 		instanceControlWorker->m_thread = new std::thread(&InstanceControlWorker::workerMain, instanceControlWorker);
 
-§§		// Wait for a keypress or a kill message
-§§		int checkAgainMS = 250;
+		// Wait for a keypress or a kill message
+		int checkAgainMS = 250;
 		while (true)
-§§		{
+		{
 			if (Util::kbhit() != 0) {
 				LOG(INFO) << "Key Pressed -> Shutting down ...";
 				break;
@@ -220,8 +220,8 @@ int main(int argc, char* argv[])
 				LOG(INFO) << "Could not reach manager -> Shutting down ...";
 				break;
 			}
-§§			std::this_thread::sleep_for(std::chrono::milliseconds(checkAgainMS));
-§§		}
+			std::this_thread::sleep_for(std::chrono::milliseconds(checkAgainMS));
+		}
 
 		//Stop worker threads
 		LOG(DEBUG) << "Stoping instanceMonitorWorker";
@@ -303,7 +303,7 @@ int main(int argc, char* argv[])
 
 	// ################## End of Destruct global objects  ##################
 
-§§	LOG(DEBUG) << "Program terminated normally :) ";
+	LOG(DEBUG) << "Program terminated normally :) ";
 
 	return 0;
 }

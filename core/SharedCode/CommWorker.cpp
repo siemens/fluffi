@@ -17,7 +17,7 @@ Author(s): Thomas Riedmaier, Abian Blome
 #include "WorkerThreadState.h"
 #include "IWorkerThreadStateBuilder.h"
 
-§§CommWorker::CommWorker(CommInt* commInt, IWorkerThreadStateBuilder* workerThreadStateBuilder, unsigned short workerNum) :
+CommWorker::CommWorker(CommInt* commInt, IWorkerThreadStateBuilder* workerThreadStateBuilder, unsigned short workerNum) :
 	m_commInt(commInt),
 	m_workerThreadStateBuilder(workerThreadStateBuilder),
 	m_isready(false),
@@ -76,19 +76,19 @@ void CommWorker::workerMain() {
 		}
 		zmq::message_t request = mrequest.remove();
 
-§§		FLUFFIMessage incomingMessage;
-§§		incomingMessage.ParseFromArray(request.data(), static_cast<int>(request.size()));
+		FLUFFIMessage incomingMessage;
+		incomingMessage.ParseFromArray(request.data(), static_cast<int>(request.size()));
 
-§§		LOG(DEBUG) << "Received request of type " << incomingMessage.GetDescriptor()->oneof_decl(0)->field(incomingMessage.fluff_case() - 1)->camelcase_name() << " of length " << incomingMessage.ByteSize();
-§§
+		LOG(DEBUG) << "Received request of type " << incomingMessage.GetDescriptor()->oneof_decl(0)->field(incomingMessage.fluff_case() - 1)->camelcase_name() << " of length " << incomingMessage.ByteSize();
+
 		FLUFFIMessage outgoingMessage;
-§§		m_commInt->getFLUFFIMessageHandler(incomingMessage.fluff_case())->handleFLUFFIMessage(m_workerThreadState, &incomingMessage, &outgoingMessage);
+		m_commInt->getFLUFFIMessageHandler(incomingMessage.fluff_case())->handleFLUFFIMessage(m_workerThreadState, &incomingMessage, &outgoingMessage);
 
-§§		char* responseAsArray = new char[outgoingMessage.ByteSize()];
+		char* responseAsArray = new char[outgoingMessage.ByteSize()];
 		outgoingMessage.SerializeToArray(responseAsArray, outgoingMessage.ByteSize());
 
 		LOG(DEBUG) << "Sending response of type " << outgoingMessage.GetDescriptor()->oneof_decl(0)->field(outgoingMessage.fluff_case() - 1)->camelcase_name() << " of length " << outgoingMessage.ByteSize();
-§§
+
 		zmq::message_t zeroMQRequest(responseAsArray, outgoingMessage.ByteSize());
 		mrequest.add(std::move(zeroMQRequest));
 		try {
@@ -100,11 +100,11 @@ void CommWorker::workerMain() {
 		catch (zmq::error_t& e) {
 			LOG(ERROR) << "CommWorker::workerMain: Something went wrong while sending messages:" << zmq_errno() << "-" << e.what();
 			google::protobuf::ShutdownProtobufLibrary();
-§§			_exit(EXIT_FAILURE); //make compiler happy
+			_exit(EXIT_FAILURE); //make compiler happy
 		}
 
 		delete[] responseAsArray;
-§§		responseAsArray = nullptr;
+		responseAsArray = nullptr;
 	}
 
 	m_workerThreadStateBuilder->destructState(m_workerThreadState);

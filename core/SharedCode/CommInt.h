@@ -11,8 +11,8 @@ Author(s): Thomas Riedmaier, Abian Blome
 */
 
 #pragma once
-§§#include "FluffiServiceDescriptor.h"
-§§
+#include "FluffiServiceDescriptor.h"
+
 class CommWorker;
 class CommProxyWorker;
 class IFLUFFIMessageHandler;
@@ -23,26 +23,26 @@ class WorkerThreadState;
 class CommInt
 {
 public:
-§§	CommInt(IWorkerThreadStateBuilder*  workerThreadStateBuilder, unsigned char workerThreadCount, unsigned char ioThreadCount, const std::string& bindAddr = "tcp://*:*");
+	CommInt(IWorkerThreadStateBuilder*  workerThreadStateBuilder, unsigned char workerThreadCount, unsigned char ioThreadCount, const std::string& bindAddr = "tcp://*:*");
 	virtual ~CommInt();
 
-§§	IFLUFFIMessageHandler* getFLUFFIMessageHandler(FLUFFIMessage::FluffCase whatfor);
+	IFLUFFIMessageHandler* getFLUFFIMessageHandler(FLUFFIMessage::FluffCase whatfor);
 	int getMyListeningPort();
 	std::string getMyGUID();
 	FluffiServiceDescriptor getMyLMServiceDescriptor();
-§§	FluffiServiceDescriptor getOwnServiceDescriptor();
-§§	bool waitForGMRegistration(WorkerThreadState* workerThreadState, AgentType type, const std::set<std::string> implementedAgentSubTypes, const std::string location, int intervallBetweenTwoPullingRoundsInMillisec);
-§§	bool waitForLMRegistration(WorkerThreadState* workerThreadState, AgentType type, const std::set<std::string> implementedAgentSubTypes, const std::string location, int intervallBetweenTwoPullingRoundsInMillisec);
+	FluffiServiceDescriptor getOwnServiceDescriptor();
+	bool waitForGMRegistration(WorkerThreadState* workerThreadState, AgentType type, const std::set<std::string> implementedAgentSubTypes, const std::string location, int intervallBetweenTwoPullingRoundsInMillisec);
+	bool waitForLMRegistration(WorkerThreadState* workerThreadState, AgentType type, const std::set<std::string> implementedAgentSubTypes, const std::string location, int intervallBetweenTwoPullingRoundsInMillisec);
 
 	std::string getAverageRoundTripTime();
 	int getFreeListeningPort();
 	bool getLMConfigFromGM(WorkerThreadState* workerThreadState, const std::string location, const std::string GMHAP, FluffiLMConfiguration** theConfig);
-§§	void registerFLUFFIMessageHandler(IFLUFFIMessageHandler* handler, FLUFFIMessage::FluffCase whatfor);
+	void registerFLUFFIMessageHandler(IFLUFFIMessageHandler* handler, FLUFFIMessage::FluffCase whatfor);
 	bool sendReqAndRecvResp(FLUFFIMessage* req, FLUFFIMessage* resp, WorkerThreadState* workerThreadState, const std::string  destinationHAP, int timeoutMS);
 
-§§	zmq::context_t* m_zeroMQContext;
-§§	zmq::socket_t* m_commIntServerSocket;
-§§	zmq::socket_t* m_commIntWorkerSocket;
+	zmq::context_t* m_zeroMQContext;
+	zmq::socket_t* m_commIntServerSocket;
+	zmq::socket_t* m_commIntWorkerSocket;
 
 	static const std::string GlobalManagerHAP;
 	static const std::streamoff chunkSizeInBytes;
@@ -51,19 +51,19 @@ public:
 	static const int timeoutFileTransferMessage;
 
 private:
-§§	bool registerAtGM(WorkerThreadState* workerThreadState, AgentType type, const std::set<std::string> implementedAgentSubTypes, const std::string location, const std::string GMHAP);
-§§	bool registerAtLM(WorkerThreadState* workerThreadState, AgentType type, const std::set<std::string> implementedAgentSubTypes, const std::string location, const std::string LMHAP);
-§§
-§§	FluffiServiceDescriptor m_lmServiceDescriptor;
+	bool registerAtGM(WorkerThreadState* workerThreadState, AgentType type, const std::set<std::string> implementedAgentSubTypes, const std::string location, const std::string GMHAP);
+	bool registerAtLM(WorkerThreadState* workerThreadState, AgentType type, const std::set<std::string> implementedAgentSubTypes, const std::string location, const std::string LMHAP);
+
+	FluffiServiceDescriptor m_lmServiceDescriptor;
 	int m_listeningPort;
 
-§§	NotImplementedHandler* m_notImplementedHandler;
-§§	zmq::socket_t* m_commIntProxyControlSocket;
+	NotImplementedHandler* m_notImplementedHandler;
+	zmq::socket_t* m_commIntProxyControlSocket;
 	std::vector<CommWorker*> m_workerThreads;
-§§	CommProxyWorker* m_proxyWorker;
+	CommProxyWorker* m_proxyWorker;
 	std::string m_ownHAP;
 	std::string m_ownGUID;
-§§	std::map <FLUFFIMessage::FluffCase, IFLUFFIMessageHandler*> m_registeredHandlers;
+	std::map <FLUFFIMessage::FluffCase, IFLUFFIMessageHandler*> m_registeredHandlers;
 
 	unsigned int m_lastRoundTripTimes[20];
 	int m_lastUpdatedRoundTripTime;

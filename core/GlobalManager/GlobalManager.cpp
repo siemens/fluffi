@@ -14,7 +14,7 @@ Author(s): Thomas Riedmaier, Abian Blome
 #include "CommInt.h"
 #include "RegisterAtGMRequestHandler.h"
 #include "GMWorkerThreadStateBuilder.h"
-§§#include "LMMonitorWorker.h"
+#include "LMMonitorWorker.h"
 #include "Util.h"
 #include "GMDatabaseManager.h"
 
@@ -35,23 +35,23 @@ int main()
 	_CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
 	_CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDOUT);
 
-§§	char* b = new char[14]{ "LEAK DETECTOR" };  //Trigger a memory leak for NEW
+	char* b = new char[14]{ "LEAK DETECTOR" };  //Trigger a memory leak for NEW
 #endif
 
 	// ################## Define / Build global objects  ##################
 	Util::setDefaultLogOptions("logs" + Util::pathSeperator + "GlobalManager.log");
 
 	int timeBetweenTwoStatusFetchRoundsinMS = 5 * 1000;
-§§
-§§	GMWorkerThreadStateBuilder* workerStateBuilder = new GMWorkerThreadStateBuilder();
 
-§§	CommInt* comm = new CommInt(workerStateBuilder, 5, 5, "tcp://*:6669");
+	GMWorkerThreadStateBuilder* workerStateBuilder = new GMWorkerThreadStateBuilder();
+
+	CommInt* comm = new CommInt(workerStateBuilder, 5, 5, "tcp://*:6669");
 	LOG(INFO) << std::endl << "Hey! I am the GlobalManager" << std::endl << "My Host and Port: " << comm->getOwnServiceDescriptor().m_serviceHostAndPort << std::endl << "I was built on: " << __DATE__;;
 
 	// ################## End of Define / Build global objects  ##################
 
 	// ################## Registering Message Handler  ##################
-§§	RegisterAtGMRequestHandler* m_RegisterRequest = new RegisterAtGMRequestHandler(comm);
+	RegisterAtGMRequestHandler* m_RegisterRequest = new RegisterAtGMRequestHandler(comm);
 	comm->registerFLUFFIMessageHandler(m_RegisterRequest, FLUFFIMessage::FluffCase::kRegisterAtGMRequest);
 	// ################## End of Registering Message Handler  ##################
 
@@ -65,22 +65,22 @@ int main()
 
 	GMDatabaseManager::setDBConnectionParameters("db.fluffi", "fluffi_gm", "fluffi_gm", "fluffi_gm");
 
-§§	// Start monitoring thread for LMs
-§§	LOG(DEBUG) << "Starting thread for monitoring LM instances";
-§§	LMMonitorWorker* lmMonitorWorker = new LMMonitorWorker(comm, workerStateBuilder, timeBetweenTwoStatusFetchRoundsinMS);
-§§
-§§	lmMonitorWorker->m_thread = new std::thread(&LMMonitorWorker::workerMain, lmMonitorWorker);
-§§
+	// Start monitoring thread for LMs
+	LOG(DEBUG) << "Starting thread for monitoring LM instances";
+	LMMonitorWorker* lmMonitorWorker = new LMMonitorWorker(comm, workerStateBuilder, timeBetweenTwoStatusFetchRoundsinMS);
+
+	lmMonitorWorker->m_thread = new std::thread(&LMMonitorWorker::workerMain, lmMonitorWorker);
+
 	std::cin.ignore(); //Wait for a keypress
 	LOG(INFO) << "Key Pressed -> Shutting down ...";
 
-§§	// Stop worker threads
-§§	LOG(DEBUG) << "Stoping thread for monitoring LM instances";
+	// Stop worker threads
+	LOG(DEBUG) << "Stoping thread for monitoring LM instances";
 	lmMonitorWorker->stop();
 
-§§	lmMonitorWorker->m_thread->join();
-§§	delete lmMonitorWorker;
-§§
+	lmMonitorWorker->m_thread->join();
+	delete lmMonitorWorker;
+
 	// ################## End of Main Logic  ##################
 
 	// ################## Destruct global objects  ##################

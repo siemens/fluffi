@@ -52,22 +52,22 @@ public:
 	~Util();
 
 	static std::string agentTypeToString(AgentType a);
-§§	static void markAllFilesOfTypeInPathForDeletion(const std::string path, const std::string type, GarbageCollectorWorker* garbageCollectorWorker);
+	static void markAllFilesOfTypeInPathForDeletion(const std::string path, const std::string type, GarbageCollectorWorker* garbageCollectorWorker);
 	static void attemptDeletePathRecursive(std::experimental::filesystem::v1::path dir);
 	static bool attemptRenameFile(const std::string from, const std::string to);
 	static void createFolderAndParentFolders(std::experimental::filesystem::v1::path folder);
 	static bool enableDebugPrivilege();
 	static std::string generateTestcasePathAndFilename(const FluffiTestcaseID testcaseID, std::string testcaseDir);
 	static int kbhit();
-§§	static std::string loadTestcaseChunkInMemory(const FluffiTestcaseID testcaseId, const std::string testcaseDir, int chunkNum, bool* isLastChunk);
-§§	static std::string loadTestcaseInMemory(const FluffiTestcaseID testcaseId, const std::string testcaseDir); //Meant for use by database exclusively
+	static std::string loadTestcaseChunkInMemory(const FluffiTestcaseID testcaseId, const std::string testcaseDir, int chunkNum, bool* isLastChunk);
+	static std::string loadTestcaseInMemory(const FluffiTestcaseID testcaseId, const std::string testcaseDir); //Meant for use by database exclusively
 	static std::string newGUID();
 	static std::vector<char> readAllBytesFromFile(const std::string filename);
 	static void setConsoleWindowTitle(const std::string title);
 	static void setDefaultLogOptions(std::string filename = "");
 	static std::vector<std::string> splitString(std::string str, std::string token);
 	static std::tuple<std::string, std::string> splitPathIntoDirectoryAndFileName(std::string path);
-§§	static bool storeTestcaseFileOnDisk(const FluffiTestcaseID testcaseId, const std::string testcaseDir, const std::string* firstChunk, bool isLastChunk, const  std::string sourceHAP, CommInt* commPtr, WorkerThreadState* workerThreadState, GarbageCollectorWorker* garbageCollectorWorker);
+	static bool storeTestcaseFileOnDisk(const FluffiTestcaseID testcaseId, const std::string testcaseDir, const std::string* firstChunk, bool isLastChunk, const  std::string sourceHAP, CommInt* commPtr, WorkerThreadState* workerThreadState, GarbageCollectorWorker* garbageCollectorWorker);
 	static bool stringHasEnding(std::string const &fullString, std::string const &ending);
 	static void replaceAll(std::string &s, const std::string &search, const std::string &replace);
 	static std::string wstring_to_utf8(const std::wstring& str);
@@ -76,5 +76,5 @@ public:
 
 private:
 
-§§	static bool appendRemainingChunks(FILE* outstream, const FluffiTestcaseID testcaseID, const  std::string sourceHAP, CommInt* commPtr, WorkerThreadState* workerThreadState);
+	static bool appendRemainingChunks(FILE* outstream, const FluffiTestcaseID testcaseID, const  std::string sourceHAP, CommInt* commPtr, WorkerThreadState* workerThreadState);
 };

@@ -301,20 +301,20 @@ exit 0</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-§§    <ClInclude Include="GMDatabaseManager.h" />
+    <ClInclude Include="GMDatabaseManager.h" />
     <ClInclude Include="GMWorkerThreadState.h" />
     <ClInclude Include="GMWorkerThreadStateBuilder.h" />
-§§    <ClInclude Include="LMMonitorWorker.h" />
-§§    <ClInclude Include="RegisterAtGMRequestHandler.h" />
+    <ClInclude Include="LMMonitorWorker.h" />
+    <ClInclude Include="RegisterAtGMRequestHandler.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GlobalManager.cpp" />
-§§    <ClCompile Include="GMDatabaseManager.cpp" />
+    <ClCompile Include="GMDatabaseManager.cpp" />
     <ClCompile Include="GMWorkerThreadStateBuilder.cpp" />
-§§    <ClCompile Include="LMMonitorWorker.cpp" />
-§§    <ClCompile Include="RegisterAtGMRequestHandler.cpp" />
+    <ClCompile Include="LMMonitorWorker.cpp" />
+    <ClCompile Include="RegisterAtGMRequestHandler.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">Create</PrecompiledHeader>

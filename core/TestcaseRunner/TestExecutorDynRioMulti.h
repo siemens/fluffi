@@ -85,7 +85,7 @@ public:
 #endif //_VSTEST
 
 	bool m_target_and_feeder_okay;
-§§	SharedMemIPC* m_sharedMemIPC_toFeeder;
+	SharedMemIPC* m_sharedMemIPC_toFeeder;
 	std::shared_ptr<ExternalProcess> m_debuggeeProcess;
 	process_id_t m_targetProcessID;
 	client_id_t  m_dynrio_clientID;
@@ -96,20 +96,20 @@ public:
 	std::string m_feederCmdline;
 	std::string m_starterCmdline;
 	bool m_attachInsteadOfStart;
-§§	CommInt* m_commInt;
+	CommInt* m_commInt;
 	std::string m_dynrioPipeName;
 	int m_forceRestartAfterXTCs;
 	int m_executionsSinceLastRestart;
 
 #if defined(_WIN64) || defined(_WIN32)
 	HMODULE m_hdrconfiglib;
-§§	dr_nudge_pid_func* m_dr_nudge_pid;
-§§	dr_register_process_func* m_dr_register_process;
-§§	dr_unregister_process_func* m_dr_unregister_process;
-§§	dr_register_client_func* m_dr_register_client;
-§§	dr_process_is_registered_func* m_dr_process_is_registered;
-§§	dr_register_syswide_func* m_dr_register_syswide;
-§§	dr_syswide_is_on_func* m_dr_syswide_is_on;
+	dr_nudge_pid_func* m_dr_nudge_pid;
+	dr_register_process_func* m_dr_register_process;
+	dr_unregister_process_func* m_dr_unregister_process;
+	dr_register_client_func* m_dr_register_client;
+	dr_process_is_registered_func* m_dr_process_is_registered;
+	dr_register_syswide_func* m_dr_register_syswide;
+	dr_syswide_is_on_func* m_dr_syswide_is_on;
 
 	HANDLE m_pipe_to_dynrio;
 	HANDLE m_SharedMemIPCInterruptEvent;
@@ -125,7 +125,7 @@ public:
 	dr_config_status_t m_dr_nudge_pid(process_id_t process_id, client_id_t client_id, uint64_t arg, uint timeout_ms);
 §§#endif
 
-§§	bool setDynamoRioRegistration(bool active, const std::string dynrioPipeName, std::string* errormsg);
+	bool setDynamoRioRegistration(bool active, const std::string dynrioPipeName, std::string* errormsg);
 	bool runSingleTestcase(const FluffiTestcaseID testcaseId, std::shared_ptr<DebugExecutionOutput> exResult, bool use_dyn_rio);
 	bool attemptStartTargetAndFeeder(bool use_dyn_rio);
 	bool waitForDynRioInitialization(int timeoutMS);

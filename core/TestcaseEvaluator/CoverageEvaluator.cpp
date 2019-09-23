@@ -7,7 +7,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-§§Author(s): Thomas Riedmaier, Abian Blome
+Author(s): Thomas Riedmaier, Abian Blome
 */
 
 #include "stdafx.h"
@@ -19,7 +19,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #include "CommInt.h"
 #include "TEWorkerThreadState.h"
 
-§§CoverageEvaluator::CoverageEvaluator(std::string testcaseDir, BlockCoverageCache* localBlockCoverageCache, GarbageCollectorWorker* garbageCollectorWorker, CommInt* commInt, TEWorkerThreadState* workerThreadState) :
+CoverageEvaluator::CoverageEvaluator(std::string testcaseDir, BlockCoverageCache* localBlockCoverageCache, GarbageCollectorWorker* garbageCollectorWorker, CommInt* commInt, TEWorkerThreadState* workerThreadState) :
 	FluffiEvaluator(testcaseDir, localBlockCoverageCache, garbageCollectorWorker, commInt, workerThreadState),
 	m_currentTestcaseEvaluationSendTimeout(CommInt::timeoutFileTransferMessage)
 {
@@ -37,20 +37,20 @@ bool CoverageEvaluator::isSetupFunctionable() {
 	return setupFunctionable;
 }
 
-§§void CoverageEvaluator::processTestOutcomeDescriptor(TestOutcomeDescriptor* tod) {
+void CoverageEvaluator::processTestOutcomeDescriptor(TestOutcomeDescriptor* tod) {
 	FLUFFIMessage req;
 	FLUFFIMessage resp;
 
 	FluffiTestcaseID testcaseId = tod->getId();
 	FluffiTestcaseID parentId = tod->getparentId();
 
-§§	TestcaseID* mutableTestcaseId = new TestcaseID();
+	TestcaseID* mutableTestcaseId = new TestcaseID();
 	mutableTestcaseId->CopyFrom(testcaseId.getProtobuf());
 
-§§	TestcaseID* mutableParentTestcaseId = new TestcaseID();
+	TestcaseID* mutableParentTestcaseId = new TestcaseID();
 	mutableParentTestcaseId->CopyFrom(parentId.getProtobuf());
 
-§§	PutTestEvaluationRequest* putTestEvaluationRequest = new PutTestEvaluationRequest();
+	PutTestEvaluationRequest* putTestEvaluationRequest = new PutTestEvaluationRequest();
 	putTestEvaluationRequest->set_allocated_id(mutableTestcaseId);
 	putTestEvaluationRequest->set_allocated_parentid(mutableParentTestcaseId);
 
@@ -80,7 +80,7 @@ bool CoverageEvaluator::isSetupFunctionable() {
 
 		putTestEvaluationRequest->set_parentratingdelta(generateParentRatingDelta(tod->getTestResult().m_exitType, hasNewBlocks, tod->getparentId().m_serviceDescriptor.m_guid == "special"));
 
-§§		TestResult* mutableTestResult = new TestResult();
+		TestResult* mutableTestResult = new TestResult();
 		if (tod->getTestResult().m_hasFullCoverage) {
 			//Report full coverage to LM
 			FluffiTestResult  testResult = copyTestResultButStripDuplicateBlocks(tod->getTestResult());

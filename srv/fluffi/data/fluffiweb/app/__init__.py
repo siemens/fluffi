@@ -9,22 +9,22 @@
 # Author(s): Junes Najah, Abian Blome, Thomas Riedmaier
 
 §§import pymysql
-§§from flask import Flask
-§§from flask_bootstrap import Bootstrap
-§§from flask_sqlalchemy import SQLAlchemy
+from flask import Flask
+from flask_bootstrap import Bootstrap
+from flask_sqlalchemy import SQLAlchemy
 §§from pytz import utc
-§§
-§§pymysql.install_as_MySQLdb()
-§§
-§§app = Flask(__name__)
-§§Bootstrap(app)
-§§app.config.from_object("config")
-§§db = SQLAlchemy(app)
-§§
+
+pymysql.install_as_MySQLdb()
+
+app = Flask(__name__)
+Bootstrap(app)
+app.config.from_object("config")
+db = SQLAlchemy(app)
+
 §§from .nav import nav
 §§
-§§nav.init_app(app)
-§§
+nav.init_app(app)
+
 §§from app import views, models, controllers
 §§
 §§from apscheduler.schedulers.background import BackgroundScheduler

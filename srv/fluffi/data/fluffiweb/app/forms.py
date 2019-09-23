@@ -8,16 +8,16 @@
 # 
 # Author(s): Junes Najah, Michael Kraus, Fabian Russwurm, Abian Blome, Thomas Riedmaier, Pascal Eckmann
 
-§§from flask_wtf import FlaskForm
-§§from flask_wtf.file import FileField, FileRequired
+from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileRequired
 §§from wtforms import FieldList, FormField, IntegerField, SelectField, StringField, SubmitField
 §§from wtforms.validators import DataRequired, NumberRange
 §§
-§§
-§§class AddLocationProjectForm(FlaskForm):
+
+class AddLocationProjectForm(FlaskForm):
 §§    project = SelectField('Project', choices = [])
 §§
-§§
+
 §§class TargetForm(FlaskForm):
 §§    # this forms is never exposed so we can user the non CSRF version
 §§    target_moduleC = StringField('Target Module', validators = [DataRequired()])
@@ -30,7 +30,7 @@
 §§    option_module_pathC = StringField('Module Value')
 §§
 §§
-§§class CreateProjectForm(FlaskForm):
+class CreateProjectForm(FlaskForm):
 §§    name = StringField("name", validators = [DataRequired()])
 §§    location = SelectField('location', choices = [])
 §§    subtype = SelectField('subtype', choices = [])
@@ -47,7 +47,7 @@
 §§    options = FieldList(FormField(OptionForm))
 §§
 §§
-§§class CreateCustomProjectForm(FlaskForm):
+class CreateCustomProjectForm(FlaskForm):
 §§    name = StringField("name", validators = [DataRequired()])
 §§    DBHost = StringField("DBHost", validators = [DataRequired()])
 §§    DBUser = StringField("DBUser", validators = [DataRequired()])
@@ -55,24 +55,24 @@
 §§    DBName = StringField("DBName", validators = [DataRequired()])
 §§
 §§
-§§class CreateProjectSettingForm(FlaskForm):
+class CreateProjectSettingForm(FlaskForm):
 §§    option_module = StringField("option_module", validators = [DataRequired()])
 §§    option_module_value = StringField("option_module_value", validators = [])
 §§
-§§
-§§class CreateProjectModuleForm(FlaskForm):
+
+class CreateProjectModuleForm(FlaskForm):
 §§    target_module = StringField("target_module", validators = [DataRequired()])
 §§    target_module_path = StringField("target_module_path", validators = [], default = "*")
 §§
-§§
-§§class AddProjectLocationForm(FlaskForm):
+
+class AddProjectLocationForm(FlaskForm):
 §§    location = SelectField('location', choices = [])
 §§
 §§
 §§class CreateLocationForm(FlaskForm):
 §§    name = StringField("name", validators = [DataRequired()])
 §§
-§§
+
 §§class ExecuteInitialSetupForm(FlaskForm):
 §§    ram_disk_size = IntegerField(label = 'Size of Ramdisk: ', default = 1024,
 §§                                 validators = [DataRequired(), NumberRange(min = 512, max = 128000)])

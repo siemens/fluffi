@@ -23,10 +23,10 @@ Author(s): Thomas Riedmaier, Roman Bendt, Abian Blome, Michael Kraus
 #include <random>
 #include <regex>
 #include <iomanip>
-§§
+
 //Easylogging
 #include "easylogging++.h"
-§§
+
 //ZeroMQ
 #include <zmq.hpp>
 #include <zmq_addon.hpp>

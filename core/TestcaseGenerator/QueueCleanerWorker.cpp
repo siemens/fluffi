@@ -21,7 +21,7 @@ Author(s): Thomas Riedmaier, Abian Blome
 #include "GarbageCollectorWorker.h"
 #include "FluffiSetting.h"
 
-§§QueueCleanerWorker::QueueCleanerWorker(CommInt* commInt, TGWorkerThreadStateBuilder* workerThreadStateBuilder, int intervallBetweenTwoCleaningRoundsInMillisec, int maxRetriesBeforeReport, std::string testcaseDir, TGTestcaseManager*  testcaseManager, GarbageCollectorWorker* garbageCollectorWorker)
+QueueCleanerWorker::QueueCleanerWorker(CommInt* commInt, TGWorkerThreadStateBuilder* workerThreadStateBuilder, int intervallBetweenTwoCleaningRoundsInMillisec, int maxRetriesBeforeReport, std::string testcaseDir, TGTestcaseManager*  testcaseManager, GarbageCollectorWorker* garbageCollectorWorker)
 	: m_commInt(commInt),
 	m_workerThreadStateBuilder(workerThreadStateBuilder),
 	m_intervallBetweenTwoCleaningRoundsInMillisec(intervallBetweenTwoCleaningRoundsInMillisec),
@@ -77,13 +77,13 @@ void QueueCleanerWorker::workerMain() {
 
 void QueueCleanerWorker::removeCompletedTestcases()
 {
-§§	LOG(DEBUG) << "Sending sendGetCompletedTestcaseIDsRequest";
+	LOG(DEBUG) << "Sending sendGetCompletedTestcaseIDsRequest";
 
 	FLUFFIMessage req;
 	FLUFFIMessage resp;
 
 	ServiceDescriptor* ptMySelfServiceDescriptor = new ServiceDescriptor();
-§§	ptMySelfServiceDescriptor->CopyFrom(m_commInt->getOwnServiceDescriptor().getProtobuf());
+	ptMySelfServiceDescriptor->CopyFrom(m_commInt->getOwnServiceDescriptor().getProtobuf());
 
 	GetNewCompletedTestcaseIDsRequest* getRequest = new GetNewCompletedTestcaseIDsRequest();
 	getRequest->set_lastupdatetimestamp(m_serverTimestampOfNewestEvaluationResult);
@@ -92,12 +92,12 @@ void QueueCleanerWorker::removeCompletedTestcases()
 
 	bool success = m_commInt->sendReqAndRecvResp(&req, &resp, m_workerThreadState, m_commInt->getMyLMServiceDescriptor().m_serviceHostAndPort, CommInt::timeoutNormalMessage);
 	if (!success) {
-§§		LOG(ERROR) << "Sending sendGetCompletedTestcaseIDsRequest failed!";
+		LOG(ERROR) << "Sending sendGetCompletedTestcaseIDsRequest failed!";
 		return;
 	}
 
 	m_serverTimestampOfNewestEvaluationResult = resp.getnewcompletedtestcaseidsresponse().updatetimestamp();
-§§	LOG(DEBUG) << "New timestamp: " << m_serverTimestampOfNewestEvaluationResult;
+	LOG(DEBUG) << "New timestamp: " << m_serverTimestampOfNewestEvaluationResult;
 
 	m_testcaseManager->removeEvaluatedTestcases(resp.getnewcompletedtestcaseidsresponse().ids());
 }
@@ -111,7 +111,7 @@ void QueueCleanerWorker::reinsertTestcasesWithNoResponse()
 		{
 			FLUFFIMessage req;
 			FLUFFIMessage resp;
-§§			GetFuzzJobConfigurationRequest* getfuzzjobconfigurationrequest = new GetFuzzJobConfigurationRequest();
+			GetFuzzJobConfigurationRequest* getfuzzjobconfigurationrequest = new GetFuzzJobConfigurationRequest();
 			ServiceDescriptor* ptMySelfServiceDescriptor = new ServiceDescriptor();
 			ptMySelfServiceDescriptor->CopyFrom(m_commInt->getOwnServiceDescriptor().getProtobuf());
 			getfuzzjobconfigurationrequest->set_allocated_servicedescriptor(ptMySelfServiceDescriptor);
@@ -154,32 +154,32 @@ void QueueCleanerWorker::reinsertTestcasesWithNoResponse()
 		LOG(INFO) << "Setting the intervall to wait for reinsertion in millisec to " << m_intervallToWaitForReinsertionInMillisec;
 	}
 
-§§	std::chrono::time_point<std::chrono::steady_clock> timeBeforeWhichShouldBeReinserted = std::chrono::steady_clock::now() - std::chrono::milliseconds(m_intervallToWaitForReinsertionInMillisec);
+	std::chrono::time_point<std::chrono::steady_clock> timeBeforeWhichShouldBeReinserted = std::chrono::steady_clock::now() - std::chrono::milliseconds(m_intervallToWaitForReinsertionInMillisec);
 
 	m_testcaseManager->reinsertTestcasesHavingNoAnswerSince(timeBeforeWhichShouldBeReinserted);
 }
 
 void QueueCleanerWorker::reportTestcasesWithMultipleNoResponse() {
 	std::vector<TestcaseDescriptor> testcasesThatNeedToBeReported =
-§§		m_testcaseManager->handMeAllTestcasesWithTooManyRetries(m_maxRetriesBeforeReport);
+		m_testcaseManager->handMeAllTestcasesWithTooManyRetries(m_maxRetriesBeforeReport);
 
 	while (!testcasesThatNeedToBeReported.empty()) {
-§§		TestcaseDescriptor tcToReport = testcasesThatNeedToBeReported.back();
+		TestcaseDescriptor tcToReport = testcasesThatNeedToBeReported.back();
 		testcasesThatNeedToBeReported.pop_back();
 
 		FLUFFIMessage req;
 		FLUFFIMessage resp;
 
-§§		TestcaseID* mutableTestcaseId = new TestcaseID();
-§§		mutableTestcaseId->CopyFrom(tcToReport.getId().getProtobuf());
-§§		TestcaseID* mutableParentId = new TestcaseID();
-§§		mutableParentId->CopyFrom(tcToReport.getparentId().getProtobuf());
+		TestcaseID* mutableTestcaseId = new TestcaseID();
+		mutableTestcaseId->CopyFrom(tcToReport.getId().getProtobuf());
+		TestcaseID* mutableParentId = new TestcaseID();
+		mutableParentId->CopyFrom(tcToReport.getparentId().getProtobuf());
 
 		bool isLastChunk;
 		FluffiTestcaseID testcaseID = tcToReport.getId();
 		std::string data = Util::loadTestcaseChunkInMemory(testcaseID, m_testcaseDir, 0, &isLastChunk);
 
-§§		ReportTestcaseWithNoResultRequest* reportRequest = new ReportTestcaseWithNoResultRequest();
+		ReportTestcaseWithNoResultRequest* reportRequest = new ReportTestcaseWithNoResultRequest();
 		reportRequest->set_allocated_id(mutableTestcaseId);
 		reportRequest->set_allocated_parentid(mutableParentId);
 		reportRequest->set_testcasefirstchunk(data);
@@ -189,7 +189,7 @@ void QueueCleanerWorker::reportTestcasesWithMultipleNoResponse() {
 
 		bool success = m_commInt->sendReqAndRecvResp(&req, &resp, m_workerThreadState, m_commInt->getMyLMServiceDescriptor().m_serviceHostAndPort, CommInt::timeoutFileTransferMessage);
 		if (!success) {
-§§			LOG(ERROR) << "Sending ReportTestcaseWithNoResultRequest failed!";
+			LOG(ERROR) << "Sending ReportTestcaseWithNoResultRequest failed!";
 			m_testcaseManager->pushNewGeneratedTestcase(tcToReport); //try again later
 		}
 		else {

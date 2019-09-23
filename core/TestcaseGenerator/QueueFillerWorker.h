@@ -32,22 +32,22 @@ public:
 	std::thread* m_thread = nullptr;
 
 private:
-§§	FluffiTestcaseID getNewParent();
+	FluffiTestcaseID getNewParent();
 	bool tryGetConfigFromLM();
-§§
+
 	bool m_gotConfigFromLM;
-§§	CommInt* m_commInt;
-§§	TGWorkerThreadStateBuilder* m_workerThreadStateBuilder;
+	CommInt* m_commInt;
+	TGWorkerThreadStateBuilder* m_workerThreadStateBuilder;
 	size_t m_desiredQueueFillLevel;
 	std::string m_queueFillerTempDir;
-§§	TGTestcaseManager* m_testcaseManager;
+	TGTestcaseManager* m_testcaseManager;
 	int m_howManyWillBeGeneratedFromParent;
 	FluffiServiceDescriptor m_mySelfServiceDescriptor;
-§§	TGWorkerThreadState* m_workerThreadState;
-§§	GarbageCollectorWorker* m_garbageCollectorWorker;
+	TGWorkerThreadState* m_workerThreadState;
+	GarbageCollectorWorker* m_garbageCollectorWorker;
 	std::string m_testcaseDirectory;
 	int m_delayToWaitUntilConfigIsCompleteInMS;
 	std::set<std::string> m_myAgentSubTypes;
-§§	FluffiMutator* m_mutator;
+	FluffiMutator* m_mutator;
 	bool m_mutatorNeedsParents;
 };

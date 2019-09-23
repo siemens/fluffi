@@ -10,28 +10,28 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Abian Blome, Pascal Eckmann
 */
 
-§§#pragma once
+#pragma once
 
 class CommInt;
 class GMWorkerThreadStateBuilder;
 class IWorkerThreadStateBuilder;
 class GMWorkerThreadState;
-§§class LMMonitorWorker
-§§{
-§§public:
+class LMMonitorWorker
+{
+public:
 §§	LMMonitorWorker(CommInt* commInt, GMWorkerThreadStateBuilder* workerThreadStateBuilder, int loopIntervalMS);;
-§§	~LMMonitorWorker();
-§§
-§§	void workerMain();
+	~LMMonitorWorker();
+
+	void workerMain();
 	void stop();
-§§
-§§	std::thread* m_thread = nullptr;
-§§
-§§private:
-§§	bool commandHandler(std::string command, std::string argument);
-§§
-§§	CommInt* m_commInt = nullptr;
-§§	IWorkerThreadStateBuilder* m_workerThreadStateBuilder = nullptr;
-§§	GMWorkerThreadState* m_workerThreadState = nullptr;
-§§	int m_loopIntervalMS;
-§§};
+
+	std::thread* m_thread = nullptr;
+
+private:
+	bool commandHandler(std::string command, std::string argument);
+
+	CommInt* m_commInt = nullptr;
+	IWorkerThreadStateBuilder* m_workerThreadStateBuilder = nullptr;
+	GMWorkerThreadState* m_workerThreadState = nullptr;
+	int m_loopIntervalMS;
+};

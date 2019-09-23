@@ -20,7 +20,7 @@ class RegisterAtLMRequestHandler :
 public:
 	RegisterAtLMRequestHandler(std::string mylocation);
 	virtual ~RegisterAtLMRequestHandler();
-§§	void handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp);
+	void handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp);
 
 	void setMyFuzzjob(const std::string myfuzzjob);
 

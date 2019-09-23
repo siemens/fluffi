@@ -7,7 +7,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-§§Author(s): Thomas Riedmaier, Abian Blome
+Author(s): Thomas Riedmaier, Abian Blome
 */
 
 #include "stdafx.h"
@@ -31,7 +31,7 @@ FluffiTestExecutor::FluffiTestExecutor(const std::string targetCMDline, int hang
 	_fullpath(full, m_testcaseDir.c_str(), MAX_PATH);
 #else
 	char full[PATH_MAX];
-§§	char* res = realpath(m_testcaseDir.c_str(), full);
+	char* res = realpath(m_testcaseDir.c_str(), full);
 	if (res == NULL) {
 		LOG(ERROR) << "realpath failed: " << errno;
 	}
@@ -43,9 +43,9 @@ FluffiTestExecutor::~FluffiTestExecutor()
 {
 }
 
-§§bool FluffiTestExecutor::initializeFeeder(std::shared_ptr<ExternalProcess> feederProcess, SharedMemIPC* sharedMemIPC_toFeeder, process_id_t targetProcessID, int timeoutMS) {
-§§	std::chrono::time_point<std::chrono::steady_clock> routineEntryTimeStamp = std::chrono::steady_clock::now();
-§§	std::chrono::time_point<std::chrono::steady_clock> latestRoutineExitTimeStamp = routineEntryTimeStamp + std::chrono::milliseconds(timeoutMS);
+bool FluffiTestExecutor::initializeFeeder(std::shared_ptr<ExternalProcess> feederProcess, SharedMemIPC* sharedMemIPC_toFeeder, process_id_t targetProcessID, int timeoutMS) {
+	std::chrono::time_point<std::chrono::steady_clock> routineEntryTimeStamp = std::chrono::steady_clock::now();
+	std::chrono::time_point<std::chrono::steady_clock> latestRoutineExitTimeStamp = routineEntryTimeStamp + std::chrono::milliseconds(timeoutMS);
 
 	if (!feederProcess->initProcess()) {
 		LOG(ERROR) << "Could not initialize the feeder process";

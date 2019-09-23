@@ -25,8 +25,8 @@ namespace FluffiTester
 	{
 	public:
 
-§§		LMDatabaseManager* dbman = nullptr;
-§§		GarbageCollectorWorker* garbageCollector = nullptr;
+		LMDatabaseManager* dbman = nullptr;
+		GarbageCollectorWorker* garbageCollector = nullptr;
 
 		TEST_METHOD_INITIALIZE(ModuleInitialize)
 		{
@@ -175,7 +175,7 @@ namespace FluffiTester
 		const std::string testdbHost = "fluffiLMDBHost";
 		const std::string testdbName = "fluffi_test";
 
-§§		LMDatabaseManager* setupTestDB(GarbageCollectorWorker* garbageCollectorWorker) {
+		LMDatabaseManager* setupTestDB(GarbageCollectorWorker* garbageCollectorWorker) {
 			std::ifstream createDatabaseFile("..\\..\\..\\srv\\fluffi\\data\\fluffiweb\\app\\sql_files\\createLMDB.sql");
 			std::string dbCreateFileContent;
 
@@ -214,7 +214,7 @@ namespace FluffiTester
 
 			std::vector<std::string> SQLcommands = Util::splitString(dbCreateFileContent, ";");
 
-§§			LMDatabaseManager* dbman = new LMDatabaseManager(garbageCollectorWorker);
+			LMDatabaseManager* dbman = new LMDatabaseManager(garbageCollectorWorker);
 			LMDatabaseManager::setDBConnectionParameters(testdbHost, testdbUser, testdbPass, "information_schema");
 
 			dbman->EXECUTE_TEST_STATEMENT("DROP DATABASE IF EXISTS " + testdbName);

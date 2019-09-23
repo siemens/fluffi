@@ -259,10 +259,10 @@ namespace FluffiTester
 
 §§			std::vector<std::tuple<std::string, uint64_t, uint64_t>> baseAddressesAndSizes;
 			Assert::IsTrue(TestExecutorGDB::getBaseAddressesAndSizes(baseAddressesAndSizes, sampleoutput), L"getBaseAddressesAndSizes");
-§§			Assert::IsTrue(TestExecutorGDB::getCrashRVA(baseAddressesAndSizes, 0x1234) == "unknown+0x00001234", L"0x1234 was not correctly translated");
+			Assert::IsTrue(TestExecutorGDB::getCrashRVA(baseAddressesAndSizes, 0x1234) == "unknown+0x00001234", L"0x1234 was not correctly translated");
 
-§§			Assert::IsTrue(TestExecutorGDB::getCrashRVA(baseAddressesAndSizes, 0x000000014000c1d0) == "InstrumentedDebuggerTester.exe/.rsrc+0x000001d0", L"0x000000014000c1d0 was not correctly translated");
-§§			Assert::IsTrue(TestExecutorGDB::getCrashRVA(baseAddressesAndSizes, 0x000000015000c000) == "unknown+0x15000c000", L"0x000000015000c000 was not correctly translated");
+			Assert::IsTrue(TestExecutorGDB::getCrashRVA(baseAddressesAndSizes, 0x000000014000c1d0) == "InstrumentedDebuggerTester.exe/.rsrc+0x000001d0", L"0x000000014000c1d0 was not correctly translated");
+			Assert::IsTrue(TestExecutorGDB::getCrashRVA(baseAddressesAndSizes, 0x000000015000c000) == "unknown+0x15000c000", L"0x000000015000c000 was not correctly translated");
 		}
 
 		TEST_METHOD(TestExecutorGDB_parseInfoFiles) {

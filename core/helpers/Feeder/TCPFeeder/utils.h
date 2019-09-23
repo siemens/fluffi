@@ -10,27 +10,27 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Abian Blome, Thomas Riedmaier, Pascal Eckmann
 */
 
-§§#pragma once
-§§#include "stdafx.h"
-§§
-§§#if !defined(_WIN32) && !defined(_WIN64)
-§§#define SOCKETTYPE int
-§§#define closesocket close
-§§#define INVALID_SOCKET -1
-§§#define SOCKET_ERROR -1
-§§
-§§std::string execCommandAndGetOutput(std::string command);
+#pragma once
+#include "stdafx.h"
+
+#if !defined(_WIN32) && !defined(_WIN64)
+#define SOCKETTYPE int
+#define closesocket close
+#define INVALID_SOCKET -1
+#define SOCKET_ERROR -1
+
+std::string execCommandAndGetOutput(std::string command);
 §§char** split_commandline(const std::string cmdline);
 §§int memcpy_s(void* a, size_t b, const void* c, size_t d);
-§§#endif
-§§
-§§bool isPortOpen(std::string target, uint16_t port);
-§§void initializeIPC(SharedMemIPC& sharedMemIPC_ToRunner);
-§§std::vector<std::string> splitString(std::string str, std::string token);
-§§std::vector<char> readAllBytesFromFile(const std::string filename);
-§§int getServerPortFromPID(int targetPID);
-§§void initFromArgs(int argc, char* argv[], int& targetport, std::string& ipcName);
-§§uint16_t getTargetPID(SharedMemIPC& sharedMemIPC_ToRunner, int feederTimeoutMS);
-§§uint16_t getServerPortFromPIDOrTimeout(SharedMemIPC& sharedMemIPC_ToRunner, uint16_t targetPID, std::chrono::time_point<std::chrono::system_clock> timeLimit);
-§§void waitForPortOpenOrTimeout(SharedMemIPC& sharedMemIPC_ToRunner, std::string targethost, uint16_t targetport, std::chrono::time_point<std::chrono::system_clock> timeOfLastConnectAttempt);
+#endif
+
+bool isPortOpen(std::string target, uint16_t port);
+void initializeIPC(SharedMemIPC& sharedMemIPC_ToRunner);
+std::vector<std::string> splitString(std::string str, std::string token);
+std::vector<char> readAllBytesFromFile(const std::string filename);
+int getServerPortFromPID(int targetPID);
+void initFromArgs(int argc, char* argv[], int& targetport, std::string& ipcName);
+uint16_t getTargetPID(SharedMemIPC& sharedMemIPC_ToRunner, int feederTimeoutMS);
+uint16_t getServerPortFromPIDOrTimeout(SharedMemIPC& sharedMemIPC_ToRunner, uint16_t targetPID, std::chrono::time_point<std::chrono::system_clock> timeLimit);
+void waitForPortOpenOrTimeout(SharedMemIPC& sharedMemIPC_ToRunner, std::string targethost, uint16_t targetport, std::chrono::time_point<std::chrono::system_clock> timeOfLastConnectAttempt);
 std::string getNewFuzzFileOrDie(SharedMemIPC& sharedMemIPC_ToRunner, int feederTimeoutMS);

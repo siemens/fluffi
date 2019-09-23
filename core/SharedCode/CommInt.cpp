@@ -26,7 +26,7 @@ const int CommInt::timeoutGMRegisterMessage = 2000;
 const int CommInt::timeoutNormalMessage = 10 * 1000;
 const int CommInt::timeoutFileTransferMessage = 10 * CommInt::timeoutNormalMessage;
 
-§§CommInt::CommInt(IWorkerThreadStateBuilder* workerThreadStateBuilder, unsigned char workerThreadCount, unsigned char ioThreadCount, const std::string& bindAddr) :
+CommInt::CommInt(IWorkerThreadStateBuilder* workerThreadStateBuilder, unsigned char workerThreadCount, unsigned char ioThreadCount, const std::string& bindAddr) :
 	m_zeroMQContext(nullptr),
 	m_commIntServerSocket(nullptr),
 	m_commIntWorkerSocket(nullptr),
@@ -69,8 +69,8 @@ const int CommInt::timeoutFileTransferMessage = 10 * CommInt::timeoutNormalMessa
 	m_commIntProxyControlSocket->bind("inproc://proxyControl");
 
 	//  Launch pool of worker threads
-§§	for (unsigned short i = 0; i < workerThreadCount; i++) {
-§§		CommWorker* worker = new CommWorker(this, workerThreadStateBuilder, i);
+	for (unsigned short i = 0; i < workerThreadCount; i++) {
+		CommWorker* worker = new CommWorker(this, workerThreadStateBuilder, i);
 		m_workerThreads.push_back(worker);
 		worker->m_thread = new std::thread(&CommWorker::workerMain, worker);
 	}
@@ -106,27 +106,27 @@ const int CommInt::timeoutFileTransferMessage = 10 * CommInt::timeoutNormalMessa
 CommInt::~CommInt()
 {
 	//Stopping the workers
-§§	LOG(DEBUG) << "Telling workers to stop";
+	LOG(DEBUG) << "Telling workers to stop";
 	for (CommWorker* w : m_workerThreads) {
-§§		if (w != nullptr) {
-§§			w->stop();
-§§		}
-	}
-
-	while (!m_workerThreads.empty()) {
-§§		CommWorker* w = m_workerThreads.back();
-§§		if (w != nullptr) {
-§§			if (w->m_thread != nullptr) {
-§§				w->m_thread->join();
-§§			}
-§§			m_workerThreads.pop_back();
-§§			delete w;
+		if (w != nullptr) {
+			w->stop();
 		}
 	}
 
-§§	LOG(DEBUG) << "All workers stopped";
+	while (!m_workerThreads.empty()) {
+		CommWorker* w = m_workerThreads.back();
+		if (w != nullptr) {
+			if (w->m_thread != nullptr) {
+				w->m_thread->join();
+			}
+			m_workerThreads.pop_back();
+			delete w;
+		}
+	}
 
-§§	LOG(DEBUG) << "Telling proxy thread to stop";
+	LOG(DEBUG) << "All workers stopped";
+
+	LOG(DEBUG) << "Telling proxy thread to stop";
 	zmq::const_buffer buf = zmq::const_buffer("TERMINATE", 9);
 	m_commIntProxyControlSocket->send(buf, zmq::send_flags::none);
 	if (m_proxyWorker != nullptr) {
@@ -135,7 +135,7 @@ CommInt::~CommInt()
 	delete m_proxyWorker;
 	m_proxyWorker = nullptr;
 
-§§	LOG(DEBUG) << "Proxy thread stopped";
+	LOG(DEBUG) << "Proxy thread stopped";
 
 	//Tearing down zeroMQ;
 	delete m_commIntProxyControlSocket;
@@ -151,7 +151,7 @@ CommInt::~CommInt()
 	delete m_notImplementedHandler;
 	m_notImplementedHandler = nullptr;
 
-§§	LOG(DEBUG) << "Freed all ComInt ressources";
+	LOG(DEBUG) << "Freed all ComInt ressources";
 }
 
 int CommInt::getMyListeningPort() {
@@ -173,12 +173,12 @@ int CommInt::getFreeListeningPort() {
 	return atoi(strchr(port + 5, ':') + 1);
 }
 
-§§bool CommInt::registerAtLM(WorkerThreadState* workerThreadState, AgentType type, const std::set<std::string> implementedAgentSubTypes, const  std::string location, const std::string LMHAP) {
+bool CommInt::registerAtLM(WorkerThreadState* workerThreadState, AgentType type, const std::set<std::string> implementedAgentSubTypes, const  std::string location, const std::string LMHAP) {
 	FLUFFIMessage req;
 	FLUFFIMessage resp;
 
 	ServiceDescriptor* ptMySelfServiceDescriptor = new ServiceDescriptor();
-§§	ptMySelfServiceDescriptor->CopyFrom(getOwnServiceDescriptor().getProtobuf());
+	ptMySelfServiceDescriptor->CopyFrom(getOwnServiceDescriptor().getProtobuf());
 
 	RegisterAtLMRequest* registerRequest = new RegisterAtLMRequest();
 	registerRequest->set_type(type);
@@ -206,21 +206,21 @@ int CommInt::getFreeListeningPort() {
 	}
 }
 
-§§bool CommInt::getLMConfigFromGM(WorkerThreadState* workerThreadState, const std::string location, const std::string GMHAP, FluffiLMConfiguration** theConfig) {
-§§	FLUFFIMessage req;
-§§	FLUFFIMessage resp;
-§§
-§§	ServiceDescriptor* ptMySelfServiceDescriptor = new ServiceDescriptor();
-§§	ptMySelfServiceDescriptor->CopyFrom(getOwnServiceDescriptor().getProtobuf());
-§§
-§§	RegisterAtGMRequest* registerRequest = new RegisterAtGMRequest();
-§§	registerRequest->set_type(AgentType::LocalManager);
-§§	registerRequest->set_location(location);
-§§	registerRequest->set_allocated_servicedescriptor(ptMySelfServiceDescriptor);
-§§	req.set_allocated_registeratgmrequest(registerRequest);
+bool CommInt::getLMConfigFromGM(WorkerThreadState* workerThreadState, const std::string location, const std::string GMHAP, FluffiLMConfiguration** theConfig) {
+	FLUFFIMessage req;
+	FLUFFIMessage resp;
+
+	ServiceDescriptor* ptMySelfServiceDescriptor = new ServiceDescriptor();
+	ptMySelfServiceDescriptor->CopyFrom(getOwnServiceDescriptor().getProtobuf());
+
+	RegisterAtGMRequest* registerRequest = new RegisterAtGMRequest();
+	registerRequest->set_type(AgentType::LocalManager);
+	registerRequest->set_location(location);
+	registerRequest->set_allocated_servicedescriptor(ptMySelfServiceDescriptor);
+	req.set_allocated_registeratgmrequest(registerRequest);
 	bool success = sendReqAndRecvResp(&req, &resp, workerThreadState, GMHAP, CommInt::timeoutGMRegisterMessage);
-§§	if (success)
-§§	{
+	if (success)
+	{
 		if (resp.registeratgmresponse().retrylater())
 		{
 			LOG(INFO) << "Registration at Global Manager " << GMHAP << " was delayed as it is not yet decided what we should do!";
@@ -229,53 +229,53 @@ int CommInt::getFreeListeningPort() {
 		LOG(INFO) << "Registration at Global Manager " << GMHAP << " successful!";
 		*theConfig = new FluffiLMConfiguration(resp.registeratgmresponse().lmconfiguration());
 		return true;
-§§	}
-§§	else
-§§	{
-§§		LOG(ERROR) << "Registration at Global Manager " << GMHAP << " failed!";
+	}
+	else
+	{
+		LOG(ERROR) << "Registration at Global Manager " << GMHAP << " failed!";
 		return false;
-§§	}
-§§}
-§§
-§§bool CommInt::registerAtGM(WorkerThreadState* workerThreadState, AgentType type, const std::set<std::string> implementedAgentSubTypes, const std::string location, const std::string GMHAP) {
-§§	FLUFFIMessage req;
-§§	FLUFFIMessage resp;
-§§
-§§	ServiceDescriptor* ptMySelfServiceDescriptor = new ServiceDescriptor();
-§§	ptMySelfServiceDescriptor->CopyFrom(getOwnServiceDescriptor().getProtobuf());
-§§
-§§	RegisterAtGMRequest* registerRequest = new RegisterAtGMRequest();
-§§	registerRequest->set_type(type);
+	}
+}
+
+bool CommInt::registerAtGM(WorkerThreadState* workerThreadState, AgentType type, const std::set<std::string> implementedAgentSubTypes, const std::string location, const std::string GMHAP) {
+	FLUFFIMessage req;
+	FLUFFIMessage resp;
+
+	ServiceDescriptor* ptMySelfServiceDescriptor = new ServiceDescriptor();
+	ptMySelfServiceDescriptor->CopyFrom(getOwnServiceDescriptor().getProtobuf());
+
+	RegisterAtGMRequest* registerRequest = new RegisterAtGMRequest();
+	registerRequest->set_type(type);
 	for (auto it = implementedAgentSubTypes.begin(); it != implementedAgentSubTypes.end(); ++it) {
 		registerRequest->add_implementedagentsubtypes(*it);
 	}
-§§	registerRequest->set_location(location);
-§§	registerRequest->set_allocated_servicedescriptor(ptMySelfServiceDescriptor);
-§§	req.set_allocated_registeratgmrequest(registerRequest);
+	registerRequest->set_location(location);
+	registerRequest->set_allocated_servicedescriptor(ptMySelfServiceDescriptor);
+	req.set_allocated_registeratgmrequest(registerRequest);
 	bool success = sendReqAndRecvResp(&req, &resp, workerThreadState, GMHAP, CommInt::timeoutGMRegisterMessage);
-§§	if (success)
-§§	{
-§§		if (resp.registeratgmresponse().retrylater())
-§§		{
+	if (success)
+	{
+		if (resp.registeratgmresponse().retrylater())
+		{
 			LOG(INFO) << "Registration at Global Manager " << GMHAP << " was delayed as it is not yet decided what we should do!";
-§§			return false;
-§§		}
+			return false;
+		}
 		LOG(INFO) << "Registration at Global Manager " << GMHAP << " successful!";
-§§		m_lmServiceDescriptor = FluffiServiceDescriptor(resp.registeratgmresponse().lmservicedescriptor());
-§§		return true;
-§§	}
-§§	else
-§§	{
-§§		LOG(ERROR) << "Registration at Global Manager " << GMHAP << " failed!";
-§§		return false;
-§§	}
-§§}
-§§
-§§FluffiServiceDescriptor CommInt::getOwnServiceDescriptor() {
+		m_lmServiceDescriptor = FluffiServiceDescriptor(resp.registeratgmresponse().lmservicedescriptor());
+		return true;
+	}
+	else
+	{
+		LOG(ERROR) << "Registration at Global Manager " << GMHAP << " failed!";
+		return false;
+	}
+}
+
+FluffiServiceDescriptor CommInt::getOwnServiceDescriptor() {
 	if (m_ownHAP == "" || m_ownGUID == "") {
 		char hostname[128];
 		gethostname(hostname, 128);
-§§		hostname[127] = 0;
+		hostname[127] = 0;
 		int port = getMyListeningPort();
 		m_ownHAP = std::string(hostname) + ".fluffi" + ":" + std::to_string(port);
 	}
@@ -283,28 +283,28 @@ int CommInt::getFreeListeningPort() {
 		m_ownGUID = Util::newGUID();
 	}
 
-§§	return FluffiServiceDescriptor{ m_ownHAP, m_ownGUID };
+	return FluffiServiceDescriptor{ m_ownHAP, m_ownGUID };
 }
 
 FluffiServiceDescriptor CommInt::getMyLMServiceDescriptor() {
 	return m_lmServiceDescriptor;
 }
 
-§§bool CommInt::waitForGMRegistration(WorkerThreadState* workerThreadState, AgentType type, const std::set<std::string> implementedAgentSubTypes, const std::string location, int intervallBetweenTwoPullingRoundsInMillisec)
-§§{
+bool CommInt::waitForGMRegistration(WorkerThreadState* workerThreadState, AgentType type, const std::set<std::string> implementedAgentSubTypes, const std::string location, int intervallBetweenTwoPullingRoundsInMillisec)
+{
 	bool wasKeyPressed = false;
 	int attemptCount = 0;
 	while (!wasKeyPressed && attemptCount < 5)
-§§	{
+	{
 		attemptCount++;
 		bool didRegistrationSucceed = registerAtGM(workerThreadState, type, implementedAgentSubTypes, location, CommInt::GlobalManagerHAP);
 		if (didRegistrationSucceed)
-§§		{
+		{
 			LOG(INFO) << "Registered at GM succesfull, forwarded to LM: " << m_lmServiceDescriptor.m_serviceHostAndPort;
 			return true;
-§§		}
-§§		else
-§§		{
+		}
+		else
+		{
 			LOG(INFO) << "Could not retrieve my LM from GM, retrying in " << intervallBetweenTwoPullingRoundsInMillisec / 1000 << " seconds";
 			int checkAgainMS = 500;
 			int waitedMS = 0;
@@ -322,14 +322,14 @@ FluffiServiceDescriptor CommInt::getMyLMServiceDescriptor() {
 					break;
 				}
 			}
-§§		}
-§§	}
+		}
+	}
 	LOG(ERROR) << "Could not register at GM!";
-§§
+
 	return false;
-§§}
-§§
-§§bool CommInt::waitForLMRegistration(WorkerThreadState* workerThreadState, AgentType type, const std::set<std::string> implementedAgentSubTypes, const std::string location, int intervallBetweenTwoPullingRoundsInMillisec)
+}
+
+bool CommInt::waitForLMRegistration(WorkerThreadState* workerThreadState, AgentType type, const std::set<std::string> implementedAgentSubTypes, const std::string location, int intervallBetweenTwoPullingRoundsInMillisec)
 {
 	bool wasKeyPressed = false;
 	while (!wasKeyPressed)
@@ -374,16 +374,16 @@ std::string CommInt::getMyGUID() {
 }
 
 bool CommInt::sendReqAndRecvResp(FLUFFIMessage* req, FLUFFIMessage* resp, WorkerThreadState* workerThreadState, const std::string destinationHAP, int timeoutMS) {
-§§	zmq::socket_t* sock = workerThreadState->getSocketFor(m_zeroMQContext, destinationHAP, timeoutMS);
+	zmq::socket_t* sock = workerThreadState->getSocketFor(m_zeroMQContext, destinationHAP, timeoutMS);
 
-§§	char* reqAsArray = new char[req->ByteSize()];
+	char* reqAsArray = new char[req->ByteSize()];
 	req->SerializeToArray(reqAsArray, req->ByteSize());
 
 	LOG(DEBUG) << "Sending request of type " << req->GetDescriptor()->oneof_decl(0)->field(req->fluff_case() - 1)->camelcase_name() << " of length " << req->ByteSize();
 	zmq::message_t zeroMQRequest(reqAsArray, req->ByteSize());
 	delete[] reqAsArray;
 
-§§	std::chrono::time_point<std::chrono::steady_clock> preSendTS = std::chrono::steady_clock::now();
+	std::chrono::time_point<std::chrono::steady_clock> preSendTS = std::chrono::steady_clock::now();
 	try {
 		zmq::detail::send_result_t wasSuccessfullySend = sock->send(zeroMQRequest, zmq::send_flags::none);
 		if (!wasSuccessfullySend.has_value()) {
@@ -415,7 +415,7 @@ bool CommInt::sendReqAndRecvResp(FLUFFIMessage* req, FLUFFIMessage* resp, Worker
 		_exit(EXIT_FAILURE); //make compiler happy
 	}
 
-§§	std::chrono::time_point<std::chrono::steady_clock> postReceiveTS = std::chrono::steady_clock::now();
+	std::chrono::time_point<std::chrono::steady_clock> postReceiveTS = std::chrono::steady_clock::now();
 	unsigned int elapsedMilliseconds = static_cast<unsigned int>(std::chrono::duration_cast<std::chrono::milliseconds>(postReceiveTS - preSendTS).count());
 	//Updating the RTTs like this is not thread safe. However, the worst thing that happens is that we loose RTT values. Consequently, we ignore thread safety / race conditions here
 	m_lastRoundTripTimes[m_lastUpdatedRoundTripTime] = elapsedMilliseconds;
@@ -427,11 +427,11 @@ bool CommInt::sendReqAndRecvResp(FLUFFIMessage* req, FLUFFIMessage* resp, Worker
 	return true;
 }
 
-§§void CommInt::registerFLUFFIMessageHandler(IFLUFFIMessageHandler* handler, FLUFFIMessage::FluffCase whatfor) {
+void CommInt::registerFLUFFIMessageHandler(IFLUFFIMessageHandler* handler, FLUFFIMessage::FluffCase whatfor) {
 	m_registeredHandlers[whatfor] = handler;
 }
 
-§§IFLUFFIMessageHandler* CommInt::getFLUFFIMessageHandler(FLUFFIMessage::FluffCase whatfor) {
+IFLUFFIMessageHandler* CommInt::getFLUFFIMessageHandler(FLUFFIMessage::FluffCase whatfor) {
 	if (m_registeredHandlers.count(whatfor) == 1) {
 		return m_registeredHandlers[whatfor];
 	}

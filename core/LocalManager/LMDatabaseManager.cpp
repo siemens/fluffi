@@ -27,15 +27,15 @@ std::string LMDatabaseManager::s_dbUser = "";
 std::string LMDatabaseManager::s_dbPassword = "";
 std::string LMDatabaseManager::s_dbName = "";
 
-§§LMDatabaseManager::LMDatabaseManager(GarbageCollectorWorker* garbageCollectorWorker) :
+LMDatabaseManager::LMDatabaseManager(GarbageCollectorWorker* garbageCollectorWorker) :
 	m_DBConnection(nullptr),
 	m_garbageCollectorWorker(garbageCollectorWorker),
-§§	performanceWatchTimePoint(std::chrono::steady_clock::now())
+	performanceWatchTimePoint(std::chrono::steady_clock::now())
 §§{
 	if (!mysql_thread_safe()) {
 		LOG(ERROR) << "The maria db connector was not compiled in a thread safe way! This won't work!";
 		google::protobuf::ShutdownProtobufLibrary();
-§§		_exit(EXIT_FAILURE); //make compiler happy
+		_exit(EXIT_FAILURE); //make compiler happy
 	}
 }
 
@@ -56,8 +56,8 @@ void LMDatabaseManager::setDBConnectionParameters(std::string host, std::string 
 	s_dbName = db;
 }
 
-§§MYSQL* LMDatabaseManager::establishDBConnection() {
-§§	MYSQL* re = mysql_init(NULL);
+MYSQL* LMDatabaseManager::establishDBConnection() {
+	MYSQL* re = mysql_init(NULL);
 §§
 	my_bool reconnect = true;
 	mysql_options(re, MYSQL_OPT_RECONNECT, &reconnect);
@@ -65,9 +65,9 @@ void LMDatabaseManager::setDBConnectionParameters(std::string host, std::string 
 
 	if (!mysql_real_connect(re, s_dbHost.c_str(), s_dbUser.c_str(), s_dbPassword.c_str(), s_dbName.c_str(), 3306, "", 0))
 §§	{
-§§		LOG(ERROR) << "Failed to connect to database";
+		LOG(ERROR) << "Failed to connect to database";
 		google::protobuf::ShutdownProtobufLibrary();
-§§		_exit(EXIT_FAILURE); //make compiler happy
+		_exit(EXIT_FAILURE); //make compiler happy
 §§	}
 §§	else
 §§	{
@@ -79,7 +79,7 @@ void LMDatabaseManager::setDBConnectionParameters(std::string host, std::string 
 	return re;
 §§}
 §§
-§§MYSQL* LMDatabaseManager::getDBConnection() {
+MYSQL* LMDatabaseManager::getDBConnection() {
 	if (m_DBConnection == nullptr) {
 		m_DBConnection = establishDBConnection();
 	}
@@ -93,7 +93,7 @@ std::string LMDatabaseManager::EXECUTE_TEST_STATEMENT(const std::string query) {
 		return "";
 	}
 
-§§	MYSQL_RES* result = mysql_store_result(getDBConnection());
+	MYSQL_RES* result = mysql_store_result(getDBConnection());
 	if (result == NULL) {
 		return "";
 	}
@@ -111,7 +111,7 @@ std::string LMDatabaseManager::EXECUTE_TEST_STATEMENT(const std::string query) {
 }
 #endif // _VSTEST
 
-§§bool LMDatabaseManager::writeManagedInstance(const FluffiServiceDescriptor serviceDescriptor, int type, std::string subtype, std::string location)
+bool LMDatabaseManager::writeManagedInstance(const FluffiServiceDescriptor serviceDescriptor, int type, std::string subtype, std::string location)
 §§{
 	PERFORMANCE_WATCH_FUNCTION_ENTRY
 		int preparedType = type;
@@ -244,11 +244,11 @@ std::string LMDatabaseManager::EXECUTE_TEST_STATEMENT(const std::string query) {
 		return true;
 §§}
 
-§§GetNewCompletedTestcaseIDsResponse* LMDatabaseManager::generateGetNewCompletedTestcaseIDsResponse(time_t lastUpdateTimeStamp)
+GetNewCompletedTestcaseIDsResponse* LMDatabaseManager::generateGetNewCompletedTestcaseIDsResponse(time_t lastUpdateTimeStamp)
 §§{
 	PERFORMANCE_WATCH_FUNCTION_ENTRY
 		GetNewCompletedTestcaseIDsResponse* re = new GetNewCompletedTestcaseIDsResponse();
-§§
+
 §§	struct tm structCurTime;
 	gmtime_s(&structCurTime, &lastUpdateTimeStamp);
 §§	MYSQL_TIME timeStamp;
@@ -280,7 +280,7 @@ std::string LMDatabaseManager::EXECUTE_TEST_STATEMENT(const std::string query) {
 §§	if (mysql_stmt_execute(sql_stmt) != 0) {
 		LOG(ERROR) << "generateGetNewCompletedTestcaseIDsResponse encountered the following error: " << mysql_stmt_error(sql_stmt);
 §§		mysql_stmt_close(sql_stmt);
-§§		return re;
+		return re;
 §§	}
 §§
 	MYSQL_TIME outputTimeStamp;
@@ -313,7 +313,7 @@ std::string LMDatabaseManager::EXECUTE_TEST_STATEMENT(const std::string query) {
 	for (unsigned long long i = 0; i < resultRows; i++) {
 		mysql_stmt_fetch(sql_stmt);
 
-§§		char* responseCol0 = new char[lineLengthCol0 + 1];
+		char* responseCol0 = new char[lineLengthCol0 + 1];
 		memset(responseCol0, 0, lineLengthCol0 + 1);
 
 		resultBIND[0].buffer = responseCol0;
@@ -336,23 +336,23 @@ std::string LMDatabaseManager::EXECUTE_TEST_STATEMENT(const std::string query) {
 		if (latestTimeSTamp == 0)
 §§		{
 			latestTimeSTamp = newTimestamp;
-§§			LOG(DEBUG) << "Setting initial timestamp";
+			LOG(DEBUG) << "Setting initial timestamp";
 §§		}
 		else if (difftime(newTimestamp, latestTimeSTamp) > 0.0)
 		{
 			latestTimeSTamp = newTimestamp;
-§§			LOG(DEBUG) << "Found newer timestamp";
+			LOG(DEBUG) << "Found newer timestamp";
 		}
 		else
 		{
-§§			LOG(DEBUG) << "Timestamp not newer";
+			LOG(DEBUG) << "Timestamp not newer";
 §§		}
 §§
-§§		ServiceDescriptor* creatorSd = new ServiceDescriptor();
+		ServiceDescriptor* creatorSd = new ServiceDescriptor();
 		creatorSd->set_guid(responseCol0);
 		//the service's hostandPort is unknown and therefore not set (and irrelevant anyways)
 
-§§		TestcaseID* tcID = re->add_ids();
+		TestcaseID* tcID = re->add_ids();
 		tcID->set_allocated_servicedescriptor(creatorSd);
 		tcID->set_localid(creatorLocalID);
 
@@ -421,10 +421,10 @@ std::vector<std::pair<FluffiServiceDescriptor, AgentType>> LMDatabaseManager::ge
 	for (unsigned long long i = 0; i < resultRows; i++) {
 		mysql_stmt_fetch(sql_stmt);
 
-§§		char* responseCol0 = new char[lineLengthCol0 + 1];
+		char* responseCol0 = new char[lineLengthCol0 + 1];
 		memset(responseCol0, 0, lineLengthCol0 + 1);
 
-§§		char* responseCol1 = new char[lineLengthCol1 + 1];
+		char* responseCol1 = new char[lineLengthCol1 + 1];
 		memset(responseCol1, 0, lineLengthCol1 + 1);
 
 		resultBIND[0].buffer = responseCol0;
@@ -504,10 +504,10 @@ std::vector<std::pair<FluffiServiceDescriptor, AgentType>> LMDatabaseManager::ge
 	for (unsigned long long i = 0; i < resultRows; i++) {
 		mysql_stmt_fetch(sql_stmt);
 
-§§		char* responseCol0 = new char[lineLengthCol0 + 1];
+		char* responseCol0 = new char[lineLengthCol0 + 1];
 		memset(responseCol0, 0, lineLengthCol0 + 1);
 
-§§		char* responseCol1 = new char[lineLengthCol1 + 1];
+		char* responseCol1 = new char[lineLengthCol1 + 1];
 		memset(responseCol1, 0, lineLengthCol1 + 1);
 
 		resultBIND[0].buffer = responseCol0;
@@ -661,7 +661,7 @@ std::string LMDatabaseManager::getRegisteredInstanceSubType(std::string ServiceD
 	else {
 		mysql_stmt_fetch(sql_stmt);
 
-§§		char* responseCol0 = new char[lineLengthCol0 + 1];
+		char* responseCol0 = new char[lineLengthCol0 + 1];
 		memset(responseCol0, 0, lineLengthCol0 + 1);
 
 		resultBIND[0].buffer = responseCol0;
@@ -682,11 +682,11 @@ std::string LMDatabaseManager::getRegisteredInstanceSubType(std::string ServiceD
 		return re;
 }
 
-§§GetTestcaseToMutateResponse* LMDatabaseManager::generateGetTestcaseToMutateResponse(std::string testcaseTempDir, int ratingAdaption) {
+GetTestcaseToMutateResponse* LMDatabaseManager::generateGetTestcaseToMutateResponse(std::string testcaseTempDir, int ratingAdaption) {
 	PERFORMANCE_WATCH_FUNCTION_ENTRY
-§§		GetTestcaseToMutateResponse* response = new GetTestcaseToMutateResponse();
+		GetTestcaseToMutateResponse* response = new GetTestcaseToMutateResponse();
 	long long int testcaseID = 0;
-§§
+
 	//#################### First part: get testcase ####################
 	{
 		if (mysql_query(getDBConnection(), "SELECT ID, CreatorServiceDescriptorGUID, CreatorLocalID, RawBytes  FROM interesting_testcases WHERE TestCaseType = 0 ORDER BY Rating DESC LIMIT 1") != 0) {
@@ -723,7 +723,7 @@ std::string LMDatabaseManager::getRegisteredInstanceSubType(std::string ServiceD
 			std::stringstream ss;
 			ss << creatorGUID << "-" << creatorLocalID;
 			//apparently, fwrite performs much better than ofstream
-§§			FILE* testcaseFile;
+			FILE* testcaseFile;
 			if (0 != fopen_s(&testcaseFile, (testcaseTempDir + Util::pathSeperator + ss.str()).c_str(), "wb")) {
 				LOG(ERROR) << "LMDatabaseManager::generateGetTestcaseToMutateResponse failed to open the file " << (testcaseTempDir + Util::pathSeperator + ss.str());
 				delete rawBytes;
@@ -736,11 +736,11 @@ std::string LMDatabaseManager::getRegisteredInstanceSubType(std::string ServiceD
 			delete rawBytes;
 		}
 
-§§		ServiceDescriptor* creatorSd = new ServiceDescriptor();
+		ServiceDescriptor* creatorSd = new ServiceDescriptor();
 		creatorSd->set_guid(creatorGUID);
 		//the service's hostandPort is unknown and therefore not set (and irrelevant anyways)
 
-§§		TestcaseID* tcID = new TestcaseID();
+		TestcaseID* tcID = new TestcaseID();
 		tcID->set_allocated_servicedescriptor(creatorSd);
 		tcID->set_localid(creatorLocalID);
 
@@ -838,14 +838,14 @@ std::string LMDatabaseManager::getRegisteredInstanceSubType(std::string ServiceD
 		return response;
 }
 
-§§std::vector<StatusOfInstance> LMDatabaseManager::getStatusOfManagedInstances(std::string location)
-§§{
+std::vector<StatusOfInstance> LMDatabaseManager::getStatusOfManagedInstances(std::string location)
+{
 	PERFORMANCE_WATCH_FUNCTION_ENTRY
 		std::vector<StatusOfInstance> re{};
-§§
+
 	const char* cStrLocation = location.c_str();
 	unsigned long locationLength = static_cast<unsigned long>(location.length());
-§§
+
 	MYSQL_STMT* sql_stmt = mysql_stmt_init(getDBConnection());
 	const char* stmt = "SELECT ServiceDescriptorHostAndPort, managed_instances.ServiceDescriptorGUID,  AgentType, TimeOfStatus, Status FROM managed_instances INNER JOIN (SELECT * FROM managed_instances_statuses AS a WHERE TimeOfStatus = (SELECT MAX(TimeOfStatus) FROM managed_instances_statuses AS b WHERE a.ServiceDescriptorGUID = b.ServiceDescriptorGUID) GROUP BY ServiceDescriptorGUID ) AS statuses ON managed_instances.ServiceDescriptorGUID = statuses.ServiceDescriptorGUID  WHERE Location = ?";
 	mysql_stmt_prepare(sql_stmt, stmt, static_cast<unsigned long>(strlen(stmt)));
@@ -864,15 +864,15 @@ std::string LMDatabaseManager::getRegisteredInstanceSubType(std::string ServiceD
 		LOG(ERROR) << "getStatusOfManagedInstances encountered the following error: " << mysql_stmt_error(sql_stmt);
 		mysql_stmt_close(sql_stmt);
 		return re;
-§§	}
-§§
+	}
+
 	MYSQL_BIND resultBIND[5];
 	memset(resultBIND, 0, sizeof(resultBIND));
-§§
+
 	unsigned long lineLengthCol0 = 0;
 	unsigned long lineLengthCol1 = 0;
 	unsigned long lineLengthCol4 = 0;
-§§
+
 	resultBIND[0].buffer_type = MYSQL_TYPE_VAR_STRING;
 	resultBIND[1].buffer_type = MYSQL_TYPE_VAR_STRING;
 	resultBIND[2].buffer_type = MYSQL_TYPE_LONG;
@@ -899,13 +899,13 @@ std::string LMDatabaseManager::getRegisteredInstanceSubType(std::string ServiceD
 	for (unsigned long long i = 0; i < resultRows; i++) {
 		mysql_stmt_fetch(sql_stmt);
 
-§§		char* responseCol0 = new char[lineLengthCol0 + 1];
+		char* responseCol0 = new char[lineLengthCol0 + 1];
 		memset(responseCol0, 0, lineLengthCol0 + 1);
 
-§§		char* responseCol1 = new char[lineLengthCol1 + 1];
+		char* responseCol1 = new char[lineLengthCol1 + 1];
 		memset(responseCol1, 0, lineLengthCol1 + 1);
 
-§§		char* responseCol4 = new char[lineLengthCol4 + 1];
+		char* responseCol4 = new char[lineLengthCol4 + 1];
 		memset(responseCol4, 0, lineLengthCol4 + 1);
 
 		resultBIND[0].buffer = responseCol0;
@@ -919,8 +919,8 @@ std::string LMDatabaseManager::getRegisteredInstanceSubType(std::string ServiceD
 		mysql_stmt_fetch_column(sql_stmt, &resultBIND[0], 0, 0);
 		mysql_stmt_fetch_column(sql_stmt, &resultBIND[1], 1, 0);
 		mysql_stmt_fetch_column(sql_stmt, &resultBIND[4], 4, 0);
-§§
-§§		{
+
+		{
 			struct tm timeinfo = tm();
 
 			timeinfo.tm_year = outputTimeStamp.year - 1900;
@@ -931,49 +931,49 @@ std::string LMDatabaseManager::getRegisteredInstanceSubType(std::string ServiceD
 			timeinfo.tm_sec = outputTimeStamp.second;
 			timeinfo.tm_isdst = -1;
 
-§§			StatusOfInstance newStatus{};
-§§			newStatus.serviceDescriptorHostAndPort = responseCol0;
-§§			newStatus.serviceDescriptorGUID = responseCol1;
+			StatusOfInstance newStatus{};
+			newStatus.serviceDescriptorHostAndPort = responseCol0;
+			newStatus.serviceDescriptorGUID = responseCol1;
 			newStatus.type = static_cast<AgentType>(outputAgentType);
-§§			newStatus.lastStatusUpdate = _mkgmtime(&timeinfo);
+			newStatus.lastStatusUpdate = _mkgmtime(&timeinfo);
 
 			for (auto&& element : Util::splitString(responseCol4, "|"))
-§§			{
+			{
 				// Warning: Ugly hack, we need something neater. Probably obsolete once we actually store the things in a DB table and not as a string
 				std::vector<std::string> pair = Util::splitString(element, " ");
 				if (pair.size() == 3)
 				{
-§§					newStatus.status[pair[0]] = pair[1];
+					newStatus.status[pair[0]] = pair[1];
 				}
 				else if (pair.size() == 4)
 				{
-§§					newStatus.status[pair[1]] = pair[2];
+					newStatus.status[pair[1]] = pair[2];
 				}
-§§			}
-§§			re.push_back(newStatus);
-§§		}
-§§
+			}
+			re.push_back(newStatus);
+		}
+
 		delete[] responseCol0;
 		delete[] responseCol1;
 		delete[] responseCol4;
 	}
-§§
+
 	mysql_stmt_free_result(sql_stmt);
 	mysql_stmt_close(sql_stmt);
 
 	PERFORMANCE_WATCH_FUNCTION_EXIT("getStatusOfManagedInstances")
 		return re;
-§§}
-§§
+}
+
 bool LMDatabaseManager::addEntryToInterestingTestcasesTable(const FluffiTestcaseID tcID, const FluffiTestcaseID tcparentID, int rating, const std::string testcaseDir, TestCaseType tcType) {
 	PERFORMANCE_WATCH_FUNCTION_ENTRY
 		const char* cStrCreatorServiceDescriptorGUID = tcID.m_serviceDescriptor.m_guid.c_str();
-§§	unsigned long creatorGUIDLength = static_cast<unsigned long>(tcID.m_serviceDescriptor.m_guid.length());
+	unsigned long creatorGUIDLength = static_cast<unsigned long>(tcID.m_serviceDescriptor.m_guid.length());
 
 	uint64_t preparedCreatorLocalID = tcID.m_localID;
 
-§§	const char* cStrParentServiceDescriptorGUID = tcparentID.m_serviceDescriptor.m_guid.c_str();
-§§	unsigned long parentGUIDLength = static_cast<unsigned long>(tcparentID.m_serviceDescriptor.m_guid.length());
+	const char* cStrParentServiceDescriptorGUID = tcparentID.m_serviceDescriptor.m_guid.c_str();
+	unsigned long parentGUIDLength = static_cast<unsigned long>(tcparentID.m_serviceDescriptor.m_guid.length());
 
 	uint64_t preparedParentLocalID = tcparentID.m_localID;
 
@@ -1061,17 +1061,17 @@ bool LMDatabaseManager::addEntryToInterestingTestcasesTable(const FluffiTestcase
 		return re;
 }
 
-§§bool LMDatabaseManager::setSessionParameters(MYSQL* conn) {
+bool LMDatabaseManager::setSessionParameters(MYSQL* conn) {
 	//Set timezone to UTC
 	return mysql_query(conn, "SET SESSION time_zone = '+0:00'") == 0;
 }
 
-§§GetCurrentBlockCoverageResponse* LMDatabaseManager::generateGetCurrentBlockCoverageResponse() {
+GetCurrentBlockCoverageResponse* LMDatabaseManager::generateGetCurrentBlockCoverageResponse() {
 	PERFORMANCE_WATCH_FUNCTION_ENTRY
-§§		GetCurrentBlockCoverageResponse* resp = new GetCurrentBlockCoverageResponse();
-§§
+		GetCurrentBlockCoverageResponse* resp = new GetCurrentBlockCoverageResponse();
+
 	if (mysql_query(getDBConnection(), "SELECT DISTINCT Offset, ModuleID FROM covered_blocks") != 0) {
-§§		return resp;
+		return resp;
 	}
 
 §§	MYSQL_RES* result = mysql_store_result(getDBConnection());
@@ -1098,7 +1098,7 @@ bool LMDatabaseManager::addEntryToInterestingTestcasesTable(const FluffiTestcase
 bool LMDatabaseManager::addEntryToCompletedTestcasesTable(const FluffiTestcaseID tcID) {
 	PERFORMANCE_WATCH_FUNCTION_ENTRY
 		const char* cStrCreatorServiceDescriptorGUID = tcID.m_serviceDescriptor.m_guid.c_str();
-§§	unsigned long creatorGUIDLength = static_cast<unsigned long>(tcID.m_serviceDescriptor.m_guid.length());
+	unsigned long creatorGUIDLength = static_cast<unsigned long>(tcID.m_serviceDescriptor.m_guid.length());
 
 	uint64_t preparedCreatorLocalID = tcID.m_localID;
 
@@ -1163,7 +1163,7 @@ bool LMDatabaseManager::addEntriesToCompletedTestcasesTable(const std::set<Fluff
 	}
 
 	size_t row_size = sizeof(struct st_data);
-§§	struct st_data* data = new struct st_data[array_size];
+	struct st_data* data = new struct st_data[array_size];
 	unsigned int i = 0;
 	for (std::set<FluffiTestcaseID>::iterator it = testcaseIDs->begin(); it != testcaseIDs->end(); i++, ++it) {
 		strcpy_s(data[i].guid, maxGUIDLength, (*it).m_serviceDescriptor.m_guid.c_str()); //check above ensures that tcID->servicedescriptor().guid().length() < maxGUIDLength (which is the size of the target buffer)
@@ -1219,8 +1219,8 @@ bool LMDatabaseManager::addDeltaToTestcaseRating(const FluffiTestcaseID tcID, in
 
 	int preparedRatingDelta = ratingDelta;
 
-§§	const char* cStrCreatorServiceDescriptorGUID = tcID.m_serviceDescriptor.m_guid.c_str();
-§§	unsigned long creatorGUIDLength = static_cast<unsigned long>(tcID.m_serviceDescriptor.m_guid.length());
+	const char* cStrCreatorServiceDescriptorGUID = tcID.m_serviceDescriptor.m_guid.c_str();
+	unsigned long creatorGUIDLength = static_cast<unsigned long>(tcID.m_serviceDescriptor.m_guid.length());
 
 	uint64_t preparedCreatorLocalID = tcID.m_localID;
 
@@ -1440,7 +1440,7 @@ std::deque<FluffiBasicBlock> LMDatabaseManager::getTargetBlocks() {
 		return re;
 	}
 
-§§	MYSQL_RES* result = mysql_store_result(getDBConnection());
+	MYSQL_RES* result = mysql_store_result(getDBConnection());
 	if (result == NULL) {
 		return re;
 	}
@@ -1476,7 +1476,7 @@ std::deque<FluffiModuleNameToID> LMDatabaseManager::getTargetModules() {
 	while ((row = mysql_fetch_row(result)))
 	{
 		FluffiModuleNameToID mod{ row[1], row[2],static_cast<uint32_t>(std::stoi(row[0])) };
-§§		re.push_back(mod);
+		re.push_back(mod);
 	}
 	mysql_free_result(result);
 

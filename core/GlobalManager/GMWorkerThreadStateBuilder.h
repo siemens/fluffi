@@ -20,8 +20,8 @@ public:
 	GMWorkerThreadStateBuilder();
 	~GMWorkerThreadStateBuilder();
 
-§§	WorkerThreadState* constructState();
-§§	void destructState(WorkerThreadState* theState);
+	WorkerThreadState* constructState();
+	void destructState(WorkerThreadState* theState);
 
 private:
 };

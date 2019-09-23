@@ -19,7 +19,7 @@ Author(s): Thomas Riedmaier, Abian Blome
 //64 bit Windows
 #include <build64/configure.h>
 #include <core/lib/globals_shared.h>
-§§#include <build64/include/dr_config.h>
+#include <build64/include/dr_config.h>
 
 #else
 //32 bit Windows
@@ -58,5 +58,5 @@ protected:
 
 	bool m_treatAnyAccessViolationAsFatal;
 
-§§	static void copyCoveredModulesToDebugExecutionOutput(const std::vector<char>* input, const std::set<Module>* modulesToCover, std::shared_ptr<DebugExecutionOutput> exOutput);
+	static void copyCoveredModulesToDebugExecutionOutput(const std::vector<char>* input, const std::set<Module>* modulesToCover, std::shared_ptr<DebugExecutionOutput> exOutput);
 };

@@ -25,7 +25,7 @@ Author(s): Michael Kraus, Thomas Riedmaier, Abian Blome
 §§	{
 §§	public:
 §§
-§§		GMDatabaseManager* dbman = nullptr;
+		GMDatabaseManager* dbman = nullptr;
 §§
 §§		TEST_METHOD_INITIALIZE(ModuleInitialize)
 §§		{
@@ -206,13 +206,13 @@ Author(s): Michael Kraus, Thomas Riedmaier, Abian Blome
 §§			FluffiServiceDescriptor sd1{ testHAP1 ,testGUID1 };
 §§
 §§			// Update with new LM with same data -> Error, new GUID should not overwrite existing LM
-§§			GMDatabaseManager* dbmanPtrLM = dbman;
+			GMDatabaseManager* dbmanPtrLM = dbman;
 			auto fx = [dbmanPtrLM, sd1] { dbmanPtrLM->setLMForLocationAndFuzzJob(std::string("Auenland"), sd1, 22); };
 §§			Assert::ExpectException<std::runtime_error>(fx);
 §§			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from localmanagers") == "2");
 §§
 §§			// Existing LM
-§§			GMDatabaseManager* dbmanPtr = dbman;
+			GMDatabaseManager* dbmanPtr = dbman;
 			auto f = [dbmanPtr, sd1] { dbmanPtr->setLMForLocationAndFuzzJob(std::string("Mordor"), sd1, 22); };
 §§			Assert::ExpectException<std::runtime_error>(f);
 §§			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from localmanagers") == "2");
@@ -232,7 +232,7 @@ Author(s): Michael Kraus, Thomas Riedmaier, Abian Blome
 §§			std::string testGUID3 = "2222-2222";
 §§			std::string testHAP3 = "testhap1";
 §§			FluffiServiceDescriptor sd3{ testHAP3 ,testGUID3 };
-§§			GMDatabaseManager* dbmanPtr2 = dbman;
+			GMDatabaseManager* dbmanPtr2 = dbman;
 			auto f2 = [dbmanPtr2, sd3] { dbmanPtr2->setLMForLocationAndFuzzJob(std::string("Auenland"), sd3, 24); };
 §§			Assert::ExpectException<std::runtime_error>(f2);
 §§			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from localmanagers") == "3");
@@ -457,73 +457,73 @@ Author(s): Michael Kraus, Thomas Riedmaier, Abian Blome
 §§		}
 §§
 		TEST_METHOD(GMDatabaseManager_getNewCommands)
-§§		{
-§§			// Empty DB
+		{
+			// Empty DB
 			dbman->EXECUTE_TEST_STATEMENT("TRUNCATE TABLE command_queue;");
-§§
-§§			std::vector<std::tuple<int, std::string, std::string>> commands = dbman->getNewCommands();
-§§			Assert::IsTrue(commands.empty(), L"Error fetching empty set of commands");
-§§
-§§			// Simple tests
-§§			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO command_queue (command, argument) VALUES ( 'asdf', 'qwer');");
-§§			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO command_queue (command, argument) VALUES ( 'asdf2', '');");
-§§			commands = dbman->getNewCommands();
-§§			Assert::AreEqual((size_t)2, commands.size(), L"getNewCommands does not return all new commands");
 
-§§			int id;
-§§			std::string cmd, arg;
-§§			tie(id, cmd, arg) = commands[0];
-§§			Assert::AreEqual(std::string("asdf"), cmd, L"getNewCommands does not return expected cmd");
-§§			Assert::AreEqual(std::string("qwer"), arg, L"getNewCommands does not return expected arg");
-§§
-§§			tie(id, cmd, arg) = commands[1];
-§§			Assert::AreEqual(std::string("asdf2"), cmd, L"getNewCommands does not return expected cmd");
-§§			Assert::AreEqual(std::string(""), arg, L"getNewCommands does not return expected arg");
-§§
-§§			// We shouldn't get the 'Done' ones
-§§			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO command_queue (Command, Argument, Done) VALUES ( 'blue', '', 1);");
-§§			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO command_queue (Command, Argument, Done) VALUES ( 'red', '', 1);");
-§§			commands = dbman->getNewCommands();
-§§			Assert::AreEqual((size_t)2, commands.size(), L"getNewCommands returns commands marked as Done");
-§§
+			std::vector<std::tuple<int, std::string, std::string>> commands = dbman->getNewCommands();
+			Assert::IsTrue(commands.empty(), L"Error fetching empty set of commands");
+
+			// Simple tests
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO command_queue (command, argument) VALUES ( 'asdf', 'qwer');");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO command_queue (command, argument) VALUES ( 'asdf2', '');");
+			commands = dbman->getNewCommands();
+			Assert::AreEqual((size_t)2, commands.size(), L"getNewCommands does not return all new commands");
+
+			int id;
+			std::string cmd, arg;
+			tie(id, cmd, arg) = commands[0];
+			Assert::AreEqual(std::string("asdf"), cmd, L"getNewCommands does not return expected cmd");
+			Assert::AreEqual(std::string("qwer"), arg, L"getNewCommands does not return expected arg");
+
+			tie(id, cmd, arg) = commands[1];
+			Assert::AreEqual(std::string("asdf2"), cmd, L"getNewCommands does not return expected cmd");
+			Assert::AreEqual(std::string(""), arg, L"getNewCommands does not return expected arg");
+
+			// We shouldn't get the 'Done' ones
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO command_queue (Command, Argument, Done) VALUES ( 'blue', '', 1);");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO command_queue (Command, Argument, Done) VALUES ( 'red', '', 1);");
+			commands = dbman->getNewCommands();
+			Assert::AreEqual((size_t)2, commands.size(), L"getNewCommands returns commands marked as Done");
+
 			dbman->EXECUTE_TEST_STATEMENT("TRUNCATE TABLE command_queue;");
-§§		}
-§§
+		}
+
 		TEST_METHOD(GMDatabaseManager_setCommandAsDone)
-§§		{
-§§			// Empty DB
+		{
+			// Empty DB
 			dbman->EXECUTE_TEST_STATEMENT("TRUNCATE TABLE command_queue;");
-§§
-§§			// Simple tests
-§§			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO command_queue (command, argument) VALUES ( 'asdf', 'qwer');");
-§§			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO command_queue (command, argument) VALUES ( 'asdf2', '');");
-§§			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO command_queue (Command, Argument, Done) VALUES ( 'blue', '', 0);");
-§§			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO command_queue (Command, Argument, Done) VALUES ( 'red', '', 0);");
-§§			std::vector<std::tuple<int, std::string, std::string>>commands = dbman->getNewCommands();
-§§
-§§			int id;
-§§			std::string cmd, arg;
-§§			tie(id, cmd, arg) = commands[0];
-§§			Assert::IsTrue(dbman->setCommandAsDone(id, ""));
-§§			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from command_queue WHERE Done=1") == "1");
 
-§§			tie(id, cmd, arg) = commands[1];
-§§			Assert::IsTrue(dbman->setCommandAsDone(id, "ASDF"));
-§§			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from command_queue WHERE Done=1") == "2");
-§§			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from command_queue WHERE Error='ASDF'") == "1");
+			// Simple tests
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO command_queue (command, argument) VALUES ( 'asdf', 'qwer');");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO command_queue (command, argument) VALUES ( 'asdf2', '');");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO command_queue (Command, Argument, Done) VALUES ( 'blue', '', 0);");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO command_queue (Command, Argument, Done) VALUES ( 'red', '', 0);");
+			std::vector<std::tuple<int, std::string, std::string>>commands = dbman->getNewCommands();
 
-§§			tie(id, cmd, arg) = commands[0];
-§§			Assert::IsTrue(dbman->setCommandAsDone(id, ""));
-§§			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from command_queue WHERE Done=1") == "2");
+			int id;
+			std::string cmd, arg;
+			tie(id, cmd, arg) = commands[0];
+			Assert::IsTrue(dbman->setCommandAsDone(id, ""));
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from command_queue WHERE Done=1") == "1");
 
-§§			tie(id, cmd, arg) = commands[1];
-§§			Assert::IsTrue(dbman->setCommandAsDone(id, "ASDF"));
-§§			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from command_queue WHERE Done=1") == "2");
-§§			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from command_queue WHERE Error='ASDF'") == "1");
-§§
+			tie(id, cmd, arg) = commands[1];
+			Assert::IsTrue(dbman->setCommandAsDone(id, "ASDF"));
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from command_queue WHERE Done=1") == "2");
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from command_queue WHERE Error='ASDF'") == "1");
+
+			tie(id, cmd, arg) = commands[0];
+			Assert::IsTrue(dbman->setCommandAsDone(id, ""));
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from command_queue WHERE Done=1") == "2");
+
+			tie(id, cmd, arg) = commands[1];
+			Assert::IsTrue(dbman->setCommandAsDone(id, "ASDF"));
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from command_queue WHERE Done=1") == "2");
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from command_queue WHERE Error='ASDF'") == "1");
+
 			dbman->EXECUTE_TEST_STATEMENT("TRUNCATE TABLE command_queue;");
-§§		}
-§§
+		}
+
 		TEST_METHOD(GMDatabaseManager_deleteDoneCommandsOlderThanXSec)
 		{
 			// Empty DB
@@ -573,7 +573,7 @@ Author(s): Michael Kraus, Thomas Riedmaier, Abian Blome
 §§		const std::string testdbHost = "fluffiLMDBHost";
 		const std::string testdbName = "fluffi_gm_test";
 §§
-§§		GMDatabaseManager* setupTestDB() {
+		GMDatabaseManager* setupTestDB() {
 			std::ifstream createDatabaseFile("..\\..\\..\\srv\\fluffi\\data\\fluffiweb\\app\\sql_files\\createGMDB.sql");
 §§			std::string dbCreateFileContent;
 §§
@@ -612,7 +612,7 @@ Author(s): Michael Kraus, Thomas Riedmaier, Abian Blome
 
 §§			std::vector<std::string> SQLcommands = Util::splitString(dbCreateFileContent, ";");
 §§
-§§			GMDatabaseManager* dbman = new GMDatabaseManager();
+			GMDatabaseManager* dbman = new GMDatabaseManager();
 			GMDatabaseManager::setDBConnectionParameters(testdbHost, testdbUser, testdbPass, "information_schema");
 
 §§			dbman->EXECUTE_TEST_STATEMENT("DROP DATABASE IF EXISTS " + testdbName);

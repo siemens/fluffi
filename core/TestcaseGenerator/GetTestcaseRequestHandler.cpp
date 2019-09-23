@@ -16,7 +16,7 @@ Author(s): Thomas Riedmaier, Michael Kraus, Abian Blome
 #include "TGTestcaseManager.h"
 #include "Util.h"
 §§
-§§GetTestcaseRequestHandler::GetTestcaseRequestHandler(TGTestcaseManager*  testcaseManager, std::string testcaseDir, CommInt* commInt)
+GetTestcaseRequestHandler::GetTestcaseRequestHandler(TGTestcaseManager*  testcaseManager, std::string testcaseDir, CommInt* commInt)
 §§{
 	this->m_testcaseManager = testcaseManager;
 	this->m_testcaseDir = testcaseDir;
@@ -27,7 +27,7 @@ Author(s): Thomas Riedmaier, Michael Kraus, Abian Blome
 §§{
 §§}
 §§
-§§void GetTestcaseRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp) {
+void GetTestcaseRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp) {
 	(void)(workerThreadState); //avoid unused parameter warning
 	(void)(req); //avoid unused parameter warning
 
@@ -35,12 +35,12 @@ Author(s): Thomas Riedmaier, Michael Kraus, Abian Blome
 §§
 	// Get next TestcaseDescriptor from TestcaseQueue
 	try {
-§§		TestcaseDescriptor testcase = m_testcaseManager->popPendingTCForProcessing();
+		TestcaseDescriptor testcase = m_testcaseManager->popPendingTCForProcessing();
 		TestcaseID* mutableId = new TestcaseID();
-§§		mutableId->CopyFrom(testcase.getId().getProtobuf());
+		mutableId->CopyFrom(testcase.getId().getProtobuf());
 
 		TestcaseID* mutableIdParent = new TestcaseID();
-§§		mutableIdParent->CopyFrom(testcase.getparentId().getProtobuf());
+		mutableIdParent->CopyFrom(testcase.getparentId().getProtobuf());
 §§
 		bool isLastChunk;
 		std::string data = Util::loadTestcaseChunkInMemory(testcase.getId(), m_testcaseDir, 0, &isLastChunk);
@@ -54,7 +54,7 @@ Author(s): Thomas Riedmaier, Michael Kraus, Abian Blome
 		TcResp->set_success(true);
 	}
 	catch (std::runtime_error & e)
-§§	{
+	{
 		LOG(WARNING) << "Could not get a testcase for processing: " << e.what();
 		TcResp->set_success(false);
 	}

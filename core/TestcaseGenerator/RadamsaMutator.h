@@ -10,20 +10,20 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Abian Blome
 */
 
-§§#pragma once
+#pragma once
 #include "FluffiMutator.h"
-§§
+
 class FluffiServiceDescriptor;
 class TestcaseDescriptor;
 class FluffiTestcaseID;
 class RadamsaMutator : public FluffiMutator
-§§{
-§§public:
-§§	RadamsaMutator(FluffiServiceDescriptor ptMySelfServiceDescriptor, std::string testcaseDirectory);
+{
+public:
+	RadamsaMutator(FluffiServiceDescriptor ptMySelfServiceDescriptor, std::string testcaseDirectory);
 	virtual ~RadamsaMutator();
-§§
+
 	bool isSetupFunctionable();
 	std::deque<TestcaseDescriptor> batchMutate(unsigned int numToGenerate, const FluffiTestcaseID parentID, const std::string parentPathAndFilename);
-§§
-§§private:
-§§};
+
+private:
+};

@@ -20,5 +20,5 @@ public:
 	NotImplementedHandler();
 	virtual ~NotImplementedHandler();
 
-§§	void handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp);
+	void handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp);
 };

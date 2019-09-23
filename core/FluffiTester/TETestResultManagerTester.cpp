@@ -28,8 +28,8 @@ Author(s): Michael Kraus, Thomas Riedmaier, Abian Blome, Pascal Eckmann
 §§	{
 §§	public:
 §§
-§§		TETestResultManager* testResultManager = nullptr;
-§§		GarbageCollectorWorker* garbageCollector = nullptr;
+		TETestResultManager* testResultManager = nullptr;
+		GarbageCollectorWorker* garbageCollector = nullptr;
 §§
 §§		TEST_METHOD_INITIALIZE(ModuleInitialize)
 §§		{
@@ -57,7 +57,7 @@ Author(s): Michael Kraus, Thomas Riedmaier, Abian Blome, Pascal Eckmann
 §§			FluffiTestcaseID id1 = FluffiTestcaseID(sd1, 111);
 §§			FluffiTestcaseID parentId1 = FluffiTestcaseID(sd1, 222);
 			FluffiTestResult tR1 = FluffiTestResult(ExitType::Exception_Other, std::vector<FluffiBasicBlock>(), std::string("testMessage1"), true);
-§§			TestOutcomeDescriptor* outcomeDesc1 = new TestOutcomeDescriptor(id1, parentId1, tR1);
+			TestOutcomeDescriptor* outcomeDesc1 = new TestOutcomeDescriptor(id1, parentId1, tR1);
 §§
 §§			// Test Method
 §§			testResultManager->pushNewTestOutcomeFromTCRunner(outcomeDesc1);
@@ -68,7 +68,7 @@ Author(s): Michael Kraus, Thomas Riedmaier, Abian Blome, Pascal Eckmann
 §§			FluffiTestcaseID id2 = FluffiTestcaseID(sd2, 333);
 §§			FluffiTestcaseID parentId2 = FluffiTestcaseID(sd2, 444);
 			FluffiTestResult tR2 = FluffiTestResult(ExitType::Exception_Other, std::vector<FluffiBasicBlock>(), std::string("testMessage2"), true);
-§§			TestOutcomeDescriptor* outcomeDesc2 = new TestOutcomeDescriptor(id2, parentId2, tR2);
+			TestOutcomeDescriptor* outcomeDesc2 = new TestOutcomeDescriptor(id2, parentId2, tR2);
 §§
 §§			// Test Method
 §§			testResultManager->pushNewTestOutcomeFromTCRunner(outcomeDesc2);
@@ -85,7 +85,7 @@ Author(s): Michael Kraus, Thomas Riedmaier, Abian Blome, Pascal Eckmann
 §§			FluffiTestcaseID parentId = FluffiTestcaseID(sd, 222);
 			FluffiTestResult tR = FluffiTestResult(ExitType::Exception_Other, std::vector<FluffiBasicBlock>(), std::string("testMessage"), true);
 §§
-§§			TestOutcomeDescriptor* outcomeDesc = new TestOutcomeDescriptor(id, parentId, tR);
+			TestOutcomeDescriptor* outcomeDesc = new TestOutcomeDescriptor(id, parentId, tR);
 §§			testResultManager->pushNewTestOutcomeFromTCRunner(outcomeDesc);
 §§
 §§			Assert::AreEqual(testResultManager->getTestOutcomeDequeSize(), (size_t)1, L"Error calculating correct size of testOutcomeQueue of TETestResultManager (popTestOutcomeForEvaluation)");
@@ -108,7 +108,7 @@ Author(s): Michael Kraus, Thomas Riedmaier, Abian Blome, Pascal Eckmann
 §§				FluffiTestcaseID parentId = FluffiTestcaseID(sd, runningPId);
 				FluffiTestResult tR = FluffiTestResult(ExitType::Exception_Other, std::vector<FluffiBasicBlock>(), std::string("testMessage" + runningId), true);
 §§
-§§				TestOutcomeDescriptor* outcomeDesc = new TestOutcomeDescriptor(id, parentId, tR);
+				TestOutcomeDescriptor* outcomeDesc = new TestOutcomeDescriptor(id, parentId, tR);
 §§				testResultManager->pushNewTestOutcomeFromTCRunner(outcomeDesc);
 §§
 §§				Assert::AreEqual(testResultManager->getTestOutcomeDequeSize(), (size_t)(i), L"Error calculating correct size of testOutcomeQueue of TETestResultManager (popTestOutcomeForEvaluation)");
@@ -147,7 +147,7 @@ Author(s): Michael Kraus, Thomas Riedmaier, Abian Blome, Pascal Eckmann
 §§			FluffiTestcaseID parentId = FluffiTestcaseID(sd, 111);
 			FluffiTestResult tR = FluffiTestResult(ExitType::Exception_Other, std::vector<FluffiBasicBlock>(), std::string("testMessage"), true);
 §§
-§§			TestOutcomeDescriptor* outcomeDesc = new TestOutcomeDescriptor(id, parentId, tR);
+			TestOutcomeDescriptor* outcomeDesc = new TestOutcomeDescriptor(id, parentId, tR);
 §§			testResultManager->pushNewTestOutcomeFromTCRunner(outcomeDesc);
 §§
 §§			// Test Method
@@ -159,7 +159,7 @@ Author(s): Michael Kraus, Thomas Riedmaier, Abian Blome, Pascal Eckmann
 §§				FluffiTestcaseID parentId = FluffiTestcaseID(sd, 111);
 				FluffiTestResult tR = FluffiTestResult(ExitType::Exception_Other, std::vector<FluffiBasicBlock>(), std::string("testMessage"), true);
 §§
-§§				TestOutcomeDescriptor* outcomeDesc = new TestOutcomeDescriptor(id, parentId, tR);
+				TestOutcomeDescriptor* outcomeDesc = new TestOutcomeDescriptor(id, parentId, tR);
 §§				testResultManager->pushNewTestOutcomeFromTCRunner(outcomeDesc);
 §§
 §§				// Test Method

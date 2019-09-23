@@ -33,40 +33,40 @@ Author(s): Thomas Riedmaier, Abian Blome
 
 class SHAREDMEMIPC_API SharedMemIPC {
 public:
-§§	SharedMemIPC(const char* sharedMemName, int sharedMemorySize = 0x1000);
+	SharedMemIPC(const char* sharedMemName, int sharedMemorySize = 0x1000);
 	~SharedMemIPC();
 
 	bool initializeAsServer();
 	bool initializeAsClient();
 
-§§	bool sendMessageToServer(const SharedMemMessage* message);
-§§	bool sendMessageToClient(const SharedMemMessage* message);
+	bool sendMessageToServer(const SharedMemMessage* message);
+	bool sendMessageToClient(const SharedMemMessage* message);
 
 #if defined(_WIN32) || defined(_WIN64)
-§§	bool waitForNewMessageToClient(SharedMemMessage* messagePointer, unsigned long  timeoutMilliseconds, HANDLE interruptEventHandle);
-§§	bool waitForNewMessageToServer(SharedMemMessage* messagePointer, unsigned long  timeoutMilliseconds, HANDLE interruptEventHandle);
+	bool waitForNewMessageToClient(SharedMemMessage* messagePointer, unsigned long  timeoutMilliseconds, HANDLE interruptEventHandle);
+	bool waitForNewMessageToServer(SharedMemMessage* messagePointer, unsigned long  timeoutMilliseconds, HANDLE interruptEventHandle);
 #else
-§§	bool waitForNewMessageToClient(SharedMemMessage* messagePointer, unsigned long  timeoutMilliseconds, int interruptFD);
-§§	bool waitForNewMessageToServer(SharedMemMessage* messagePointer, unsigned long  timeoutMilliseconds, int interruptFD);
+	bool waitForNewMessageToClient(SharedMemMessage* messagePointer, unsigned long  timeoutMilliseconds, int interruptFD);
+	bool waitForNewMessageToServer(SharedMemMessage* messagePointer, unsigned long  timeoutMilliseconds, int interruptFD);
 #endif
 
-§§	bool waitForNewMessageToClient(SharedMemMessage* messagePointer, unsigned long  timeoutMilliseconds);
-§§	bool waitForNewMessageToServer(SharedMemMessage* messagePointer, unsigned long  timeoutMilliseconds);
+	bool waitForNewMessageToClient(SharedMemMessage* messagePointer, unsigned long  timeoutMilliseconds);
+	bool waitForNewMessageToServer(SharedMemMessage* messagePointer, unsigned long  timeoutMilliseconds);
 
 private:
 #if defined(_WIN32) || defined(_WIN64)
 	HANDLE m_hMapFile;
-§§	char* m_pView;
+	char* m_pView;
 	HANDLE m_hEventForNewMessageForClient;
 	HANDLE m_hEventForNewMessageForServer;
 #else
 	int m_fdSharedMem;
-§§	char* m_pView;
+	char* m_pView;
 	int m_fdFIFOForNewMessageForClient;
 	int m_fdFIFOForNewMessageForServer;
 #endif
 
-§§	std::string* m_sharedMemName;
+	std::string* m_sharedMemName;
 	int m_sharedMemorySize;
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -77,8 +77,8 @@ private:
 	bool notifyClientAboutNewMessage();
 	bool notifyServerAboutNewMessage();
 
-§§	bool placeMessageForClient(const SharedMemMessage*  message);
-§§	bool placeMessageForServer(const SharedMemMessage* message);
+	bool placeMessageForClient(const SharedMemMessage*  message);
+	bool placeMessageForServer(const SharedMemMessage* message);
 
 	static std::string newGUID();
 };
@@ -88,14 +88,14 @@ Please note that if you ever want to use this code, e.g. from python, you need t
 http://www.auctoris.co.uk/2017/04/29/calling-c-classes-from-python-with-ctypes/*/
 extern "C"
 {
-§§	SHAREDMEMIPC_API SharedMemIPC* SharedMemIPC_new(const char* sharedMemName, int sharedMemorySize = 0x1000);
+	SHAREDMEMIPC_API SharedMemIPC* SharedMemIPC_new(const char* sharedMemName, int sharedMemorySize = 0x1000);
 	SHAREDMEMIPC_API void SharedMemIPC_delete(SharedMemIPC* thisp);
 	SHAREDMEMIPC_API bool SharedMemIPC_initializeAsServer(SharedMemIPC* thisp);
 	SHAREDMEMIPC_API bool SharedMemIPC_initializeAsClient(SharedMemIPC* thisp);
 
-§§	SHAREDMEMIPC_API bool SharedMemIPC_sendMessageToServer(SharedMemIPC* thisp, const SharedMemMessage* message);
-§§	SHAREDMEMIPC_API bool SharedMemIPC_sendMessageToClient(SharedMemIPC* thisp, const SharedMemMessage* message);
+	SHAREDMEMIPC_API bool SharedMemIPC_sendMessageToServer(SharedMemIPC* thisp, const SharedMemMessage* message);
+	SHAREDMEMIPC_API bool SharedMemIPC_sendMessageToClient(SharedMemIPC* thisp, const SharedMemMessage* message);
 
-§§	SHAREDMEMIPC_API bool SharedMemIPC_waitForNewMessageToClient(SharedMemIPC* thisp, SharedMemMessage* messagePointer, unsigned long timeoutMilliseconds);
-§§	SHAREDMEMIPC_API bool SharedMemIPC_waitForNewMessageToServer(SharedMemIPC* thisp, SharedMemMessage* messagePointer, unsigned long timeoutMilliseconds);
+	SHAREDMEMIPC_API bool SharedMemIPC_waitForNewMessageToClient(SharedMemIPC* thisp, SharedMemMessage* messagePointer, unsigned long timeoutMilliseconds);
+	SHAREDMEMIPC_API bool SharedMemIPC_waitForNewMessageToServer(SharedMemIPC* thisp, SharedMemMessage* messagePointer, unsigned long timeoutMilliseconds);
 }

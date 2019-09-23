@@ -7,7 +7,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-§§Author(s): Thomas Riedmaier, Abian Blome
+Author(s): Thomas Riedmaier, Abian Blome
 */
 
 #pragma once
@@ -22,7 +22,7 @@ class FluffiEvaluator;
 class TEMainWorker
 {
 public:
-§§	TEMainWorker(CommInt* commInt, TEWorkerThreadStateBuilder*  workerThreadStateBuilder, int delayToWaitUntilConfigIsCompleteInMS, TETestResultManager* teTestResultManager, std::string testcaseDir, BlockCoverageCache* localBlockCoverageCache, std::set<std::string> myAgentSubTypes, GarbageCollectorWorker* garbageCollectorWorker);
+	TEMainWorker(CommInt* commInt, TEWorkerThreadStateBuilder*  workerThreadStateBuilder, int delayToWaitUntilConfigIsCompleteInMS, TETestResultManager* teTestResultManager, std::string testcaseDir, BlockCoverageCache* localBlockCoverageCache, std::set<std::string> myAgentSubTypes, GarbageCollectorWorker* garbageCollectorWorker);
 	virtual ~TEMainWorker();
 
 	void workerMain();
@@ -35,14 +35,14 @@ private:
 	bool tryGetConfigFromLM();
 
 	bool m_gotConfigFromLM;
-§§	CommInt* m_commInt;
-§§	TEWorkerThreadStateBuilder* m_workerThreadStateBuilder;
-§§	TETestResultManager* m_teTestResultManager;
+	CommInt* m_commInt;
+	TEWorkerThreadStateBuilder* m_workerThreadStateBuilder;
+	TETestResultManager* m_teTestResultManager;
 	std::string m_testcaseDir;
-§§	BlockCoverageCache* m_localBlockCoverageCache;
-§§	GarbageCollectorWorker* m_garbageCollectorWorker;
+	BlockCoverageCache* m_localBlockCoverageCache;
+	GarbageCollectorWorker* m_garbageCollectorWorker;
 	int m_delayToWaitUntilConfigIsCompleteInMS;
-§§	TEWorkerThreadState* m_workerThreadState;
+	TEWorkerThreadState* m_workerThreadState;
 	std::set<std::string> m_myAgentSubTypes;
-§§	FluffiEvaluator* m_evaluator;
+	FluffiEvaluator* m_evaluator;
 };

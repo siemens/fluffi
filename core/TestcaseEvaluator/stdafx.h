@@ -22,7 +22,7 @@ Author(s): Thomas Riedmaier, Michael Kraus, Abian Blome, Roman Bendt
 
 //Easylogging
 #include "easylogging++.h"
-§§
+
 //ZeroMQ
 #include <zmq.hpp>
 #include <zmq_addon.hpp>

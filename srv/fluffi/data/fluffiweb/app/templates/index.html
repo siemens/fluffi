@@ -9,9 +9,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 Author(s): Junes Najah, Thomas Riedmaier, Michael Kraus, Abian Blome, Pascal Eckmann
 -->
-§§
-§§{% extends "base.html" %}
-§§
+
+{% extends "base.html" %}
+
 §§{% block scripts  %}
 §§<script src="{{ url_for('static', filename = 'javascript/fuzzjobNavigation.js') }}" type="text/javascript"></script>
 §§{{super()}}
@@ -113,6 +113,6 @@ Author(s): Junes Najah, Thomas Riedmaier, Michael Kraus, Abian Blome, Pascal Eck
 §§<footer class="container">
 §§    <p>&copy; {{ footer }}</p>
 §§</footer>
-§§
-§§{% endblock %}
-§§
+
+{% endblock %}
+

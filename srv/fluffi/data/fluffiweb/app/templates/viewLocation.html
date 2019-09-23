@@ -10,55 +10,55 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Abian Blome, Junes Najah, Thomas Riedmaier, Michael Kraus
 -->
 
-§§{% extends "base.html" %}
-§§
-§§{% block content %}
-§§
-§§<script language="JavaScript">
-§§
+{% extends "base.html" %}
+
+{% block content %}
+
+<script language="JavaScript">
+
 §§function deleteProject(projId, locId) {
 §§    var delUrl = "/locations/" + locId + "/delProject/" + projId;
-§§    window.location.replace(delUrl);
-§§}
-§§
-§§function assignWorker(guid) {
+    window.location.replace(delUrl);
+}
+
+function assignWorker(guid) {
 §§    var assignUrl = "/locations/assignWorker/" + guid;
-§§    var data = { "ProjectID": document.getElementById("worker-" + guid).value };
-§§
-§§    $.ajax({
-§§        url: assignUrl,
-§§        type: 'POST',
-§§        data: JSON.stringify(data),
-§§        contentType: 'application/json; charset=utf-8',
-§§        dataType: 'json',
-§§        async: false,
-§§        success: function(msg) {}
-§§    });
+    var data = { "ProjectID": document.getElementById("worker-" + guid).value };
+
+    $.ajax({
+        url: assignUrl,
+        type: 'POST',
+        data: JSON.stringify(data),
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        async: false,
+        success: function(msg) {}
+    });
 §§    location.reload();
-§§}
-§§</script>
-§§
-§§<div class="container">
-§§    <h1>Location details: {{ location.name }}</h1>
-§§</div>
+}
+</script>
+
+<div class="container">
+    <h1>Location details: {{ location.name }}</h1>
+</div>
 §§{{ flashMessages() }}
 §§<hr>
-§§
+
 §§<div class="jumbotron">
 §§    <div class="container"></div>
 §§</div>
 §§
-§§<div class="container">
-§§    <h2>Projects</h2>
+<div class="container">
+    <h2>Projects</h2>
 §§    <div><a href="/locations/{{ location.id }}/addProject">Add Project</a></div>
-§§    <table class="table">
-§§        <thead>
+    <table class="table">
+        <thead>
 §§        <tr>
 §§            <th>Name</th>
 §§            <th>Operations</th>
 §§        </tr>
-§§        </thead>
-§§        <tbody>
+        </thead>
+        <tbody>
 §§        {% for project in location.projects %}
 §§        <tr>
 §§            <td><a href="/projects/view/{{project.id}}">{{ project.name }}</a></td>
@@ -67,22 +67,22 @@ Author(s): Abian Blome, Junes Najah, Thomas Riedmaier, Michael Kraus
 §§            </td>
 §§        </tr>
 §§        {% endfor %}
-§§        </tbody>
-§§    </table>
-§§</div>
-§§
-§§<div class="container">
-§§    <h2>Unassigned Workers</h2>
-§§    <table class="table">
-§§        <thead>
+        </tbody>
+    </table>
+</div>
+
+<div class="container">
+    <h2>Unassigned Workers</h2>
+    <table class="table">
+        <thead>
 §§        <tr>
 §§            <th>Type</th>
 §§            <th>SubType</th>
 §§            <th>Last Request</th>
 §§            <th>Operations</th>
 §§        </tr>
-§§        </thead>
-§§        <tbody>
+        </thead>
+        <tbody>
 §§        {% for worker in location.workers %}
 §§        <tr>
 §§            {% if worker.Agenttype == 1 %}
@@ -105,9 +105,9 @@ Author(s): Abian Blome, Junes Najah, Thomas Riedmaier, Michael Kraus
 §§            </td>
 §§        </tr>
 §§        {% endfor %}
-§§        </tbody>
-§§    </table>
-§§</div>
-§§
-§§{% endblock %}
-§§
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
+

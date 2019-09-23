@@ -16,15 +16,15 @@ Author(s): Thomas Riedmaier, Abian Blome, Roman Bendt
 #include "Util.h"
 
 std::atomic<TIMETYPE> ExternalProcess::s_allTimeSpent = { 0 };
-§§std::unordered_set<ExternalProcess*> ExternalProcess::s_runningProcessSet;
+std::unordered_set<ExternalProcess*> ExternalProcess::s_runningProcessSet;
 std::mutex ExternalProcess::s_runningProcessSet_mutex_;
 
 #if defined(_WIN32) || defined(_WIN64)
 
 ExternalProcess::ExternalProcess(std::string commandline, CHILD_OUTPUT_TYPE child_output_mode) :
-§§	m_hasBeenRun(false),
-§§	m_hasBeenInitialized(false),
-§§	m_isBeingDebugged(false),
+	m_hasBeenRun(false),
+	m_hasBeenInitialized(false),
+	m_isBeingDebugged(false),
 	m_exitStatus(-1),
 	m_stdInOstream(nullptr),
 	m_stdOutIstream(nullptr),
@@ -108,7 +108,7 @@ ExternalProcess::~ExternalProcess()
 }
 
 void ExternalProcess::updateTimeSpent() {
-§§	if (m_hasBeenInitialized && m_job_handle != NULL) {
+	if (m_hasBeenInitialized && m_job_handle != NULL) {
 		JOBOBJECT_BASIC_ACCOUNTING_INFORMATION jobInfo;
 		BOOL ret = QueryInformationJobObject(m_job_handle, JobObjectBasicAccountingInformation, &jobInfo, sizeof(jobInfo), NULL);
 		if (ret != FALSE) {
@@ -156,7 +156,7 @@ int ExternalProcess::getProcessID() {
 }
 
 //adapted from https://www.codeproject.com/Questions/78801/How-to-get-the-main-thread-ID-of-a-process-known-b
-§§bool ExternalProcess::fillInMainThread(PROCESS_INFORMATION* m_pi)
+bool ExternalProcess::fillInMainThread(PROCESS_INFORMATION* m_pi)
 {
 	DWORD dwMainThreadID = 0;
 	ULONGLONG ullMinCreateTime = MAXULONGLONG;
@@ -205,7 +205,7 @@ DWORD ExternalProcess::getPIDForProcessName(std::string processName) {
 	//get procNameAndPath from targetCMDLine
 	std::wstring wtargetCMDLine = std::wstring(processName.begin(), processName.end());
 	int numOfBlocks;
-§§	LPWSTR* szArglist = CommandLineToArgvW(wtargetCMDLine.c_str(), &numOfBlocks); //for some reasons this does not exist for Ascii :(
+	LPWSTR* szArglist = CommandLineToArgvW(wtargetCMDLine.c_str(), &numOfBlocks); //for some reasons this does not exist for Ascii :(
 	if (NULL == szArglist || numOfBlocks < 1) {
 		LOG(ERROR) << "Invalid processName: " << processName;
 		return 0;
@@ -377,7 +377,7 @@ bool ExternalProcess::attachToProcess() {
 	}
 
 	LOG(DEBUG) << "Attaching to PID " << m_pi.dwProcessId << " succeeded.";
-§§	m_hasBeenInitialized = true;
+	m_hasBeenInitialized = true;
 	return true;
 }
 
@@ -502,7 +502,7 @@ bool ExternalProcess::initProcess() {
 
 	LOG(DEBUG) << "We successfully created PID " << m_pi.dwProcessId;
 
-§§	m_hasBeenInitialized = true;
+	m_hasBeenInitialized = true;
 	return true;
 }
 
@@ -555,7 +555,7 @@ BOOL ExternalProcess::CreateProcessInJob(
 }
 
 bool ExternalProcess::runAndWaitForCompletion(unsigned long timeoutMilliseconds) {
-§§	if (m_pi.hThread == NULL || m_pi.hProcess == NULL || m_hasBeenRun || !m_hasBeenInitialized) {
+	if (m_pi.hThread == NULL || m_pi.hProcess == NULL || m_hasBeenRun || !m_hasBeenInitialized) {
 		LOG(ERROR) << "The process " << m_commandline << " cannot run, as it is not in a runnable state";
 		return false;
 	}
@@ -586,11 +586,11 @@ bool ExternalProcess::runAndWaitForCompletion(unsigned long timeoutMilliseconds)
 		m_exitStatus = exitCode;
 	}
 
-§§	m_hasBeenRun = true;
+	m_hasBeenRun = true;
 	return true;
 }
 bool ExternalProcess::run() {
-§§	if (m_pi.hThread == NULL || m_pi.dwProcessId == NULL || m_hasBeenRun || !m_hasBeenInitialized) {
+	if (m_pi.hThread == NULL || m_pi.dwProcessId == NULL || m_hasBeenRun || !m_hasBeenInitialized) {
 		LOG(ERROR) << "The process " << m_commandline << " cannot run, as it is not in a runnable state";
 		return false;
 	}
@@ -605,12 +605,12 @@ bool ExternalProcess::run() {
 		return false;
 	}
 
-§§	m_hasBeenRun = true;
+	m_hasBeenRun = true;
 	return true;
 }
 
 void ExternalProcess::debug(unsigned long timeoutMilliseconds, std::shared_ptr<DebugExecutionOutput> exResult, bool doPostMortemAnalysis, bool treatAnyAccessViolationAsFatal) {
-§§	if (m_pi.hThread == NULL || m_pi.dwProcessId == NULL || m_hasBeenRun || !m_hasBeenInitialized) {
+	if (m_pi.hThread == NULL || m_pi.dwProcessId == NULL || m_hasBeenRun || !m_hasBeenInitialized) {
 		std::stringstream oss;
 		oss << "The process " << m_commandline << " cannot run, as it is not in a runnable state" << std::endl;
 		exResult->m_terminationType = DebugExecutionOutput::PROCESS_TERMINATION_TYPE::ERR;
@@ -630,7 +630,7 @@ void ExternalProcess::debug(unsigned long timeoutMilliseconds, std::shared_ptr<D
 	}
 
 	//Ready to debug
-§§	m_isBeingDebugged = true;
+	m_isBeingDebugged = true;
 
 	//So far there is no exception
 	exResult->m_terminationType = DebugExecutionOutput::PROCESS_TERMINATION_TYPE::CLEAN;
@@ -704,11 +704,11 @@ void ExternalProcess::debug(unsigned long timeoutMilliseconds, std::shared_ptr<D
 					//We got an access violation but it's not said that the program will terminate because of it. We need to return here forcefully (just as with a hang)
 					if (debug_event.u.Exception.ExceptionRecord.ExceptionCode == EXCEPTION_ACCESS_VIOLATION && treatAnyAccessViolationAsFatal) {
 						//Stop debugging (also for all subprocesses)
-§§						for (DWORD myProcessID : myProcessIDs)
+						for (DWORD myProcessID : myProcessIDs)
 						{
-§§							DebugActiveProcessStop(myProcessID);
+							DebugActiveProcessStop(myProcessID);
 						}
-§§						m_hasBeenRun = true;
+						m_hasBeenRun = true;
 						return;
 					}
 				}
@@ -724,7 +724,7 @@ void ExternalProcess::debug(unsigned long timeoutMilliseconds, std::shared_ptr<D
 				exResult->m_terminationDescription = "RIP Event";
 				ContinueDebugEvent(debug_event.dwProcessId, debug_event.dwThreadId, dwContinueStatus);
 				DebugActiveProcessStop(m_pi.dwProcessId);
-§§				m_hasBeenRun = true;
+				m_hasBeenRun = true;
 				return;
 			case CREATE_PROCESS_DEBUG_EVENT:
 				numberOfCreatedProcesses++;
@@ -735,7 +735,7 @@ void ExternalProcess::debug(unsigned long timeoutMilliseconds, std::shared_ptr<D
 					exResult->m_terminationType = DebugExecutionOutput::PROCESS_TERMINATION_TYPE::ERR;
 					exResult->m_terminationDescription = "debug_event.u.CreateProcessInfo.hFile was NULL!";
 					LOG(ERROR) << exResult->m_terminationDescription;
-§§					m_hasBeenRun = true;
+					m_hasBeenRun = true;
 					return;
 				}
 				myProcessIDs.push_back(debug_event.dwProcessId);
@@ -754,7 +754,7 @@ void ExternalProcess::debug(unsigned long timeoutMilliseconds, std::shared_ptr<D
 
 					ContinueDebugEvent(debug_event.dwProcessId, debug_event.dwThreadId, dwContinueStatus);
 					DebugActiveProcessStop(m_pi.dwProcessId);
-§§					m_hasBeenRun = true;
+					m_hasBeenRun = true;
 					return;
 				}
 				break;
@@ -778,7 +778,7 @@ void ExternalProcess::debug(unsigned long timeoutMilliseconds, std::shared_ptr<D
 					exResult->m_terminationType = DebugExecutionOutput::PROCESS_TERMINATION_TYPE::ERR;
 					exResult->m_terminationDescription = "debug_event.u.LoadDll.hFile was NULL!";
 					LOG(ERROR) << exResult->m_terminationDescription;
-§§					m_hasBeenRun = true;
+					m_hasBeenRun = true;
 					return;
 				}
 				break;
@@ -790,7 +790,7 @@ void ExternalProcess::debug(unsigned long timeoutMilliseconds, std::shared_ptr<D
 				exResult->m_terminationType = DebugExecutionOutput::PROCESS_TERMINATION_TYPE::ERR;
 				exResult->m_terminationDescription = oss.str();
 				LOG(ERROR) << exResult->m_terminationDescription;
-§§				m_hasBeenRun = true;
+				m_hasBeenRun = true;
 				return;
 			}
 			ContinueDebugEvent(debug_event.dwProcessId, debug_event.dwThreadId, dwContinueStatus);
@@ -807,11 +807,11 @@ void ExternalProcess::debug(unsigned long timeoutMilliseconds, std::shared_ptr<D
 				exResult->m_terminationType = DebugExecutionOutput::PROCESS_TERMINATION_TYPE::TIMEOUT;
 
 				//Stop debugging (also for all subprocesses)
-§§				for (DWORD myProcessID : myProcessIDs)
+				for (DWORD myProcessID : myProcessIDs)
 				{
-§§					DebugActiveProcessStop(myProcessID);
+					DebugActiveProcessStop(myProcessID);
 				}
-§§				m_hasBeenRun = true;
+				m_hasBeenRun = true;
 				return;
 			}
 			else
@@ -822,11 +822,11 @@ void ExternalProcess::debug(unsigned long timeoutMilliseconds, std::shared_ptr<D
 				exResult->m_terminationDescription = oss.str();
 				exResult->m_terminationType = DebugExecutionOutput::PROCESS_TERMINATION_TYPE::ERR;
 				//Stop debugging (also for all subprocesses)
-§§				for (DWORD myProcessID : myProcessIDs)
+				for (DWORD myProcessID : myProcessIDs)
 				{
-§§					DebugActiveProcessStop(myProcessID);
+					DebugActiveProcessStop(myProcessID);
 				}
-§§				m_hasBeenRun = true;
+				m_hasBeenRun = true;
 				return;
 			}
 		}
@@ -879,9 +879,9 @@ ExternalProcess::ExternalProcess(std::string commandline, CHILD_OUTPUT_TYPE chil
 	m_child_output_mode(child_output_mode),
 	m_inputPipe{ -1,-1 },
 	m_outputPipe{ -1,-1 },
-§§	m_hasBeenRun(false),
-§§	m_hasBeenInitialized(false),
-§§	m_isBeingDebugged(false),
+	m_hasBeenRun(false),
+	m_hasBeenInitialized(false),
+	m_isBeingDebugged(false),
 	m_exitStatus(-1),
 	m_stdInOstream(nullptr),
 	m_stdOutIstream(nullptr),
@@ -1195,7 +1195,7 @@ bool ExternalProcess::initProcessInChrootEnv(const std::string  chrootPath) {
 		//This code is only executed if execve failed, e.g. if the file does not exist
 §§		printf("execve failed: %s; %s\n", strerror(errno), m_argv[0]);
 		google::protobuf::ShutdownProtobufLibrary();
-§§		_exit(EXIT_FAILURE); //Make compiler happy
+		_exit(EXIT_FAILURE); //Make compiler happy
 	}
 	else if (m_childPID > 0) {
 		close(m_fd_pipe[0]);  // Close reading end of debuggee / debugger pipe
@@ -1212,7 +1212,7 @@ bool ExternalProcess::initProcessInChrootEnv(const std::string  chrootPath) {
 
 		LOG(DEBUG) << "Initialization for " << m_argv[0] << " completed";
 
-§§		m_hasBeenInitialized = true;
+		m_hasBeenInitialized = true;
 		return true;
 	}
 	else {
@@ -1222,11 +1222,11 @@ bool ExternalProcess::initProcessInChrootEnv(const std::string  chrootPath) {
 }
 
 bool ExternalProcess::runAndWaitForCompletion(unsigned long timeoutMilliseconds) {
-§§	if (m_hasBeenRun || !m_hasBeenInitialized) {
+	if (m_hasBeenRun || !m_hasBeenInitialized) {
 		LOG(ERROR) << "The process cannot run, as it is not in a runnable state";
 		return false;
 	}
-§§	m_hasBeenRun = true;
+	m_hasBeenRun = true;
 
 §§	struct timespec timeout;
 
@@ -1338,12 +1338,12 @@ bool ExternalProcess::runAndWaitForCompletion(unsigned long timeoutMilliseconds)
 }
 §§
 bool ExternalProcess::run() {
-§§	if (m_hasBeenRun || !m_hasBeenInitialized) {
+	if (m_hasBeenRun || !m_hasBeenInitialized) {
 		LOG(ERROR) << "The process cannot run, as it is not in a runnable state";
 		return false;
 	}
 
-§§	m_hasBeenRun = true;
+	m_hasBeenRun = true;
 §§
 	struct timespec timeout; //timeout for the initial "stop" signal. Once we received that-> detach
 	timeout.tv_sec = 100;
@@ -1417,7 +1417,7 @@ bool ExternalProcess::run() {
 }
 
 void ExternalProcess::die() {
-§§	if (m_hasBeenInitialized) {
+	if (m_hasBeenInitialized) {
 		LOG(DEBUG) << "Telling PID " << m_childPID << " (\"" << m_argv[0] << "\") to die...";
 
 		updateTimeSpent();
@@ -1554,14 +1554,14 @@ bool ExternalProcess::attachToProcess() {
 	// there is no communication pipe to the debuggee. Right now let the write calls write to /dev/null. Alternatively: Store if we attached in a member variable and act based on it
 	m_fd_pipe[1] = open("/dev/null", O_WRONLY);
 
-§§	m_hasBeenInitialized = true;
+	m_hasBeenInitialized = true;
 	return true;
 }
 
 //For list of signals see https://de.wikipedia.org/wiki/Signal_(Unix)
 void ExternalProcess::debug(unsigned long timeoutMilliseconds, std::shared_ptr<DebugExecutionOutput> exResult, bool doPostMortemAnalysis, bool treatAnyAccessViolationAsFatal)
 {
-§§	if (m_hasBeenRun || !m_hasBeenInitialized) {
+	if (m_hasBeenRun || !m_hasBeenInitialized) {
 		std::stringstream oss;
 		oss << "The process " << m_childPID << " cannot run, as it is not in a runnable state" << std::endl;
 		exResult->m_terminationType = DebugExecutionOutput::PROCESS_TERMINATION_TYPE::ERR;
@@ -1596,7 +1596,7 @@ void ExternalProcess::debug(unsigned long timeoutMilliseconds, std::shared_ptr<D
 	}
 
 	//Ready to debug
-§§	m_isBeingDebugged = true;
+	m_isBeingDebugged = true;
 
 	do {
 		//Wait for a SIGCHLD event
@@ -1613,7 +1613,7 @@ void ExternalProcess::debug(unsigned long timeoutMilliseconds, std::shared_ptr<D
 				exResult->m_terminationDescription = "Process hang detected!";
 				exResult->m_terminationType = DebugExecutionOutput::PROCESS_TERMINATION_TYPE::TIMEOUT;
 				die();
-§§				m_hasBeenRun = true;
+				m_hasBeenRun = true;
 				return;
 			}
 			else {
@@ -1623,7 +1623,7 @@ void ExternalProcess::debug(unsigned long timeoutMilliseconds, std::shared_ptr<D
 				exResult->m_terminationDescription = oss.str();
 				LOG(ERROR) << exResult->m_terminationDescription;
 				die();
-§§				m_hasBeenRun = true;
+				m_hasBeenRun = true;
 				return;
 			}
 		}
@@ -1635,7 +1635,7 @@ void ExternalProcess::debug(unsigned long timeoutMilliseconds, std::shared_ptr<D
 			exResult->m_terminationType = DebugExecutionOutput::PROCESS_TERMINATION_TYPE::ERR;
 			exResult->m_terminationDescription = "waitpid encountered an error";
 			die();
-§§			m_hasBeenRun = true;
+			m_hasBeenRun = true;
 			return;
 		}
 		else if (signalSourcePID == 0) {
@@ -1778,19 +1778,19 @@ void ExternalProcess::debug(unsigned long timeoutMilliseconds, std::shared_ptr<D
 		}
 	} while (true);
 
-§§	m_hasBeenRun = true;
+	m_hasBeenRun = true;
 	return;
 }
 
 void ExternalProcess::updateTimeSpent() {
-§§	if (m_hasBeenInitialized && m_childPID != 0) {
+	if (m_hasBeenInitialized && m_childPID != 0) {
 		//TBH I don't know how to implement this recursively without blowing it up imensely. Just thinking about child processes that terminated, which might calculate "negative" ticks since last count.
 		//We stick to performance of the specified process for now
 
 		unsigned long utime = 0, stime = 0, cutime = 0, cstime = 0; //divide by  sysconf(_SC_CLK_TCK) to get seconds
 		FILE* file = fopen(("/proc/" + std::to_string(m_childPID) + "/stat").c_str(), "r");
 		if (file == NULL) {
-§§			LOG(ERROR) << "Could not open /proc/[pid]/stat for process " << m_childPID;
+			LOG(ERROR) << "Could not open /proc/[pid]/stat for process " << m_childPID;
 		}
 		else {
 			int elementsParsed = fscanf(file, "%*d %*s %*c %*d %*d %*d %*d %*d %*u %*u %*u %*u %*u %lu %lu %ld %ld", &utime, &stime, &cutime, &cstime);
@@ -1804,32 +1804,32 @@ void ExternalProcess::updateTimeSpent() {
 			m_laststime = stime;
 			m_lastcutime = cutime;
 			m_lastcstime = cstime;
-§§		}
+		}
 	}
 }
 
 #endif
 
 bool ExternalProcess::waitForProcessInitialization(int timeoutMS) {
-§§	std::chrono::time_point<std::chrono::steady_clock> routineEntryTimeStamp = std::chrono::steady_clock::now();
-§§	std::chrono::time_point<std::chrono::steady_clock> latestRoutineExitTimeStamp = routineEntryTimeStamp + std::chrono::milliseconds(timeoutMS);
+	std::chrono::time_point<std::chrono::steady_clock> routineEntryTimeStamp = std::chrono::steady_clock::now();
+	std::chrono::time_point<std::chrono::steady_clock> latestRoutineExitTimeStamp = routineEntryTimeStamp + std::chrono::milliseconds(timeoutMS);
 
-§§	while (!m_hasBeenInitialized && std::chrono::steady_clock::now() < latestRoutineExitTimeStamp) {
+	while (!m_hasBeenInitialized && std::chrono::steady_clock::now() < latestRoutineExitTimeStamp) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
 
-§§	return m_hasBeenInitialized;
+	return m_hasBeenInitialized;
 }
 
 bool ExternalProcess::waitUntilProcessIsBeingDebugged(int timeoutMS) {
-§§	std::chrono::time_point<std::chrono::steady_clock> routineEntryTimeStamp = std::chrono::steady_clock::now();
-§§	std::chrono::time_point<std::chrono::steady_clock> latestRoutineExitTimeStamp = routineEntryTimeStamp + std::chrono::milliseconds(timeoutMS);
+	std::chrono::time_point<std::chrono::steady_clock> routineEntryTimeStamp = std::chrono::steady_clock::now();
+	std::chrono::time_point<std::chrono::steady_clock> latestRoutineExitTimeStamp = routineEntryTimeStamp + std::chrono::milliseconds(timeoutMS);
 
-§§	while (!m_isBeingDebugged && std::chrono::steady_clock::now() < latestRoutineExitTimeStamp) {
+	while (!m_isBeingDebugged && std::chrono::steady_clock::now() < latestRoutineExitTimeStamp) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
 
-§§	return m_isBeingDebugged;
+	return m_isBeingDebugged;
 }
 
 TIMETYPE ExternalProcess::getAllTimeSpentSinceLastCall() {
@@ -1839,7 +1839,7 @@ TIMETYPE ExternalProcess::getAllTimeSpentSinceLastCall() {
 	return re;
 }
 
-§§void ExternalProcess::addToRunningProcessesSet(ExternalProcess* thisp) {
+void ExternalProcess::addToRunningProcessesSet(ExternalProcess* thisp) {
 	std::unique_lock<std::mutex> mlock(s_runningProcessSet_mutex_);
 	s_runningProcessSet.insert(thisp);
 }
@@ -1847,15 +1847,15 @@ TIMETYPE ExternalProcess::getAllTimeSpentSinceLastCall() {
 bool ExternalProcess::isInRunningProcessesSet(int pid) {
 	std::unique_lock<std::mutex> mlock(s_runningProcessSet_mutex_);
 
-§§	for (ExternalProcess* runningProcess : s_runningProcessSet) {
-§§		if (runningProcess->getProcessID() == pid) {
+	for (ExternalProcess* runningProcess : s_runningProcessSet) {
+		if (runningProcess->getProcessID() == pid) {
 			return true;
 		}
 	}
 	return false;
 }
 
-§§void ExternalProcess::removeFromRunningProcessesSet(ExternalProcess* thisp) {
+void ExternalProcess::removeFromRunningProcessesSet(ExternalProcess* thisp) {
 	std::unique_lock<std::mutex> mlock(s_runningProcessSet_mutex_);
 	if (s_runningProcessSet.count(thisp) > 0) {
 		s_runningProcessSet.erase(thisp);
@@ -1867,9 +1867,9 @@ bool ExternalProcess::isInRunningProcessesSet(int pid) {
 void ExternalProcess::updateTimeSpentOnAllInRunningProcessesSet() {
 	std::unique_lock<std::mutex> mlock(s_runningProcessSet_mutex_);
 
-§§	for (ExternalProcess* runningProcess : s_runningProcessSet)
+	for (ExternalProcess* runningProcess : s_runningProcessSet)
 	{
-§§		runningProcess->updateTimeSpent();
+		runningProcess->updateTimeSpent();
 	}
 }
 
@@ -1884,7 +1884,7 @@ HANDLETYPE ExternalProcess::getStdOutHandle() {
 	return m_outputPipe[0];
 }
 
-§§std::istream* ExternalProcess::getStdOutIstream() {
+std::istream* ExternalProcess::getStdOutIstream() {
 	if (m_child_output_mode != SPECIAL) {
 		return nullptr;
 	}
@@ -1896,7 +1896,7 @@ HANDLETYPE ExternalProcess::getStdOutHandle() {
 			LOG(ERROR) << "open_osfhandle failed";
 			return nullptr;
 		}
-§§		FILE* fp = _fdopen(fd, "r");
+		FILE* fp = _fdopen(fd, "r");
 		if (fp == NULL) {
 			LOG(ERROR) << "_fdopen failed";
 			_close(fd);
@@ -1911,22 +1911,22 @@ HANDLETYPE ExternalProcess::getStdOutHandle() {
 
 #endif
 	}
-§§	return m_stdOutIstream;
-§§}
+	return m_stdOutIstream;
+}
 
-§§std::ostream* ExternalProcess::getStdInOstream() {
+std::ostream* ExternalProcess::getStdInOstream() {
 	if (m_child_output_mode != SPECIAL) {
 		return nullptr;
 	}
 
 	if (m_stdInOstream == nullptr) {
 #if defined(_WIN32) || defined(_WIN64)
-§§		int fd = _open_osfhandle((std::intptr_t)getStdInHandle(), _O_WRONLY);
+		int fd = _open_osfhandle((std::intptr_t)getStdInHandle(), _O_WRONLY);
 		if (fd == -1) {
 			LOG(ERROR) << "open_osfhandle failed";
 			return nullptr;
 		}
-§§		FILE* fp = _fdopen(fd, "a");
+		FILE* fp = _fdopen(fd, "a");
 		if (fp == NULL) {
 			LOG(ERROR) << "_fdopen failed";
 			_close(fd);
@@ -1941,5 +1941,5 @@ HANDLETYPE ExternalProcess::getStdOutHandle() {
 
 #endif
 	}
-§§	return m_stdInOstream;
+	return m_stdInOstream;
 }

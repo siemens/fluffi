@@ -14,17 +14,17 @@ Author(s): Thomas Riedmaier, Abian Blome, Michael Kraus, Roman Bendt
 
 #include "targetver.h"
 
-§§#include <memory>
+#include <memory>
 #include <thread>
 #include <deque>
 #include <sstream>
 §§#include <mutex>
 #include <random>
 #include <experimental/filesystem>
-§§
+
 //Easylogging
 #include "easylogging++.h"
-§§
+
 //ZeroMQ
 #include <zmq.hpp>
 #include <zmq_addon.hpp>

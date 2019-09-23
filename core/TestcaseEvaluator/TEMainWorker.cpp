@@ -7,7 +7,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-§§Author(s): Thomas Riedmaier, Abian Blome
+Author(s): Thomas Riedmaier, Abian Blome
 */
 
 #include "stdafx.h"
@@ -24,15 +24,15 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #include "CoverageEvaluator.h"
 #include "FluffiSetting.h"
 
-§§TEMainWorker::TEMainWorker(CommInt* commInt,
-§§	TEWorkerThreadStateBuilder* workerThreadStateBuilder,
-§§	int delayToWaitUntilConfigIsCompleteInMS,
-§§	TETestResultManager* teTestResultManager,
-§§	std::string testcaseDir,
-§§	BlockCoverageCache* localBlockCoverageCache,
-§§	std::set<std::string> myAgentSubTypes,
-§§	GarbageCollectorWorker* garbageCollectorWorker
-§§) :
+TEMainWorker::TEMainWorker(CommInt* commInt,
+	TEWorkerThreadStateBuilder* workerThreadStateBuilder,
+	int delayToWaitUntilConfigIsCompleteInMS,
+	TETestResultManager* teTestResultManager,
+	std::string testcaseDir,
+	BlockCoverageCache* localBlockCoverageCache,
+	std::set<std::string> myAgentSubTypes,
+	GarbageCollectorWorker* garbageCollectorWorker
+) :
 	m_gotConfigFromLM(false),
 	m_commInt(commInt),
 	m_workerThreadStateBuilder(workerThreadStateBuilder),
@@ -78,7 +78,7 @@ void TEMainWorker::workerMain() {
 			}
 		}
 
-§§		TestOutcomeDescriptor* tod = m_teTestResultManager->popTestOutcomeForEvaluation();
+		TestOutcomeDescriptor* tod = m_teTestResultManager->popTestOutcomeForEvaluation();
 		if (tod == nullptr) {
 			std::this_thread::sleep_for(std::chrono::milliseconds(checkAgainMS));
 			continue;
@@ -94,7 +94,7 @@ bool TEMainWorker::tryGetConfigFromLM() {
 	// get config from lm
 	FLUFFIMessage req;
 	FLUFFIMessage resp;
-§§	GetFuzzJobConfigurationRequest* getfuzzjobconfigurationrequest = new GetFuzzJobConfigurationRequest();
+	GetFuzzJobConfigurationRequest* getfuzzjobconfigurationrequest = new GetFuzzJobConfigurationRequest();
 	ServiceDescriptor* ptMySelfServiceDescriptor = new ServiceDescriptor();
 	ptMySelfServiceDescriptor->CopyFrom(m_commInt->getOwnServiceDescriptor().getProtobuf());
 	getfuzzjobconfigurationrequest->set_allocated_servicedescriptor(ptMySelfServiceDescriptor);

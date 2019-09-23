@@ -7,7 +7,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-§§Author(s): Thomas Riedmaier, Abian Blome
+Author(s): Thomas Riedmaier, Abian Blome
 */
 
 #include "stdafx.h"
@@ -29,7 +29,7 @@ UINT32 ForServer::data
 
 */
 
-§§SharedMemIPC::SharedMemIPC(const char* sharedMemName, int sharedMemorySize) :
+SharedMemIPC::SharedMemIPC(const char* sharedMemName, int sharedMemorySize) :
 #if defined(_WIN32) || defined(_WIN64)
 	m_hMapFile(NULL),
 	m_pView(NULL),
@@ -412,7 +412,7 @@ bool SharedMemIPC::notifyServerAboutNewMessage() {
 #endif
 }
 
-§§bool SharedMemIPC::placeMessageForClient(const SharedMemMessage* message) {
+bool SharedMemIPC::placeMessageForClient(const SharedMemMessage* message) {
 	*(reinterpret_cast<uint32_t*>(m_pView + MAX_PATH)) = message->getMessageType();
 	*(reinterpret_cast<uint32_t*>(m_pView + MAX_PATH + 4)) = static_cast<uint32_t>(message->getDataSize());
 
@@ -425,7 +425,7 @@ bool SharedMemIPC::notifyServerAboutNewMessage() {
 
 	return 0 == memcpy_s((m_pView + MAX_PATH + 8), (m_sharedMemorySize / 2) - (MAX_PATH + 8), message->getDataPointer(), message->getDataSize());
 }
-§§bool SharedMemIPC::placeMessageForServer(const SharedMemMessage* message) {
+bool SharedMemIPC::placeMessageForServer(const SharedMemMessage* message) {
 	*(reinterpret_cast<uint32_t*>(m_pView + (m_sharedMemorySize / 2) + MAX_PATH)) = message->getMessageType();
 	*(reinterpret_cast<uint32_t*>(m_pView + (m_sharedMemorySize / 2) + MAX_PATH + 4)) = static_cast<uint32_t>(message->getDataSize());
 
@@ -438,14 +438,14 @@ bool SharedMemIPC::notifyServerAboutNewMessage() {
 	return 0 == memcpy_s((m_pView + (m_sharedMemorySize / 2) + MAX_PATH + 8), (m_sharedMemorySize / 2) - (MAX_PATH + 8), message->getDataPointer(), message->getDataSize());
 }
 
-§§bool SharedMemIPC::sendMessageToServer(const SharedMemMessage* message) {
+bool SharedMemIPC::sendMessageToServer(const SharedMemMessage* message) {
 	return placeMessageForServer(message) && notifyServerAboutNewMessage();
 }
-§§bool SharedMemIPC::sendMessageToClient(const SharedMemMessage* message) {
+bool SharedMemIPC::sendMessageToClient(const SharedMemMessage* message) {
 	return placeMessageForClient(message) && notifyClientAboutNewMessage();
 }
 
-§§bool SharedMemIPC::waitForNewMessageToClient(SharedMemMessage* messagePointer, unsigned long timeoutMilliseconds) {
+bool SharedMemIPC::waitForNewMessageToClient(SharedMemMessage* messagePointer, unsigned long timeoutMilliseconds) {
 #if defined(_WIN32) || defined(_WIN64)
 	return waitForNewMessageToClient(messagePointer, timeoutMilliseconds, NULL);
 #else
@@ -453,7 +453,7 @@ bool SharedMemIPC::notifyServerAboutNewMessage() {
 #endif
 }
 
-§§bool SharedMemIPC::waitForNewMessageToServer(SharedMemMessage* messagePointer, unsigned long timeoutMilliseconds) {
+bool SharedMemIPC::waitForNewMessageToServer(SharedMemMessage* messagePointer, unsigned long timeoutMilliseconds) {
 #if defined(_WIN32) || defined(_WIN64)
 	return waitForNewMessageToServer(messagePointer, timeoutMilliseconds, NULL);
 #else
@@ -463,7 +463,7 @@ bool SharedMemIPC::notifyServerAboutNewMessage() {
 
 #if defined(_WIN32) || defined(_WIN64)
 
-§§bool SharedMemIPC::waitForNewMessageToClient(SharedMemMessage* messagePointer, unsigned long timeoutMilliseconds, HANDLE interruptEventHandle) {
+bool SharedMemIPC::waitForNewMessageToClient(SharedMemMessage* messagePointer, unsigned long timeoutMilliseconds, HANDLE interruptEventHandle) {
 	if (interruptEventHandle == NULL) {
 		DWORD success = WaitForSingleObject(m_hEventForNewMessageForClient, timeoutMilliseconds);
 		if (success != WAIT_OBJECT_0) {
@@ -501,7 +501,7 @@ bool SharedMemIPC::notifyServerAboutNewMessage() {
 	return true;
 }
 
-§§bool SharedMemIPC::waitForNewMessageToServer(SharedMemMessage* messagePointer, unsigned long  timeoutMilliseconds, HANDLE interruptEventHandle) {
+bool SharedMemIPC::waitForNewMessageToServer(SharedMemMessage* messagePointer, unsigned long  timeoutMilliseconds, HANDLE interruptEventHandle) {
 	if (interruptEventHandle == NULL) {
 		DWORD success = WaitForSingleObject(m_hEventForNewMessageForServer, timeoutMilliseconds);
 		if (success != WAIT_OBJECT_0) {
@@ -541,7 +541,7 @@ bool SharedMemIPC::notifyServerAboutNewMessage() {
 
 #else
 
-§§bool SharedMemIPC::waitForNewMessageToClient(SharedMemMessage* messagePointer, unsigned long  timeoutMilliseconds, int interruptFD) {
+bool SharedMemIPC::waitForNewMessageToClient(SharedMemMessage* messagePointer, unsigned long  timeoutMilliseconds, int interruptFD) {
 	fd_set readfds;
 	FD_ZERO(&readfds);
 	FD_SET(m_fdFIFOForNewMessageForClient, &readfds);
@@ -587,7 +587,7 @@ bool SharedMemIPC::notifyServerAboutNewMessage() {
 		//clear the interrupt pipe
 		int nbytes = 0;
 		ioctl(interruptFD, FIONREAD, &nbytes);
-§§		char* buff = new char[nbytes];
+		char* buff = new char[nbytes];
 		ssize_t readChars = read(interruptFD, buff, nbytes);
 		if (readChars != nbytes) {
 			printf("SMIPC: Failed to cleanup interruptFD\n");
@@ -612,7 +612,7 @@ bool SharedMemIPC::notifyServerAboutNewMessage() {
 	{
 		int nbytes = 0;
 		ioctl(m_fdFIFOForNewMessageForClient, FIONREAD, &nbytes);
-§§		char* buff = new char[nbytes];
+		char* buff = new char[nbytes];
 		ssize_t readChars = read(m_fdFIFOForNewMessageForClient, buff, nbytes);
 		if (readChars != nbytes) {
 			printf("SMIPC: Failed to cleanup m_fdFIFOForNewMessageForClient\n");
@@ -628,7 +628,7 @@ bool SharedMemIPC::notifyServerAboutNewMessage() {
 	return true;
 }
 
-§§bool SharedMemIPC::waitForNewMessageToServer(SharedMemMessage* messagePointer, unsigned long  timeoutMilliseconds, int interruptFD) {
+bool SharedMemIPC::waitForNewMessageToServer(SharedMemMessage* messagePointer, unsigned long  timeoutMilliseconds, int interruptFD) {
 	fd_set readfds;
 	FD_ZERO(&readfds);
 	FD_SET(m_fdFIFOForNewMessageForServer, &readfds);
@@ -674,7 +674,7 @@ bool SharedMemIPC::notifyServerAboutNewMessage() {
 		//clear the interrupt pipe
 		int nbytes = 0;
 		ioctl(interruptFD, FIONREAD, &nbytes);
-§§		char* buff = new char[nbytes];
+		char* buff = new char[nbytes];
 		ssize_t readChars = read(interruptFD, buff, nbytes);
 		if (readChars != nbytes) {
 			printf("SMIPC: Failed to cleanup interruptFD\n");
@@ -699,7 +699,7 @@ bool SharedMemIPC::notifyServerAboutNewMessage() {
 	{
 		int nbytes = 0;
 		ioctl(m_fdFIFOForNewMessageForServer, FIONREAD, &nbytes);
-§§		char* buff = new char[nbytes];
+		char* buff = new char[nbytes];
 		ssize_t readChars = read(m_fdFIFOForNewMessageForServer, buff, nbytes);
 		if (readChars != nbytes) {
 			printf("SMIPC: Failed to cleanup m_fdFIFOForNewMessageForServer\n");
@@ -723,7 +723,7 @@ std::string SharedMemIPC::newGUID() {
 	UUID uuid;
 	RPC_STATUS success = UuidCreate(&uuid);
 
-§§	unsigned char* str;
+	unsigned char* str;
 	success = UuidToStringA(&uuid, &str);
 
 	std::string s((char*)str);
@@ -746,19 +746,19 @@ std::string SharedMemIPC::newGUID() {
 
 #if defined(_WIN32) || defined(_WIN64)
 #else
-§§int SharedMemIPC::memcpy_s(void* a, size_t  b, const void* c, size_t d) {
+int SharedMemIPC::memcpy_s(void* a, size_t  b, const void* c, size_t d) {
 	return ((memcpy(a, c, std::min(b, d)) == a) ? 0 : -1);
 }
 #endif
 
 //C wrapper
-§§SharedMemIPC* SharedMemIPC_new(const char* sharedMemName, int sharedMemorySize) { return new SharedMemIPC(sharedMemName, sharedMemorySize); }
+SharedMemIPC* SharedMemIPC_new(const char* sharedMemName, int sharedMemorySize) { return new SharedMemIPC(sharedMemName, sharedMemorySize); }
 void SharedMemIPC_delete(SharedMemIPC* thisp) { delete thisp; }
 bool SharedMemIPC_initializeAsServer(SharedMemIPC* thisp) { return thisp->initializeAsServer(); }
 bool SharedMemIPC_initializeAsClient(SharedMemIPC* thisp) { return thisp->initializeAsClient(); }
 
-§§bool SharedMemIPC_sendMessageToServer(SharedMemIPC* thisp, const SharedMemMessage* message) { return thisp->sendMessageToServer(message); }
-§§bool SharedMemIPC_sendMessageToClient(SharedMemIPC* thisp, const SharedMemMessage* message) { return  thisp->sendMessageToClient(message); }
+bool SharedMemIPC_sendMessageToServer(SharedMemIPC* thisp, const SharedMemMessage* message) { return thisp->sendMessageToServer(message); }
+bool SharedMemIPC_sendMessageToClient(SharedMemIPC* thisp, const SharedMemMessage* message) { return  thisp->sendMessageToClient(message); }
 
-§§bool SharedMemIPC_waitForNewMessageToClient(SharedMemIPC* thisp, SharedMemMessage* messagePointer, unsigned long  timeoutMilliseconds) { return thisp->waitForNewMessageToClient(messagePointer, timeoutMilliseconds); }
+bool SharedMemIPC_waitForNewMessageToClient(SharedMemIPC* thisp, SharedMemMessage* messagePointer, unsigned long  timeoutMilliseconds) { return thisp->waitForNewMessageToClient(messagePointer, timeoutMilliseconds); }
 bool SharedMemIPC_waitForNewMessageToServer(SharedMemIPC* thisp, SharedMemMessage* messagePointer, unsigned long  timeoutMilliseconds) { return thisp->waitForNewMessageToServer(messagePointer, timeoutMilliseconds); }

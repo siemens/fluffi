@@ -11,7 +11,7 @@ Author(s): Michael Kraus, Junes Najah, Thomas Riedmaier, Abian Blome, Pascal Eck
 */
 
 CREATE DATABASE IF NOT EXISTS fluffi_gm;
-§§
+
 CREATE TABLE IF NOT EXISTS fluffi_gm.command_queue (
 §§	`ID` int(11) NOT NULL AUTO_INCREMENT,
 §§	`Command` varchar(256) NOT NULL DEFAULT '',
@@ -30,8 +30,8 @@ CREATE TABLE IF NOT EXISTS fluffi_gm.fuzzjob (
 §§	`DBPass` varchar(256) DEFAULT NULL,
 §§	`DBName` varchar(256) DEFAULT NULL,
 §§	PRIMARY KEY (`id`)
-§§) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-§§
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE IF NOT EXISTS fluffi_gm.localmanagers_statuses (
 §§	`ID` int(11) NOT NULL AUTO_INCREMENT,
 §§	`ServiceDescriptorGUID` varchar(50) DEFAULT NULL,
@@ -45,8 +45,8 @@ CREATE TABLE IF NOT EXISTS fluffi_gm.locations (
 §§	`Name` VARCHAR(150) NOT NULL,
 §§	PRIMARY KEY (`id`),
 §§	UNIQUE (`Name`)
-§§) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-§§
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 §§CREATE TABLE IF NOT EXISTS fluffi_gm.systems (
 §§	`id` INT(11) NOT NULL AUTO_INCREMENT,
 §§	`Name` VARCHAR(150) NOT NULL,
@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS fluffi_gm.workers (
 §§	`AgentSubTypes` varchar(1000) DEFAULT "",
 §§	PRIMARY KEY (`ServiceDescriptorGUID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-§§
+
 §§CREATE TABLE IF NOT EXISTS fluffi_gm.location_fuzzjobs (
 §§	`Location` INT(11) NOT NULL,
 §§	`Fuzzjob` INT(11) NOT NULL,

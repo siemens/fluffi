@@ -10,19 +10,19 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Abian Blome
 */
 
-§§#pragma once
-§§#include "FluffiServiceDescriptor.h"
-§§
-§§class FluffiTestcaseID
-§§{
-§§public:
+#pragma once
+#include "FluffiServiceDescriptor.h"
+
+class FluffiTestcaseID
+{
+public:
 	FluffiTestcaseID(const FluffiServiceDescriptor serviceDescriptor, uint64_t localID);
-§§	FluffiTestcaseID(const TestcaseID& testcaseID);
-§§	virtual ~FluffiTestcaseID();
-§§
-§§	TestcaseID getProtobuf() const;
-§§
-§§	FluffiServiceDescriptor m_serviceDescriptor;
+	FluffiTestcaseID(const TestcaseID& testcaseID);
+	virtual ~FluffiTestcaseID();
+
+	TestcaseID getProtobuf() const;
+
+	FluffiServiceDescriptor m_serviceDescriptor;
 	uint64_t m_localID;
 
 	inline friend std::ostream & operator<<(std::ostream & os, FluffiTestcaseID const & v) {
@@ -41,4 +41,4 @@ Author(s): Thomas Riedmaier, Abian Blome
 		}
 		return this->m_serviceDescriptor.m_guid < rhs.m_serviceDescriptor.m_guid;
 	}
-§§};
+};

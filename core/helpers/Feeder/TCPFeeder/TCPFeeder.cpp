@@ -13,8 +13,8 @@ Author(s): Thomas Riedmaier, Abian Blome, Roman Bendt, Pascal Eckmann
 #include "stdafx.h"
 #include "SharedMemIPC.h"
 
-§§#include "http.h"
-§§#include "utils.h"
+#include "http.h"
+#include "utils.h"
 
 #if defined(_WIN32) || defined(_WIN64)
 #define SOCKETTYPE SOCKET
@@ -28,19 +28,19 @@ Author(s): Thomas Riedmaier, Abian Blome, Roman Bendt, Pascal Eckmann
 //cp ../../../bin/libsharedmemipc.so .
 §§//g++ --std=c++11 -I../../../SharedMemIPC/ -o TCPFeeder stdafx.cpp TCPFeeder.cpp utils.cpp libsharedmemipc.so -Wl,-rpath='${ORIGIN}'
 
-§§void preprocess(std::vector<char> bytes) {
-§§	// Add preprocession steps here as needed, e.g. for HTTP:
-§§	// dropNoDoubleLinebreak(&bytes);
-§§	// fixHTTPContentLength(&bytes);
-§§	// performHTTPAuthAndManageSession();
-§§	return;
+void preprocess(std::vector<char> bytes) {
+	// Add preprocession steps here as needed, e.g. for HTTP:
+	// dropNoDoubleLinebreak(&bytes);
+	// fixHTTPContentLength(&bytes);
+	// performHTTPAuthAndManageSession();
+	return;
 }
 
-§§bool sendBytesToHostAndPort(std::vector<char> fuzzBytes, std::string targethost, int serverport) {
-§§	// Returning true, as empty payloads are not forwarded
-§§	if (fuzzBytes.size() == 0) {
-§§		//std::cout << "TCPFeeder: sending SHARED_MEM_MESSAGE_FUZZ_DONE to the runner as empty payloads are not forwarded" << std::endl;
-§§		return true;
+bool sendBytesToHostAndPort(std::vector<char> fuzzBytes, std::string targethost, int serverport) {
+	// Returning true, as empty payloads are not forwarded
+	if (fuzzBytes.size() == 0) {
+		//std::cout << "TCPFeeder: sending SHARED_MEM_MESSAGE_FUZZ_DONE to the runner as empty payloads are not forwarded" << std::endl;
+		return true;
 	}
 	//try until the runner kills us
 	while (true) {
@@ -73,7 +73,7 @@ Author(s): Thomas Riedmaier, Abian Blome, Roman Bendt, Pascal Eckmann
 			continue;
 		}
 
-§§		iResult = send(connectSocket, &(fuzzBytes)[0], (int)fuzzBytes.size(), 0);
+		iResult = send(connectSocket, &(fuzzBytes)[0], (int)fuzzBytes.size(), 0);
 		if (iResult == SOCKET_ERROR) {
 			closesocket(connectSocket);
 			connectSocket = INVALID_SOCKET;
@@ -115,38 +115,38 @@ int main(int argc, char* argv[])
 	int feederTimeoutMS = 10 * 60 * 1000;
 	std::string targethost = "127.0.0.1";
 
-§§	auto timeOfLastConnectAttempt = std::chrono::system_clock::now() + std::chrono::milliseconds(feederTimeoutMS);
-§§	int targetport = 0;
-§§	std::string ipcName;
-§§	initFromArgs(argc, argv, targetport, ipcName);
+	auto timeOfLastConnectAttempt = std::chrono::system_clock::now() + std::chrono::milliseconds(feederTimeoutMS);
+	int targetport = 0;
+	std::string ipcName;
+	initFromArgs(argc, argv, targetport, ipcName);
 
-§§	SharedMemIPC sharedMemIPC_ToRunner(ipcName.c_str());
-§§	initializeIPC(sharedMemIPC_ToRunner);
+	SharedMemIPC sharedMemIPC_ToRunner(ipcName.c_str());
+	initializeIPC(sharedMemIPC_ToRunner);
 
-§§	uint16_t targetPID = getTargetPID(sharedMemIPC_ToRunner, feederTimeoutMS);
+	uint16_t targetPID = getTargetPID(sharedMemIPC_ToRunner, feederTimeoutMS);
 
 	if (targetport == 0) {
-§§		targetport = getServerPortFromPIDOrTimeout(sharedMemIPC_ToRunner, targetPID, timeOfLastConnectAttempt);
+		targetport = getServerPortFromPIDOrTimeout(sharedMemIPC_ToRunner, targetPID, timeOfLastConnectAttempt);
 	}
 
-§§	waitForPortOpenOrTimeout(sharedMemIPC_ToRunner, targethost, targetport, timeOfLastConnectAttempt);
+	waitForPortOpenOrTimeout(sharedMemIPC_ToRunner, targethost, targetport, timeOfLastConnectAttempt);
 	std::cout << "TCPFeeder: It was possible to establish a tcp connection to the target. We are good to go!" << std::endl;
 
 	SharedMemMessage readyToFuzzMessage = SharedMemMessage(SHARED_MEM_MESSAGE_READY_TO_FUZZ, nullptr, 0);
 	sharedMemIPC_ToRunner.sendMessageToServer(&readyToFuzzMessage);
 	while (true) {
-§§		std::string fuzzFileName = getNewFuzzFileOrDie(sharedMemIPC_ToRunner, feederTimeoutMS);
-§§		std::vector<char> fuzzBytes = readAllBytesFromFile(fuzzFileName);
+		std::string fuzzFileName = getNewFuzzFileOrDie(sharedMemIPC_ToRunner, feederTimeoutMS);
+		std::vector<char> fuzzBytes = readAllBytesFromFile(fuzzFileName);
 
-§§		preprocess(fuzzBytes);
-§§		if (sendBytesToHostAndPort(fuzzBytes, targethost, targetport)) {
-§§			SharedMemMessage fuzzDoneMessage(SHARED_MEM_MESSAGE_FUZZ_DONE, nullptr, 0);
-§§			sharedMemIPC_ToRunner.sendMessageToServer(&fuzzDoneMessage);
+		preprocess(fuzzBytes);
+		if (sendBytesToHostAndPort(fuzzBytes, targethost, targetport)) {
+			SharedMemMessage fuzzDoneMessage(SHARED_MEM_MESSAGE_FUZZ_DONE, nullptr, 0);
+			sharedMemIPC_ToRunner.sendMessageToServer(&fuzzDoneMessage);
 		}
 		else {
-§§			std::string errorDesc = "Failed sending the fuzz file bytes to the target port";
-§§			SharedMemMessage messageToFeeder(SHARED_MEM_MESSAGE_FUZZ_ERROR, errorDesc.c_str(), (int)errorDesc.length());
-§§			sharedMemIPC_ToRunner.sendMessageToServer(&messageToFeeder);
+			std::string errorDesc = "Failed sending the fuzz file bytes to the target port";
+			SharedMemMessage messageToFeeder(SHARED_MEM_MESSAGE_FUZZ_ERROR, errorDesc.c_str(), (int)errorDesc.length());
+			sharedMemIPC_ToRunner.sendMessageToServer(&messageToFeeder);
 		}
 	}
 

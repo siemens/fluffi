@@ -38,15 +38,15 @@ Author(s): Thomas Riedmaier, Abian Blome
     <ClInclude Include="GMWorkerThreadState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-§§    <ClInclude Include="GMDatabaseManager.h">
-§§      <Filter>Header Files</Filter>
-§§    </ClInclude>
-§§    <ClInclude Include="RegisterAtGMRequestHandler.h">
-§§      <Filter>Header Files</Filter>
-§§    </ClInclude>
-§§    <ClInclude Include="LMMonitorWorker.h">
-§§      <Filter>Header Files</Filter>
-§§    </ClInclude>
+    <ClInclude Include="GMDatabaseManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RegisterAtGMRequestHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LMMonitorWorker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -58,14 +58,14 @@ Author(s): Thomas Riedmaier, Abian Blome
     <ClCompile Include="GMWorkerThreadStateBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-§§    <ClCompile Include="GMDatabaseManager.cpp">
-§§      <Filter>Source Files</Filter>
-§§    </ClCompile>
-§§    <ClCompile Include="RegisterAtGMRequestHandler.cpp">
-§§      <Filter>Source Files</Filter>
-§§    </ClCompile>
-§§    <ClCompile Include="LMMonitorWorker.cpp">
-§§      <Filter>Source Files</Filter>
-§§    </ClCompile>
+    <ClCompile Include="GMDatabaseManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RegisterAtGMRequestHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LMMonitorWorker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

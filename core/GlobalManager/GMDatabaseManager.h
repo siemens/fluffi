@@ -10,51 +10,51 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Abian Blome, Thomas Riedmaier
 */
 
-§§#pragma once
-§§
+#pragma once
+
 class FluffiLMConfiguration;
 class FluffiServiceDescriptor;
-§§class GMDatabaseManager
-§§{
-§§public:
-§§	GMDatabaseManager();
-§§	~GMDatabaseManager();
-§§
-§§	static void setDBConnectionParameters(std::string host, std::string user, std::string pwd, std::string db);
+class GMDatabaseManager
+{
+public:
+	GMDatabaseManager();
+	~GMDatabaseManager();
+
+	static void setDBConnectionParameters(std::string host, std::string user, std::string pwd, std::string db);
 	FluffiServiceDescriptor getLMServiceDescriptorForWorker(FluffiServiceDescriptor fsd);
-§§	FluffiLMConfiguration getLMConfigurationForFuzzJob(int fuzzJob);
+	FluffiLMConfiguration getLMConfigurationForFuzzJob(int fuzzJob);
 	bool addWorkerToDatabase(FluffiServiceDescriptor fsd, AgentType type, std::string subtypes, std::string location);
 	bool setLMForLocationAndFuzzJob(std::string location, FluffiServiceDescriptor lmServiceDescriptor, long fuzzjob);
-§§	bool deleteManagedLMStatusOlderThanXSec(int olderThanInSeconds);
+	bool deleteManagedLMStatusOlderThanXSec(int olderThanInSeconds);
 	bool deleteWorkersNotSeenSinceXSec(int olderThanInSeconds);
 	bool deleteDoneCommandsOlderThanXSec(int olderThanInSeconds);
-§§	std::vector<std::pair<std::string, std::string>> getAllRegisteredLMs();
-§§	bool removeManagedLM(std::string ServiceDescriptorGUID);
+	std::vector<std::pair<std::string, std::string>> getAllRegisteredLMs();
+	bool removeManagedLM(std::string ServiceDescriptorGUID);
 	bool removeWorkerFromDatabase(FluffiServiceDescriptor fsd);
-§§	bool addNewManagedLMStatus(std::string ServiceDescriptorGUID, std::string newStatus);
-§§	long getFuzzJobWithoutLM(std::string location);
-§§	std::vector<std::tuple<int, std::string, std::string>> getNewCommands();
-§§	bool setCommandAsDone(int commandID, std::string errorMessage);
-§§
-§§#ifdef _VSTEST
-§§	std::string EXECUTE_TEST_STATEMENT(const std::string query);
-§§#endif // _VSTEST
-§§
-§§private:
-§§	static MYSQL* establishDBConnection();
-§§	static bool setSessionParameters(MYSQL* conn);
-§§
-§§	MYSQL* m_DBConnection;
-§§
-§§	MYSQL* getDBConnection();
-§§
-§§	static std::string s_dbHost;
-§§	static std::string s_dbUser;
-§§	static std::string s_dbPassword;
-§§	static std::string s_dbName;
+	bool addNewManagedLMStatus(std::string ServiceDescriptorGUID, std::string newStatus);
+	long getFuzzJobWithoutLM(std::string location);
+	std::vector<std::tuple<int, std::string, std::string>> getNewCommands();
+	bool setCommandAsDone(int commandID, std::string errorMessage);
+
+#ifdef _VSTEST
+	std::string EXECUTE_TEST_STATEMENT(const std::string query);
+#endif // _VSTEST
+
+private:
+	static MYSQL* establishDBConnection();
+	static bool setSessionParameters(MYSQL* conn);
+
+	MYSQL* m_DBConnection;
+
+	MYSQL* getDBConnection();
+
+	static std::string s_dbHost;
+	static std::string s_dbUser;
+	static std::string s_dbPassword;
+	static std::string s_dbName;
 
 	//Performance watching
-§§	std::chrono::steady_clock::time_point performanceWatchTimePoint;
-§§#define PERFORMANCE_WATCH_FUNCTION_ENTRY performanceWatchTimePoint = std::chrono::steady_clock::now();
-§§#define PERFORMANCE_WATCH_FUNCTION_EXIT(X)  	if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - performanceWatchTimePoint).count()  > CommInt::timeoutNormalMessage/2) {		LOG(WARNING) << X << " is taking dangerously long to respond: "<< std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - performanceWatchTimePoint).count() ;	}
-§§};
+	std::chrono::steady_clock::time_point performanceWatchTimePoint;
+#define PERFORMANCE_WATCH_FUNCTION_ENTRY performanceWatchTimePoint = std::chrono::steady_clock::now();
+#define PERFORMANCE_WATCH_FUNCTION_EXIT(X)  	if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - performanceWatchTimePoint).count()  > CommInt::timeoutNormalMessage/2) {		LOG(WARNING) << X << " is taking dangerously long to respond: "<< std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - performanceWatchTimePoint).count() ;	}
+};

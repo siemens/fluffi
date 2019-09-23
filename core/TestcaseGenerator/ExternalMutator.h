@@ -10,22 +10,22 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Abian Blome, Thomas Riedmaier
 */
 
-§§#pragma once
-§§#include "FluffiMutator.h"
-§§
-§§class CommInt;
-§§class TGWorkerThreadState;
-§§class ExternalMutator :
-§§	public FluffiMutator
-§§{
-§§public:
-§§	ExternalMutator(FluffiServiceDescriptor serviceDescriptor, std::string testcaseDirectory, std::string extDirectory, CommInt* commInt = nullptr, TGWorkerThreadState* workerThreadState = nullptr);
-§§	virtual ~ExternalMutator();
-§§
-§§	bool isSetupFunctionable();
-§§	std::deque<TestcaseDescriptor> batchMutate(unsigned int numToGenerate, const FluffiTestcaseID parentID, const std::string parentPathAndFilename);
-§§private:
-§§	std::string m_extTestcaseDir;
+#pragma once
+#include "FluffiMutator.h"
+
+class CommInt;
+class TGWorkerThreadState;
+class ExternalMutator :
+	public FluffiMutator
+{
+public:
+	ExternalMutator(FluffiServiceDescriptor serviceDescriptor, std::string testcaseDirectory, std::string extDirectory, CommInt* commInt = nullptr, TGWorkerThreadState* workerThreadState = nullptr);
+	virtual ~ExternalMutator();
+
+	bool isSetupFunctionable();
+	std::deque<TestcaseDescriptor> batchMutate(unsigned int numToGenerate, const FluffiTestcaseID parentID, const std::string parentPathAndFilename);
+private:
+	std::string m_extTestcaseDir;
 	CommInt* m_commInt;
-§§	TGWorkerThreadState* m_workerThreadState;
-§§};
+	TGWorkerThreadState* m_workerThreadState;
+};

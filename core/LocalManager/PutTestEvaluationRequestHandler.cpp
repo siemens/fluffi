@@ -20,13 +20,13 @@ Author(s): Thomas Riedmaier, Abian Blome
 #include "FluffiTestcaseID.h"
 
 //forceFlushAfterMS should be well below intervallToWaitForReinsertionInMillisec
-§§PutTestEvaluationRequestHandler::PutTestEvaluationRequestHandler(std::string testcaseDir, CommInt* commPtr, GarbageCollectorWorker* garbageCollectorWorker, int forceFlushAfterMS) :
+PutTestEvaluationRequestHandler::PutTestEvaluationRequestHandler(std::string testcaseDir, CommInt* commPtr, GarbageCollectorWorker* garbageCollectorWorker, int forceFlushAfterMS) :
 	m_testcaseDir(testcaseDir),
 	m_comm(commPtr),
 	m_garbageCollectorWorker(garbageCollectorWorker),
 	m_completedTestcases_notYetPushedToDB(),
 	m_completedTestcasesCache_mutex_(),
-§§	m_timeOfLastFlush(std::chrono::steady_clock::now()),
+	m_timeOfLastFlush(std::chrono::steady_clock::now()),
 	m_forceFlushAfterMS(forceFlushAfterMS)
 {
 }
@@ -35,7 +35,7 @@ PutTestEvaluationRequestHandler::~PutTestEvaluationRequestHandler()
 {
 }
 
-§§bool PutTestEvaluationRequestHandler::markTestcaseAsCompleted(LMDatabaseManager* dbManager, FluffiTestcaseID testcaseID) {
+bool PutTestEvaluationRequestHandler::markTestcaseAsCompleted(LMDatabaseManager* dbManager, FluffiTestcaseID testcaseID) {
 	//add one by one
 	//return dbManager->addEntryToCompletedTestcasesTable(testcaseID);
 
@@ -45,13 +45,13 @@ PutTestEvaluationRequestHandler::~PutTestEvaluationRequestHandler()
 	std::unique_lock<std::mutex> mlock(m_completedTestcasesCache_mutex_);
 	m_completedTestcases_notYetPushedToDB.insert(testcaseID);
 
-§§	if (m_completedTestcases_notYetPushedToDB.size() > 100 || std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - m_timeOfLastFlush).count() > m_forceFlushAfterMS) {
+	if (m_completedTestcases_notYetPushedToDB.size() > 100 || std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - m_timeOfLastFlush).count() > m_forceFlushAfterMS) {
 		LOG(DEBUG) << "flushing the set of cashed completed testcases to the database";
 		//flush completed testcases to db
 		bool success = dbManager->addEntriesToCompletedTestcasesTable(&m_completedTestcases_notYetPushedToDB);
 		if (success) {
 			m_completedTestcases_notYetPushedToDB.clear();
-§§			m_timeOfLastFlush = std::chrono::steady_clock::now();
+			m_timeOfLastFlush = std::chrono::steady_clock::now();
 		}
 		return success;
 	}
@@ -60,7 +60,7 @@ PutTestEvaluationRequestHandler::~PutTestEvaluationRequestHandler()
 	}
 }
 
-§§void PutTestEvaluationRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp)
+void PutTestEvaluationRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp)
 {
 	LMWorkerThreadState* lmWorkerThreadState = dynamic_cast<LMWorkerThreadState*>(workerThreadState);
 	if (lmWorkerThreadState == nullptr) {
@@ -68,11 +68,11 @@ PutTestEvaluationRequestHandler::~PutTestEvaluationRequestHandler()
 		return;
 	}
 
-§§	const PutTestEvaluationRequest* putTestEvaluationRequest = &req->puttestevaluationrequest();
+	const PutTestEvaluationRequest* putTestEvaluationRequest = &req->puttestevaluationrequest();
 
-§§	FluffiTestcaseID testcaseID = FluffiTestcaseID(putTestEvaluationRequest->id());
-§§	FluffiTestcaseID parentTestcaseID = FluffiTestcaseID(putTestEvaluationRequest->parentid());
-§§
+	FluffiTestcaseID testcaseID = FluffiTestcaseID(putTestEvaluationRequest->id());
+	FluffiTestcaseID parentTestcaseID = FluffiTestcaseID(putTestEvaluationRequest->parentid());
+
 	bool success = markTestcaseAsCompleted(lmWorkerThreadState->dbManager, testcaseID);
 	if (!success) {
 		LOG(ERROR) << "PutTestEvaluationRequestHandler: addEntryToCompletedTestcasesTable failed";
@@ -91,7 +91,7 @@ PutTestEvaluationRequestHandler::~PutTestEvaluationRequestHandler()
 		//Discard the testcase - no more actions required
 		LOG(DEBUG) << "PutTestEvaluationRequestHandler - Discard";
 		break;
-§§	case TestEvaluation::Keep:
+	case TestEvaluation::Keep:
 		LOG(DEBUG) << "PutTestEvaluationRequestHandler - Keep";
 
 		//Get & store testcase bin
@@ -124,11 +124,11 @@ PutTestEvaluationRequestHandler::~PutTestEvaluationRequestHandler()
 
 		//Add testcase to database (Testacase file gets deleted here)
 		success = lmWorkerThreadState->dbManager->addEntryToInterestingTestcasesTable(
-§§			testcaseID,
-§§			parentTestcaseID,
-§§			(tcType == LMDatabaseManager::TestCaseType::Population) ? LMDatabaseManager::defaultInitialPopulationRating : 0,
-§§			m_testcaseDir,
-§§			(tcType == LMDatabaseManager::TestCaseType::Population) ? LMDatabaseManager::TestCaseType::Locked : tcType);
+			testcaseID,
+			parentTestcaseID,
+			(tcType == LMDatabaseManager::TestCaseType::Population) ? LMDatabaseManager::defaultInitialPopulationRating : 0,
+			m_testcaseDir,
+			(tcType == LMDatabaseManager::TestCaseType::Population) ? LMDatabaseManager::TestCaseType::Locked : tcType);
 		if (!success) {
 			LOG(ERROR) << "PutTestEvaluationRequestHandler: addEntryToInterestingTestcasesTable failed";
 			goto fail;
@@ -169,7 +169,7 @@ PutTestEvaluationRequestHandler::~PutTestEvaluationRequestHandler()
 	}
 
 fail:
-§§	PutTestEvaluationResponse* putTestEvaluationResponse = new PutTestEvaluationResponse();
+	PutTestEvaluationResponse* putTestEvaluationResponse = new PutTestEvaluationResponse();
 	putTestEvaluationResponse->set_success(success);
 	LOG(DEBUG) << "PutTestEvaluationRequestHandler returns " << success;
 	resp->set_allocated_puttestevaluationresponse(putTestEvaluationResponse);

@@ -30,7 +30,7 @@ Author(s): Thomas Riedmaier, Pascal Eckmann, Abian Blome
 */
 
 syntax = "proto3";
-§§
+
 message FLUFFIMessage {
 oneof fluff {
   GetStatusRequest getStatusRequest = 1;
@@ -39,44 +39,44 @@ oneof fluff {
   SetTGsAndTEsRequest setTGsAndTEsRequest = 3;
   SetTGsAndTEsResponse setTGsAndTEsResponse = 4;
 
-§§  RegisterAtLMRequest registerAtLMRequest = 5;
-§§  RegisterAtLMResponse registerAtLMResponse = 6;
+  RegisterAtLMRequest registerAtLMRequest = 5;
+  RegisterAtLMResponse registerAtLMResponse = 6;
 
-§§  GetTestcaseRequest getTestcaseRequest = 7;
-§§  GetTestcaseResponse getTestcaseResponse = 8;
+  GetTestcaseRequest getTestcaseRequest = 7;
+  GetTestcaseResponse getTestcaseResponse = 8;
 
-§§  PutTestResultRequest putTestResultRequest = 9;
-§§  PutTestResultResponse putTestResultResponse = 10;
+  PutTestResultRequest putTestResultRequest = 9;
+  PutTestResultResponse putTestResultResponse = 10;
 
-§§  PutTestEvaluationRequest putTestEvaluationRequest = 11;
-§§  PutTestEvaluationResponse putTestEvaluationResponse = 12;
+  PutTestEvaluationRequest putTestEvaluationRequest = 11;
+  PutTestEvaluationResponse putTestEvaluationResponse = 12;
 
-§§  GetCurrentBlockCoverageRequest getCurrentBlockCoverageRequest = 13;
-§§  GetCurrentBlockCoverageResponse getCurrentBlockCoverageResponse = 14;
+  GetCurrentBlockCoverageRequest getCurrentBlockCoverageRequest = 13;
+  GetCurrentBlockCoverageResponse getCurrentBlockCoverageResponse = 14;
 
-§§  GetNewCompletedTestcaseIDsRequest getNewCompletedTestcaseIDsRequest = 15;
-§§  GetNewCompletedTestcaseIDsResponse getNewCompletedTestcaseIDsResponse = 16;
+  GetNewCompletedTestcaseIDsRequest getNewCompletedTestcaseIDsRequest = 15;
+  GetNewCompletedTestcaseIDsResponse getNewCompletedTestcaseIDsResponse = 16;
 
-§§  GetTestcaseToMutateRequest getTestcaseToMutateRequest = 17;
-§§  GetTestcaseToMutateResponse getTestcaseToMutateResponse = 18;
+  GetTestcaseToMutateRequest getTestcaseToMutateRequest = 17;
+  GetTestcaseToMutateResponse getTestcaseToMutateResponse = 18;
 
-§§  ReportTestcaseWithNoResultRequest reportTestcaseWithNoResultRequest = 19;
-§§  ReportTestcaseWithNoResultResponse reportTestcaseWithNoResultResponse = 20;
+  ReportTestcaseWithNoResultRequest reportTestcaseWithNoResultRequest = 19;
+  ReportTestcaseWithNoResultResponse reportTestcaseWithNoResultResponse = 20;
 
-§§  GetTestCaseChunkRequest getTestCaseChunkRequest = 21;
-§§  GetTestCaseChunkResponse getTestCaseChunkResponse = 22;
+  GetTestCaseChunkRequest getTestCaseChunkRequest = 21;
+  GetTestCaseChunkResponse getTestCaseChunkResponse = 22;
 
-§§  GetFuzzJobConfigurationRequest getFuzzJobConfigurationRequest = 23;
-§§  GetFuzzJobConfigurationResponse getFuzzJobConfigurationResponse = 24;
+  GetFuzzJobConfigurationRequest getFuzzJobConfigurationRequest = 23;
+  GetFuzzJobConfigurationResponse getFuzzJobConfigurationResponse = 24;
 
-§§  RequestTypeNotImplementedRequest requestTypeNotImplementedRequest = 25;
-§§  RequestTypeNotImplementedResponse requestTypeNotImplementedResponse = 26;
+  RequestTypeNotImplementedRequest requestTypeNotImplementedRequest = 25;
+  RequestTypeNotImplementedResponse requestTypeNotImplementedResponse = 26;
 
-§§  RegisterAtGMRequest registerAtGMRequest = 27;
-§§  RegisterAtGMResponse registerAtGMResponse = 28;
-§§
-§§  KillInstanceRequest killInstanceRequest = 29;
-§§  KillInstanceResponse killInstanceResponse = 30;
+  RegisterAtGMRequest registerAtGMRequest = 27;
+  RegisterAtGMResponse registerAtGMResponse = 28;
+
+  KillInstanceRequest killInstanceRequest = 29;
+  KillInstanceResponse killInstanceResponse = 30;
 
   IsAgentWelcomedRequest isAgentWelcomedRequest = 31;
   IsAgentWelcomedResponse isAgentWelcomedResponse = 32;
@@ -119,8 +119,8 @@ enum AgentType {
     TestcaseGenerator = 0;
     TestcaseRunner = 1;
     TestcaseEvaluator = 2;
-§§    GlobalManager = 3;
-§§    LocalManager = 4;
+    GlobalManager = 3;
+    LocalManager = 4;
 }
 
 message RegisterAtLMRequest{
@@ -153,7 +153,7 @@ message LMConfiguration{
 
 message RegisterAtGMResponse{
   oneof gmResponse {
-§§    bool retryLater = 1;
+    bool retryLater = 1;
     ServiceDescriptor lmServiceDescriptor = 2;
     LMConfiguration lmConfiguration = 3;
   }
@@ -305,13 +305,13 @@ message GetFuzzJobConfigurationResponse{
 §§  repeated BasicBlock targetBlocks = 2;
 §§  repeated Setting settings = 3;
 }
-§§
-§§message KillInstanceRequest{
-§§}
-§§
-§§message KillInstanceResponse{
-§§  bool success = 1;
-§§}
+
+message KillInstanceRequest{
+}
+
+message KillInstanceResponse{
+  bool success = 1;
+}
 
 message IsAgentWelcomedRequest{
   AgentType type = 1;

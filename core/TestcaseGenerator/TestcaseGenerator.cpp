@@ -16,7 +16,7 @@ Author(s): Thomas Riedmaier, Abian Blome, Michael Kraus, Roman Bendt
 §§#include "TestcaseDescriptor.h"
 #include "TGWorkerThreadStateBuilder.h"
 §§#include "GetTestcaseChunkRequestHandler.h"
-§§#include "KillInstanceRequestHandler.h"
+#include "KillInstanceRequestHandler.h"
 #include "TGGetStatusRequestHandler.h"
 #include "QueueCleanerWorker.h"
 #include "QueueFillerWorker.h"
@@ -24,8 +24,8 @@ Author(s): Thomas Riedmaier, Abian Blome, Michael Kraus, Roman Bendt
 #include "Util.h"
 #include "GarbageCollectorWorker.h"
 
-§§INITIALIZE_EASYLOGGINGPP
-§§
+INITIALIZE_EASYLOGGINGPP
+
 int main(int argc, char* argv[])
 {
 #ifdef HUNTMEMLEAKS
@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
 	_CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
 	_CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDOUT);
 
-§§	char* b = new char[14]{ "LEAK DETECTOR" };  //Trigger a memory leak for NEW
+	char* b = new char[14]{ "LEAK DETECTOR" };  //Trigger a memory leak for NEW
 #endif
 
 	// ################## Define / Build global objects  ##################
@@ -59,9 +59,9 @@ int main(int argc, char* argv[])
 	myAgentSubTypes.insert("RadamsaMutator");
 	myAgentSubTypes.insert("AFLMutator");
 §§	myAgentSubTypes.insert("CaRRoTMutator");
-§§	myAgentSubTypes.insert("HonggfuzzMutator");
+	myAgentSubTypes.insert("HonggfuzzMutator");
 §§	myAgentSubTypes.insert("OedipusMutator");
-§§	myAgentSubTypes.insert("ExternalMutator");
+	myAgentSubTypes.insert("ExternalMutator");
 
 	if (argc >= 3) {
 		//Get the Subtypes specified on the commandline as set
@@ -85,35 +85,35 @@ int main(int argc, char* argv[])
 	unsigned long maxAllowedTimeOfManagerInactivityMS = 10 * 60 * 1000;
 
 	//The garbage collector needs to be initialized as early as possible and deleted as late as possible
-§§	GarbageCollectorWorker* garbageCollectorWorker = new GarbageCollectorWorker(intervallBetweenTwoCollectionRoundsInMillisec);
+	GarbageCollectorWorker* garbageCollectorWorker = new GarbageCollectorWorker(intervallBetweenTwoCollectionRoundsInMillisec);
 
-§§	TGWorkerThreadStateBuilder* workerStateBuilder = new TGWorkerThreadStateBuilder();
-§§	CommInt* comm = new CommInt(workerStateBuilder, 10, 10);
+	TGWorkerThreadStateBuilder* workerStateBuilder = new TGWorkerThreadStateBuilder();
+	CommInt* comm = new CommInt(workerStateBuilder, 10, 10);
 	LOG(INFO) << std::endl << "Hey! I am TestcaseGenerator " << comm->getMyGUID() << std::endl << "My location: " << location << std::endl << "My Host and Port: " << comm->getOwnServiceDescriptor().m_serviceHostAndPort << std::endl << "I was built on: " << __DATE__;
 §§
 	// Specify path to testcase directory, preferable relative
 	std::string testcaseDir = "." + Util::pathSeperator + "testcaseFiles" + Util::pathSeperator + comm->getMyGUID();
-§§	std::string queueFillerTempDir = testcaseDir + Util::pathSeperator + "queueFillerTempDir";
+	std::string queueFillerTempDir = testcaseDir + Util::pathSeperator + "queueFillerTempDir";
 	Util::createFolderAndParentFolders(queueFillerTempDir);
 
 §§	// Queue for managing testcases
-§§	TGTestcaseManager* testcaseManager = new TGTestcaseManager(garbageCollectorWorker);
+	TGTestcaseManager* testcaseManager = new TGTestcaseManager(garbageCollectorWorker);
 §§
 	// ################## End of Define / Build global objects  ##################
 
 	// ################## Registering Message Handler  ##################
-§§	GetTestcaseRequestHandler* m_getTestcaseRequestHandler = new GetTestcaseRequestHandler(testcaseManager, testcaseDir, comm);
+	GetTestcaseRequestHandler* m_getTestcaseRequestHandler = new GetTestcaseRequestHandler(testcaseManager, testcaseDir, comm);
 	comm->registerFLUFFIMessageHandler(m_getTestcaseRequestHandler, FLUFFIMessage::FluffCase::kGetTestcaseRequest);
 §§
-§§	GetTestcaseChunkRequestHandler* m_getTestcaseChunkRequestHandler = new GetTestcaseChunkRequestHandler(testcaseDir, false, garbageCollectorWorker);
+	GetTestcaseChunkRequestHandler* m_getTestcaseChunkRequestHandler = new GetTestcaseChunkRequestHandler(testcaseDir, false, garbageCollectorWorker);
 	comm->registerFLUFFIMessageHandler(m_getTestcaseChunkRequestHandler, FLUFFIMessage::FluffCase::kGetTestCaseChunkRequest);
 §§
-§§	TGGetStatusRequestHandler* m_getStatusRequestHandler = new TGGetStatusRequestHandler(comm, testcaseManager);
+	TGGetStatusRequestHandler* m_getStatusRequestHandler = new TGGetStatusRequestHandler(comm, testcaseManager);
 	comm->registerFLUFFIMessageHandler(m_getStatusRequestHandler, FLUFFIMessage::FluffCase::kGetStatusRequest);
 
-§§	KillInstanceRequestHandler* m_killInstanceRequestHandler = new KillInstanceRequestHandler();
+	KillInstanceRequestHandler* m_killInstanceRequestHandler = new KillInstanceRequestHandler();
 	comm->registerFLUFFIMessageHandler(m_killInstanceRequestHandler, FLUFFIMessage::FluffCase::kKillInstanceRequest);
-§§
+
 	// ################## End of Registering Message Handler  ##################
 
 	// ################## Main Logic  ##################
@@ -124,7 +124,7 @@ int main(int argc, char* argv[])
 	Util::setConsoleWindowTitle("FLUFFI TG(32bit) - NO FUZZJOB YET");
 #endif
 
-§§	// Register at Global Manager
+	// Register at Global Manager
 	WorkerThreadState* workerThreadState = workerStateBuilder->constructState();
 	bool didGMRegistrationSucceed = comm->waitForGMRegistration(workerThreadState, AgentType::TestcaseGenerator, myAgentSubTypes, location, intervallBetweenTwoRegistrationRoundsInMillisec);
 	workerStateBuilder->destructState(workerThreadState);
@@ -147,18 +147,18 @@ int main(int argc, char* argv[])
 
 		// Thread that cleans the testcase queue
 		LOG(DEBUG) << "Starting QueueCleanerWorker Thread";
-§§		QueueCleanerWorker* queueCleanerWorker = new QueueCleanerWorker(comm, workerStateBuilder, intervallBetweenTwoCleaningRoundsInMillisec, maxRetriesBeforeReport, testcaseDir, testcaseManager, garbageCollectorWorker);
+		QueueCleanerWorker* queueCleanerWorker = new QueueCleanerWorker(comm, workerStateBuilder, intervallBetweenTwoCleaningRoundsInMillisec, maxRetriesBeforeReport, testcaseDir, testcaseManager, garbageCollectorWorker);
 		queueCleanerWorker->m_thread = new std::thread(&QueueCleanerWorker::workerMain, queueCleanerWorker);
 
 		// Thread that generates testcaes and puts them in the queue
 		LOG(DEBUG) << "Starting QueueFillerWorker Thread";
-§§		QueueFillerWorker* queueFillerWorker = new QueueFillerWorker(comm, workerStateBuilder, delayToWaitUntilConfigIsCompleteInMS, desiredQueueFillLevel, testcaseDir, queueFillerTempDir, testcaseManager, myAgentSubTypes, garbageCollectorWorker);
+		QueueFillerWorker* queueFillerWorker = new QueueFillerWorker(comm, workerStateBuilder, delayToWaitUntilConfigIsCompleteInMS, desiredQueueFillLevel, testcaseDir, queueFillerTempDir, testcaseManager, myAgentSubTypes, garbageCollectorWorker);
 		queueFillerWorker->m_thread = new std::thread(&QueueFillerWorker::workerMain, queueFillerWorker);
 
-§§		// Wait for a keypress or a kill message
-§§		int checkAgainMS = 250;
+		// Wait for a keypress or a kill message
+		int checkAgainMS = 250;
 		while (true)
-§§		{
+		{
 			if (Util::kbhit() != 0) {
 				LOG(INFO) << "Key Pressed -> Shutting down ...";
 				break;
@@ -175,8 +175,8 @@ int main(int argc, char* argv[])
 				LOG(INFO) << "It looks like my LocalManager was replaced -> Shutting down ...";
 				break;
 			}
-§§			std::this_thread::sleep_for(std::chrono::milliseconds(checkAgainMS));
-§§		}
+			std::this_thread::sleep_for(std::chrono::milliseconds(checkAgainMS));
+		}
 
 		//Stop worker threads
 		LOG(DEBUG) << "Stoping QueueCleanerWorker";
@@ -246,7 +246,7 @@ int main(int argc, char* argv[])
 
 	// ################## End of Destruct global objects  ##################
 
-§§	LOG(DEBUG) << "Program terminated normally :) ";
+	LOG(DEBUG) << "Program terminated normally :) ";
 
 	return 0;
 }

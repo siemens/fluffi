@@ -17,22 +17,22 @@ class GarbageCollectorWorker;
 §§class TGTestcaseManager
 §§{
 §§public:
-§§	TGTestcaseManager(GarbageCollectorWorker* garbageCollectorWorker);
+	TGTestcaseManager(GarbageCollectorWorker* garbageCollectorWorker);
 §§	~TGTestcaseManager();
 §§
 	size_t getPendingTestcaseQueueSize();
 	size_t getSentButNotEvaluatedTestcaseSetSize();
-§§	std::vector<TestcaseDescriptor> handMeAllTestcasesWithTooManyRetries(int maxRetriesBeforeReport);
-§§	TestcaseDescriptor popPendingTCForProcessing();
-§§	void pushNewGeneratedTestcase(TestcaseDescriptor newTestcase);
-§§	void pushNewGeneratedTestcases(std::deque<TestcaseDescriptor>  newTestcases);
-§§	void reinsertTestcasesHavingNoAnswerSince(std::chrono::time_point<std::chrono::steady_clock> timeBeforeWhichShouldBeReinserted);
-§§	void removeEvaluatedTestcases(const google::protobuf::RepeatedPtrField<TestcaseID>  evaluatedTestcases);
+	std::vector<TestcaseDescriptor> handMeAllTestcasesWithTooManyRetries(int maxRetriesBeforeReport);
+	TestcaseDescriptor popPendingTCForProcessing();
+	void pushNewGeneratedTestcase(TestcaseDescriptor newTestcase);
+	void pushNewGeneratedTestcases(std::deque<TestcaseDescriptor>  newTestcases);
+	void reinsertTestcasesHavingNoAnswerSince(std::chrono::time_point<std::chrono::steady_clock> timeBeforeWhichShouldBeReinserted);
+	void removeEvaluatedTestcases(const google::protobuf::RepeatedPtrField<TestcaseID>  evaluatedTestcases);
 §§
 private:
-§§	GarbageCollectorWorker* m_garbageCollectorWorker;
+	GarbageCollectorWorker* m_garbageCollectorWorker;
 
-§§	std::deque<TestcaseDescriptor> m_pendingTestcaseQueue;
+	std::deque<TestcaseDescriptor> m_pendingTestcaseQueue;
 	std::mutex m_mutex_;
-§§	std::vector<TestcaseDescriptor> m_sentButNotEvaluatedTestcaseSet;
+	std::vector<TestcaseDescriptor> m_sentButNotEvaluatedTestcaseSet;
 §§};

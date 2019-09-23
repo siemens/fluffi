@@ -8,56 +8,56 @@
 # 
 # Author(s): Abian Blome, Thomas Riedmaier
 
-§§import idaapi
-§§import ida_nalt
-§§import idautils
-§§import idc
-§§from sqlalchemy import Column, String, Integer, Boolean, ForeignKey, Date, create_engine, func
-§§from sqlalchemy.orm import relationship, sessionmaker                
-§§from sqlalchemy.ext.declarative import declarative_base
-§§import csv
-§§
-§§Base = declarative_base()
-§§
-§§class BasicBlocks(Base):
-§§    __tablename__ = 'basic_blocks'
-§§
-§§    id = Column(Integer, primary_key=True)
-§§    offset = Column(Integer)
-§§    reached = Column(Boolean)
-§§    when = Column(Date)
-§§    testcase = Column(String)
-§§
-§§    def __init__(self, offset, reached, when, testcase):
-§§        self.offset = offset
-§§        self.reached = reached
-§§        self.when = when
-§§        self.testcase = testcase
-§§
-§§filename = idaapi.ask_file(False, '*.csv', 'Please select csv')
-§§
-§§blocks = []
-§§
-§§with open(filename) as csvfile:
-§§    readCSV = csv.reader(csvfile, delimiter=";", quotechar='"')
-§§    next(readCSV)
-§§    for row in readCSV:
-§§        print row
-§§        blocks.append(int(row[4]))
-§§
-§§
-§§
-§§for bb in blocks:
-§§    absPos = bb + ida_nalt.get_imagebase()
-§§    f = idaapi.get_func(absPos)
-§§    if f is None:
-§§        continue
-§§    fc = idaapi.FlowChart(f)
-§§    # Highlight the complete function
-§§    idc.SetColor(absPos, idc.CIC_FUNC, 0xFFF000)
-§§    for block in fc:
-§§        if block.startEA <= absPos and block.endEA > absPos:
-§§            #print "Setting colour for %x" % absPos
-§§            for i in Heads(block.startEA, block.endEA):
-§§                idc.set_color(i, CIC_ITEM, 0xFFAA00)
-§§
+import idaapi
+import ida_nalt
+import idautils
+import idc
+from sqlalchemy import Column, String, Integer, Boolean, ForeignKey, Date, create_engine, func
+from sqlalchemy.orm import relationship, sessionmaker                
+from sqlalchemy.ext.declarative import declarative_base
+import csv
+
+Base = declarative_base()
+
+class BasicBlocks(Base):
+    __tablename__ = 'basic_blocks'
+
+    id = Column(Integer, primary_key=True)
+    offset = Column(Integer)
+    reached = Column(Boolean)
+    when = Column(Date)
+    testcase = Column(String)
+
+    def __init__(self, offset, reached, when, testcase):
+        self.offset = offset
+        self.reached = reached
+        self.when = when
+        self.testcase = testcase
+
+filename = idaapi.ask_file(False, '*.csv', 'Please select csv')
+
+blocks = []
+
+with open(filename) as csvfile:
+    readCSV = csv.reader(csvfile, delimiter=";", quotechar='"')
+    next(readCSV)
+    for row in readCSV:
+        print row
+        blocks.append(int(row[4]))
+
+
+
+for bb in blocks:
+    absPos = bb + ida_nalt.get_imagebase()
+    f = idaapi.get_func(absPos)
+    if f is None:
+        continue
+    fc = idaapi.FlowChart(f)
+    # Highlight the complete function
+    idc.SetColor(absPos, idc.CIC_FUNC, 0xFFF000)
+    for block in fc:
+        if block.startEA <= absPos and block.endEA > absPos:
+            #print "Setting colour for %x" % absPos
+            for i in Heads(block.startEA, block.endEA):
+                idc.set_color(i, CIC_ITEM, 0xFFAA00)
+

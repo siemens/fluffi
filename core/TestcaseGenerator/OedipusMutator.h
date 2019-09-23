@@ -7,7 +7,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-§§Author(s): Roman Bendt, Thomas Riedmaier, Abian Blome
+Author(s): Roman Bendt, Thomas Riedmaier, Abian Blome
 */
 
 §§#pragma once
@@ -29,9 +29,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 §§	std::deque<TestcaseDescriptor> batchMutate(unsigned int numToGenerate, const FluffiTestcaseID parentID, const std::string parentPathAndFilename);
 §§
 §§private:
-§§	static std::string string2hex(const std::string& input);
-§§	std::string encodedDBcredentials{ "" };
+	static std::string string2hex(const std::string& input);
+	std::string encodedDBcredentials{ "" };
 §§
-§§	CommInt* m_commInt;
+	CommInt* m_commInt;
 	TGWorkerThreadState* m_workerThreadState;
 §§};

@@ -31,7 +31,7 @@ class FluffiBasicBlock;
 class LMDatabaseManager
 §§{
 §§public:
-§§	LMDatabaseManager(GarbageCollectorWorker* garbageCollectorWorker);
+	LMDatabaseManager(GarbageCollectorWorker* garbageCollectorWorker);
 	~LMDatabaseManager();
 
 	static void setDBConnectionParameters(std::string host, std::string user, std::string pwd, std::string db);
@@ -45,7 +45,7 @@ class LMDatabaseManager
 	bool removeManagedInstance(std::string ServiceDescriptorGUID, std::string location);
 	bool deleteManagedInstanceStatusOlderThanXSec(int olderThanInSeconds);
 	bool writeManagedInstance(const FluffiServiceDescriptor serviceDescriptor, int type, std::string subtype, std::string location);
-§§	std::vector<StatusOfInstance> getStatusOfManagedInstances(std::string location);
+	std::vector<StatusOfInstance> getStatusOfManagedInstances(std::string location);
 
 	//Testcase management
 	enum TestCaseType {
@@ -60,25 +60,25 @@ class LMDatabaseManager
 	static const int defaultInitialPopulationRating = 10000;
 
 	bool addBlocksToCoveredBlocks(const FluffiTestcaseID tcID, const std::set<FluffiBasicBlock>* basicBlocks); //in order to prevent deadlocks, the basic blocks need to be inserted in a sorted order. Therefore a set (which is soted) is used to pass the basicBlocks
-§§	bool addDeltaToTestcaseRating(const FluffiTestcaseID tcID, int ratingDelta);
+	bool addDeltaToTestcaseRating(const FluffiTestcaseID tcID, int ratingDelta);
 	bool addEntriesToCompletedTestcasesTable(const std::set<FluffiTestcaseID>* testcaseIDs);
-§§	bool addEntryToCompletedTestcasesTable(const FluffiTestcaseID tcID);
+	bool addEntryToCompletedTestcasesTable(const FluffiTestcaseID tcID);
 	bool addEntryToCrashDescriptionsTable(const FluffiTestcaseID tcID, const std::string crashFootprint);
-§§	bool addEntryToInterestingTestcasesTable(const FluffiTestcaseID tcID, const FluffiTestcaseID tcparentID, int rating, const std::string testcaseDir, TestCaseType tcType);
+	bool addEntryToInterestingTestcasesTable(const FluffiTestcaseID tcID, const FluffiTestcaseID tcparentID, int rating, const std::string testcaseDir, TestCaseType tcType);
 
 	bool dropTestcaseTypeIFMoreThan(LMDatabaseManager::TestCaseType type, int instances);
 	bool dropTestcaseIfCrashFootprintAppearedMoreThanXTimes(int times, std::string crashFootprint);
 	std::deque<std::string> getAllCrashFootprints();
 
-§§	GetCurrentBlockCoverageResponse* generateGetCurrentBlockCoverageResponse();
+	GetCurrentBlockCoverageResponse* generateGetCurrentBlockCoverageResponse();
 	GetNewCompletedTestcaseIDsResponse* generateGetNewCompletedTestcaseIDsResponse(time_t lastUpdateTimeStamp);
-§§	GetTestcaseToMutateResponse* generateGetTestcaseToMutateResponse(std::string testcaseTempDir, int ratingAdaption);
+	GetTestcaseToMutateResponse* generateGetTestcaseToMutateResponse(std::string testcaseTempDir, int ratingAdaption);
 
 	bool setTestcaseType(const FluffiTestcaseID tcID, TestCaseType tcType);
 
 	//Configuration
 	std::deque<FluffiSetting> getAllSettings();
-§§	std::deque<FluffiModuleNameToID> getTargetModules();
+	std::deque<FluffiModuleNameToID> getTargetModules();
 	std::deque<FluffiBasicBlock> getTargetBlocks();
 
 	//Misc
@@ -92,13 +92,13 @@ class LMDatabaseManager
 #endif // _VSTEST
 
 §§private:
-§§	static MYSQL* establishDBConnection();
-§§	static bool setSessionParameters(MYSQL* conn);
+	static MYSQL* establishDBConnection();
+	static bool setSessionParameters(MYSQL* conn);
 
-§§	MYSQL* m_DBConnection;
-§§	GarbageCollectorWorker* m_garbageCollectorWorker;
+	MYSQL* m_DBConnection;
+	GarbageCollectorWorker* m_garbageCollectorWorker;
 
-§§	MYSQL* getDBConnection();
+	MYSQL* getDBConnection();
 
 	static std::string s_dbHost;
 	static std::string s_dbUser;
@@ -106,7 +106,7 @@ class LMDatabaseManager
 	static std::string s_dbName;
 
 	//Performance watching
-§§	std::chrono::steady_clock::time_point performanceWatchTimePoint;
-§§#define PERFORMANCE_WATCH_FUNCTION_ENTRY performanceWatchTimePoint = std::chrono::steady_clock::now();
-§§#define PERFORMANCE_WATCH_FUNCTION_EXIT(X)  if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - performanceWatchTimePoint).count()  > CommInt::timeoutNormalMessage/2) {		LOG(WARNING) << X << " is taking dangerously long to respond: "<< std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - performanceWatchTimePoint).count() ;	}
+	std::chrono::steady_clock::time_point performanceWatchTimePoint;
+#define PERFORMANCE_WATCH_FUNCTION_ENTRY performanceWatchTimePoint = std::chrono::steady_clock::now();
+#define PERFORMANCE_WATCH_FUNCTION_EXIT(X)  if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - performanceWatchTimePoint).count()  > CommInt::timeoutNormalMessage/2) {		LOG(WARNING) << X << " is taking dangerously long to respond: "<< std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - performanceWatchTimePoint).count() ;	}
 §§};

@@ -16,10 +16,10 @@
 §§SQLALCHEMY_DATABASE_URI = "mysql://root:toor@localhost/fluffi_gm" if LOCAL_DEV else "mysql://fluffi_gm:fluffi_gm@" \
 §§                                                                                    + socket.gethostbyname('db.fluffi')\
 §§                                                                                    + "/fluffi_gm"
-§§SQLALCHEMY_TRACK_MODIFICATIONS = False
-§§WTF_CSRF_ENABLED = True
-§§SECRET_KEY = "asdf"
-§§BOOTSTRAP_SERVE_LOCAL = True
+SQLALCHEMY_TRACK_MODIFICATIONS = False
+WTF_CSRF_ENABLED = True
+SECRET_KEY = "asdf"
+BOOTSTRAP_SERVE_LOCAL = True
 §§
 §§DBHOST = "localhost" if LOCAL_DEV else socket.gethostbyname('db.fluffi')
 §§DBUSER = "root" if LOCAL_DEV else "fluffi_gm"

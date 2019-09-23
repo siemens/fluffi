@@ -38,7 +38,7 @@ namespace FluffiTester
 
 			Assert::IsNotNull(thestate->m_zeroMQSockets);
 
-§§			zmq::context_t* zeroMQContext = new zmq::context_t();
+			zmq::context_t* zeroMQContext = new zmq::context_t();
 §§			zmq::socket_t* sock = new zmq::socket_t(*zeroMQContext, ZMQ_REQ); //ZMQ_REQ<->ZMQ_DEALER
 §§			zmq::socket_t* sock2 = new zmq::socket_t(*zeroMQContext, ZMQ_REQ); //ZMQ_REQ<->ZMQ_DEALER
 §§			zmq::socket_t* sock3 = new zmq::socket_t(*zeroMQContext, ZMQ_REQ); //ZMQ_REQ<->ZMQ_DEALER

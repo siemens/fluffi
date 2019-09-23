@@ -19,9 +19,9 @@ Author(s): Thomas Riedmaier, Abian Blome, Roman Bendt
 #include "GarbageCollectorWorker.h"
 #include "GDBBreakpoint.h"
 
-§§TestExecutorGDB::TestExecutorGDB(const std::string targetCMDline, int hangTimeoutMS, const std::set<Module> modulesToCover,
-§§	const std::string testcaseDir, ExternalProcess::CHILD_OUTPUT_TYPE child_output_mode, GarbageCollectorWorker* garbageCollectorWorker,
-§§	const std::string  feederCmdline, const std::string starterCmdline, int initializationTimeoutMS, int forceRestartAfterXTCs,
+TestExecutorGDB::TestExecutorGDB(const std::string targetCMDline, int hangTimeoutMS, const std::set<Module> modulesToCover,
+	const std::string testcaseDir, ExternalProcess::CHILD_OUTPUT_TYPE child_output_mode, GarbageCollectorWorker* garbageCollectorWorker,
+	const std::string  feederCmdline, const std::string starterCmdline, int initializationTimeoutMS, int forceRestartAfterXTCs,
 	std::set<FluffiBasicBlock> blocksToCover, uint32_t bpInstr, int bpInstrBytes) :
 	FluffiTestExecutor(targetCMDline, hangTimeoutMS, modulesToCover, testcaseDir, child_output_mode, "", garbageCollectorWorker), //As we rely on starters, the Environment of the target process cannot be influenced here
 	m_feederCmdline(feederCmdline),
@@ -210,12 +210,12 @@ std::shared_ptr<DebugExecutionOutput> TestExecutorGDB::execute(const FluffiTestc
 	google::protobuf::ShutdownProtobufLibrary();
 	_exit(EXIT_FAILURE); //make compiler happy;
 }
-§§
+
 bool TestExecutorGDB::isSetupFunctionable() {
 	//1)Check if targetCMDline is a functional GDB
 	{
-§§		std::chrono::time_point<std::chrono::steady_clock> routineEntryTimeStamp = std::chrono::steady_clock::now();
-§§		std::chrono::time_point<std::chrono::steady_clock> latestRoutineExitTimeStamp = routineEntryTimeStamp + std::chrono::milliseconds(500);
+		std::chrono::time_point<std::chrono::steady_clock> routineEntryTimeStamp = std::chrono::steady_clock::now();
+		std::chrono::time_point<std::chrono::steady_clock> latestRoutineExitTimeStamp = routineEntryTimeStamp + std::chrono::milliseconds(500);
 
 		ExternalProcess ep(m_targetCMDline + " --version", ExternalProcess::CHILD_OUTPUT_TYPE::SPECIAL);
 		bool success = ep.initProcess();
@@ -224,7 +224,7 @@ bool TestExecutorGDB::isSetupFunctionable() {
 			return false;
 		}
 
-§§		std::istream* is = ep.getStdOutIstream();
+		std::istream* is = ep.getStdOutIstream();
 		success = ep.run();
 		if (!success) {
 			LOG(ERROR) << "targetCMDline " << m_targetCMDline << "could not be run";
@@ -234,7 +234,7 @@ bool TestExecutorGDB::isSetupFunctionable() {
 		char identifier[8];
 		identifier[7] = 0;
 		std::streamsize charsRead = 0;
-§§		while (charsRead < 7 && std::chrono::steady_clock::now() < latestRoutineExitTimeStamp) {
+		while (charsRead < 7 && std::chrono::steady_clock::now() < latestRoutineExitTimeStamp) {
 			std::streamsize charsToRead = 7 - charsRead;
 			if (is->peek() != EOF) {
 				charsRead += is->readsome(&identifier[charsRead], charsToRead);
@@ -252,7 +252,7 @@ bool TestExecutorGDB::isSetupFunctionable() {
 #if defined(_WIN32) || defined(_WIN64)
 		std::wstring wfeedercmdline = std::wstring(m_feederCmdline.begin(), m_feederCmdline.end());
 		int numOfBlocks;
-§§		LPWSTR* szArglist = CommandLineToArgvW(wfeedercmdline.c_str(), &numOfBlocks); //for some reasons this does not exist for Ascii :(
+		LPWSTR* szArglist = CommandLineToArgvW(wfeedercmdline.c_str(), &numOfBlocks); //for some reasons this does not exist for Ascii :(
 		if (NULL == szArglist || numOfBlocks < 1) {
 			LOG(ERROR) << "feeder command line invalid";
 			return false;
@@ -298,7 +298,7 @@ bool TestExecutorGDB::isSetupFunctionable() {
 #if defined(_WIN32) || defined(_WIN64)
 	std::wstring wstartercmdline = std::wstring(m_starterCmdline.begin(), m_starterCmdline.end());
 	int numOfBlocks;
-§§	LPWSTR* szArglist = CommandLineToArgvW(wstartercmdline.c_str(), &numOfBlocks); //for some reasons this does not exist for Ascii :(
+	LPWSTR* szArglist = CommandLineToArgvW(wstartercmdline.c_str(), &numOfBlocks); //for some reasons this does not exist for Ascii :(
 	if (NULL == szArglist || numOfBlocks < 1) {
 		LOG(ERROR) << "starter command line invalid";
 		return false;
@@ -352,10 +352,10 @@ bool TestExecutorGDB::isSetupFunctionable() {
 	}
 
 	//6) check if we have a moduleid for all blocks to cover have
-§§	for (const FluffiBasicBlock& fluffiBasicBlockit : m_blocksToCover) {
+	for (const FluffiBasicBlock& fluffiBasicBlockit : m_blocksToCover) {
 		bool isThereAModule = false;
-§§		for (const Module& modIt : m_modulesToCover) {
-§§			if (fluffiBasicBlockit.m_moduleID == modIt.m_moduleid) {
+		for (const Module& modIt : m_modulesToCover) {
+			if (fluffiBasicBlockit.m_moduleID == modIt.m_moduleid) {
 				isThereAModule = true;
 				break;
 			}
@@ -394,28 +394,28 @@ bool TestExecutorGDB::isSetupFunctionable() {
 }
 
 bool TestExecutorGDB::waitUntilTargetIsBeingDebugged(std::shared_ptr<GDBThreadCommunication> gDBThreadCommunication, int timeoutMS) {
-§§	std::chrono::time_point<std::chrono::steady_clock> routineEntryTimeStamp = std::chrono::steady_clock::now();
-§§	std::chrono::time_point<std::chrono::steady_clock> latestRoutineExitTimeStamp = routineEntryTimeStamp + std::chrono::milliseconds(timeoutMS);
+	std::chrono::time_point<std::chrono::steady_clock> routineEntryTimeStamp = std::chrono::steady_clock::now();
+	std::chrono::time_point<std::chrono::steady_clock> latestRoutineExitTimeStamp = routineEntryTimeStamp + std::chrono::milliseconds(timeoutMS);
 
-§§	gDBThreadCommunication->waitForDebuggingReadyTimeout(latestRoutineExitTimeStamp - std::chrono::steady_clock::now());
+	gDBThreadCommunication->waitForDebuggingReadyTimeout(latestRoutineExitTimeStamp - std::chrono::steady_clock::now());
 
 	return gDBThreadCommunication->get_debuggingReady();
 }
 
 bool TestExecutorGDB::waitUntilCoverageState(std::shared_ptr<GDBThreadCommunication> gDBThreadCommunication, GDBThreadCommunication::COVERAGE_STATE desiredState, int timeoutMS) {
-§§	std::chrono::time_point<std::chrono::steady_clock> routineEntryTimeStamp = std::chrono::steady_clock::now();
-§§	std::chrono::time_point<std::chrono::steady_clock> latestRoutineExitTimeStamp = routineEntryTimeStamp + std::chrono::milliseconds(timeoutMS);
+	std::chrono::time_point<std::chrono::steady_clock> routineEntryTimeStamp = std::chrono::steady_clock::now();
+	std::chrono::time_point<std::chrono::steady_clock> latestRoutineExitTimeStamp = routineEntryTimeStamp + std::chrono::milliseconds(timeoutMS);
 
-§§	while (!gDBThreadCommunication->get_gdbThreadShouldTerminate() && gDBThreadCommunication->get_coverageState() != desiredState && std::chrono::steady_clock::now() < latestRoutineExitTimeStamp) {
-§§		gDBThreadCommunication->waitForTerminateMessageOrCovStateChangeTimeout(latestRoutineExitTimeStamp - std::chrono::steady_clock::now(), &desiredState, 1);
+	while (!gDBThreadCommunication->get_gdbThreadShouldTerminate() && gDBThreadCommunication->get_coverageState() != desiredState && std::chrono::steady_clock::now() < latestRoutineExitTimeStamp) {
+		gDBThreadCommunication->waitForTerminateMessageOrCovStateChangeTimeout(latestRoutineExitTimeStamp - std::chrono::steady_clock::now(), &desiredState, 1);
 	}
 
 	return gDBThreadCommunication->get_coverageState() == desiredState;
 }
 
 bool TestExecutorGDB::attemptStartTargetAndFeeder() {
-§§	std::chrono::time_point<std::chrono::steady_clock> routineEntryTimeStamp = std::chrono::steady_clock::now();
-§§	std::chrono::time_point<std::chrono::steady_clock> latestRoutineExitTimeStamp = routineEntryTimeStamp + std::chrono::milliseconds(m_initializationTimeoutMS);
+	std::chrono::time_point<std::chrono::steady_clock> routineEntryTimeStamp = std::chrono::steady_clock::now();
+	std::chrono::time_point<std::chrono::steady_clock> latestRoutineExitTimeStamp = routineEntryTimeStamp + std::chrono::milliseconds(m_initializationTimeoutMS);
 	LOG(DEBUG) << "Attempting to start target and feeder";
 
 	/*Design decission: Target is ALWAYS started before feeder.
@@ -508,7 +508,7 @@ bool TestExecutorGDB::attemptStartTargetAndFeeder() {
 	int nbytes = 0;
 	ioctl(m_SharedMemIPCInterruptFD[0], FIONREAD, &nbytes);
 	if (nbytes > 0) {
-§§		char* buff = new char[nbytes];
+		char* buff = new char[nbytes];
 		ssize_t bytesRead = read(m_SharedMemIPCInterruptFD[0], buff, nbytes);
 		delete[] buff;
 		if (bytesRead == nbytes) {
@@ -530,8 +530,8 @@ bool TestExecutorGDB::attemptStartTargetAndFeeder() {
 }
 
 #if defined(_WIN32) || defined(_WIN64)
-§§void TestExecutorGDB::debuggerThreadMain(const std::string targetCMDline, std::shared_ptr<GDBThreadCommunication> gDBThreadCommunication,
-§§	ExternalProcess::CHILD_OUTPUT_TYPE child_output_mode, const  std::string  gdbInitFile, HANDLE sharedMemIPCInterruptEvent,
+void TestExecutorGDB::debuggerThreadMain(const std::string targetCMDline, std::shared_ptr<GDBThreadCommunication> gDBThreadCommunication,
+	ExternalProcess::CHILD_OUTPUT_TYPE child_output_mode, const  std::string  gdbInitFile, HANDLE sharedMemIPCInterruptEvent,
 	const std::set<Module> modulesToCover, const std::set<FluffiBasicBlock> blocksToCover, uint32_t bpInstr, int bpInstrBytes) {
 #else
 void TestExecutorGDB::debuggerThreadMain(const std::string targetCMDline, std::shared_ptr<GDBThreadCommunication> gDBThreadCommunication, ExternalProcess::CHILD_OUTPUT_TYPE child_output_mode, const  std::string  gdbInitFile, int sharedMemIPCInterruptWriteFD, const std::set<Module> modulesToCover, const std::set<FluffiBasicBlock> blocksToCover, unsigned int bpInstr, int bpInstrBytes) {
@@ -734,7 +734,7 @@ bool TestExecutorGDB::sendCommandToGDBAndWaitForResponse(const std::string comma
 }
 
 std::string TestExecutorGDB::getCrashRVA(std::vector<tModuleAddressesAndSizes>& baseAddressesAndSizes, uint64_t signalAddress) {
-§§	for (tModuleAddressesAndSizes& baseAddressesAndSizesit : baseAddressesAndSizes) {
+	for (tModuleAddressesAndSizes& baseAddressesAndSizesit : baseAddressesAndSizes) {
 		if (std::get<1>(baseAddressesAndSizesit) < signalAddress &&std::get<1>(baseAddressesAndSizesit) + std::get<2>(baseAddressesAndSizesit) > signalAddress) {
 			std::stringstream oss;
 			oss << std::get<0>(baseAddressesAndSizesit) << "+0x" << std::hex << std::setw(8) << std::setfill('0') << signalAddress - std::get<1>(baseAddressesAndSizesit);
@@ -747,8 +747,8 @@ std::string TestExecutorGDB::getCrashRVA(std::vector<tModuleAddressesAndSizes>& 
 	return oss.str();
 }
 
-§§bool TestExecutorGDB::handleSignal(std::shared_ptr<GDBThreadCommunication> gDBThreadCommunication, std::string signalmessage,
-§§	std::map<uint64_t, GDBBreakpoint>* allBreakpoints, std::set<FluffiBasicBlock>* blocksCoveredSinceLastReset, int bpInstrBytes) {
+bool TestExecutorGDB::handleSignal(std::shared_ptr<GDBThreadCommunication> gDBThreadCommunication, std::string signalmessage,
+	std::map<uint64_t, GDBBreakpoint>* allBreakpoints, std::set<FluffiBasicBlock>* blocksCoveredSinceLastReset, int bpInstrBytes) {
 	std::string signalName;
 	std::string::size_type pos = signalmessage.find(',');
 	if (pos != std::string::npos)
@@ -841,7 +841,7 @@ std::string TestExecutorGDB::getCrashRVA(std::vector<tModuleAddressesAndSizes>& 
 		}
 	}
 
-§§	std::vector<tModuleAddressesAndSizes> baseAddressesAndSizes;
+	std::vector<tModuleAddressesAndSizes> baseAddressesAndSizes;
 	std::string infoFilesResp;
 	if (!sendCommandToGDBAndWaitForResponse("info files", &infoFilesResp, gDBThreadCommunication)) {
 		gDBThreadCommunication->m_exOutput.m_terminationType = DebugExecutionOutput::PROCESS_TERMINATION_TYPE::ERR;
@@ -849,14 +849,14 @@ std::string TestExecutorGDB::getCrashRVA(std::vector<tModuleAddressesAndSizes>& 
 		LOG(ERROR) << gDBThreadCommunication->m_exOutput.m_terminationDescription;
 		return false;
 	}
-§§	if (!getBaseAddressesAndSizes(baseAddressesAndSizes, infoFilesResp)) {
+	if (!getBaseAddressesAndSizes(baseAddressesAndSizes, infoFilesResp)) {
 		gDBThreadCommunication->m_exOutput.m_terminationType = DebugExecutionOutput::PROCESS_TERMINATION_TYPE::ERR;
 		gDBThreadCommunication->m_exOutput.m_terminationDescription = "handleSignal: \"getBaseAddressesAndSizes\" failed";
 		LOG(ERROR) << gDBThreadCommunication->m_exOutput.m_terminationDescription;
 		return false;
 	}
 
-§§	std::string crashRVA = getCrashRVA(baseAddressesAndSizes, signalAddress);
+	std::string crashRVA = getCrashRVA(baseAddressesAndSizes, signalAddress);
 
 	if (gDBThreadCommunication->m_exOutput.m_firstCrash == "") {
 		//first crash
@@ -894,8 +894,8 @@ std::string TestExecutorGDB::getCrashRVA(std::vector<tModuleAddressesAndSizes>& 
 	return true;
 }
 
-§§bool TestExecutorGDB::consumeGDBOutputQueue(std::shared_ptr<GDBThreadCommunication> gDBThreadCommunication,
-§§	std::set<FluffiBasicBlock>* blocksCoveredSinceLastReset, std::map<uint64_t, GDBBreakpoint>* allBreakpoints, int bpInstrBytes) {
+bool TestExecutorGDB::consumeGDBOutputQueue(std::shared_ptr<GDBThreadCommunication> gDBThreadCommunication,
+	std::set<FluffiBasicBlock>* blocksCoveredSinceLastReset, std::map<uint64_t, GDBBreakpoint>* allBreakpoints, int bpInstrBytes) {
 	while (gDBThreadCommunication->get_gdbOutputQueue_size() > 0) {
 		std::string line = gDBThreadCommunication->gdbOutputQueue_pop_front();
 		if (line.find_first_not_of(" \t\f\v\n\r", 0) != std::string::npos) {
@@ -946,11 +946,11 @@ std::string TestExecutorGDB::generateEnableAllCommand(std::map<uint64_t, GDBBrea
 	std::stringstream oss;
 
 	typedef std::pair<const uint64_t, GDBBreakpoint> breakpointPair;
-§§	for (breakpointPair& it : allBreakpoints)
+	for (breakpointPair& it : allBreakpoints)
 	{
-§§		if (!it.second.m_isEnabled) {
+		if (!it.second.m_isEnabled) {
 			//It will be enabled now
-§§			it.second.m_isEnabled = true;
+			it.second.m_isEnabled = true;
 
 			switch (bpInstrBytes)
 			{
@@ -974,7 +974,7 @@ std::string TestExecutorGDB::generateEnableAllCommand(std::map<uint64_t, GDBBrea
 	return oss.str();
 }
 
-§§void TestExecutorGDB::gdbDebug(std::shared_ptr<GDBThreadCommunication> gDBThreadCommunication, const std::set<Module> modulesToCover,
+void TestExecutorGDB::gdbDebug(std::shared_ptr<GDBThreadCommunication> gDBThreadCommunication, const std::set<Module> modulesToCover,
 	const std::set<FluffiBasicBlock> blocksToCover, uint32_t bpInstr, int bpInstrBytes) {
 	std::map<uint64_t, GDBBreakpoint> allBreakpoints;
 	if (!gdbPrepareForDebug(gDBThreadCommunication, modulesToCover, blocksToCover, &allBreakpoints, bpInstrBytes)) {
@@ -1013,7 +1013,7 @@ std::string TestExecutorGDB::generateEnableAllCommand(std::map<uint64_t, GDBBrea
 			std::string resp;
 			bool noProblem = false;
 			while (true) {
-§§				noProblem = sendCommandToGDBAndWaitForResponse(generateEnableAllCommand(allBreakpoints, bpInstr, bpInstrBytes), &resp, gDBThreadCommunication, true);
+				noProblem = sendCommandToGDBAndWaitForResponse(generateEnableAllCommand(allBreakpoints, bpInstr, bpInstrBytes), &resp, gDBThreadCommunication, true);
 				if (noProblem) {
 					break;
 				}
@@ -1057,8 +1057,8 @@ std::string TestExecutorGDB::generateEnableAllCommand(std::map<uint64_t, GDBBrea
 §§				gDBThreadCommunication->m_exOutput.swapBlockVectorWith(t);
 			}
 
-§§			for (const FluffiBasicBlock& blockIt : blocksCoveredSinceLastReset) {
-§§				gDBThreadCommunication->m_exOutput.addCoveredBasicBlock(blockIt);
+			for (const FluffiBasicBlock& blockIt : blocksCoveredSinceLastReset) {
+				gDBThreadCommunication->m_exOutput.addCoveredBasicBlock(blockIt);
 			}
 
 			gDBThreadCommunication->set_coverageState(GDBThreadCommunication::COVERAGE_STATE::DUMPED);
@@ -1071,8 +1071,8 @@ std::string TestExecutorGDB::generateEnableAllCommand(std::map<uint64_t, GDBBrea
 	}
 }
 
-§§bool TestExecutorGDB::gdbPrepareForDebug(std::shared_ptr<GDBThreadCommunication> gDBThreadCommunication, const std::set<Module> modulesToCover,
-§§	const std::set<FluffiBasicBlock> blocksToCover, std::map<uint64_t, GDBBreakpoint>* allBreakpoints, int bpInstrBytes) {
+bool TestExecutorGDB::gdbPrepareForDebug(std::shared_ptr<GDBThreadCommunication> gDBThreadCommunication, const std::set<Module> modulesToCover,
+	const std::set<FluffiBasicBlock> blocksToCover, std::map<uint64_t, GDBBreakpoint>* allBreakpoints, int bpInstrBytes) {
 	if (gDBThreadCommunication->get_gdbOutputQueue_size() != 0) {
 		gDBThreadCommunication->m_exOutput.m_terminationType = DebugExecutionOutput::PROCESS_TERMINATION_TYPE::ERR;
 		gDBThreadCommunication->m_exOutput.m_terminationDescription = "GDB initialization failed: we got a message when we did not expect it:" + gDBThreadCommunication->gdbOutputQueue_pop_front();
@@ -1192,7 +1192,7 @@ std::string TestExecutorGDB::generateEnableAllCommand(std::map<uint64_t, GDBBrea
 	//Fill the allBreakpoints map: 1 - Generate the statement to get all "real" bytes where we will set the breakpoints
 	std::stringstream breakpointsToSetSS;
 	bool isFirstBreak = true;
-§§	for (const FluffiBasicBlock& basicBlockIt : blocksToCover) {
+	for (const FluffiBasicBlock& basicBlockIt : blocksToCover) {
 		if (isFirstBreak) {
 			isFirstBreak = false;
 		}
@@ -1202,13 +1202,13 @@ std::string TestExecutorGDB::generateEnableAllCommand(std::map<uint64_t, GDBBrea
 		switch (bpInstrBytes)
 		{
 		case 1:
-§§			breakpointsToSetSS << "x/1xb 0x" << std::hex << basicBlockIt.m_rva + baseMap[basicBlockIt.m_moduleID];
+			breakpointsToSetSS << "x/1xb 0x" << std::hex << basicBlockIt.m_rva + baseMap[basicBlockIt.m_moduleID];
 			break;
 		case 2:
-§§			breakpointsToSetSS << "x/1xh 0x" << std::hex << basicBlockIt.m_rva + baseMap[basicBlockIt.m_moduleID];
+			breakpointsToSetSS << "x/1xh 0x" << std::hex << basicBlockIt.m_rva + baseMap[basicBlockIt.m_moduleID];
 			break;
 		case 4:
-§§			breakpointsToSetSS << "x/1xw 0x" << std::hex << basicBlockIt.m_rva + baseMap[basicBlockIt.m_moduleID];
+			breakpointsToSetSS << "x/1xw 0x" << std::hex << basicBlockIt.m_rva + baseMap[basicBlockIt.m_moduleID];
 			break;
 		default:
 			LOG(ERROR) << "Reached a code path in gdbPrepareForDebug, that should be unreachable";
@@ -1228,7 +1228,7 @@ std::string TestExecutorGDB::generateEnableAllCommand(std::map<uint64_t, GDBBrea
 	allBreakpoints->clear();
 	std::vector<std::string> lines = Util::splitString(resp, "\n");
 	std::set<FluffiBasicBlock>::iterator fbbIt = blocksToCover.begin();
-§§	for (std::string& linesIt : lines) {
+	for (std::string& linesIt : lines) {
 		try {
 			uint64_t absAddress = (*fbbIt).m_rva + baseMap[(*fbbIt).m_moduleID];
 			if (std::stoull(linesIt.c_str(), 0, 16) == absAddress && linesIt.find_first_of(":") != std::string::npos) {
@@ -1242,7 +1242,7 @@ std::string TestExecutorGDB::generateEnableAllCommand(std::map<uint64_t, GDBBrea
 				}
 			}
 			else {
-§§				LOG(DEBUG) << "Read line \"" << linesIt << "\" when parsing the getting-all-real-breakpoint-bytes output.";
+				LOG(DEBUG) << "Read line \"" << linesIt << "\" when parsing the getting-all-real-breakpoint-bytes output.";
 				continue;
 			}
 		}
@@ -1263,7 +1263,7 @@ std::string TestExecutorGDB::generateEnableAllCommand(std::map<uint64_t, GDBBrea
 	return true;
 }
 
-§§bool TestExecutorGDB::getBaseAddressesForModules(std::map<int, uint64_t>* modmap, const std::set<Module> modulesToCover, std::string parseInfoOutput) {
+bool TestExecutorGDB::getBaseAddressesForModules(std::map<int, uint64_t>* modmap, const std::set<Module> modulesToCover, std::string parseInfoOutput) {
 	//Check for the NULL module
 	for (std::set<Module>::iterator it = modulesToCover.begin(); it != modulesToCover.end(); ++it) {
 		if ((*it).m_modulename == "" || (*it).m_modulename == "NULL" || (*it).m_modulename == "0") {
@@ -1272,7 +1272,7 @@ std::string TestExecutorGDB::generateEnableAllCommand(std::map<uint64_t, GDBBrea
 	}
 
 	std::vector<tModuleInformation>  loadedFiles;
-§§	if (!parseInfoFiles(loadedFiles, parseInfoOutput)) {
+	if (!parseInfoFiles(loadedFiles, parseInfoOutput)) {
 		return false;
 	}
 
@@ -1288,49 +1288,49 @@ std::string TestExecutorGDB::generateEnableAllCommand(std::map<uint64_t, GDBBrea
 	return true;
 }
 
-§§bool TestExecutorGDB::getBaseAddressesAndSizes(std::vector<tModuleAddressesAndSizes>& outBaseAddressesAndSizes, std::string parseInfoOutput) {
-§§	// start, end, name, segmentname, path
-§§	std::vector<tModuleInformation> loadedFiles;
-§§
-§§	if (!parseInfoFiles(loadedFiles, parseInfoOutput)) {
+bool TestExecutorGDB::getBaseAddressesAndSizes(std::vector<tModuleAddressesAndSizes>& outBaseAddressesAndSizes, std::string parseInfoOutput) {
+	// start, end, name, segmentname, path
+	std::vector<tModuleInformation> loadedFiles;
+
+	if (!parseInfoFiles(loadedFiles, parseInfoOutput)) {
 		return false;
 	}
 
-§§	using std::get;
-§§	for (tModuleInformation& loadedFilesIT : loadedFiles) {
-§§		outBaseAddressesAndSizes.push_back(
-§§			std::make_tuple(
-§§				get<2>(loadedFilesIT) + "/" + get<3>(loadedFilesIT),
-§§				get<0>(loadedFilesIT),
-§§				get<1>(loadedFilesIT) - get<0>(loadedFilesIT)
-§§			)
-§§		);
+	using std::get;
+	for (tModuleInformation& loadedFilesIT : loadedFiles) {
+		outBaseAddressesAndSizes.push_back(
+			std::make_tuple(
+				get<2>(loadedFilesIT) + "/" + get<3>(loadedFilesIT),
+				get<0>(loadedFilesIT),
+				get<1>(loadedFilesIT) - get<0>(loadedFilesIT)
+			)
+		);
 	}
 
 	return true;
 }
 
-§§bool TestExecutorGDB::parseInfoFiles(std::vector<tModuleInformation>& loadedFiles, std::string infoFilesResp) {
+bool TestExecutorGDB::parseInfoFiles(std::vector<tModuleInformation>& loadedFiles, std::string infoFilesResp) {
 	std::vector<std::string> lines = Util::splitString(infoFilesResp, "\n");
 
 	bool reachedMainPart = false;
 	std::string procName = "";
 	std::string procPath = "";
-§§	for (std::string& lineIt : lines) {
+	for (std::string& lineIt : lines) {
 		//Skip all lines until the list of files
 		if (!reachedMainPart) {
-§§			if (lineIt.substr(0, 5) == "Local") {
+			if (lineIt.substr(0, 5) == "Local") {
 				reachedMainPart = true;
 			}
 			continue;
 		}
 
 		//Is this the line that contains the file name? If yes: extract main module name and path
-§§		if (lineIt.find("file type") != std::string::npos) {
-§§			size_t start = lineIt.find_first_of(0x60, 0);
-§§			size_t end = lineIt.find_first_of(0x27, 0);
+		if (lineIt.find("file type") != std::string::npos) {
+			size_t start = lineIt.find_first_of(0x60, 0);
+			size_t end = lineIt.find_first_of(0x27, 0);
 			if (start != std::string::npos && end != std::string::npos) {
-§§				std::string mainPathAndName = lineIt.substr(start + 1, end - start - 1);
+				std::string mainPathAndName = lineIt.substr(start + 1, end - start - 1);
 				std::tuple<std::string, std::string> directoryAndFilename = Util::splitPathIntoDirectoryAndFileName(mainPathAndName);
 				procName = std::get<1>(directoryAndFilename);
 				procPath = std::get<0>(directoryAndFilename);
@@ -1339,12 +1339,12 @@ std::string TestExecutorGDB::generateEnableAllCommand(std::map<uint64_t, GDBBrea
 		}
 
 		//Parse each line
-§§		size_t actualLineStart = lineIt.find_first_not_of(" \t\f\v\n\r", 0);
-§§		size_t actualLineEnd = lineIt.find_last_not_of(" \t\f\v\n\r", lineIt.length());
+		size_t actualLineStart = lineIt.find_first_not_of(" \t\f\v\n\r", 0);
+		size_t actualLineEnd = lineIt.find_last_not_of(" \t\f\v\n\r", lineIt.length());
 		if (actualLineStart == std::string::npos || actualLineEnd == std::string::npos) {
 			continue;
 		}
-§§		std::string trimmedLine = lineIt.substr(actualLineStart, actualLineEnd - actualLineStart + 1);
+		std::string trimmedLine = lineIt.substr(actualLineStart, actualLineEnd - actualLineStart + 1);
 		size_t isPos = trimmedLine.find("is ");
 		if (isPos != std::string::npos) {
 			std::string afterIs = trimmedLine.substr(isPos + 3);
@@ -1379,11 +1379,11 @@ std::string TestExecutorGDB::generateEnableAllCommand(std::map<uint64_t, GDBBrea
 				_exit(EXIT_FAILURE); //make compiler happy
 			}
 
-§§			loadedFiles.push_back(std::make_tuple(currentStartAddress,
-§§				currentEndAddress,
-§§				currentName,
-§§				currentSegmentName,
-§§				currentPath));
+			loadedFiles.push_back(std::make_tuple(currentStartAddress,
+				currentEndAddress,
+				currentName,
+				currentSegmentName,
+				currentPath));
 		}
 	}
 
@@ -1402,13 +1402,13 @@ void TestExecutorGDB::gdbLinereaderThread(std::shared_ptr<GDBThreadCommunication
 			continue;
 		}
 
-§§		char* buff = new char[totalBytesAvail];
+		char* buff = new char[totalBytesAvail];
 		ReadFile(inputHandleFromGdb, buff, totalBytesAvail, &bytesRead, NULL);
 		if (totalBytesAvail != bytesRead) {
 #else
 	int nbytes = 0;
 §§	while (!gDBThreadCommunication->get_gdbThreadShouldTerminate() && 0 != ioctl(inputHandleFromGdb, FIONREAD, &nbytes)) {
-§§		char* buff = new char[nbytes];
+		char* buff = new char[nbytes];
 §§		ssize_t bytesRead = read(inputHandleFromGdb, buff, nbytes);
 §§		if (bytesRead != nbytes) {
 #endif
@@ -1461,8 +1461,8 @@ void TestExecutorGDB::gdbLinereaderThread(std::shared_ptr<GDBThreadCommunication
 }
 
 bool TestExecutorGDB::runSingleTestcase(const FluffiTestcaseID testcaseId, std::shared_ptr<DebugExecutionOutput> exResult, CoverageMode covMode) {
-§§	std::chrono::time_point<std::chrono::steady_clock> routineEntryTimeStamp = std::chrono::steady_clock::now();
-§§	std::chrono::time_point<std::chrono::steady_clock> latestRoutineExitTimeStamp = routineEntryTimeStamp + std::chrono::milliseconds(m_hangTimeoutMS);
+	std::chrono::time_point<std::chrono::steady_clock> routineEntryTimeStamp = std::chrono::steady_clock::now();
+	std::chrono::time_point<std::chrono::steady_clock> latestRoutineExitTimeStamp = routineEntryTimeStamp + std::chrono::milliseconds(m_hangTimeoutMS);
 	LOG(DEBUG) << "runSingleTestcase:" << testcaseId << " in covMode " << ((covMode == CoverageMode::FULL) ? "FULL" : ((covMode == CoverageMode::NONE) ? "NONE" : "PARTIAL"));
 
 	if (covMode != CoverageMode::NONE) {
@@ -1540,13 +1540,13 @@ bool TestExecutorGDB::runSingleTestcase(const FluffiTestcaseID testcaseId, std::
 }
 
 void TestExecutorGDB::waitForDebuggerToTerminate() {
-§§	std::chrono::time_point<std::chrono::steady_clock> routineEntryTimeStamp = std::chrono::steady_clock::now();
-§§	std::chrono::time_point<std::chrono::steady_clock> timestampToKillTheTarget = routineEntryTimeStamp + std::chrono::milliseconds(m_hangTimeoutMS);
+	std::chrono::time_point<std::chrono::steady_clock> routineEntryTimeStamp = std::chrono::steady_clock::now();
+	std::chrono::time_point<std::chrono::steady_clock> timestampToKillTheTarget = routineEntryTimeStamp + std::chrono::milliseconds(m_hangTimeoutMS);
 	bool targetKilled = false;
 	LOG(DEBUG) << "Waiting for the debugger thread to terminate.";
 	while (!m_gDBThreadCommunication->m_exOutput.m_debuggerThreadDone) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
-§§		if (!targetKilled && std::chrono::steady_clock::now() > timestampToKillTheTarget) {
+		if (!targetKilled && std::chrono::steady_clock::now() > timestampToKillTheTarget) {
 			LOG(DEBUG) << "Waiting sucks - killing the target.";
 			m_gDBThreadCommunication->set_gdbThreadShouldTerminate(); //In case the crash is not reproducible, terminate gdb to avoid race conditions. This should also kill the target.
 			targetKilled = true;

@@ -16,7 +16,7 @@ Author(s): Thomas Riedmaier, Abian Blome, Michael Kraus, Roman Bendt
 §§#include "PutTestResultRequestHandler.h"
 #include "TEGetStatusRequestHandler.h"
 #include "GetTestcaseChunkRequestHandler.h"
-§§#include "KillInstanceRequestHandler.h"
+#include "KillInstanceRequestHandler.h"
 #include "TEMainWorker.h"
 #include "CoveragePullerWorker.h"
 #include "BlockCoverageCache.h"
@@ -24,8 +24,8 @@ Author(s): Thomas Riedmaier, Abian Blome, Michael Kraus, Roman Bendt
 #include "Util.h"
 #include "TETestResultManager.h"
 
-§§INITIALIZE_EASYLOGGINGPP
-§§
+INITIALIZE_EASYLOGGINGPP
+
 int main(int argc, char* argv[])
 {
 #ifdef HUNTMEMLEAKS
@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
 	_CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
 	_CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDOUT);
 
-§§	char* b = new char[14]{ "LEAK DETECTOR" };  //Trigger a memory leak for NEW
+	char* b = new char[14]{ "LEAK DETECTOR" };  //Trigger a memory leak for NEW
 #endif
 
 	// ################## Define / Build global objects  ##################
@@ -78,10 +78,10 @@ int main(int argc, char* argv[])
 	unsigned long maxAllowedTimeOfManagerInactivityMS = 10 * 60 * 1000;
 §§
 	//The garbage collector needs to be initialized as early as possible and deleted as late as possible
-§§	GarbageCollectorWorker* garbageCollectorWorker = new GarbageCollectorWorker(intervallBetweenTwoCollectionRoundsInMillisec);
+	GarbageCollectorWorker* garbageCollectorWorker = new GarbageCollectorWorker(intervallBetweenTwoCollectionRoundsInMillisec);
 
-§§	TEWorkerThreadStateBuilder* workerStateBuilder = new TEWorkerThreadStateBuilder();
-§§	CommInt* comm = new CommInt(workerStateBuilder, 10, 10);
+	TEWorkerThreadStateBuilder* workerStateBuilder = new TEWorkerThreadStateBuilder();
+	CommInt* comm = new CommInt(workerStateBuilder, 10, 10);
 	LOG(INFO) << std::endl << "Hey! I am TestcaseEvaluator " << comm->getMyGUID() << std::endl << "My location: " << location << std::endl << "My Host and Port: " << comm->getOwnServiceDescriptor().m_serviceHostAndPort << std::endl << "I was built on: " << __DATE__;
 
 	// Specify path to testcase directory, preferable relative
@@ -89,26 +89,26 @@ int main(int argc, char* argv[])
 	Util::createFolderAndParentFolders(testcaseDir);
 
 	// Queue for managing test results
-§§	TETestResultManager* trestresultManager = new TETestResultManager(testcaseDir, garbageCollectorWorker);
+	TETestResultManager* trestresultManager = new TETestResultManager(testcaseDir, garbageCollectorWorker);
 
 	// Create a local block coverage cache
-§§	BlockCoverageCache* localBlockCoverageCache = new BlockCoverageCache();
+	BlockCoverageCache* localBlockCoverageCache = new BlockCoverageCache();
 
 	// ################## End of Define / Build global objects  ##################
 
 	// ################## Registering Message Handler  ##################
-§§	PutTestResultRequestHandler* m_putTestResultRequestHandler = new PutTestResultRequestHandler(testcaseDir, comm, trestresultManager, garbageCollectorWorker);
+	PutTestResultRequestHandler* m_putTestResultRequestHandler = new PutTestResultRequestHandler(testcaseDir, comm, trestresultManager, garbageCollectorWorker);
 	comm->registerFLUFFIMessageHandler(m_putTestResultRequestHandler, FLUFFIMessage::FluffCase::kPutTestResultRequest);
 §§
-§§	TEGetStatusRequestHandler* m_getStatusRequestHandler = new TEGetStatusRequestHandler(comm, trestresultManager);
+	TEGetStatusRequestHandler* m_getStatusRequestHandler = new TEGetStatusRequestHandler(comm, trestresultManager);
 	comm->registerFLUFFIMessageHandler(m_getStatusRequestHandler, FLUFFIMessage::FluffCase::kGetStatusRequest);
 
-§§	GetTestcaseChunkRequestHandler* m_getTestcaseChunkRequestHandler = new GetTestcaseChunkRequestHandler(testcaseDir, true, garbageCollectorWorker);
+	GetTestcaseChunkRequestHandler* m_getTestcaseChunkRequestHandler = new GetTestcaseChunkRequestHandler(testcaseDir, true, garbageCollectorWorker);
 	comm->registerFLUFFIMessageHandler(m_getTestcaseChunkRequestHandler, FLUFFIMessage::FluffCase::kGetTestCaseChunkRequest);
 
-§§	KillInstanceRequestHandler* m_killInstanceRequestHandler = new KillInstanceRequestHandler();
+	KillInstanceRequestHandler* m_killInstanceRequestHandler = new KillInstanceRequestHandler();
 	comm->registerFLUFFIMessageHandler(m_killInstanceRequestHandler, FLUFFIMessage::FluffCase::kKillInstanceRequest);
-§§
+
 	// ################## End of Registering Message Handler  ##################
 
 	// ################## Main Logic  ##################
@@ -119,7 +119,7 @@ int main(int argc, char* argv[])
 	Util::setConsoleWindowTitle("FLUFFI TE(32bit) - NO FUZZJOB YET");
 #endif
 
-§§	// Register at Global Manager
+	// Register at Global Manager
 	WorkerThreadState* workerThreadState = workerStateBuilder->constructState();
 	bool didGMRegistrationSucceed = comm->waitForGMRegistration(workerThreadState, AgentType::TestcaseEvaluator, myAgentSubTypes, location, intervallBetweenTwoRegistrationRoundsInMillisec);
 	workerStateBuilder->destructState(workerThreadState);
@@ -142,18 +142,18 @@ int main(int argc, char* argv[])
 
 		// The CoveragePullerWorker thread
 		LOG(DEBUG) << "Starting CoveragePullerWorker Thread";
-§§		CoveragePullerWorker* coveragePullerWorker = new CoveragePullerWorker(comm, workerStateBuilder, intervallBetweenTwoPullingRoundsInMillisec, localBlockCoverageCache);
+		CoveragePullerWorker* coveragePullerWorker = new CoveragePullerWorker(comm, workerStateBuilder, intervallBetweenTwoPullingRoundsInMillisec, localBlockCoverageCache);
 		coveragePullerWorker->m_thread = new std::thread(&CoveragePullerWorker::workerMain, coveragePullerWorker);
 
 		// The TEMainWorker thread
 		LOG(DEBUG) << "Starting TEMainWorker Thread";
-§§		TEMainWorker* teMainWorker = new TEMainWorker(comm, workerStateBuilder, delayToWaitUntilConfigIsCompleteInMS, trestresultManager, testcaseDir, localBlockCoverageCache, myAgentSubTypes, garbageCollectorWorker);
+		TEMainWorker* teMainWorker = new TEMainWorker(comm, workerStateBuilder, delayToWaitUntilConfigIsCompleteInMS, trestresultManager, testcaseDir, localBlockCoverageCache, myAgentSubTypes, garbageCollectorWorker);
 		teMainWorker->m_thread = new std::thread(&TEMainWorker::workerMain, teMainWorker);
 
-§§		// Wait for a keypress or a kill message
-§§		int checkAgainMS = 250;
+		// Wait for a keypress or a kill message
+		int checkAgainMS = 250;
 		while (true)
-§§		{
+		{
 			if (Util::kbhit() != 0) {
 				LOG(INFO) << "Key Pressed -> Shutting down ...";
 				break;
@@ -170,8 +170,8 @@ int main(int argc, char* argv[])
 				LOG(INFO) << "It looks like my LocalManager was replaced -> Shutting down ...";
 				break;
 			}
-§§			std::this_thread::sleep_for(std::chrono::milliseconds(checkAgainMS));
-§§		}
+			std::this_thread::sleep_for(std::chrono::milliseconds(checkAgainMS));
+		}
 
 		//Stop worker threads
 		LOG(DEBUG) << "Stoping TEMainWorker";
@@ -185,10 +185,10 @@ int main(int argc, char* argv[])
 
 		teMainWorker->m_thread->join();
 		delete teMainWorker;
-§§		teMainWorker = nullptr;
+		teMainWorker = nullptr;
 		coveragePullerWorker->m_thread->join();
 		delete coveragePullerWorker;
-§§		coveragePullerWorker = nullptr;
+		coveragePullerWorker = nullptr;
 		garbageCollectorWorker->m_thread->join();
 		//delete garbageCollectorWorker IS NOT DONE HERE ON PURPOSE. It is done at the very end as it's destructor is supposed to remove all files
 	}
@@ -237,7 +237,7 @@ int main(int argc, char* argv[])
 
 	// ################## End of Destruct global objects  ##################
 
-§§	LOG(DEBUG) << "Program terminated normally :)";
+	LOG(DEBUG) << "Program terminated normally :)";
 
 	return 0;
 }
