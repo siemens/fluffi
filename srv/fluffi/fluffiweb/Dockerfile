@@ -9,7 +9,7 @@
 # Author(s): Thomas Riedmaier, Fabian Russwurm, Junes Najah, Roman Bendt
 
 FROM tiangolo/uwsgi-nginx-flask:python3.6-alpine3.7
-§§
+
 # Install mariadb-client
 RUN apk --no-cache --no-progress upgrade && \
     apk --no-cache --no-progress add mariadb-client
@@ -19,9 +19,9 @@ RUN apk --no-cache --no-progress upgrade && \
 §§ENV UWSGI_INI /app/uwsgi.ini
 §§ENV FLASK_DEBUG 1
 ENV STATIC_PATH /app/app/static
-§§
-§§COPY requirements.txt /tmp/
-§§
+
+COPY requirements.txt /tmp/
+
 §§#RUN pip3 install -U pip
-§§RUN pip3 install -r /tmp/requirements.txt
+RUN pip3 install -r /tmp/requirements.txt
 

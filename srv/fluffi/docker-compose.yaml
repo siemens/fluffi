@@ -8,20 +8,20 @@
 # 
 # Author(s): Roman Bendt, Thomas Riedmaier, Fabian Russwurm
 
-§§# -*- coding: utf-8 -*-
-§§# vim: ts=4 et sw=4 sts=4 expandtab
+# -*- coding: utf-8 -*-
+# vim: ts=4 et sw=4 sts=4 expandtab
 version: '2'
-§§services:
-§§    # DHCP, DNS, TFPT
-§§    dnsmasq:
+services:
+    # DHCP, DNS, TFPT
+    dnsmasq:
         build: ./dnsmasq
         restart: always
-§§        cap_add:
-§§            - NET_ADMIN
+        cap_add:
+            - NET_ADMIN
         network_mode: host
         # there are no ports here, because nwmode host lets
         # the container bind to whatever it wants anyway.
-§§        volumes:
+        volumes:
             - /etc/localtime:/etc/localtime:ro
             - ./data/dnsmasq/resolv.conf:/etc/resolv.conf
             - ./data/dnsmasq/hosts:/etc/hosts
@@ -57,29 +57,29 @@ version: '2'
             - SYS_RESOURCE
             - SYS_TIME
         dns: 10.66.0.1
-§§    ftp:
+    ftp:
         build: ./ftp
         restart: always
-§§        volumes:
+        volumes:
             - /etc/localtime:/etc/localtime:ro
             - ./data/ftp/vsftpd.conf:/etc/vsftpd.conf
             - ./data/ftp/run.sh:/run.sh
             - ./data/ftp/files:/var/ftp
               # - /srv/xferlog:/var/log/xferlog
               # - /srv/vsftpd.log:/var/log/vsftpd.log
-§§        ports:
+        ports:
             - 20-21:20-21
             - 65500-65515:65500-65515
         dns: 10.66.0.1
-§§    smb:
+    smb:
         build: ./smb
         restart: always
         command: '-s "install;/files;yes;no;yes"'
-§§        volumes:
+        volumes:
             - /etc/localtime:/etc/localtime:ro
             - ./data/smb/files:/files
             - ./data/smb/samba.sh:/usr/bin/samba.sh
-§§        ports:
+        ports:
             - 137:137/udp
             - 138:138/udp
             - 139:139/tcp

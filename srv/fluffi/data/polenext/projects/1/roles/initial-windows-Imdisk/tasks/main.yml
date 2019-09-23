@@ -8,50 +8,50 @@
 # 
 # Author(s): Fabian Russwurm, Thomas Riedmaier
 
-§§- name: Check architecture for x86 installer
-§§  set_fact:
-§§    ImdiskInstallerFileName: "{{ImdiskInstallerX32FileName}}"
-§§  when: ansible_architecture == "32-bit"
-§§
-§§- name: Fetch ImDisk installer from "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{ImdiskFTPDirname}}/{{ImdiskInstallerFileName}}"
-§§  win_get_url: 
-§§    url: "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{ImdiskFTPDirname}}/{{ImdiskInstallerFileName}}"
-§§    dest: "{{remoteUtilitiesFilePath}}{{ImdiskInstallerFileName}}"
-§§
-§§- name: Install imdisk by executing {{ImdiskInstallerFileName}}
-§§  win_package:
-§§    path: "{{remoteUtilitiesFilePath}}{{ImdiskInstallerFileName}}"
-§§    product_id: imdisk
-§§    arguments: /fullsilent
-§§
-§§- name: Create new ramdisk
-§§  win_command: "imdisk -a -s {{RamDiskSize}} -m {{ramDiskMountpointLetter}}: -p \"/fs:ntfs /q /y\""
-§§  args:
-§§    creates: "{{ramDiskMountpointLetter}}:\\"
-§§
-§§- name: Ensure startup script directory exists
-§§  win_file:
-§§    path: "{{startupscriptDirectory}}"
-§§    state: directory
-§§
-§§- name: Copy startup script to machine
-§§  win_template:
-§§    src: "{{startupscriptFilename}}"
-§§    dest: "{{startupscriptDirectory}}\\{{startupscriptFilename}}"
+- name: Check architecture for x86 installer
+  set_fact:
+    ImdiskInstallerFileName: "{{ImdiskInstallerX32FileName}}"
+  when: ansible_architecture == "32-bit"
+
+- name: Fetch ImDisk installer from "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{ImdiskFTPDirname}}/{{ImdiskInstallerFileName}}"
+  win_get_url: 
+    url: "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{ImdiskFTPDirname}}/{{ImdiskInstallerFileName}}"
+    dest: "{{remoteUtilitiesFilePath}}{{ImdiskInstallerFileName}}"
+
+- name: Install imdisk by executing {{ImdiskInstallerFileName}}
+  win_package:
+    path: "{{remoteUtilitiesFilePath}}{{ImdiskInstallerFileName}}"
+    product_id: imdisk
+    arguments: /fullsilent
+
+- name: Create new ramdisk
+  win_command: "imdisk -a -s {{RamDiskSize}} -m {{ramDiskMountpointLetter}}: -p \"/fs:ntfs /q /y\""
+  args:
+    creates: "{{ramDiskMountpointLetter}}:\\"
+
+- name: Ensure startup script directory exists
+  win_file:
+    path: "{{startupscriptDirectory}}"
+    state: directory
+
+- name: Copy startup script to machine
+  win_template:
+    src: "{{startupscriptFilename}}"
+    dest: "{{startupscriptDirectory}}\\{{startupscriptFilename}}"
   ignore_errors: True
-§§
-§§- name: Add task schedule to run script at start up
-§§  win_scheduled_task:
-§§    name: syncFluffiToRAM
-§§    description: This service creates and sync the persistent file to a ram disk
-§§    actions:
-§§    - path: "{{startupscriptDirectory}}\\{{startupscriptFilename}}"
-§§    triggers:
-§§    - type: boot
-§§    username: "{{ansible_user}}"
-§§    password: "{{ansible_password}}"
-§§    logon_type: password
-§§    start_when_available: no
-§§    run_level: highest
-§§    state: present
-§§    enabled: yes
+
+- name: Add task schedule to run script at start up
+  win_scheduled_task:
+    name: syncFluffiToRAM
+    description: This service creates and sync the persistent file to a ram disk
+    actions:
+    - path: "{{startupscriptDirectory}}\\{{startupscriptFilename}}"
+    triggers:
+    - type: boot
+    username: "{{ansible_user}}"
+    password: "{{ansible_password}}"
+    logon_type: password
+    start_when_available: no
+    run_level: highest
+    state: present
+    enabled: yes

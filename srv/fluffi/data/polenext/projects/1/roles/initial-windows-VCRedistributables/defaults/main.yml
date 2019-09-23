@@ -8,23 +8,23 @@
 # 
 # Author(s): Fabian Russwurm, Thomas Riedmaier, Pascal Eckmann
 
-§§# The version of the VSRedistributable
-§§VC_RedistributableVersion: 2017
+# The version of the VSRedistributable
+VC_RedistributableVersion: 2017
 §§
 §§# CPU architecture to install
-§§architecture: x64
+architecture: x64
 §§
 §§# Folder name on the ftp server
-§§FTPRedistributableDirname: VCRedistributables
+FTPRedistributableDirname: VCRedistributables
 §§
 §§# Prefix of all installer files
-§§installerFilename: vcredist_{{architecture}}.exe
+installerFilename: vcredist_{{architecture}}.exe
 §§
-§§# Installer flags per redistributable installer
-§§installerFlags: /install /passive /norestart
-§§  #2010: /install /passive /norestart
-§§  #2010_SP1: /install /passive /norestart
-§§  #2012:  /install /passive /norestart
-§§  #2013:  /install /passive /norestart
-§§  #2015:  /install /passive /norestart
+# Installer flags per redistributable installer
+installerFlags: /install /passive /norestart
+  #2010: /install /passive /norestart
+  #2010_SP1: /install /passive /norestart
+  #2012:  /install /passive /norestart
+  #2013:  /install /passive /norestart
+  #2015:  /install /passive /norestart
   #2017:  /install /passive /norestart

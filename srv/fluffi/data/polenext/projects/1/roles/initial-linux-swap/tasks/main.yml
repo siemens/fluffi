@@ -8,12 +8,12 @@
 # 
 # Author(s): Thomas Riedmaier, Fabian Russwurm
 
-§§- name: Remove swapfile from /etc/fstab to permanently disable swapping
-§§  mount:
-§§    name: swap
-§§    fstype: swap
-§§    state: absent
-§§
-§§- name: Disable swap
-§§  command: swapoff -a
+- name: Remove swapfile from /etc/fstab to permanently disable swapping
+  mount:
+    name: swap
+    fstype: swap
+    state: absent
+
+- name: Disable swap
+  command: swapoff -a
   become: yes

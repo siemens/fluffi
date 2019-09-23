@@ -13,7 +13,7 @@ Author(s): Thomas Riedmaier, Abian Blome, Fabian Russwurm, Roman Bendt, Pascal E
 #include "stdafx.h"
 #include "CommInt.h"
 #include "RegisterAtLMRequestHandler.h"
-§§#include "GetTestcaseToMutateRequestHandler.h"
+#include "GetTestcaseToMutateRequestHandler.h"
 #include "ReportTestcaseWithNoResultRequestHandler.h"
 #include "GetNewCompletedTestcaseIDsRequestHandler.h"
 #include "GetCurrentBlockCoverageRequestHandler.h"
@@ -33,7 +33,7 @@ Author(s): Thomas Riedmaier, Abian Blome, Fabian Russwurm, Roman Bendt, Pascal E
 #include "Util.h"
 #include "GarbageCollectorWorker.h"
 #include "GetLMConfigurationRequestHandler.h"
-§§
+
 INITIALIZE_EASYLOGGINGPP
 
 int main(int argc, char* argv[])
@@ -84,9 +84,9 @@ int main(int argc, char* argv[])
 	// Specify path to testcase directory, preferable relative
 	std::string testcaseTempDir = "." + Util::pathSeperator + "testcaseFiles" + Util::pathSeperator + comm->getMyGUID();
 	Util::createFolderAndParentFolders(testcaseTempDir);
-§§
+
 	CommProxyWorker localManagerServer(comm);
-§§
+
 	// ################## End of Define / Build global objects  ##################
 
 	// ################## Registering Message Handler  ##################
@@ -95,22 +95,22 @@ int main(int argc, char* argv[])
 
 	RegisterAtLMRequestHandler* m_RegisterRequestHandler = new RegisterAtLMRequestHandler(location);
 	comm->registerFLUFFIMessageHandler(m_RegisterRequestHandler, FLUFFIMessage::FluffCase::kRegisterAtLMRequest);
-§§
+
 	GetTestcaseToMutateRequestHandler* m_GetTestcaseToMutateRequestHandler = new GetTestcaseToMutateRequestHandler(testcaseTempDir);
 	comm->registerFLUFFIMessageHandler(m_GetTestcaseToMutateRequestHandler, FLUFFIMessage::FluffCase::kGetTestcaseToMutateRequest);
-§§
+
 	ReportTestcaseWithNoResultRequestHandler* m_GetReportWithNoResultRequestHandler = new ReportTestcaseWithNoResultRequestHandler(testcaseTempDir, comm, garbageCollectorWorker);
 	comm->registerFLUFFIMessageHandler(m_GetReportWithNoResultRequestHandler, FLUFFIMessage::FluffCase::kReportTestcaseWithNoResultRequest);
-§§
+
 	GetNewCompletedTestcaseIDsRequestHandler* m_GetNewCompletedTestcaseIDsHandler = new GetNewCompletedTestcaseIDsRequestHandler();
 	comm->registerFLUFFIMessageHandler(m_GetNewCompletedTestcaseIDsHandler, FLUFFIMessage::FluffCase::kGetNewCompletedTestcaseIDsRequest);
 
 	GetCurrentBlockCoverageRequestHandler* m_GetCurrentBlockCoverageHandler = new GetCurrentBlockCoverageRequestHandler();
 	comm->registerFLUFFIMessageHandler(m_GetCurrentBlockCoverageHandler, FLUFFIMessage::FluffCase::kGetCurrentBlockCoverageRequest);
-§§
+
 	PutTestEvaluationRequestHandler* m_PutTestEvaluationHandler = new PutTestEvaluationRequestHandler(testcaseTempDir, comm, garbageCollectorWorker, forceCompletedTestcasesCacheFlushAfterMS);
 	comm->registerFLUFFIMessageHandler(m_PutTestEvaluationHandler, FLUFFIMessage::FluffCase::kPutTestEvaluationRequest);
-§§
+
 §§	GetTestcaseChunkRequestHandler* m_getTestcaseChunkRequestHandler = new GetTestcaseChunkRequestHandler(testcaseTempDir, true, garbageCollectorWorker);
 	comm->registerFLUFFIMessageHandler(m_getTestcaseChunkRequestHandler, FLUFFIMessage::FluffCase::kGetTestCaseChunkRequest);
 

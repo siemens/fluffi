@@ -10,22 +10,22 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Fabian Russwurm, Abian Blome
 */
 
-§§#include "stdafx.h"
-§§#include "GetTestcaseToMutateRequestHandler.h"
+#include "stdafx.h"
+#include "GetTestcaseToMutateRequestHandler.h"
 #include "LMWorkerThreadState.h"
 #include "LMDatabaseManager.h"
-§§
+
 GetTestcaseToMutateRequestHandler::GetTestcaseToMutateRequestHandler(std::string testcaseTempDir)
-§§{
+{
 	m_testcaseTempDir = testcaseTempDir;
-§§}
-§§
-§§GetTestcaseToMutateRequestHandler::~GetTestcaseToMutateRequestHandler()
-§§{
-§§}
-§§
+}
+
+GetTestcaseToMutateRequestHandler::~GetTestcaseToMutateRequestHandler()
+{
+}
+
 void GetTestcaseToMutateRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp)
-§§{
+{
 	LMWorkerThreadState* lmWorkerThreadState = dynamic_cast<LMWorkerThreadState*>(workerThreadState);
 	if (lmWorkerThreadState == nullptr) {
 		LOG(ERROR) << "GetTestcaseToMutateRequestHandler::handleFLUFFIMessage - workerThreadState cannot be accessed";

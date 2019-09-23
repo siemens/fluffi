@@ -8,14 +8,14 @@
 # 
 # Author(s): Thomas Riedmaier, Fabian Russwurm, Pascal Eckmann
 §§
-§§- hosts: windows
-§§  gather_facts: False
-§§  tasks:
-§§    - name: Ping windows host
-§§      win_ping:
-§§    
+- hosts: windows
+  gather_facts: False
+  tasks:
+    - name: Ping windows host
+      win_ping:
+    
 §§- hosts: linux, odroids
-§§  gather_facts: False
-§§  tasks:
-§§    - name: Ping linux host
+  gather_facts: False
+  tasks:
+    - name: Ping linux host
       ping:

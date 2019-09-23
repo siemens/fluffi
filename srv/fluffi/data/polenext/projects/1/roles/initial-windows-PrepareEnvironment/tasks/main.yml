@@ -9,16 +9,16 @@
 # Author(s): Thomas Riedmaier, Fabian Russwurm, Pascal Eckmann
 
 §§- name: Create a FLUFFI directory
-§§  win_file:
-§§    path: "{{deploymentPath}}"
-§§    state: directory
-§§    
-§§- name: Set ACL for {{deploymentPath}}
-§§  win_acl:
-§§    path: "{{deploymentPath}}"
-§§    rights: FullControl
-§§    user: Everyone
-§§    type: allow
+  win_file:
+    path: "{{deploymentPath}}"
+    state: directory
+    
+- name: Set ACL for {{deploymentPath}}
+  win_acl:
+    path: "{{deploymentPath}}"
+    rights: FullControl
+    user: Everyone
+    type: allow
     state: present
 
 - name: Set AllowUnencrypted to True

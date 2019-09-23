@@ -25,7 +25,7 @@ public:
 	void setMyFuzzjob(const std::string myfuzzjob);
 
 #ifndef _VSTEST
-§§private:
+private:
 #endif // _VSTEST
 
 §§	static std::string decideSubAgentType(LMDatabaseManager* dbManager, AgentType type, const google::protobuf::RepeatedPtrField< std::string > implementedSubtypes);

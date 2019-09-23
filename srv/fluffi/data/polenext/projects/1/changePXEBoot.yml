@@ -9,6 +9,6 @@
 # Author(s): Thomas Riedmaier, Fabian Russwurm, Pascal Eckmann
 §§
 - hosts: master
-§§  gather_facts: False
-§§  roles:
-§§    - deployment-local-changePXEBoot
+  gather_facts: False
+  roles:
+    - deployment-local-changePXEBoot

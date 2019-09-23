@@ -8,38 +8,38 @@
 # 
 # Author(s): Fabian Russwurm, Thomas Riedmaier, Pascal Eckmann
 
-§§- name: Check directory "{{ ramdiskPath }}"
-§§  stat: 
-§§    path: "{{ ramdiskPath }}"
-§§  register: ramdiskDetails
-§§    
-§§- name: Creating new directory for mounting ramdisk if necessary
-§§  file:
-§§    dest: "{{ ramdiskPath }}" 
-§§    mode: 00777 
-§§    state: directory
-§§    owner: "{{ansible_ssh_user}}"
-§§    group: "{{ansible_ssh_user}}"
-§§  when: not ramdiskDetails.stat.exists
-§§
+- name: Check directory "{{ ramdiskPath }}"
+  stat: 
+    path: "{{ ramdiskPath }}"
+  register: ramdiskDetails
+    
+- name: Creating new directory for mounting ramdisk if necessary
+  file:
+    dest: "{{ ramdiskPath }}" 
+    mode: 00777 
+    state: directory
+    owner: "{{ansible_ssh_user}}"
+    group: "{{ansible_ssh_user}}"
+  when: not ramdiskDetails.stat.exists
+
 §§- name: Creating ramdisk
-§§  mount:
-§§    name: "{{ ramdiskPath }}"
-§§    src: tmpfs
-§§    fstype: tmpfs
-§§    opts: "size={{ ramdiskSize }}"
-§§    state: mounted
-§§  become: yes
-§§
-§§- name: Copy init script to sync ramdisk on startup
-§§  template:
-§§    src: ramdisk
-§§    dest: /etc/init.d/ramdisk
-§§    owner: "root"
-§§    group: "root"
-§§    mode: 00755
-§§  become: yes
-§§
-§§- name: execute update-rc.d to enable init script 
-§§  command: update-rc.d ramdisk defaults 00 99
+  mount:
+    name: "{{ ramdiskPath }}"
+    src: tmpfs
+    fstype: tmpfs
+    opts: "size={{ ramdiskSize }}"
+    state: mounted
+  become: yes
+
+- name: Copy init script to sync ramdisk on startup
+  template:
+    src: ramdisk
+    dest: /etc/init.d/ramdisk
+    owner: "root"
+    group: "root"
+    mode: 00755
+  become: yes
+
+- name: execute update-rc.d to enable init script 
+  command: update-rc.d ramdisk defaults 00 99
   become: yes

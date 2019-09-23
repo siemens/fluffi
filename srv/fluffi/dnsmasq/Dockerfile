@@ -8,7 +8,7 @@
 # 
 # Author(s): Thomas Riedmaier, Fabian Russwurm
 
-§§FROM alpine
-§§RUN apk --no-cache add dnsmasq
-§§
-§§ENTRYPOINT ["dnsmasq", "-d"]
+FROM alpine
+RUN apk --no-cache add dnsmasq
+
+ENTRYPOINT ["dnsmasq", "-d"]

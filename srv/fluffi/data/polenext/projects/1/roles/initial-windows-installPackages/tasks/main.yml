@@ -8,15 +8,15 @@
 # 
 # Author(s): Thomas Riedmaier, Fabian Russwurm
 
-§§- name: Ensure source directory exists
-§§  win_file:
-§§    path: "{{remoteUtilitiesFilePath}}"
-§§    state: directory
-§§
-§§- name: Get listing of files on FTP
-§§  local_action: "shell curl -l {{ftpserverURL}}/{{initialInstallPackages}}/"
-§§  register: fileListing
-§§
-§§- name: Install all packages
-§§  include: fetchAndInstallPackage.yml pkgName="{{item}}"
+- name: Ensure source directory exists
+  win_file:
+    path: "{{remoteUtilitiesFilePath}}"
+    state: directory
+
+- name: Get listing of files on FTP
+  local_action: "shell curl -l {{ftpserverURL}}/{{initialInstallPackages}}/"
+  register: fileListing
+
+- name: Install all packages
+  include: fetchAndInstallPackage.yml pkgName="{{item}}"
   with_items: "{{ fileListing.stdout_lines }}"

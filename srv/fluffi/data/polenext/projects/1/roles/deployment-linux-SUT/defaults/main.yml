@@ -9,5 +9,5 @@
 # Author(s): Thomas Riedmaier, Pascal Eckmann, Fabian Russwurm
 
 §§# User input, which file to fetch --> no default
-§§# e.g. ftp:\\host\SUT\name_uuid.zip
+# e.g. ftp:\\host\SUT\name_uuid.zip
 filePathToFetchFromFTP: ""

@@ -10,10 +10,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Abian Blome, Junes Najah, Fabian Russwurm
 */
 
-§§CREATE DATABASE IF NOT EXISTS fluffi;
-§§
+CREATE DATABASE IF NOT EXISTS fluffi;
 
-§§CREATE TABLE IF NOT EXISTS fluffi.managed_instances (
+
+CREATE TABLE IF NOT EXISTS fluffi.managed_instances (
 	`ServiceDescriptorGUID` VARCHAR(50) NOT NULL,
 	`ServiceDescriptorHostAndPort` VARCHAR(50) NOT NULL,
 	`AgentType` INT(1) NOT NULL,

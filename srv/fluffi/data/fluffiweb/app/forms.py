@@ -73,32 +73,32 @@ class AddProjectLocationForm(FlaskForm):
 §§    name = StringField("name", validators = [DataRequired()])
 §§
 
-§§class ExecuteInitialSetupForm(FlaskForm):
+class ExecuteInitialSetupForm(FlaskForm):
 §§    ram_disk_size = IntegerField(label = 'Size of Ramdisk: ', default = 1024,
 §§                                 validators = [DataRequired(), NumberRange(min = 512, max = 128000)])
-§§    execute_initial_submit = SubmitField('Start Setup')
+    execute_initial_submit = SubmitField('Start Setup')
+
 §§
+class SyncToRamdiskForm(FlaskForm):
+    execute_sync_ramdisk = SubmitField('Syncronize')
+
 §§
-§§class SyncToRamdiskForm(FlaskForm):
-§§    execute_sync_ramdisk = SubmitField('Syncronize')
-§§
-§§
-§§class ExecuteDeployFluffiForm(FlaskForm):
+class ExecuteDeployFluffiForm(FlaskForm):
 §§    architecture = SelectField(label = "Architecture: ", choices = [])
-§§    execute_deploy_fluffi = SubmitField('Deploy')
+    execute_deploy_fluffi = SubmitField('Deploy')
+
 §§
-§§
-§§class ExecuteDeployInstallPackageForm(FlaskForm):
+class ExecuteDeployInstallPackageForm(FlaskForm):
 §§    installPackage = SelectField(label = "Select Package: ", choices = [])
-§§    execute_deploy_package = SubmitField('Deploy')
+    execute_deploy_package = SubmitField('Deploy')
+
 §§
-§§
-§§class ExecuteDeployFuzzjobInstallPackageForm(FlaskForm):
+class ExecuteDeployFuzzjobInstallPackageForm(FlaskForm):
 §§    fuzzingJob = SelectField(label = "Select Fuzzjob: ", choices = [])
-§§    execute_deploy_package = SubmitField('Deploy')
+    execute_deploy_package = SubmitField('Deploy')
+
 §§
-§§
-§§class StartFluffiComponentForm(FlaskForm):
+class StartFluffiComponentForm(FlaskForm):
 §§    component = SelectField(label = "Select Component: ",
 §§                            choices = [("0", "Testcase Generator"), ("1", "Testcase Runner"),
 §§                                       ("2", "Testcase Evaluator"),

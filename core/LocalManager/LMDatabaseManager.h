@@ -10,7 +10,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Abian Blome, Fabian Russwurm, Pascal Eckmann
 */
 
-§§#pragma once
+#pragma once
 
 #if defined(_WIN32) || defined(_WIN64)
 #else
@@ -29,8 +29,8 @@ class FluffiModuleNameToID;
 class GarbageCollectorWorker;
 class FluffiBasicBlock;
 class LMDatabaseManager
-§§{
-§§public:
+{
+public:
 	LMDatabaseManager(GarbageCollectorWorker* garbageCollectorWorker);
 	~LMDatabaseManager();
 
@@ -91,7 +91,7 @@ class LMDatabaseManager
 	std::string EXECUTE_TEST_STATEMENT(const std::string query);
 #endif // _VSTEST
 
-§§private:
+private:
 	static MYSQL* establishDBConnection();
 	static bool setSessionParameters(MYSQL* conn);
 
@@ -109,4 +109,4 @@ class LMDatabaseManager
 	std::chrono::steady_clock::time_point performanceWatchTimePoint;
 #define PERFORMANCE_WATCH_FUNCTION_ENTRY performanceWatchTimePoint = std::chrono::steady_clock::now();
 #define PERFORMANCE_WATCH_FUNCTION_EXIT(X)  if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - performanceWatchTimePoint).count()  > CommInt::timeoutNormalMessage/2) {		LOG(WARNING) << X << " is taking dangerously long to respond: "<< std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - performanceWatchTimePoint).count() ;	}
-§§};
+};

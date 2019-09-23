@@ -993,20 +993,20 @@ def locations():
 §§def viewSystem(hostname, group):
 §§    if group == "odroids":
 §§        group = "linux"
-§§    # initialize forms
-§§    initialSetupForm = ExecuteInitialSetupForm()
-§§    fluffiDeployForm = ExecuteDeployFluffiForm()
-§§    syncRamdiskForm = SyncToRamdiskForm()
-§§    deployPackageForm = ExecuteDeployInstallPackageForm()
-§§    deployFuzzjobPackageForm = ExecuteDeployFuzzjobInstallPackageForm()
-§§    startFluffiComponentForm = StartFluffiComponentForm()
+    # initialize forms
+    initialSetupForm = ExecuteInitialSetupForm()
+    fluffiDeployForm = ExecuteDeployFluffiForm()
+    syncRamdiskForm = SyncToRamdiskForm()
+    deployPackageForm = ExecuteDeployInstallPackageForm()
+    deployFuzzjobPackageForm = ExecuteDeployFuzzjobInstallPackageForm()
+    startFluffiComponentForm = StartFluffiComponentForm()
 §§    systemInstanceConfigForm = SystemInstanceConfigForm()
-§§    availableInstallPackagesFromFTP = FTP_CONNECTOR.getListOfFilesOnFTPServer("SUT/")
-§§    deployPackageForm.installPackage.choices = availableInstallPackagesFromFTP
+    availableInstallPackagesFromFTP = FTP_CONNECTOR.getListOfFilesOnFTPServer("SUT/")
+    deployPackageForm.installPackage.choices = availableInstallPackagesFromFTP
 §§    availableArchitecturesFromFTP = FTP_CONNECTOR.getListOfArchitecturesOnFTPServer("fluffi/" + group + "/", group)
-§§    fluffiDeployForm.architecture.choices = availableArchitecturesFromFTP
+    fluffiDeployForm.architecture.choices = availableArchitecturesFromFTP
 §§    availableArchitecturesFromFTP = FTP_CONNECTOR.getListOfArchitecturesOnFTPServer("fluffi/" + group + "/", group)
-§§    startFluffiComponentForm.architecture.choices = availableArchitecturesFromFTP
+    startFluffiComponentForm.architecture.choices = availableArchitecturesFromFTP
 §§    system = ANSIBLE_REST_CONNECTOR.getSystemObjectByName(hostname)
 §§    jobList = []
 §§    fuzzjobs = db.session.query(models.SystemsLocation, models.Systems, models.LocationFuzzjobs, models.Fuzzjob).join(
@@ -1138,63 +1138,63 @@ def locations():
 §§
 §§
 §§@app.route("/systems/view/<string:hostname>/initialSetup", methods = ["POST"])
-§§def viewSystemInitialSetup(hostname):
-§§    # validate and execute playbook
+def viewSystemInitialSetup(hostname):
+    # validate and execute playbook
 §§    ramDiskSize = request.form.getlist('ram_disk_size')[0] + "M"
 §§    arguments = {'RamDiskSize': ramDiskSize}
 §§    historyURL = ANSIBLE_REST_CONNECTOR.executePlaybook('initialSetup.yml', hostname, arguments)
 §§
-§§    if historyURL is not None:
+    if historyURL is not None:
 §§        return redirect(historyURL, code = 302)
-§§    else:
+    else:
 §§        return redirect(url_for('viewSystem', hostname = hostname))
-§§
+
 §§
 §§@app.route("/systems/view/<string:hostname>/deployFluffi", methods = ["POST"])
-§§def viewDeployFluffi(hostname):
-§§    # validate and execute playbook
-§§    architecture = str(request.form.getlist('architecture')[0])
+def viewDeployFluffi(hostname):
+    # validate and execute playbook
+    architecture = str(request.form.getlist('architecture')[0])
 §§    location = db.session.query(models.SystemsLocation, models.Systems, models.Locations).join(
 §§        models.Systems).filter(models.SystemsLocation.System == models.Systems.id).filter_by(Name=hostname).join(
 §§        models.Locations).filter(models.SystemsLocation.Location == models.Locations.id).first()
 §§    arguments = {'architecture': architecture.split("-")[1], 'location': location[2].Name}
-§§    historyURL = ANSIBLE_REST_CONNECTOR.executePlaybook('deployFluffi.yml', hostname, arguments)
+    historyURL = ANSIBLE_REST_CONNECTOR.executePlaybook('deployFluffi.yml', hostname, arguments)
 §§
-§§    if historyURL is not None:
+    if historyURL is not None:
 §§        return redirect(historyURL, code = 302)
-§§    else:
+    else:
 §§        return redirect(url_for('viewSystem', hostname = hostname))
 §§
-§§
+
 §§@app.route("/systems/view/<string:hostname>/syncRamdisk", methods = ["POST"])
-§§def viewSyncRamdisk(hostname):
-§§    # validate and execute playbook 
-§§    historyURL = ANSIBLE_REST_CONNECTOR.executePlaybook('syncToRamdisk.yml', hostname)
+def viewSyncRamdisk(hostname):
+    # validate and execute playbook 
+    historyURL = ANSIBLE_REST_CONNECTOR.executePlaybook('syncToRamdisk.yml', hostname)
 §§
-§§    if historyURL is not None:
+    if historyURL is not None:
 §§        return redirect(historyURL, code = 302)
-§§    else:
+    else:
 §§        return redirect(url_for('viewSystem', hostname = hostname))
 §§
-§§
+
 §§@app.route("/systems/view/<string:hostname>/deployPackage", methods = ["POST"])
-§§def viewInstallPackage(hostname):
-§§    # validate and execute playbook
+def viewInstallPackage(hostname):
+    # validate and execute playbook
 §§    packageFileName = "ftp://" + config.FTP_URL + "/SUT/" + str(request.form.getlist('installPackage')[0])
 §§    arguments = {'filePathToFetchFromFTP': packageFileName}
-§§    historyURL = ANSIBLE_REST_CONNECTOR.executePlaybook('deploySUT.yml', hostname, arguments)
+    historyURL = ANSIBLE_REST_CONNECTOR.executePlaybook('deploySUT.yml', hostname, arguments)
 §§
-§§    if historyURL is not None:
+    if historyURL is not None:
 §§        return redirect(historyURL, code = 302)
-§§    else:
+    else:
 §§        return redirect(url_for('viewSystem', hostname = hostname))
 §§
-§§
+
 §§@app.route("/systems/view/<string:hostname>/deployFuzzPackage", methods = ["POST"])
-§§def viewInstallFuzzjobPackage(hostname):
-§§    # validate and execute playbook 
+def viewInstallFuzzjobPackage(hostname):
+    # validate and execute playbook 
 §§    historyURL = None
-§§    selectedFuzzJob = str(request.form.getlist('fuzzingJob')[0])
+    selectedFuzzJob = str(request.form.getlist('fuzzingJob')[0])
 §§    packages = []
 §§    res = db.session.query(models.Fuzzjob, models.FuzzjobDeploymentPackages, models.DeploymentPackages).filter_by(
 §§        name = selectedFuzzJob).join(models.FuzzjobDeploymentPackages).filter(
@@ -1211,14 +1211,14 @@ def locations():
 §§    for packageFileName in packages:
 §§        ftpPath = "ftp://" + config.FTP_URL + "/SUT/" + packageFileName
 §§        arguments = {'filePathToFetchFromFTP': ftpPath}
-§§        historyURL = ANSIBLE_REST_CONNECTOR.executePlaybook('deploySUT.yml', hostname, arguments)
+        historyURL = ANSIBLE_REST_CONNECTOR.executePlaybook('deploySUT.yml', hostname, arguments)
 §§
-§§    if historyURL is not None:
+    if historyURL is not None:
 §§        return redirect(historyURL, code = 302)
-§§    else:
+    else:
 §§        return redirect(url_for('viewSystem', hostname = hostname))
 §§
-§§
+
 §§@app.route("/systems/view/<string:hostname>/<string:groupName>/startFluffi", methods = ["POST"])
 §§def startFluffi(hostname, groupName):
 §§    relevantHostnames = []
@@ -1231,9 +1231,9 @@ def locations():
 §§    else:
 §§        relevantHostnames.append(hostname)
 §§
-§§    amount = request.form.getlist('numberOfComponents')[0]
+    amount = request.form.getlist('numberOfComponents')[0]
 §§    component = request.form.getlist('component')[0]
-§§    architecture = str(request.form.getlist('architecture')[0])
+    architecture = str(request.form.getlist('architecture')[0])
 §§
 §§    instanceType = None
 §§
@@ -1284,7 +1284,7 @@ def locations():
 §§
 §§    return redirect(url_for('systems'))
 §§
-§§
+
 §§@app.route("/dashboardtrigger")
 §§def dashboardTrigger():
 §§    fuzzjobs = listFuzzJobs()

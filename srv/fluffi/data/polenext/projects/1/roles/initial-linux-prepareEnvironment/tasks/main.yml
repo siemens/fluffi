@@ -8,16 +8,16 @@
 # 
 # Author(s): Thomas Riedmaier, Fabian Russwurm, Pascal Eckmann
 
-§§- name: Ensure unzip is installed
-§§  package:
-§§    name: unzip
-§§    state: present
-§§  become: yes
-§§
+- name: Ensure unzip is installed
+  package:
+    name: unzip
+    state: present
+  become: yes
+
 §§- name: Creating new directory for deploying FLUFFI
-§§  file:
-§§    dest: "{{ deploymentPath }}" 
-§§    mode: 00777 
-§§    state: directory
-§§    owner: "{{ansible_ssh_user}}"
+  file:
+    dest: "{{ deploymentPath }}" 
+    mode: 00777 
+    state: directory
+    owner: "{{ansible_ssh_user}}"
     group: "{{ansible_ssh_user}}"

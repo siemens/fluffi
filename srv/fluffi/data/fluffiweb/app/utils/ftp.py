@@ -8,25 +8,25 @@
 # 
 # Author(s): Michael Kraus, Junes Najah, Fabian Russwurm, Thomas Riedmaier
 
-§§from ftplib import FTP
+from ftplib import FTP
+
 §§
-§§
-§§class FTPConnector:
-§§
-§§    def __init__(self, ftpURL):
-§§        self.ftpURL = ftpURL
-§§        self.ftpClient = FTP()
-§§
-§§    def getListOfFilesOnFTPServer(self, path):
-§§        self.ftpClient.connect(self.ftpURL)
-§§        self.ftpClient.login()
-§§        self.ftpClient.cwd(path)
-§§        ls = []
-§§        ls = self.ftpClient.nlst()
+class FTPConnector:
+
+    def __init__(self, ftpURL):
+        self.ftpURL = ftpURL
+        self.ftpClient = FTP()
+
+    def getListOfFilesOnFTPServer(self, path):
+        self.ftpClient.connect(self.ftpURL)
+        self.ftpClient.login()
+        self.ftpClient.cwd(path)
+        ls = []
+        ls = self.ftpClient.nlst()
 §§        tupelsOfLS = zip(ls, ls)
-§§        self.ftpClient.quit()
+        self.ftpClient.quit()
 §§
-§§        return tupelsOfLS
+        return tupelsOfLS
 §§
 §§    def getListOfArchitecturesOnFTPServer(self, path, group):
 §§        self.ftpClient.connect(self.ftpURL)

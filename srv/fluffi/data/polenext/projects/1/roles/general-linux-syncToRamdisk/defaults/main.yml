@@ -8,5 +8,5 @@
 # 
 # Author(s): Thomas Riedmaier, Fabian Russwurm
 
-§§# What should be transfered to ramdisk
+# What should be transfered to ramdisk
 scope: "sut"

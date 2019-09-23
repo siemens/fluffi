@@ -9,23 +9,23 @@
 # Author(s): Fabian Russwurm, Thomas Riedmaier, Pascal Eckmann
 
 §§# Default variables
-§§
-§§# File name of the installer of the tool imdisk
-§§ImdiskInstallerX64FileName: ImDiskTk-x64.exe
-§§ImdiskInstallerX32FileName: ImDiskTk-x32.exe
-§§ImdiskInstallerFileName : ImDiskTk-x64.exe # default
-§§
-§§# Dirname of the FTP folder
-§§ImdiskFTPDirname: ImDisk
-§§
-§§# Size of the ramdisk
-§§RamDiskSize: 1024M #1024M
-§§
+
+# File name of the installer of the tool imdisk
+ImdiskInstallerX64FileName: ImDiskTk-x64.exe
+ImdiskInstallerX32FileName: ImDiskTk-x32.exe
+ImdiskInstallerFileName : ImDiskTk-x64.exe # default
+
+# Dirname of the FTP folder
+ImdiskFTPDirname: ImDisk
+
+# Size of the ramdisk
+RamDiskSize: 1024M #1024M
+
 §§# Directory of startup script
-§§startupscriptDirectory: '%SYSTEMROOT%\System32\GroupPolicy\User\Scripts\Logon'
-§§
-§§# File name of the startup script
-§§startupscriptFilename: manageFluffiRamdisk.bat
-§§
+startupscriptDirectory: '%SYSTEMROOT%\System32\GroupPolicy\User\Scripts\Logon'
+
+# File name of the startup script
+startupscriptFilename: manageFluffiRamdisk.bat
+
 §§# File name of the startup INI file
 startupiniFilename: scripts.ini

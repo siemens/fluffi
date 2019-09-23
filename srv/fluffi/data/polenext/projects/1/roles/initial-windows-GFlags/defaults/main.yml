@@ -8,5 +8,5 @@
 # 
 # Author(s): Thomas Riedmaier, Fabian Russwurm
 
-§§GFlagsDirname : "GFlags"
+GFlagsDirname : "GFlags"
 GFlagsZipFilename: "GFlags.zip"

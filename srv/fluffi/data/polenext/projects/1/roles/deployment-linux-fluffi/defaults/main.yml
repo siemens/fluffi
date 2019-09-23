@@ -9,12 +9,12 @@
 # Author(s): Thomas Riedmaier, Fabian Russwurm, Pascal Eckmann
 
 §§# Default variables
-§§
+
 §§# Which architecture should be deployed? (x86, x64, arm, mips, ppc)
-§§architecture: "x86"
-§§
-§§# Directory name on the FTP server
-§§fluffiFTPDirname: fluffi
-§§
+architecture: "x86"
+
+# Directory name on the FTP server
+fluffiFTPDirname: fluffi
+
 §§# FLUFFI file name
 fluffiFTPFilename: fluffi.zip

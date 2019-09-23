@@ -9,17 +9,17 @@
 # Author(s): Thomas Riedmaier, Fabian Russwurm, Roman Bendt
 
 FROM ubuntu:bionic
-§§
-§§RUN apt-get update \
-§§    && apt-get install -y --no-install-recommends vsftpd \
-§§    && apt-get clean \
-§§    && rm -rf /var/lib/apt/lists/*
-§§
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends vsftpd \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN adduser --disabled-password --gecos "" fluffi
 
-§§RUN mkdir -p /var/run/vsftpd/empty \
-§§ && mkdir -p /etc/vsftpd \
-§§ && mkdir -p /var/ftp \
-§§ && mv /etc/vsftpd.conf /etc/vsftpd.orig
-§§
+RUN mkdir -p /var/run/vsftpd/empty \
+ && mkdir -p /etc/vsftpd \
+ && mkdir -p /var/ftp \
+ && mv /etc/vsftpd.conf /etc/vsftpd.orig
+
 CMD ["/run.sh"]

@@ -8,10 +8,10 @@
 # 
 # Author(s): Thomas Riedmaier, Fabian Russwurm
 
-§§- name: Disabling pagefiles on windows
-§§  win_pagefile:
-§§    drive: c
-§§    automatic: no
-§§    remove_all: yes
-§§    state: absent
+- name: Disabling pagefiles on windows
+  win_pagefile:
+    drive: c
+    automatic: no
+    remove_all: yes
+    state: absent
     system_managed: no

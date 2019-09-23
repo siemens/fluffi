@@ -8,27 +8,27 @@
 # 
 # Author(s): Thomas Riedmaier, Fabian Russwurm, Pascal Eckmann
 
-§§# 1. Fetch Fluffi from FTP
-§§# 2. Unzip fluffi to C
-§§
+# 1. Fetch Fluffi from FTP
+# 2. Unzip fluffi to C
+
 §§- name: Ensure directory exists
-§§  file:
+  file:
     path: "{{deploymentPath}}{{architecture}}"
-§§    state: directory
+    state: directory
     recurse: yes
-§§
+
 §§- name: Delete old files in "{{deploymentPath}}{{architecture}}"
 §§  command: find . -not -path './logs*' -not -path './testcaseFiles*' -delete
 §§  args:
 §§    chdir: "{{deploymentPath}}{{architecture}}/"
 §§   
 §§- name: Fetch FLUFFI from "{{ftpserverURL}}/{{fluffiFTPDirname}}/linux/{{architecture}}/{{fluffiFTPFilename}}"
-§§  get_url: 
-§§    url: "{{ftpserverURL}}/{{fluffiFTPDirname}}/linux/{{architecture}}/{{fluffiFTPFilename}}"
+  get_url: 
+    url: "{{ftpserverURL}}/{{fluffiFTPDirname}}/linux/{{architecture}}/{{fluffiFTPFilename}}"
 §§    dest: "{{deploymentPath}}/{{architecture}}/{{fluffiFTPFilename}}"
-§§
-§§- name: Extract archive {{fluffiFTPFilename}}
-§§  unarchive: 
+
+- name: Extract archive {{fluffiFTPFilename}}
+  unarchive: 
     src: "{{deploymentPath}}{{architecture}}/{{fluffiFTPFilename}}"
     dest: "{{deploymentPath}}{{architecture}}/"
     remote_src: yes

@@ -8,26 +8,26 @@
 # 
 # Author(s): Fabian Russwurm, Thomas Riedmaier, Pascal Eckmann
 
-§§- name: Ensure source directory exists
-§§  win_file:
-§§    path: "{{remoteUtilitiesFilePath}}{{GFlagsDirname}}"
-§§    state: directory
-§§
-§§#- name: Copy GFlags to remote machine
-§§#  win_copy:
-§§#    src: .
-§§#    dest: "{{remoteUtilitiesFilePath}}\\{{GFlagsDirname}}\\"
-§§
+- name: Ensure source directory exists
+  win_file:
+    path: "{{remoteUtilitiesFilePath}}{{GFlagsDirname}}"
+    state: directory
+
+#- name: Copy GFlags to remote machine
+#  win_copy:
+#    src: .
+#    dest: "{{remoteUtilitiesFilePath}}\\{{GFlagsDirname}}\\"
+
 §§- name: Fetch GFlag zip file "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{GFlagsDirname}}/{{GFlagsZipFilename}}"
-§§  win_get_url: 
-§§    url: "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{GFlagsDirname}}/{{GFlagsZipFilename}}"
-§§    dest: "{{remoteUtilitiesFilePath}}{{GFlagsDirname}}\\{{GFlagsZipFilename}}"
-§§
-§§- name: Unzip GFlags
-§§  win_unzip:
-§§    src: "{{remoteUtilitiesFilePath}}\\{{GFlagsDirname}}\\{{GFlagsZipFilename}}"
-§§    dest: "{{remoteUtilitiesFilePath}}{{GFlagsDirname}}"
-§§    delete_archive: yes
-§§
-§§#- name: Globally enable Page Heap
+  win_get_url: 
+    url: "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{GFlagsDirname}}/{{GFlagsZipFilename}}"
+    dest: "{{remoteUtilitiesFilePath}}{{GFlagsDirname}}\\{{GFlagsZipFilename}}"
+
+- name: Unzip GFlags
+  win_unzip:
+    src: "{{remoteUtilitiesFilePath}}\\{{GFlagsDirname}}\\{{GFlagsZipFilename}}"
+    dest: "{{remoteUtilitiesFilePath}}{{GFlagsDirname}}"
+    delete_archive: yes
+
+#- name: Globally enable Page Heap
 #  win_command: gflags.exe -r +hpa

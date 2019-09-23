@@ -10,22 +10,22 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Fabian Russwurm, Abian Blome
 */
 
-§§#pragma once
-§§#include "IFLUFFIMessageHandler.h"
+#pragma once
+#include "IFLUFFIMessageHandler.h"
 
 class CommInt;
 class GarbageCollectorWorker;
 class ReportTestcaseWithNoResultRequestHandler :
-§§	public IFLUFFIMessageHandler
-§§{
-§§public:
+	public IFLUFFIMessageHandler
+{
+public:
 	ReportTestcaseWithNoResultRequestHandler(std::string testcaseDir, CommInt* commPtr, GarbageCollectorWorker* garbageCollectorWorker);
 	~ReportTestcaseWithNoResultRequestHandler();
-§§
+
 	void handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp);
 
 private:
 	std::string m_testcaseDir;
 	CommInt* m_commPtr;
 	GarbageCollectorWorker* m_garbageCollectorWorker;
-§§};
+};

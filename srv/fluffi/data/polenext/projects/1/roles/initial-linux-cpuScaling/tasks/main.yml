@@ -8,15 +8,15 @@
 # 
 # Author(s): Thomas Riedmaier, Fabian Russwurm
 
-§§#https://www.servernoobs.com/avoiding-cpu-speed-scaling-in-modern-linux-distributions-running-cpu-at-full-speed-tips/
-§§- name: Disable CPU scaling by changing /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
-§§  shell: for CPUFREQ in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor; do [ -f $CPUFREQ ] || continue; echo -n performance > $CPUFREQ; done
-§§  become: yes
-§§
-§§- name: Disable CPU scaling permanently by changing init script
-§§  copy: 
-§§    src: ondemand
-§§    dest: /etc/init.d/ondemand
-§§    mode: 0755
-§§    force: yes
+#https://www.servernoobs.com/avoiding-cpu-speed-scaling-in-modern-linux-distributions-running-cpu-at-full-speed-tips/
+- name: Disable CPU scaling by changing /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
+  shell: for CPUFREQ in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor; do [ -f $CPUFREQ ] || continue; echo -n performance > $CPUFREQ; done
+  become: yes
+
+- name: Disable CPU scaling permanently by changing init script
+  copy: 
+    src: ondemand
+    dest: /etc/init.d/ondemand
+    mode: 0755
+    force: yes
   become: yes

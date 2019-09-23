@@ -33,8 +33,8 @@ void GetNewCompletedTestcaseIDsRequestHandler::handleFLUFFIMessage(WorkerThreadS
 
 	// returns the new completed testcases since TimeStamp of given creator
 	time_t timestamp = static_cast<time_t>(req->getnewcompletedtestcaseidsrequest().lastupdatetimestamp());
-§§
+
 	GetNewCompletedTestcaseIDsResponse* getNewCompletedTestcaseIDsResponse = lmWorkerThreadState->dbManager->generateGetNewCompletedTestcaseIDsResponse(timestamp);
-§§
-§§	resp->set_allocated_getnewcompletedtestcaseidsresponse(getNewCompletedTestcaseIDsResponse);
+
+	resp->set_allocated_getnewcompletedtestcaseidsresponse(getNewCompletedTestcaseIDsResponse);
 }

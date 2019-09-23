@@ -8,15 +8,15 @@
 # 
 # Author(s): Fabian Russwurm, Thomas Riedmaier
 
-§§- name: Ensure NTP-related packages are installed.
-§§  package:
-§§    name: ntp
-§§    state: present
-§§  become: yes
-§§
-§§- name: Generate ntp.conf file
-§§  template:
-§§    src: ntp.conf.j2
-§§    dest: /etc/ntp.conf
-§§  become: yes
-§§  notify: restart ntp
+- name: Ensure NTP-related packages are installed.
+  package:
+    name: ntp
+    state: present
+  become: yes
+
+- name: Generate ntp.conf file
+  template:
+    src: ntp.conf.j2
+    dest: /etc/ntp.conf
+  become: yes
+  notify: restart ntp

@@ -8,16 +8,16 @@
 # 
 # Author(s): Thomas Riedmaier, Fabian Russwurm, Pascal Eckmann, Michael Kraus
 §§
-§§- hosts: windows
-§§  roles:
-§§    - deployment-windows-fluffi
-§§    - general-windows-syncToRamdisk
+- hosts: windows
+  roles:
+    - deployment-windows-fluffi
+    - general-windows-syncToRamdisk
     - initial-windows-deployRestInstanceStarter
 §§    - start-windows-restInstanceStarter
-§§
+
 §§- hosts: linux, odroids
-§§  roles:
-§§    - deployment-linux-fluffi
+  roles:
+    - deployment-linux-fluffi
 §§    - general-linux-syncToRamdisk
     - initial-linux-deployRestInstanceStarter
     - start-linux-restInstanceStarter

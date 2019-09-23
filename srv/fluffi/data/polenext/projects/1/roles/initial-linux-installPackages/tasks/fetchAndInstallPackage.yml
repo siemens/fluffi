@@ -8,57 +8,57 @@
 # 
 # Author(s): Fabian Russwurm, Thomas Riedmaier, Pascal Eckmann
 
-§§- name: Set file path to fetch
-§§  set_fact:
-§§    filePathToFetchFromFTP: "{{ftpserverURL}}/{{initialInstallPackages}}/{{pkgName}}"
-§§
-§§- name: Extract names from file path
-§§  set_fact:
-§§    PackageFileName: "{{filePathToFetchFromFTP | basename}}"
-§§    PackageDirName: "{{filePathToFetchFromFTP | basename | splitext | first }}"
-§§
-§§- name: Fetch SUT from "{{filePathToFetchFromFTP}}"
-§§  get_url: 
-§§    url: "{{filePathToFetchFromFTP}}"
-§§    dest: "{{remoteUtilitiesFilePath}}/{{PackageFileName}}"
-§§
-§§- name: Ensure source directory exists
-§§  file:
-§§    dest: "{{remoteUtilitiesFilePath}}/{{PackageDirName}}"
-§§    mode: 00777 
-§§    state: directory
-§§    owner: "{{ansible_ssh_user}}"
-§§    group: "{{ansible_ssh_user}}"
-§§
-§§- name: Extract SUT {{remoteUtilitiesFilePath}}/{{PackageFileName}}
-§§  unarchive: 
-§§    src: "{{remoteUtilitiesFilePath}}/{{PackageFileName}}"
-§§    dest: "{{remoteUtilitiesFilePath}}/{{PackageDirName}}"
-§§    remote_src: yes
-§§
-§§- name: Get info of potential install script
-§§  stat:
-§§    path: "{{remoteUtilitiesFilePath}}/{{PackageDirName}}/{{item}}"
-§§  with_items: 
-§§    - install.sh
-§§    - install.zsh
-§§    - install.bash
-§§  register: installScriptResults
-§§
-§§- name: Check if a install script exists
-§§  set_fact: 
-§§     deploymentScriptPath: "{{item.stat.path}}"
-§§  with_items: "{{installScriptResults.results}}"
-§§  when: item.stat.exists
-§§
-§§- name: Ensure that the script is executable
-§§  file: 
-§§    path: "{{deploymentScriptPath}}"
-§§    mode: 01755
-§§
-§§- name: Execute install script of the SUT on the remote machine
+- name: Set file path to fetch
+  set_fact:
+    filePathToFetchFromFTP: "{{ftpserverURL}}/{{initialInstallPackages}}/{{pkgName}}"
+
+- name: Extract names from file path
+  set_fact:
+    PackageFileName: "{{filePathToFetchFromFTP | basename}}"
+    PackageDirName: "{{filePathToFetchFromFTP | basename | splitext | first }}"
+
+- name: Fetch SUT from "{{filePathToFetchFromFTP}}"
+  get_url: 
+    url: "{{filePathToFetchFromFTP}}"
+    dest: "{{remoteUtilitiesFilePath}}/{{PackageFileName}}"
+
+- name: Ensure source directory exists
+  file:
+    dest: "{{remoteUtilitiesFilePath}}/{{PackageDirName}}"
+    mode: 00777 
+    state: directory
+    owner: "{{ansible_ssh_user}}"
+    group: "{{ansible_ssh_user}}"
+
+- name: Extract SUT {{remoteUtilitiesFilePath}}/{{PackageFileName}}
+  unarchive: 
+    src: "{{remoteUtilitiesFilePath}}/{{PackageFileName}}"
+    dest: "{{remoteUtilitiesFilePath}}/{{PackageDirName}}"
+    remote_src: yes
+
+- name: Get info of potential install script
+  stat:
+    path: "{{remoteUtilitiesFilePath}}/{{PackageDirName}}/{{item}}"
+  with_items: 
+    - install.sh
+    - install.zsh
+    - install.bash
+  register: installScriptResults
+
+- name: Check if a install script exists
+  set_fact: 
+     deploymentScriptPath: "{{item.stat.path}}"
+  with_items: "{{installScriptResults.results}}"
+  when: item.stat.exists
+
+- name: Ensure that the script is executable
+  file: 
+    path: "{{deploymentScriptPath}}"
+    mode: 01755
+
+- name: Execute install script of the SUT on the remote machine
 §§  sudo: yes
-§§  shell: "{{deploymentScriptPath}}"
-§§  args:
-§§    chdir: "{{remoteUtilitiesFilePath}}/{{PackageDirName}}"
-§§  when: deploymentScriptPath is defined
+  shell: "{{deploymentScriptPath}}"
+  args:
+    chdir: "{{remoteUtilitiesFilePath}}/{{PackageDirName}}"
+  when: deploymentScriptPath is defined

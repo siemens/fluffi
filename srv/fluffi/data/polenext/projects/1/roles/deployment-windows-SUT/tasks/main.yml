@@ -8,16 +8,16 @@
 # 
 # Author(s): Fabian Russwurm, Thomas Riedmaier, Pascal Eckmann
 
-§§- name: Ensure SUT directory exists
-§§  win_file:
-§§    path: "{{SUTPath}}"
-§§    state: directory
-§§
-§§- name: Extract names from file path
-§§  set_fact:
-§§    SUTFileName: "{{filePathToFetchFromFTP | basename}}"
-§§    SUTDirName: "{{filePathToFetchFromFTP | basename | splitext | first }}"
-§§
+- name: Ensure SUT directory exists
+  win_file:
+    path: "{{SUTPath}}"
+    state: directory
+
+- name: Extract names from file path
+  set_fact:
+    SUTFileName: "{{filePathToFetchFromFTP | basename}}"
+    SUTDirName: "{{filePathToFetchFromFTP | basename | splitext | first }}"
+
 - name: Check if the {{SUTFileName}} already exists
   win_stat: path="{{SUTPath}}/{{SUTDirName}}"
   register: stat_result
@@ -29,32 +29,32 @@
   when: stat_result.stat.exists == True 
 
 §§- name: Fetch SUT zip from "{{filePathToFetchFromFTP}}" to "{{SUTPath}}\\{{SUTFileName}}"
-§§  win_get_url: 
-§§    url: "{{filePathToFetchFromFTP}}"
-§§    dest: "{{SUTPath}}\\{{SUTFileName}}"
-§§
-§§- name: Unzip "{{SUTPath}}\\{{SUTFileName}}" to "{{SUTPath}}\\{{SUTDirName}}"
-§§  win_unzip:
-§§    src: "{{SUTPath}}\\{{SUTFileName}}"
-§§    dest: "{{SUTPath}}\\{{SUTDirName}}"
-§§    delete_archive: yes
-§§
-§§- name: Get info of potential install script
-§§  win_stat:
-§§    path: "{{SUTPath}}\\{{SUTDirName}}\\{{item}}"
-§§  with_items: 
-§§    - install.bat
-§§    - install.ps1
-§§  register: installScriptResults
-§§
-§§- name: Check if a install script exists
-§§  set_fact: 
-§§     deploymentScriptPath: "{{item.stat.path}}"
-§§  with_items: "{{installScriptResults.results}}"
-§§  when: item.stat.exists
-§§  
-§§- name: Execute install script of the SUT on the remote machine
-§§  win_shell: "{{deploymentScriptPath}}"
-§§  args:
-§§    chdir: "{{SUTPath}}\\{{SUTDirName}}"
+  win_get_url: 
+    url: "{{filePathToFetchFromFTP}}"
+    dest: "{{SUTPath}}\\{{SUTFileName}}"
+
+- name: Unzip "{{SUTPath}}\\{{SUTFileName}}" to "{{SUTPath}}\\{{SUTDirName}}"
+  win_unzip:
+    src: "{{SUTPath}}\\{{SUTFileName}}"
+    dest: "{{SUTPath}}\\{{SUTDirName}}"
+    delete_archive: yes
+
+- name: Get info of potential install script
+  win_stat:
+    path: "{{SUTPath}}\\{{SUTDirName}}\\{{item}}"
+  with_items: 
+    - install.bat
+    - install.ps1
+  register: installScriptResults
+
+- name: Check if a install script exists
+  set_fact: 
+     deploymentScriptPath: "{{item.stat.path}}"
+  with_items: "{{installScriptResults.results}}"
+  when: item.stat.exists
+  
+- name: Execute install script of the SUT on the remote machine
+  win_shell: "{{deploymentScriptPath}}"
+  args:
+    chdir: "{{SUTPath}}\\{{SUTDirName}}"
   when: deploymentScriptPath is defined

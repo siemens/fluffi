@@ -8,44 +8,44 @@
 # 
 # Author(s): Fabian Russwurm, Thomas Riedmaier, Pascal Eckmann
 
-§§- name: Set file path to fetch
-§§  set_fact:
-§§    filePathToFetchFromFTP: "{{ftpserverURL}}/{{initialInstallPackages}}/{{pkgName}}"
-§§
-§§- name: Extract names from file path
-§§  set_fact:
-§§    PackageFileName: "{{filePathToFetchFromFTP | basename}}"
-§§    PackageDirName: "{{filePathToFetchFromFTP | basename | splitext | first }}"
-§§
-§§- name: Fetch SUT from "{{filePathToFetchFromFTP}}"
-§§  win_get_url: 
-§§    url: "{{filePathToFetchFromFTP}}"
+- name: Set file path to fetch
+  set_fact:
+    filePathToFetchFromFTP: "{{ftpserverURL}}/{{initialInstallPackages}}/{{pkgName}}"
+
+- name: Extract names from file path
+  set_fact:
+    PackageFileName: "{{filePathToFetchFromFTP | basename}}"
+    PackageDirName: "{{filePathToFetchFromFTP | basename | splitext | first }}"
+
+- name: Fetch SUT from "{{filePathToFetchFromFTP}}"
+  win_get_url: 
+    url: "{{filePathToFetchFromFTP}}"
 §§    dest: "{{remoteUtilitiesFilePath}}\\{{PackageFileName}}"
-§§
+
 §§- name: Extract SUT {{remoteUtilitiesFilePath}}\\{{PackageFileName}}
-§§  win_unzip: 
+  win_unzip: 
 §§    src: "{{remoteUtilitiesFilePath}}\\{{PackageFileName}}"
 §§    dest: "{{remoteUtilitiesFilePath}}\\{{PackageDirName}}"
-§§
-§§- name: Get info of potential install script
-§§  win_stat:
+
+- name: Get info of potential install script
+  win_stat:
 §§    path: "{{remoteUtilitiesFilePath}}\\{{PackageDirName}}\\{{item}}"
-§§  with_items: 
-§§    - install.bat
-§§    - install.ps1
-§§    - install.cmd
+  with_items: 
+    - install.bat
+    - install.ps1
+    - install.cmd
 §§    - install.txt
-§§  register: installScriptResults
-§§
-§§- name: Check if a install script exists
-§§  set_fact: 
-§§     deploymentScriptPath: "{{item.stat.path}}"
-§§  with_items: "{{installScriptResults.results}}"
+  register: installScriptResults
+
+- name: Check if a install script exists
+  set_fact: 
+     deploymentScriptPath: "{{item.stat.path}}"
+  with_items: "{{installScriptResults.results}}"
 §§  register: item
-§§  when: item.stat.exists
+  when: item.stat.exists
 §§  
-§§- name: Execute install script of the SUT on the remote machine
-§§  win_shell: "{{deploymentScriptPath}}"
-§§  args:
-§§    chdir: "{{remoteUtilitiesFilePath}}/{{PackageDirName}}"
+- name: Execute install script of the SUT on the remote machine
+  win_shell: "{{deploymentScriptPath}}"
+  args:
+    chdir: "{{remoteUtilitiesFilePath}}/{{PackageDirName}}"
   when: (deploymentScriptPath is defined)

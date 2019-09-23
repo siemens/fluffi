@@ -9,30 +9,30 @@
 # Author(s): Fabian Russwurm, Thomas Riedmaier, Michael Kraus, Pascal Eckmann
 
 §§# Mountpoint letter of the ramdisk
-§§ramDiskMountpointLetter: F
-§§
+ramDiskMountpointLetter: F
+
 §§# FLUFFI directory name
-§§deploymentDirName: "FLUFFI"
-§§
-§§# SUT directory name
-§§SUTBaseDirName: "SUT"
-§§
+deploymentDirName: "FLUFFI"
+
+# SUT directory name
+SUTBaseDirName: "SUT"
+
 §§# RestStarter directory name
 §§RestStarterDirName: "restStarter"
 §§
 §§# Path where FLUFFI will be deployed
-§§deploymentPath: "C:\\{{deploymentDirName}}"
-§§
+deploymentPath: "C:\\{{deploymentDirName}}"
+
 §§# File path where initial install files are located on the FTP server
-§§initialInstallPackages: "initial/windows/activePackages"
-§§
-§§# File path where initial ansible files are located on the FTP server
-§§initialAnsibleFTPPath: "initial/windows/ansible"
-§§
-§§# Path where SUT will be deployed
-§§SUTPath: C:\\{{deploymentDirName}}\{{SUTBaseDirName}}
-§§
-§§# Remote path to store the necessary utilities
+initialInstallPackages: "initial/windows/activePackages"
+
+# File path where initial ansible files are located on the FTP server
+initialAnsibleFTPPath: "initial/windows/ansible"
+
+# Path where SUT will be deployed
+SUTPath: C:\\{{deploymentDirName}}\{{SUTBaseDirName}}
+
+# Remote path to store the necessary utilities
 §§remoteUtilitiesFilePath: c:\utils\
 §§
 §§# Remote path to store the Rest-Instance-Starter python script

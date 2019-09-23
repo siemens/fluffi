@@ -8,10 +8,10 @@
 # 
 # Author(s): Thomas Riedmaier, Fabian Russwurm, Pascal Eckmann
 §§
-§§- name: Disable crash notifiers by manipulating sysctl
-§§  sysctl: 
-§§    name: kernel.core_pattern
-§§    reload: yes
-§§    state: present
-§§    value: core
+- name: Disable crash notifiers by manipulating sysctl
+  sysctl: 
+    name: kernel.core_pattern
+    reload: yes
+    state: present
+    value: core
   become: yes

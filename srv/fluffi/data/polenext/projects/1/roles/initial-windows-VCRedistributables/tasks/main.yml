@@ -8,15 +8,15 @@
 # 
 # Author(s): Fabian Russwurm, Thomas Riedmaier
 
-§§- name: Ensure source directory exists
-§§  win_file:
-§§    path: "{{remoteUtilitiesFilePath}}"
-§§    state: directory
-§§
-§§- name: Get listing of files on FTP {{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{FTPRedistributableDirname}}/
-§§  local_action: "shell curl -l {{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{FTPRedistributableDirname}}/"
-§§  register: fileListing
-§§
-§§- name: Install all redistributables
-§§  include: fetchAndInstallRedistributable.yml pkgName="{{item}}"
-§§  with_items: "{{ fileListing.stdout_lines }}"
+- name: Ensure source directory exists
+  win_file:
+    path: "{{remoteUtilitiesFilePath}}"
+    state: directory
+
+- name: Get listing of files on FTP {{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{FTPRedistributableDirname}}/
+  local_action: "shell curl -l {{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{FTPRedistributableDirname}}/"
+  register: fileListing
+
+- name: Install all redistributables
+  include: fetchAndInstallRedistributable.yml pkgName="{{item}}"
+  with_items: "{{ fileListing.stdout_lines }}"

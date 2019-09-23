@@ -169,7 +169,7 @@ Author(s): Thomas Riedmaier, Michael Kraus, Abian Blome, Fabian Russwurm
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-§§      <AdditionalDependencies>SharedMemIPC.lib;iphlpapi.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SharedMemIPC.lib;iphlpapi.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

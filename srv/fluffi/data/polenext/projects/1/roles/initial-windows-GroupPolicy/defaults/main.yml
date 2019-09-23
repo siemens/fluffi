@@ -9,16 +9,16 @@
 # Author(s): Fabian Russwurm, Thomas Riedmaier, Pascal Eckmann
 
 §§# Default variables
-§§
-§§# File name of the executable to apply local group policies
-§§LGPOExecutableFileName: LGPO.exe
-§§
-§§# Folder name of the FTP server
-§§LGPOFTPDirname: LGPO
-§§
-§§# File name of the group policy text file which should be applied
-§§groupPolicyFileNameTxt: registry.txt
-§§
-§§# File name of the group policy file which should be applied
-§§# https://msdn.microsoft.com/en-us/library/aa374407(v=vs.85).aspx
+
+# File name of the executable to apply local group policies
+LGPOExecutableFileName: LGPO.exe
+
+# Folder name of the FTP server
+LGPOFTPDirname: LGPO
+
+# File name of the group policy text file which should be applied
+groupPolicyFileNameTxt: registry.txt
+
+# File name of the group policy file which should be applied
+# https://msdn.microsoft.com/en-us/library/aa374407(v=vs.85).aspx
 groupPolicyFileNamePol: registry.pol

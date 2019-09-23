@@ -10,15 +10,15 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Fabian Russwurm, Abian Blome
 */
 
-§§#pragma once
-§§#include "IFLUFFIMessageHandler.h"
+#pragma once
+#include "IFLUFFIMessageHandler.h"
 
 class GetCurrentBlockCoverageRequestHandler :
-§§	public IFLUFFIMessageHandler
-§§{
-§§public:
+	public IFLUFFIMessageHandler
+{
+public:
 	GetCurrentBlockCoverageRequestHandler();
 	~GetCurrentBlockCoverageRequestHandler();
-§§
+
 	void handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp);
-§§};
+};

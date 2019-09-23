@@ -8,5 +8,5 @@
 # 
 # Author(s): Thomas Riedmaier, Fabian Russwurm
 
-§§# Size of the ramdisk
+# Size of the ramdisk
 ramdiskSize: 1G

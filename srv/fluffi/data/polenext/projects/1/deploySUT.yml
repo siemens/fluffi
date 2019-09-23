@@ -8,12 +8,12 @@
 # 
 # Author(s): Thomas Riedmaier, Fabian Russwurm, Pascal Eckmann
 §§
-§§- hosts: windows
-§§  roles:
-§§    - deployment-windows-SUT
-§§    - { role: general-windows-syncToRamdisk, scope: SUT}
-§§
+- hosts: windows
+  roles:
+    - deployment-windows-SUT
+    - { role: general-windows-syncToRamdisk, scope: SUT}
+
 §§- hosts: linux, odroids
-§§  roles:
-§§    - deployment-linux-SUT
+  roles:
+    - deployment-linux-SUT
     - { role: general-linux-syncToRamdisk, scope: SUT}

@@ -10,20 +10,20 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Fabian Russwurm, Abian Blome
 */
 
-§§#pragma once
-§§#include "IFLUFFIMessageHandler.h"
+#pragma once
+#include "IFLUFFIMessageHandler.h"
 
 class CommInt;
 class GarbageCollectorWorker;
 class FluffiTestcaseID;
 class LMDatabaseManager;
 class PutTestEvaluationRequestHandler :
-§§	public IFLUFFIMessageHandler
-§§{
-§§public:
+	public IFLUFFIMessageHandler
+{
+public:
 	PutTestEvaluationRequestHandler(std::string testcaseDir, CommInt* commPtr, GarbageCollectorWorker* garbageCollectorWorker, int forceFlushAfterMS);
 	~PutTestEvaluationRequestHandler();
-§§
+
 	void handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp);
 
 private:
@@ -36,4 +36,4 @@ private:
 	std::mutex m_completedTestcasesCache_mutex_;
 	std::chrono::time_point<std::chrono::steady_clock> m_timeOfLastFlush;
 	int m_forceFlushAfterMS;
-§§};
+};

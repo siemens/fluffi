@@ -8,17 +8,17 @@
 # 
 # Author(s): Fabian Russwurm, Thomas Riedmaier, Pascal Eckmann
 
-§§- name: Ensure directory exists
-§§  file:
-§§    path: "{{SUTPath}}"
-§§    state: directory
-§§    recurse: yes
-§§
-§§- name: Extract names from file path
-§§  set_fact:
-§§    SUTFileName: "{{filePathToFetchFromFTP | basename}}"
-§§    SUTDirName: "{{filePathToFetchFromFTP | basename | splitext | first }}"
-§§
+- name: Ensure directory exists
+  file:
+    path: "{{SUTPath}}"
+    state: directory
+    recurse: yes
+
+- name: Extract names from file path
+  set_fact:
+    SUTFileName: "{{filePathToFetchFromFTP | basename}}"
+    SUTDirName: "{{filePathToFetchFromFTP | basename | splitext | first }}"
+
 - name: Check if the {{SUTFileName}} already exists
   stat:
     path: "{{SUTPath}}/{{SUTDirName}}"
@@ -61,53 +61,53 @@
     state: absent
   when: stat2_result.stat.exists
 
-§§- name: Fetch SUT from "{{filePathToFetchFromFTP}}"
-§§  get_url: 
-§§    url: "{{filePathToFetchFromFTP}}"
-§§    dest: "{{SUTPath}}/{{SUTFileName}}"
-§§
-§§- name: Ensure unarchive directory exists
-§§  file:
-§§    path: "{{SUTPath}}/{{SUTDirName}}"
-§§    state: directory
-§§    recurse: yes
-§§    
-§§- name: Extract SUT {{SUTPath}}/{{SUTFileName}}
-§§  unarchive: 
-§§    src: "{{SUTPath}}/{{SUTFileName}}"
-§§    dest: "{{SUTPath}}/{{SUTDirName}}"
-§§    remote_src: yes
-§§
-§§- name: Get info of potential install script
-§§  stat:
-§§    path: "{{SUTPath}}/{{SUTDirName}}/{{item}}"
-§§  with_items: 
-§§    - install.sh
-§§    - install.bash
-§§    - install.zsh
-§§  register: installScriptResults
-§§
-§§- name: Check if a install script exists
-§§  set_fact: 
-§§     deploymentScriptPath: "{{item.stat.path}}"
-§§  with_items: "{{installScriptResults.results}}"
-§§  when: item.stat.exists
-§§
-§§- name: Fail if no install script exists
-§§  fail: 
-§§    msg: "No install script found"
-§§  when: deploymentScriptPath is not defined
-§§    
-§§- name: Ensure install script is executable
-§§  file:
-§§    dest: "{{deploymentScriptPath}}"
-§§    mode: 00777
-§§    state: file
-§§    owner: "{{ansible_ssh_user}}"
-§§    group: "{{ansible_ssh_user}}"
-§§
-§§- name: Execute install script of the SUT on the remote machine
-§§  shell: "{{deploymentScriptPath}}"
-§§  args:
-§§    chdir: "{{SUTPath}}/{{SUTDirName}}"
+- name: Fetch SUT from "{{filePathToFetchFromFTP}}"
+  get_url: 
+    url: "{{filePathToFetchFromFTP}}"
+    dest: "{{SUTPath}}/{{SUTFileName}}"
+
+- name: Ensure unarchive directory exists
+  file:
+    path: "{{SUTPath}}/{{SUTDirName}}"
+    state: directory
+    recurse: yes
+    
+- name: Extract SUT {{SUTPath}}/{{SUTFileName}}
+  unarchive: 
+    src: "{{SUTPath}}/{{SUTFileName}}"
+    dest: "{{SUTPath}}/{{SUTDirName}}"
+    remote_src: yes
+
+- name: Get info of potential install script
+  stat:
+    path: "{{SUTPath}}/{{SUTDirName}}/{{item}}"
+  with_items: 
+    - install.sh
+    - install.bash
+    - install.zsh
+  register: installScriptResults
+
+- name: Check if a install script exists
+  set_fact: 
+     deploymentScriptPath: "{{item.stat.path}}"
+  with_items: "{{installScriptResults.results}}"
+  when: item.stat.exists
+
+- name: Fail if no install script exists
+  fail: 
+    msg: "No install script found"
+  when: deploymentScriptPath is not defined
+    
+- name: Ensure install script is executable
+  file:
+    dest: "{{deploymentScriptPath}}"
+    mode: 00777
+    state: file
+    owner: "{{ansible_ssh_user}}"
+    group: "{{ansible_ssh_user}}"
+
+- name: Execute install script of the SUT on the remote machine
+  shell: "{{deploymentScriptPath}}"
+  args:
+    chdir: "{{SUTPath}}/{{SUTDirName}}"
   become: yes

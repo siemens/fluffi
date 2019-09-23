@@ -8,32 +8,32 @@
 # 
 # Author(s): Fabian Russwurm, Thomas Riedmaier, Pascal Eckmann
 §§
-§§- name: Ensure source directory exists
-§§  win_file:
-§§    path: "{{remoteUtilitiesFilePath}}"
-§§    state: directory
-§§
+- name: Ensure source directory exists
+  win_file:
+    path: "{{remoteUtilitiesFilePath}}"
+    state: directory
+
 - name: Fetch wallpaper from "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{backgroundImageFolderName}}/{{inventory_hostname}}.png"
-§§  win_get_url: 
+  win_get_url: 
     url: "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{backgroundImageFolderName}}/{{inventory_hostname}}.png"
     dest: "{{remoteUtilitiesFilePath}}{{inventory_hostname}}.png"
 §§  when: "inventory_hostname in inventory_hostname"
   ignore_errors: True
-§§
+
 # reg add “HKEY_CURRENT_USER\Control Panel\Desktop” /v Wallpaper /t REG_SZ /d C:\wallpaper.png /f
 §§- name: Modify registry to set wallpapaer
-§§  win_regedit:
-§§     path: HKCU:\Control Panel\Desktop
-§§     name: "WallPaper"
+  win_regedit:
+     path: HKCU:\Control Panel\Desktop
+     name: "WallPaper"
      data: "{{remoteUtilitiesFilePath}}{{inventory_hostname}}.png"
-§§     type: "string"
-§§     state: "present"
+     type: "string"
+     state: "present"
   ignore_errors: True
-§§
-§§#- pause:
-§§#    minutes: 1
-§§
-§§# RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters
-§§- name: Run function UpdatePerUserSystemParameters in user32.dll
-§§  win_shell:  "RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters"
-§§
+
+#- pause:
+#    minutes: 1
+
+# RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters
+- name: Run function UpdatePerUserSystemParameters in user32.dll
+  win_shell:  "RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters"
+

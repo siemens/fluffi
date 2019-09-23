@@ -8,16 +8,16 @@
 # 
 # Author(s): Thomas Riedmaier, Fabian Russwurm, Pascal Eckmann, Roman Bendt, Michael Kraus
 
-§§- name: Set default OSRootDirName and bootFile
-§§  set_fact:
+- name: Set default OSRootDirName and bootFile
+  set_fact:
 §§    OSRootDirName: "{{OSRootDirNameArgument}}"
-§§
+
 §§- name: Clean root directory of the TFTP server
-§§  local_action: "shell rm -r {{TFTPRootPath}}/*"
-§§  ignore_errors: yes
-§§
+  local_action: "shell rm -r {{TFTPRootPath}}/*"
+  ignore_errors: yes
+
 §§- name: Copy root directory to TFTP server
   local_action: "shell cp -pr {{TFTPAllRootsPath}}/{{OSRootDirName}}/* {{TFTPRootPath}}/"
-§§
-§§#- name: Change DHCP Boot-file
+
+#- name: Change DHCP Boot-file
 #  local_action: "shell echo dhcp-boot={{bootFileOdroid}} >  {{DHCPConfigPath}}"

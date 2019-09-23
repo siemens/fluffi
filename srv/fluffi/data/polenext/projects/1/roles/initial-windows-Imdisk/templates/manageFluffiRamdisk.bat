@@ -8,5 +8,5 @@
 :: 
 :: Author(s): Thomas Riedmaier, Fabian Russwurm
 
-§§imdisk -a -s {{RamDiskSize}} -m {{ramDiskMountpointLetter}}: -p "/fs:ntfs /q /y"
+imdisk -a -s {{RamDiskSize}} -m {{ramDiskMountpointLetter}}: -p "/fs:ntfs /q /y"
 robocopy {{deploymentPath}} {{ramDiskMountpointLetter}}:\ /E

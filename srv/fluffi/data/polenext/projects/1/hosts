@@ -8,28 +8,28 @@
 # 
 # Author(s): Thomas Riedmaier, Fabian Russwurm, Michael Kraus, Pascal Eckmann
 
-§§[windows]
+[windows]
 fluffi_windows1 ansible_ssh_host=fluffi_windows1.fluffi
 fluffi_windows2 ansible_ssh_host=fluffi_windows2.fluffi
 
-§§[windows:vars]
+[windows:vars]
 ansible_user=fluffi_windows_user
 ansible_password=fluffi_windows_pw
-§§ansible_connection=winrm
-§§ansible_winrm_transport=ntlm
-§§ansible_ssh_port=5985
+ansible_connection=winrm
+ansible_winrm_transport=ntlm
+ansible_ssh_port=5985
+
 §§
-§§
-§§[linux]
+[linux]
 fluffi_linux1 ansible_ssh_host=fluffi_linux1.fluffi
 fluffi_linux2 ansible_ssh_host=fluffi_linux2.fluffi
 
-§§[linux:vars]
-§§ansible_connection=ssh
+[linux:vars]
+ansible_connection=ssh
 ansible_ssh_user=fluffi_linux_user
 ansible_ssh_pass=fluffi_linux_pw
 ansible_sudo_pass=fluffi_linux_pw
-§§
+
 §§
 §§[odroids]
 fluffi_odroid1 ansible_ssh_host=fluffi_odroid1.fluffi
@@ -42,16 +42,16 @@ ansible_ssh_pass=fluffi_odroid_pw
 ansible_sudo_pass=fluffi_odroid_pw
 §§
 §§
-§§[dashboard]
-§§dashboard-right ansible_ssh_host=fluffi-right-dashboard.fluffi
-§§dashboard-left ansible_ssh_host=fluffi-left-dashboard.fluffi
-§§
-§§[dashboard:vars]
-§§ansible_connection=ssh
-§§ansible_ssh_user=pi
+[dashboard]
+dashboard-right ansible_ssh_host=fluffi-right-dashboard.fluffi
+dashboard-left ansible_ssh_host=fluffi-left-dashboard.fluffi
+
+[dashboard:vars]
+ansible_connection=ssh
+ansible_ssh_user=pi
 ansible_ssh_pass=fluffi_dashboard_pw
 ansible_sudo_pass=fluffi_dashboard_pw
+
 §§
-§§
-§§[Master]
+[Master]
 master ansible_ssh_host=127.0.0.1 ansible_connection=local

@@ -8,5 +8,5 @@
 # 
 # Author(s): Thomas Riedmaier, Fabian Russwurm
 
-§§backgroundImageFolderName: backgrounds
-§§fullWindowsDefaultWallpaperPath: c:\windows\web\wallpaper\windows\
+backgroundImageFolderName: backgrounds
+fullWindowsDefaultWallpaperPath: c:\windows\web\wallpaper\windows\

@@ -8,19 +8,19 @@
 # 
 # Author(s): Fabian Russwurm, Thomas Riedmaier
 
-§§- name: Fetch redistributable from "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{FTPRedistributableDirname}}"
-§§  win_get_url: 
-§§    url: "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{FTPRedistributableDirname}}/{{pkgName}}/{{installerFilename}}"
-§§    dest: "{{remoteUtilitiesFilePath}}{{installerFilename}}"
-§§
-§§- name: Install redistributable "{{remoteUtilitiesFilePath}}{{installerFilename}}"
-§§  win_package:
-§§    path: "{{remoteUtilitiesFilePath}}{{installerFilename}}"
-§§    product_id: Microsoft Windows
-§§    arguments: "{{ installerFlags }}"
-§§  ignore_errors: True
-§§
-§§- name: Delete "{{remoteUtilitiesFilePath}}{{installerFilename}}"
-§§  win_file:
-§§    path: "{{remoteUtilitiesFilePath}}{{installerFilename}}"
+- name: Fetch redistributable from "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{FTPRedistributableDirname}}"
+  win_get_url: 
+    url: "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{FTPRedistributableDirname}}/{{pkgName}}/{{installerFilename}}"
+    dest: "{{remoteUtilitiesFilePath}}{{installerFilename}}"
+
+- name: Install redistributable "{{remoteUtilitiesFilePath}}{{installerFilename}}"
+  win_package:
+    path: "{{remoteUtilitiesFilePath}}{{installerFilename}}"
+    product_id: Microsoft Windows
+    arguments: "{{ installerFlags }}"
+  ignore_errors: True
+
+- name: Delete "{{remoteUtilitiesFilePath}}{{installerFilename}}"
+  win_file:
+    path: "{{remoteUtilitiesFilePath}}{{installerFilename}}"
     state: absent

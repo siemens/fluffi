@@ -10,7 +10,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Abian Blome, Fabian Russwurm, Pascal Eckmann
 */
 
-§§#include "stdafx.h"
+#include "stdafx.h"
 #include "LMDatabaseManager.h"
 #include "FluffiTestcaseID.h"
 #include "CommInt.h"
@@ -31,7 +31,7 @@ LMDatabaseManager::LMDatabaseManager(GarbageCollectorWorker* garbageCollectorWor
 	m_DBConnection(nullptr),
 	m_garbageCollectorWorker(garbageCollectorWorker),
 	performanceWatchTimePoint(std::chrono::steady_clock::now())
-§§{
+{
 	if (!mysql_thread_safe()) {
 		LOG(ERROR) << "The maria db connector was not compiled in a thread safe way! This won't work!";
 		google::protobuf::ShutdownProtobufLibrary();
@@ -58,35 +58,35 @@ void LMDatabaseManager::setDBConnectionParameters(std::string host, std::string 
 
 MYSQL* LMDatabaseManager::establishDBConnection() {
 	MYSQL* re = mysql_init(NULL);
-§§
+
 	my_bool reconnect = true;
 	mysql_options(re, MYSQL_OPT_RECONNECT, &reconnect);
 	mysql_options(re, MYSQL_SET_CHARSET_NAME, "utf8");
 
 	if (!mysql_real_connect(re, s_dbHost.c_str(), s_dbUser.c_str(), s_dbPassword.c_str(), s_dbName.c_str(), 3306, "", 0))
-§§	{
+	{
 		LOG(ERROR) << "Failed to connect to database";
 		google::protobuf::ShutdownProtobufLibrary();
 		_exit(EXIT_FAILURE); //make compiler happy
-§§	}
-§§	else
-§§	{
+	}
+	else
+	{
 		LOG(DEBUG) << "Thread " << std::this_thread::get_id() << " connected successful to database " << re->db << " with version " << re->server_version << " at host " << re->host_info;
-§§	}
+	}
 
 	setSessionParameters(re);
 
 	return re;
-§§}
-§§
+}
+
 MYSQL* LMDatabaseManager::getDBConnection() {
 	if (m_DBConnection == nullptr) {
 		m_DBConnection = establishDBConnection();
 	}
 
 	return m_DBConnection;
-§§}
-§§
+}
+
 #ifdef _VSTEST
 std::string LMDatabaseManager::EXECUTE_TEST_STATEMENT(const std::string query) {
 	if (mysql_query(getDBConnection(), query.c_str()) != 0) {
@@ -112,7 +112,7 @@ std::string LMDatabaseManager::EXECUTE_TEST_STATEMENT(const std::string query) {
 #endif // _VSTEST
 
 bool LMDatabaseManager::writeManagedInstance(const FluffiServiceDescriptor serviceDescriptor, int type, std::string subtype, std::string location)
-§§{
+{
 	PERFORMANCE_WATCH_FUNCTION_ENTRY
 		int preparedType = type;
 	const char* cStrServiceDescriptorGUID = serviceDescriptor.m_guid.c_str();
@@ -242,53 +242,53 @@ bool LMDatabaseManager::writeManagedInstance(const FluffiServiceDescriptor servi
 
 	PERFORMANCE_WATCH_FUNCTION_EXIT("writeManagedInstance")
 		return true;
-§§}
+}
 
 GetNewCompletedTestcaseIDsResponse* LMDatabaseManager::generateGetNewCompletedTestcaseIDsResponse(time_t lastUpdateTimeStamp)
-§§{
+{
 	PERFORMANCE_WATCH_FUNCTION_ENTRY
 		GetNewCompletedTestcaseIDsResponse* re = new GetNewCompletedTestcaseIDsResponse();
 
-§§	struct tm structCurTime;
+	struct tm structCurTime;
 	gmtime_s(&structCurTime, &lastUpdateTimeStamp);
-§§	MYSQL_TIME timeStamp;
+	MYSQL_TIME timeStamp;
 	memset(&timeStamp, 0, sizeof(timeStamp));
 	timeStamp.year = structCurTime.tm_year + 1900;
 	timeStamp.month = structCurTime.tm_mon + 1;
-§§	timeStamp.day = structCurTime.tm_mday;
-§§	timeStamp.hour = structCurTime.tm_hour;
-§§	timeStamp.minute = structCurTime.tm_min;
-§§	timeStamp.second = structCurTime.tm_sec;
-§§
-§§	//// prepared Statement
+	timeStamp.day = structCurTime.tm_mday;
+	timeStamp.hour = structCurTime.tm_hour;
+	timeStamp.minute = structCurTime.tm_min;
+	timeStamp.second = structCurTime.tm_sec;
+
+	//// prepared Statement
 	MYSQL_STMT* sql_stmt = mysql_stmt_init(getDBConnection());
-§§	// fetch local IDs and TimeOFCompletion to get new timestamp without race condition
+	// fetch local IDs and TimeOFCompletion to get new timestamp without race condition
 	const char* stmt = "SELECT CreatorServiceDescriptorGUID, CreatorLocalID, TimeOfCompletion FROM completed_testcases WHERE TimeOfCompletion >= ?"; //>= in order to avoid that some do not appear at all (drawback - some will appear twice)
-§§	mysql_stmt_prepare(sql_stmt, stmt, static_cast<unsigned long>(strlen(stmt)));
-§§
+	mysql_stmt_prepare(sql_stmt, stmt, static_cast<unsigned long>(strlen(stmt)));
+
 	//params
 	MYSQL_BIND bind[1];
 
-§§	memset(bind, 0, sizeof(bind));
-§§
+	memset(bind, 0, sizeof(bind));
+
 	bind[0].buffer_type = MYSQL_TYPE_TIMESTAMP;
 	bind[0].buffer = &timeStamp;
 	bind[0].is_null = 0;
 	bind[0].length = 0;
-§§
-§§	mysql_stmt_bind_param(sql_stmt, bind);
-§§	if (mysql_stmt_execute(sql_stmt) != 0) {
+
+	mysql_stmt_bind_param(sql_stmt, bind);
+	if (mysql_stmt_execute(sql_stmt) != 0) {
 		LOG(ERROR) << "generateGetNewCompletedTestcaseIDsResponse encountered the following error: " << mysql_stmt_error(sql_stmt);
-§§		mysql_stmt_close(sql_stmt);
+		mysql_stmt_close(sql_stmt);
 		return re;
-§§	}
-§§
+	}
+
 	MYSQL_TIME outputTimeStamp;
 	long long int	creatorLocalID;
-§§
+
 	MYSQL_BIND resultBIND[3];
 	memset(resultBIND, 0, sizeof(resultBIND));
-§§
+
 	unsigned long lineLengthCol0 = 0;
 
 	resultBIND[0].buffer_type = MYSQL_TYPE_VAR_STRING;
@@ -334,10 +334,10 @@ GetNewCompletedTestcaseIDsResponse* LMDatabaseManager::generateGetNewCompletedTe
 		time_t newTimestamp = _mkgmtime(&timeinfo);
 
 		if (latestTimeSTamp == 0)
-§§		{
+		{
 			latestTimeSTamp = newTimestamp;
 			LOG(DEBUG) << "Setting initial timestamp";
-§§		}
+		}
 		else if (difftime(newTimestamp, latestTimeSTamp) > 0.0)
 		{
 			latestTimeSTamp = newTimestamp;
@@ -346,8 +346,8 @@ GetNewCompletedTestcaseIDsResponse* LMDatabaseManager::generateGetNewCompletedTe
 		else
 		{
 			LOG(DEBUG) << "Timestamp not newer";
-§§		}
-§§
+		}
+
 		ServiceDescriptor* creatorSd = new ServiceDescriptor();
 		creatorSd->set_guid(responseCol0);
 		//the service's hostandPort is unknown and therefore not set (and irrelevant anyways)
@@ -360,14 +360,14 @@ GetNewCompletedTestcaseIDsResponse* LMDatabaseManager::generateGetNewCompletedTe
 	}
 
 	mysql_stmt_free_result(sql_stmt);
-§§	mysql_stmt_close(sql_stmt);
-§§
+	mysql_stmt_close(sql_stmt);
+
 	re->set_updatetimestamp(latestTimeSTamp);
 
 	PERFORMANCE_WATCH_FUNCTION_EXIT("generateGetNewCompletedTestcaseIDsResponse")
 		return re;
-§§}
-§§
+}
+
 std::vector<std::pair<FluffiServiceDescriptor, AgentType>> LMDatabaseManager::getAllRegisteredInstances(std::string location)
 {
 	PERFORMANCE_WATCH_FUNCTION_ENTRY

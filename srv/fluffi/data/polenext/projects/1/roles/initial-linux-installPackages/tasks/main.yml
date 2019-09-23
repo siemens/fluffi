@@ -8,18 +8,18 @@
 # 
 # Author(s): Fabian Russwurm, Thomas Riedmaier
 
-§§- name: Ensure source directory exists
-§§  file:
-§§    dest: "{{remoteUtilitiesFilePath}}"
-§§    mode: 00777 
-§§    state: directory
-§§    owner: "{{ansible_ssh_user}}"
-§§    group: "{{ansible_ssh_user}}"
-§§
-§§- name: Get listing of files on FTP
-§§  local_action: "shell curl -l {{ftpserverURL}}/{{initialInstallPackages}}/"
-§§  register: fileListing
-§§
-§§- name: Install all packages
-§§  include: fetchAndInstallPackage.yml pkgName="{{item}}"
+- name: Ensure source directory exists
+  file:
+    dest: "{{remoteUtilitiesFilePath}}"
+    mode: 00777 
+    state: directory
+    owner: "{{ansible_ssh_user}}"
+    group: "{{ansible_ssh_user}}"
+
+- name: Get listing of files on FTP
+  local_action: "shell curl -l {{ftpserverURL}}/{{initialInstallPackages}}/"
+  register: fileListing
+
+- name: Install all packages
+  include: fetchAndInstallPackage.yml pkgName="{{item}}"
   with_items: "{{ fileListing.stdout_lines }}"

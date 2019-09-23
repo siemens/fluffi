@@ -8,40 +8,40 @@
 # 
 # Author(s): Fabian Russwurm, Thomas Riedmaier, Pascal Eckmann
 
-§§# 1. Fetch Fluffi from FTP
-§§# 2. Unzip fluffi to C
-§§# 3. Create shortcuts
+# 1. Fetch Fluffi from FTP
+# 2. Unzip fluffi to C
+# 3. Create shortcuts
 §§
-§§- name: Ensure directory exists
-§§  win_file:
-§§    path: "{{deploymentPath}}\\{{architecture}}\\"
-§§    state: directory
-§§
+- name: Ensure directory exists
+  win_file:
+    path: "{{deploymentPath}}\\{{architecture}}\\"
+    state: directory
+
 §§- name: Fetch FLUFFI from "{{ftpserverURL}}/{{fluffiFTPDirname}}/windows/{{architecture}}/{{fluffiFTPFilename}}"
-§§  win_get_url: 
-§§    url: "{{ftpserverURL}}/{{fluffiFTPDirname}}/windows/{{architecture}}/{{fluffiFTPFilename}}"
-§§    dest: "{{deploymentPath}}\\{{architecture}}\\"
-§§
+  win_get_url: 
+    url: "{{ftpserverURL}}/{{fluffiFTPDirname}}/windows/{{architecture}}/{{fluffiFTPFilename}}"
+    dest: "{{deploymentPath}}\\{{architecture}}\\"
+
 §§- name: Unzip FLUFFI to persistent C
-§§  win_unzip:
-§§    src: "{{deploymentPath}}\\{{architecture}}\\{{fluffiFTPFilename}}"
-§§    dest: "{{deploymentPath}}\\{{architecture}}\\"
-§§    delete_archive: yes
-§§
-§§- name: Create persistent shortcuts on desktop
-§§  win_shortcut:
-§§    src: "{{deploymentPath}}\\{{architecture}}\\{{item.value}}.exe"
+  win_unzip:
+    src: "{{deploymentPath}}\\{{architecture}}\\{{fluffiFTPFilename}}"
+    dest: "{{deploymentPath}}\\{{architecture}}\\"
+    delete_archive: yes
+
+- name: Create persistent shortcuts on desktop
+  win_shortcut:
+    src: "{{deploymentPath}}\\{{architecture}}\\{{item.value}}.exe"
     args: "{{location}}"
-§§    dest: '%USERPROFILE%\Desktop\{{item.key}}{{architecture}}Disk.lnk'
-§§    directory: "{{deploymentPath}}\\{{architecture}}\\"
-§§  when: createShortcut
-§§  with_dict: "{{executableNames}}"
-§§
-§§- name: Create ramdisk shortcuts on desktop
-§§  win_shortcut:
-§§    src: "{{ramDiskMountpointLetter}}:\\{{deploymentDirName}}\\{{architecture}}\\{{item.value}}.exe"
+    dest: '%USERPROFILE%\Desktop\{{item.key}}{{architecture}}Disk.lnk'
+    directory: "{{deploymentPath}}\\{{architecture}}\\"
+  when: createShortcut
+  with_dict: "{{executableNames}}"
+
+- name: Create ramdisk shortcuts on desktop
+  win_shortcut:
+    src: "{{ramDiskMountpointLetter}}:\\{{deploymentDirName}}\\{{architecture}}\\{{item.value}}.exe"
     args: "{{location}}"
-§§    dest: '%USERPROFILE%\Desktop\{{item.key}}{{architecture}}Ram.lnk'
-§§    directory: "{{ramDiskMountpointLetter}}:\\{{deploymentDirName}}\\{{architecture}}\\"
-§§  when: createShortcut
+    dest: '%USERPROFILE%\Desktop\{{item.key}}{{architecture}}Ram.lnk'
+    directory: "{{ramDiskMountpointLetter}}:\\{{deploymentDirName}}\\{{architecture}}\\"
+  when: createShortcut
   with_dict: "{{executableNames}}"

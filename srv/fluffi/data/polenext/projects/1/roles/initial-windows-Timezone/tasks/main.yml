@@ -8,6 +8,6 @@
 # 
 # Author(s): Thomas Riedmaier, Fabian Russwurm
 
-§§- name: Set timezone to 'Romance Standard Time' (GMT+01:00)
-§§  win_timezone:
-§§    timezone: Romance Standard Time
+- name: Set timezone to 'Romance Standard Time' (GMT+01:00)
+  win_timezone:
+    timezone: Romance Standard Time

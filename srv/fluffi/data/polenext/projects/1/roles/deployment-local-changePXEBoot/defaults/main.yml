@@ -8,19 +8,19 @@
 # 
 # Author(s): Fabian Russwurm, Thomas Riedmaier, Pascal Eckmann
 
-§§OSRootDirNameWindows: "windowsServer2016Root"
-§§bootFileWindows: "pxeboot.n12"
-§§
-§§OSRootDirNameLinux: "ubuntu18.04Root"
-§§bootFileLinux: "pxelinux.0"
-§§
-§§OSRootDirNameOdroid: "windowsServer2016Root"
-§§bootFileOdroid: "pxeboot.n12"
-§§
+OSRootDirNameWindows: "windowsServer2016Root"
+bootFileWindows: "pxeboot.n12"
+
+OSRootDirNameLinux: "ubuntu18.04Root"
+bootFileLinux: "pxelinux.0"
+
+OSRootDirNameOdroid: "windowsServer2016Root"
+bootFileOdroid: "pxeboot.n12"
+
 §§# Parameters provided by user, OS and OSRootDirName are optional
 §§OS: ""
 §§OSRootDirName: ""
-§§
-§§DHCPConfigPath: "/srv/dnsmasq.d/pxe.conf"
-§§TFTPAllRootsPath: "/tftp-roots"
+
+DHCPConfigPath: "/srv/dnsmasq.d/pxe.conf"
+TFTPAllRootsPath: "/tftp-roots"
 TFTPRootPath: "/tftp"

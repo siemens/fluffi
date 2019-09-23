@@ -8,10 +8,10 @@
 # 
 # Author(s): Thomas Riedmaier, Fabian Russwurm
 
-§§- name: Disable ASLR by manipulating sysctl
-§§  sysctl: 
-§§    name: kernel.randomize_va_space
-§§    reload: yes
-§§    state: present
-§§    value: 0
+- name: Disable ASLR by manipulating sysctl
+  sysctl: 
+    name: kernel.randomize_va_space
+    reload: yes
+    state: present
+    value: 0
   become: yes

@@ -210,7 +210,7 @@ Author(s): Abian Blome, Thomas Riedmaier, Michael Kraus, Fabian Russwurm
 call testApplications\bin\get_gdb.bat
 robocopy "$(SolutionDir)FluffiTester\testApplications\bin" "$(TargetDir)." *.*
 if errorlevel 4 goto BuildEventFailed
-§§robocopy "$(SolutionDir)dependencies\dynamorio\dyndist64" "$(TargetDir)dyndist64" /E
+robocopy "$(SolutionDir)dependencies\dynamorio\dyndist64" "$(TargetDir)dyndist64" /E
 if errorlevel 4 goto BuildEventFailed
 if errorlevel 0 goto end
 :BuildEventFailed echo FIL

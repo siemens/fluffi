@@ -20,7 +20,7 @@ Author(s): Pascal Eckmann, Fabian Russwurm, Junes Najah, Michael Kraus, Thomas R
 §§
 §§
 §§<div class="container">
-§§    <div class="container">
+    <div class="container">
 §§        <h1>
 §§            {% if system.IsGroup %}
 §§            <u>Group: {{system.Name}}</u>
@@ -36,47 +36,47 @@ Author(s): Pascal Eckmann, Fabian Russwurm, Junes Najah, Michael Kraus, Thomas R
 §§</div>
 §§
 §§<br>
-§§<div class="container">
-§§    <ul class="nav nav-tabs">
-§§        <li class="active"><a data-toggle="tab" href="#menu1">1. Initial setup</a></li>
-§§        <li><a data-toggle="tab" href="#menu2">2. Deploy Fluffi</a></li>
-§§        <li><a data-toggle="tab" href="#menu3">3. Deploy SUT/Dependency</a></li>
+<div class="container">
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#menu1">1. Initial setup</a></li>
+        <li><a data-toggle="tab" href="#menu2">2. Deploy Fluffi</a></li>
+        <li><a data-toggle="tab" href="#menu3">3. Deploy SUT/Dependency</a></li>
 §§        <li><a data-toggle="tab" href="#menu4">4. Configure Instances</a></li>
-§§    </ul>
+    </ul>
 §§
-§§    <div class="tab-content">
+    <div class="tab-content">
 §§        <div class="tab-pane fade in active" id="menu1">
-§§            <br>
-§§            <form action="{{ url_for('viewSystemInitialSetup', hostname=system.Name) }}" method="post">
-§§                <table>
-§§                    <tr>
+            <br>
+            <form action="{{ url_for('viewSystemInitialSetup', hostname=system.Name) }}" method="post">
+                <table>
+                    <tr>
 §§                        <td>{{ initialSetupForm.ram_disk_size.label }}</td>
 §§                        <td>{{ initialSetupForm.ram_disk_size }}</td>
-§§                    </tr>
-§§                    <tr>
-§§                        <td>{{ initialSetupForm.execute_initial_submit }}</td>
-§§                    </tr>
-§§                </table>
-§§            </form>
-§§        </div>
+                    </tr>
+                    <tr>
+                        <td>{{ initialSetupForm.execute_initial_submit }}</td>
+                    </tr>
+                </table>
+            </form>
+        </div>
 §§        <div class="tab-pane fade" id="menu2">
-§§            <br>
-§§            <form action="{{ url_for('viewDeployFluffi', hostname=system.Name) }}" method="post">
-§§                <table>
-§§                    <tr>
+            <br>
+            <form action="{{ url_for('viewDeployFluffi', hostname=system.Name) }}" method="post">
+                <table>
+                    <tr>
 §§                        <td>{{ fluffiDeployForm.architecture.label }}</td>
 §§                        <td>{{ fluffiDeployForm.architecture }}</td>
-§§                    </tr>
-§§                    <tr>
-§§                        <td>{{ fluffiDeployForm.execute_deploy_fluffi }}</td>
-§§                    </tr>
-§§                </table>
-§§            </form>
-§§        </div>
+                    </tr>
+                    <tr>
+                        <td>{{ fluffiDeployForm.execute_deploy_fluffi }}</td>
+                    </tr>
+                </table>
+            </form>
+        </div>
 §§        <div class="tab-pane fade" id="menu3">
-§§            <br>
+            <br>
 §§            <form action="{{ url_for('viewInstallFuzzjobPackage', hostname=system.Name) }}" method="post">
-§§                <table>
+                <table>
 §§                    <tr>
 §§                        <td>{{ deployFuzzjobPackageForm.fuzzingJob.label }}</td>
 §§                        <td>{{deployFuzzjobPackageForm.fuzzingJob}}</td>
@@ -84,22 +84,22 @@ Author(s): Pascal Eckmann, Fabian Russwurm, Junes Najah, Michael Kraus, Thomas R
 §§                    <tr>
 §§                        <td>{{deployFuzzjobPackageForm.execute_deploy_package}}</td>
 §§                    </tr>
-§§                </table>
-§§            </form>
-§§            <br>
-§§            <br>
-§§            <form action="{{ url_for('viewInstallPackage', hostname=system.Name) }}" method="post">
-§§                <table>
-§§                    <tr>
+                </table>
+            </form>
+            <br>
+            <br>
+            <form action="{{ url_for('viewInstallPackage', hostname=system.Name) }}" method="post">
+                <table>
+                    <tr>
 §§                        <td>{{ deployPackageForm.installPackage.label }}</td>
 §§                        <td>{{deployPackageForm.installPackage}}</td>
-§§                    </tr>
-§§                    <tr>
-§§                        <td>{{deployPackageForm.execute_deploy_package}}</td>
-§§                    </tr>
-§§                </table>
-§§            </form>
-§§        </div>
+                    </tr>
+                    <tr>
+                        <td>{{deployPackageForm.execute_deploy_package}}</td>
+                    </tr>
+                </table>
+            </form>
+        </div>
 §§        <div class="tab-pane fade" id="menu4">
 §§            <br>
 §§                <form action="/systems/configureSystemInstances/{{system.Name}}" enctype="multipart/form-data"
@@ -224,11 +224,11 @@ Author(s): Pascal Eckmann, Fabian Russwurm, Junes Najah, Michael Kraus, Thomas R
 §§                    <button class="btn btn-success" id="configSystemsButton" type="submit">Save Config</button>
 §§                    <br>
 §§                    <br>
-§§        </div>
+        </div>
 §§    </div>
 §§</div>
-§§
-§§</div>
+
+</div>
 §§<br>
 §§<br>
 §§
