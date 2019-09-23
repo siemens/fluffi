@@ -8,54 +8,54 @@
 # 
 # Author(s): Junes Najah, Thomas Riedmaier
 
-§§from sqlalchemy import create_engine
-§§from app.utils.ftp import FTPConnector
-§§from app.utils.ansible import AnsibleRESTConnector
-§§from .helpers import fluffiResolve
-§§
-§§import config
-§§import paho.mqtt.client as paho
-§§
-§§
-§§def healthCheck():
-§§    try:
-§§        client = paho.Client()
+from sqlalchemy import create_engine
+from app.utils.ftp import FTPConnector
+from app.utils.ansible import AnsibleRESTConnector
+from .helpers import fluffiResolve
+
+import config
+import paho.mqtt.client as paho
+
+
+def healthCheck():
+    try:
+        client = paho.Client()
         client.connect("mon.fluffi", 1883)
-§§        client.publish("FLUFFI/webui/db", payload = int(checkDbConnection()), qos = 2)
-§§        client.publish("FLUFFI/webui/ftp", payload = int(checkFtpConnection()))
-§§        client.publish("FLUFFI/webui/ansible", payload = int(checkAnsibleConnection()))
-§§    except Exception as e:
-§§        print(e)
-§§        print("Failed to connect with mqtt!")
-§§
-§§
-§§def checkDbConnection():
-§§    try:
-§§        engine = create_engine(
-§§            'mysql://%s:%s@%s/%s' % (config.DBUSER, config.DBPASS, fluffiResolve(config.DBHOST), config.DEFAULT_DBNAME))
-§§        connection = engine.connect()
-§§        connection.close()
-§§        engine.dispose()
-§§        return True
-§§    except Exception as e:
-§§        print(e)
-§§        return False
-§§
-§§
-§§def checkFtpConnection():
-§§    try:
-§§        ftpConnector = FTPConnector(config.FTP_URL)
-§§        ftpConnector.getListOfFilesOnFTPServer("")
-§§        return True
-§§    except Exception as e:
-§§        print(e)
-§§        return False
-§§
-§§
-§§def checkAnsibleConnection():
-§§    try:
+        client.publish("FLUFFI/webui/db", payload = int(checkDbConnection()), qos = 2)
+        client.publish("FLUFFI/webui/ftp", payload = int(checkFtpConnection()))
+        client.publish("FLUFFI/webui/ansible", payload = int(checkAnsibleConnection()))
+    except Exception as e:
+        print(e)
+        print("Failed to connect with mqtt!")
+
+
+def checkDbConnection():
+    try:
+        engine = create_engine(
+            'mysql://%s:%s@%s/%s' % (config.DBUSER, config.DBPASS, fluffiResolve(config.DBHOST), config.DEFAULT_DBNAME))
+        connection = engine.connect()
+        connection.close()
+        engine.dispose()
+        return True
+    except Exception as e:
+        print(e)
+        return False
+
+
+def checkFtpConnection():
+    try:
+        ftpConnector = FTPConnector(config.FTP_URL)
+        ftpConnector.getListOfFilesOnFTPServer("")
+        return True
+    except Exception as e:
+        print(e)
+        return False
+
+
+def checkAnsibleConnection():
+    try:
         AnsibleRESTConnector("http://pole.fluffi:8888/api/v2/", "admin", "admin")
-§§        return True
-§§    except Exception as e:
-§§        print(e)
+        return True
+    except Exception as e:
+        print(e)
         return False

@@ -10,47 +10,47 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Junes Najah, Thomas Riedmaier
 */
 
-§§var config = (function() {
-§§    var config = null;
-§§    $.ajax({
-§§        'async': false,
-§§        'global': false,
-§§        'url': "/static/config.json",
-§§        'dataType': "json",
-§§        'success': function (data) {
-§§            config = data;
-§§        }
-§§    });
-§§    return config;
-§§})();
-§§
-§§var templates = config["Templates"];
-§§
-§§function fillTemplate(name){    
-§§    if(name != "None"){
-§§        templates.forEach(function(template){
-§§            if(template[name]){
-§§                template[name].forEach(function(setting){
-§§                    if(setting["optionNames"]){
-§§                        setting["optionNames"].forEach(function(optionName, i){
-§§                            $('#addOptionRow').click();
-§§                            $('#' + (i+1) + "_optionname").val(optionName);
-§§                        });
-§§                    }
-§§                    if(setting["optionValues"]){
-§§                        setting["optionValues"].forEach(function(optionValue, i){
-§§                            $('#' + (i+1) + "_optionvalue").val(optionValue);
-§§                        });
-§§                    }
-§§                    if(setting["targetCMDLine"]){
-§§                        $("#targetCMDLine").val(setting["targetCMDLine"]);
-§§                    }
-§§                });
-§§            }
-§§        }); 
-§§    }
-§§    else {
-§§        location.reload();
-§§    }
-§§
+var config = (function() {
+    var config = null;
+    $.ajax({
+        'async': false,
+        'global': false,
+        'url': "/static/config.json",
+        'dataType': "json",
+        'success': function (data) {
+            config = data;
+        }
+    });
+    return config;
+})();
+
+var templates = config["Templates"];
+
+function fillTemplate(name){    
+    if(name != "None"){
+        templates.forEach(function(template){
+            if(template[name]){
+                template[name].forEach(function(setting){
+                    if(setting["optionNames"]){
+                        setting["optionNames"].forEach(function(optionName, i){
+                            $('#addOptionRow').click();
+                            $('#' + (i+1) + "_optionname").val(optionName);
+                        });
+                    }
+                    if(setting["optionValues"]){
+                        setting["optionValues"].forEach(function(optionValue, i){
+                            $('#' + (i+1) + "_optionvalue").val(optionValue);
+                        });
+                    }
+                    if(setting["targetCMDLine"]){
+                        $("#targetCMDLine").val(setting["targetCMDLine"]);
+                    }
+                });
+            }
+        }); 
+    }
+    else {
+        location.reload();
+    }
+
 }

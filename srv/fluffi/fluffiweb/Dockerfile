@@ -14,14 +14,14 @@ FROM tiangolo/uwsgi-nginx-flask:python3.6-alpine3.7
 RUN apk --no-cache --no-progress upgrade && \
     apk --no-cache --no-progress add mariadb-client
 
-§§#COPY customx.conf /etc/nginx/conf.d/
-§§ENV FLASK_APP main.py
-§§ENV UWSGI_INI /app/uwsgi.ini
-§§ENV FLASK_DEBUG 1
+#COPY customx.conf /etc/nginx/conf.d/
+ENV FLASK_APP main.py
+ENV UWSGI_INI /app/uwsgi.ini
+ENV FLASK_DEBUG 1
 ENV STATIC_PATH /app/app/static
 
 COPY requirements.txt /tmp/
 
-§§#RUN pip3 install -U pip
+#RUN pip3 install -U pip
 RUN pip3 install -r /tmp/requirements.txt
 

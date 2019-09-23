@@ -8,11 +8,11 @@
 # 
 # Author(s): Thomas Riedmaier, Junes Najah
 
-§§FROM ubuntu:bionic
-§§
-§§RUN apt-get update && apt-get install -y \
-§§    python3-pip
-§§
+FROM ubuntu:bionic
+
+RUN apt-get update && apt-get install -y \
+    python3-pip
+
 COPY requirements.txt /tmp/
 
 #RUN pip3 install -U pip

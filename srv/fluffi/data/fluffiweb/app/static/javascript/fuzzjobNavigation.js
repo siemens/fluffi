@@ -10,63 +10,63 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Junes Najah, Thomas Riedmaier
 */
 
-§§var clearId = 0;
-§§var rowCount = 0;
-§§var lastTimeout = 0;
-§§
-§§$(function () {
-§§    autoSwap();
-§§});
-§§
-§§function Swap(){
-§§    var table = document.getElementById("fuzzjobTable");
-§§    var row;
-§§    row = table.rows[rowCount];
-§§    if (row) { row.style.backgroundColor = "#ffffff"; }
-§§    rowCount++;
-§§
-§§    if(rowCount > (table.rows.length-1)){
-§§      rowCount = 1;
-§§    }
-§§    
-§§    row = table.rows[rowCount];
-§§    if (row) {
-§§        row.style.backgroundColor = "#BDBDBD";
-§§        var projectID = row.cells[0].innerText;
-§§        var res = "http://mon.fluffi/dashboard/script/scripted.js?fuzzjobname=" + projectID + "&from=now-15m&to=now&orgId=1&kiosk";
-§§        $("#icontainer").empty();
-§§        $("#icontainer").append("<iframe width='100%' src='" + res + "' />");
-§§    }
-§§}
-§§ 
-§§function autoSwap() {
-§§    Swap();
-§§    clearId = setInterval(function(){
-§§        Swap();
-§§    }, 60000);
-§§}
-§§
-§§function showProjectGraph(projName) {
-§§    clearInterval(clearId);
-§§    var Url = "http://mon.fluffi/dashboard/script/scripted.js?fuzzjobname=" + projName + "&from=now-15m&to=now&orgId=1&kiosk";
-§§    var res = Url.replace(/'/g, "%27");
-§§    $("#icontainer").empty();
-§§    $("#icontainer").append("<iframe width='100%' src='" + res + "' />");
-§§    var table = document.getElementById("fuzzjobTable");
-§§    var row;
-§§    row = table.rows[rowCount];
-§§    if (row) {
-§§        row.style.backgroundColor = "#ffffff";
-§§        for (var i = 0, row; row = table.rows[i]; i++) {
-§§            //iterate through rows
-§§            //rows would be accessed using the "row" variable assigned in the for loop
-§§            if(row.cells[0].innerText==projName){
-§§                row.style.backgroundColor = "#BDBDBD";
-§§                rowCount = i;
-§§            }
-§§        }
-§§    }
-§§    
-§§    clearTimeout(lastTimeout);
-§§    lastTimeout = setTimeout(function(){ autoSwap(); }, 60000);
+var clearId = 0;
+var rowCount = 0;
+var lastTimeout = 0;
+
+$(function () {
+    autoSwap();
+});
+
+function Swap(){
+    var table = document.getElementById("fuzzjobTable");
+    var row;
+    row = table.rows[rowCount];
+    if (row) { row.style.backgroundColor = "#ffffff"; }
+    rowCount++;
+
+    if(rowCount > (table.rows.length-1)){
+      rowCount = 1;
+    }
+    
+    row = table.rows[rowCount];
+    if (row) {
+        row.style.backgroundColor = "#BDBDBD";
+        var projectID = row.cells[0].innerText;
+        var res = "http://mon.fluffi/dashboard/script/scripted.js?fuzzjobname=" + projectID + "&from=now-15m&to=now&orgId=1&kiosk";
+        $("#icontainer").empty();
+        $("#icontainer").append("<iframe width='100%' src='" + res + "' />");
+    }
+}
+ 
+function autoSwap() {
+    Swap();
+    clearId = setInterval(function(){
+        Swap();
+    }, 60000);
+}
+
+function showProjectGraph(projName) {
+    clearInterval(clearId);
+    var Url = "http://mon.fluffi/dashboard/script/scripted.js?fuzzjobname=" + projName + "&from=now-15m&to=now&orgId=1&kiosk";
+    var res = Url.replace(/'/g, "%27");
+    $("#icontainer").empty();
+    $("#icontainer").append("<iframe width='100%' src='" + res + "' />");
+    var table = document.getElementById("fuzzjobTable");
+    var row;
+    row = table.rows[rowCount];
+    if (row) {
+        row.style.backgroundColor = "#ffffff";
+        for (var i = 0, row; row = table.rows[i]; i++) {
+            //iterate through rows
+            //rows would be accessed using the "row" variable assigned in the for loop
+            if(row.cells[0].innerText==projName){
+                row.style.backgroundColor = "#BDBDBD";
+                rowCount = i;
+            }
+        }
+    }
+    
+    clearTimeout(lastTimeout);
+    lastTimeout = setTimeout(function(){ autoSwap(); }, 60000);
 }

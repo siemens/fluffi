@@ -12,30 +12,30 @@ Author(s): Pascal Eckmann, Fabian Russwurm, Junes Najah, Michael Kraus, Thomas R
 
 {% extends "base.html" %}
 {% block scripts %}
-§§<script src="{{ url_for('static', filename = 'javascript/instanceConfiguration.js') }}" type="text/javascript"></script>
+<script src="{{ url_for('static', filename = 'javascript/instanceConfiguration.js') }}" type="text/javascript"></script>
 
-§§{{super()}}
-§§{% endblock %}
+{{super()}}
+{% endblock %}
 {% block content %}
 
 
 <div class="container">
     <div class="container">
-§§        <h1>
-§§            {% if system.IsGroup %}
-§§            <u>Group: {{system.Name}}</u>
-§§            {% else %}
-§§            <u>System: {{system.Name}}</u>
-§§            {% endif %}
-§§        </h1>
-§§    </div>
+        <h1>
+            {% if system.IsGroup %}
+            <u>Group: {{system.Name}}</u>
+            {% else %}
+            <u>System: {{system.Name}}</u>
+            {% endif %}
+        </h1>
+    </div>
 </div>
 {{ flashMessages() }}
-§§<hr>
+<hr>
 <div class="jumbotron">
 </div>
 
-§§<br>
+<br>
 <div class="container">
     <ul class="nav nav-tabs">
         <li class="active"><a data-toggle="tab" href="#menu1">1. Initial setup</a></li>
@@ -43,15 +43,15 @@ Author(s): Pascal Eckmann, Fabian Russwurm, Junes Najah, Michael Kraus, Thomas R
         <li><a data-toggle="tab" href="#menu3">3. Deploy SUT/Dependency</a></li>
         <li><a data-toggle="tab" href="#menu4">4. Configure Instances</a></li>
     </ul>
-§§
+
     <div class="tab-content">
-§§        <div class="tab-pane fade in active" id="menu1">
+        <div class="tab-pane fade in active" id="menu1">
             <br>
             <form action="{{ url_for('viewSystemInitialSetup', hostname=system.Name) }}" method="post">
                 <table>
                     <tr>
-§§                        <td>{{ initialSetupForm.ram_disk_size.label }}</td>
-§§                        <td>{{ initialSetupForm.ram_disk_size }}</td>
+                        <td>{{ initialSetupForm.ram_disk_size.label }}</td>
+                        <td>{{ initialSetupForm.ram_disk_size }}</td>
                     </tr>
                     <tr>
                         <td>{{ initialSetupForm.execute_initial_submit }}</td>
@@ -59,13 +59,13 @@ Author(s): Pascal Eckmann, Fabian Russwurm, Junes Najah, Michael Kraus, Thomas R
                 </table>
             </form>
         </div>
-§§        <div class="tab-pane fade" id="menu2">
+        <div class="tab-pane fade" id="menu2">
             <br>
             <form action="{{ url_for('viewDeployFluffi', hostname=system.Name) }}" method="post">
                 <table>
                     <tr>
-§§                        <td>{{ fluffiDeployForm.architecture.label }}</td>
-§§                        <td>{{ fluffiDeployForm.architecture }}</td>
+                        <td>{{ fluffiDeployForm.architecture.label }}</td>
+                        <td>{{ fluffiDeployForm.architecture }}</td>
                     </tr>
                     <tr>
                         <td>{{ fluffiDeployForm.execute_deploy_fluffi }}</td>
@@ -73,17 +73,17 @@ Author(s): Pascal Eckmann, Fabian Russwurm, Junes Najah, Michael Kraus, Thomas R
                 </table>
             </form>
         </div>
-§§        <div class="tab-pane fade" id="menu3">
+        <div class="tab-pane fade" id="menu3">
             <br>
             <form action="{{ url_for('viewInstallFuzzjobPackage', hostname=system.Name) }}" method="post">
                 <table>
-§§                    <tr>
-§§                        <td>{{ deployFuzzjobPackageForm.fuzzingJob.label }}</td>
-§§                        <td>{{deployFuzzjobPackageForm.fuzzingJob}}</td>
-§§                    </tr>
-§§                    <tr>
-§§                        <td>{{deployFuzzjobPackageForm.execute_deploy_package}}</td>
-§§                    </tr>
+                    <tr>
+                        <td>{{ deployFuzzjobPackageForm.fuzzingJob.label }}</td>
+                        <td>{{deployFuzzjobPackageForm.fuzzingJob}}</td>
+                    </tr>
+                    <tr>
+                        <td>{{deployFuzzjobPackageForm.execute_deploy_package}}</td>
+                    </tr>
                 </table>
             </form>
             <br>
@@ -91,8 +91,8 @@ Author(s): Pascal Eckmann, Fabian Russwurm, Junes Najah, Michael Kraus, Thomas R
             <form action="{{ url_for('viewInstallPackage', hostname=system.Name) }}" method="post">
                 <table>
                     <tr>
-§§                        <td>{{ deployPackageForm.installPackage.label }}</td>
-§§                        <td>{{deployPackageForm.installPackage}}</td>
+                        <td>{{ deployPackageForm.installPackage.label }}</td>
+                        <td>{{deployPackageForm.installPackage}}</td>
                     </tr>
                     <tr>
                         <td>{{deployPackageForm.execute_deploy_package}}</td>
@@ -100,7 +100,7 @@ Author(s): Pascal Eckmann, Fabian Russwurm, Junes Najah, Michael Kraus, Thomas R
                 </table>
             </form>
         </div>
-§§        <div class="tab-pane fade" id="menu4">
+        <div class="tab-pane fade" id="menu4">
 §§            <br>
 §§                <form action="/systems/configureSystemInstances/{{system.Name}}" enctype="multipart/form-data"
 §§                      method="POST" name="configureSystemInstances">
@@ -225,12 +225,12 @@ Author(s): Pascal Eckmann, Fabian Russwurm, Junes Najah, Michael Kraus, Thomas R
 §§                    <br>
 §§                    <br>
         </div>
-§§    </div>
-§§</div>
+    </div>
+</div>
 
 </div>
-§§<br>
-§§<br>
+<br>
+<br>
 
 
 {% endblock %}

@@ -34,5 +34,5 @@ wrapt==1.10.11
 WTForms==2.1
 apscheduler==3.6.0
 paho-mqtt==1.4.0
-§§pytz==2019.2
+pytz==2019.2
 selenium==3.141.0

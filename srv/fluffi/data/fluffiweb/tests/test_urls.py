@@ -8,90 +8,90 @@
 # 
 # Author(s): Junes Najah, Thomas Riedmaier
 
-§§import unittest
-§§from app import app, models
-§§
-§§class TestURLs(unittest.TestCase):
-§§    def setUp(self):        
-§§        self.client = app.test_client()
-§§        fuzzjob = models.Fuzzjob.query.first()
-§§        if fuzzjob:
-§§            self.projId = fuzzjob.id
-§§        else:
-§§            print("Error: No fuzzjob exists for testing!")            
-§§
-§§    def test_root_redirect(self):
-§§        """ Tests if the root URL gives a 200 """
-§§
-§§        result = self.client.get("/")
-§§        self.assertEqual(result.status_code, 200)  
-§§        
-§§    def test_projects_redirect(self):
-§§        """ Tests if the projects URL gives a 200 """
-§§
-§§        result = self.client.get("/projects")
-§§        self.assertEqual(result.status_code, 200)  
-§§
-§§    def test_locations_redirect(self):
-§§        """ Tests if the locations URL gives a 200 """
-§§
-§§        result = self.client.get("/locations")
-§§        self.assertEqual(result.status_code, 200)  
-§§
-§§    def test_commands_redirect(self):
-§§        """ Tests if the commands URL gives a 200 """
-§§
-§§        result = self.client.get("/commands")
-§§        self.assertEqual(result.status_code, 200) 
-§§
-§§    def test_hangs_redirect(self):
-§§        """ Tests if the hangs URL gives a 200 """
-§§
-§§        result = self.client.get("/projects/{}/hangs".format(self.projId))
-§§        self.assertEqual(result.status_code, 200)  
-§§
-§§    def test_population_redirect(self):
-§§        """ Tests if the population URL gives a 200 """
-§§
-§§        result = self.client.get("/projects/{}/population".format(self.projId))
-§§        self.assertEqual(result.status_code, 200)  
-§§
-§§    def test_violations_redirect(self):
-§§        """ Tests if the violations URL gives a 200 """
-§§
-§§        result = self.client.get("/projects/{}/violations".format(self.projId))
-§§        self.assertEqual(result.status_code, 200) 
-§§
-§§    def test_view_projects_redirect(self):
-§§        """ Tests if the view projects URL gives a 200 """
-§§
-§§        result = self.client.get("/projects/view/{}".format(self.projId))
-§§        self.assertEqual(result.status_code, 200) 
-§§
-§§    def test_accessVioTotal_redirect(self):
-§§        """ Tests if the accessVioTotal view URL gives a 200 """
-§§
-§§        result = self.client.get("/projects/{}/accessVioTotal".format(self.projId))
-§§        self.assertEqual(result.status_code, 200)
-§§
-§§    def test_accessVioUnique_redirect(self):
-§§        """ Tests if the accessVioUnique view URL gives a 200 """
-§§
-§§        result = self.client.get("/projects/{}/accessVioUnique".format(self.projId))
-§§        self.assertEqual(result.status_code, 200)
-§§
-§§    def test_totalCrashes_redirect(self):
-§§        """ Tests if the totalCrashes view URL gives a 200 """
-§§
-§§        result = self.client.get("/projects/{}/totalCrashes".format(self.projId))
-§§        self.assertEqual(result.status_code, 200) 
-§§
-§§    def test_noResponse_redirect(self):
-§§        """ Tests if the noResponse view URL gives a 200 """
-§§
-§§        result = self.client.get("/projects/{}/noResponse".format(self.projId))
-§§        self.assertEqual(result.status_code, 200) 
-§§
-§§
-§§if __name__ == '__main__':
+import unittest
+from app import app, models
+
+class TestURLs(unittest.TestCase):
+    def setUp(self):        
+        self.client = app.test_client()
+        fuzzjob = models.Fuzzjob.query.first()
+        if fuzzjob:
+            self.projId = fuzzjob.id
+        else:
+            print("Error: No fuzzjob exists for testing!")            
+
+    def test_root_redirect(self):
+        """ Tests if the root URL gives a 200 """
+
+        result = self.client.get("/")
+        self.assertEqual(result.status_code, 200)  
+        
+    def test_projects_redirect(self):
+        """ Tests if the projects URL gives a 200 """
+
+        result = self.client.get("/projects")
+        self.assertEqual(result.status_code, 200)  
+
+    def test_locations_redirect(self):
+        """ Tests if the locations URL gives a 200 """
+
+        result = self.client.get("/locations")
+        self.assertEqual(result.status_code, 200)  
+
+    def test_commands_redirect(self):
+        """ Tests if the commands URL gives a 200 """
+
+        result = self.client.get("/commands")
+        self.assertEqual(result.status_code, 200) 
+
+    def test_hangs_redirect(self):
+        """ Tests if the hangs URL gives a 200 """
+
+        result = self.client.get("/projects/{}/hangs".format(self.projId))
+        self.assertEqual(result.status_code, 200)  
+
+    def test_population_redirect(self):
+        """ Tests if the population URL gives a 200 """
+
+        result = self.client.get("/projects/{}/population".format(self.projId))
+        self.assertEqual(result.status_code, 200)  
+
+    def test_violations_redirect(self):
+        """ Tests if the violations URL gives a 200 """
+
+        result = self.client.get("/projects/{}/violations".format(self.projId))
+        self.assertEqual(result.status_code, 200) 
+
+    def test_view_projects_redirect(self):
+        """ Tests if the view projects URL gives a 200 """
+
+        result = self.client.get("/projects/view/{}".format(self.projId))
+        self.assertEqual(result.status_code, 200) 
+
+    def test_accessVioTotal_redirect(self):
+        """ Tests if the accessVioTotal view URL gives a 200 """
+
+        result = self.client.get("/projects/{}/accessVioTotal".format(self.projId))
+        self.assertEqual(result.status_code, 200)
+
+    def test_accessVioUnique_redirect(self):
+        """ Tests if the accessVioUnique view URL gives a 200 """
+
+        result = self.client.get("/projects/{}/accessVioUnique".format(self.projId))
+        self.assertEqual(result.status_code, 200)
+
+    def test_totalCrashes_redirect(self):
+        """ Tests if the totalCrashes view URL gives a 200 """
+
+        result = self.client.get("/projects/{}/totalCrashes".format(self.projId))
+        self.assertEqual(result.status_code, 200) 
+
+    def test_noResponse_redirect(self):
+        """ Tests if the noResponse view URL gives a 200 """
+
+        result = self.client.get("/projects/{}/noResponse".format(self.projId))
+        self.assertEqual(result.status_code, 200) 
+
+
+if __name__ == '__main__':
     unittest.main()

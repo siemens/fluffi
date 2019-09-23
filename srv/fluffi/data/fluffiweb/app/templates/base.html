@@ -16,42 +16,42 @@ Author(s): Junes Najah, Thomas Riedmaier, Abian Blome
 {% import "bootstrap/fixes.html" as fixes %}
 
 {% block head %}
-§§{{super()}}
-§§{{fixes.ie8()}}
-§§
-§§<link href="/static/css/fluffi.css" rel="stylesheet" />
-§§<link href="/static/images/favicon.ico" rel="shortcut icon">
-§§<script src="/static/3rdParty/jquery/jquery-2.1.4.js"></script>
-§§<script src="/static/3rdParty/socket.io-client/socket.io.slim.js"></script>
-§§
-§§{% endblock %}
+{{super()}}
+{{fixes.ie8()}}
+
+<link href="/static/css/fluffi.css" rel="stylesheet" />
+<link href="/static/images/favicon.ico" rel="shortcut icon">
+<script src="/static/3rdParty/jquery/jquery-2.1.4.js"></script>
+<script src="/static/3rdParty/socket.io-client/socket.io.slim.js"></script>
+
+{% endblock %}
 
 {% block navbar %}
 {{nav.frontend_top.render()}}
 {% endblock %}
 
-§§
-§§{% macro flashMessages() %}
-§§{% with messages = get_flashed_messages(with_categories=true) %}
-§§{% if messages %}
-§§{% for category, message in messages %}
-§§{% if category == "error" %}
-§§
-§§<div class="alert alert-warning">
-§§    {{ message }}
-§§</div>
-§§
-§§{% elif category == "success" %}
-§§
-§§<div class="alert alert-info">
-§§    <strong>
-§§        Success!
-§§    </strong>
-§§    {{ message }}
-§§</div>
-§§
-§§{% endif %}
-§§{% endfor %}
-§§{% endif %}
-§§{% endwith %}
-§§{% endmacro %}
+
+{% macro flashMessages() %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+{% if category == "error" %}
+
+<div class="alert alert-warning">
+    {{ message }}
+</div>
+
+{% elif category == "success" %}
+
+<div class="alert alert-info">
+    <strong>
+        Success!
+    </strong>
+    {{ message }}
+</div>
+
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endwith %}
+{% endmacro %}

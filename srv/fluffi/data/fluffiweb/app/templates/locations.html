@@ -16,8 +16,8 @@ Author(s): Michael Kraus, Junes Najah, Thomas Riedmaier, Abian Blome, Pascal Eck
 
 <div class="container">
 §§    <h1>Locations</h1>
-§§    {{ flashMessages() }}
-§§    <hr>
+    {{ flashMessages() }}
+    <hr>
 </div>
 
 
@@ -30,20 +30,20 @@ Author(s): Michael Kraus, Junes Najah, Thomas Riedmaier, Abian Blome, Pascal Eck
 <div class="container">
     <table class="table">
         <thead>
-§§        <tr>
-§§            <th>Name</th>
-§§            <th style="text-align: center;"><span class="glyphicon glyphicon-trash"></span></th>
-§§        </tr>
+        <tr>
+            <th>Name</th>
+            <th style="text-align: center;"><span class="glyphicon glyphicon-trash"></span></th>
+        </tr>
         </thead>
-§§        <tbody>
-§§        {% for location in locations %}
-§§        <tr>
-§§            <td><a href="/locations/view/{{ location.id }}">{{ location.Name }}</a></td>
-§§            <td style="text-align: center;"><a class="btn btn-secondary"
-§§                                               href="/locations/removeLocation/{{ location.id }}" role="button"><span
-§§                    class="glyphicon glyphicon-remove"></span></a></td>
-§§
-§§        </tr>
+        <tbody>
+        {% for location in locations %}
+        <tr>
+            <td><a href="/locations/view/{{ location.id }}">{{ location.Name }}</a></td>
+            <td style="text-align: center;"><a class="btn btn-secondary"
+                                               href="/locations/removeLocation/{{ location.id }}" role="button"><span
+                    class="glyphicon glyphicon-remove"></span></a></td>
+
+        </tr>
         {% endfor %}
         </tbody>
     </table>

@@ -15,11 +15,11 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier
 {% block content %}
 
 <div class="container">
-§§    <h1><a href="/projects/view/{{violationsAndCrashes.project.id}}">Access Violations and Crashes: {{
-§§        violationsAndCrashes.project.name[:30] }}</a></h1>
+    <h1><a href="/projects/view/{{violationsAndCrashes.project.id}}">Access Violations and Crashes: {{
+        violationsAndCrashes.project.name[:30] }}</a></h1>
 </div>
-§§{{ flashMessages() }}
-§§<hr>
+{{ flashMessages() }}
+<hr>
 <div class="jumbotron">
     <div class="container"></div>
 </div>
@@ -28,41 +28,41 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier
     <h2>Testcases</h2>
     <table class="table">
         <thead>
-§§        <tr>
-§§            <th style="text-align: center;">Count</th>
-§§            <th style="text-align: center;">CrashFootprint</th>
-§§            <th style="text-align: center;">Type</th>
-§§            <th style="text-align: center;">Download</th>
-§§        </tr>
+        <tr>
+            <th style="text-align: center;">Count</th>
+            <th style="text-align: center;">CrashFootprint</th>
+            <th style="text-align: center;">Type</th>
+            <th style="text-align: center;">Download</th>
+        </tr>
         </thead>
         <tbody>
-§§        {% for testcase in violationsAndCrashes.testcases %}
-§§        <tr>
-§§            <td style="text-align: center;">{{ testcase.count }}</td>
-§§            <td style="text-align: center;">{{ testcase.footprint }}</td>
-§§            {% if testcase.type == 2 %}
-§§            <td style="text-align: center;">Access Violation</td>
-§§            {% elif testcase.type == 3 %}
-§§            <td style="text-align: center;">Crash</td>
-§§            {% else %}
-§§            <td style="text-align: center;">Other</td>
-§§            {% endif %}
-§§            <td style="text-align: center;">
-§§                <a class="btn btn-secondary"
-§§                   href="/projects/{{ violationsAndCrashes.project.id }}/getSmallestVioOrCrashTestcase/{{ testcase.footprint }}"
-§§                   role="button">
-§§                    <span class="glyphicon glyphicon-floppy-save"></span>
-§§                </a>
-§§                <a class="btn btn-secondary"
-§§                   href="/projects/{{ violationsAndCrashes.project.id }}/crashes/download/{{ testcase.footprint }}/{{ testcase.type }}"
-§§                   role="button">
-§§                    <span class="glyphicon glyphicon-save"></span>
-§§                </a>
-§§            </td>
-§§        </tr>
-§§        {% endfor %}
+        {% for testcase in violationsAndCrashes.testcases %}
+        <tr>
+            <td style="text-align: center;">{{ testcase.count }}</td>
+            <td style="text-align: center;">{{ testcase.footprint }}</td>
+            {% if testcase.type == 2 %}
+            <td style="text-align: center;">Access Violation</td>
+            {% elif testcase.type == 3 %}
+            <td style="text-align: center;">Crash</td>
+            {% else %}
+            <td style="text-align: center;">Other</td>
+            {% endif %}
+            <td style="text-align: center;">
+                <a class="btn btn-secondary"
+                   href="/projects/{{ violationsAndCrashes.project.id }}/getSmallestVioOrCrashTestcase/{{ testcase.footprint }}"
+                   role="button">
+                    <span class="glyphicon glyphicon-floppy-save"></span>
+                </a>
+                <a class="btn btn-secondary"
+                   href="/projects/{{ violationsAndCrashes.project.id }}/crashes/download/{{ testcase.footprint }}/{{ testcase.type }}"
+                   role="button">
+                    <span class="glyphicon glyphicon-save"></span>
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
         </tbody>
-§§    </table>
+    </table>
 </div>
 
 {% endblock %}

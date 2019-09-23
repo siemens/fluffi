@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS fluffi.covered_blocks (
       		REFERENCES fluffi.interesting_testcases(`ID`)
       		ON UPDATE CASCADE ON DELETE CASCADE,
 	FOREIGN KEY (`ModuleID`)
-§§		REFERENCES fluffi.target_modules(`ID`)
+		REFERENCES fluffi.target_modules(`ID`)
 		ON UPDATE RESTRICT ON DELETE CASCADE,
 	UNIQUE (`CreatorTestcaseID`, `ModuleID`, `Offset`),
 	INDEX(ModuleID, Offset),
@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS fluffi.blocks_to_cover (
 	`ModuleID` TINYINT UNSIGNED NOT NULL,
 	`Offset` BIGINT NOT NULL,
 	FOREIGN KEY (`ModuleID`)
-§§		REFERENCES fluffi.target_modules(`ID`)
+		REFERENCES fluffi.target_modules(`ID`)
 		ON UPDATE RESTRICT ON DELETE CASCADE,
 	UNIQUE INDEX(ModuleID, Offset),
 	PRIMARY KEY (`ID`)
@@ -116,24 +116,24 @@ CREATE TABLE IF NOT EXISTS fluffi.billing (
 	PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-§§CREATE TABLE IF NOT EXISTS fluffi.nice_names_testcase (
-§§	`ID` BIGINT NOT NULL AUTO_INCREMENT,
-§§	`NiceName` VARCHAR(100) NOT NULL,
-§§	`TestcaseID` BIGINT NOT NULL,
-§§	FOREIGN KEY (`TestcaseID`)
-§§		REFERENCES fluffi.interesting_testcases(`ID`)
-§§		ON UPDATE RESTRICT ON DELETE CASCADE,
-§§	UNIQUE (`TestcaseID`),
-§§	PRIMARY KEY (`ID`)
-§§) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-§§
-§§CREATE TABLE IF NOT EXISTS fluffi.nice_names_managed_instance (
-§§	`ID` BIGINT NOT NULL AUTO_INCREMENT,
-§§	`NiceName` VARCHAR(100) NOT NULL,
-§§	`ServiceDescriptorGUID` VARCHAR(50) NOT NULL,	
-§§	UNIQUE (`ServiceDescriptorGUID`),	
-§§	PRIMARY KEY (`ID`)
-§§) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+CREATE TABLE IF NOT EXISTS fluffi.nice_names_testcase (
+	`ID` BIGINT NOT NULL AUTO_INCREMENT,
+	`NiceName` VARCHAR(100) NOT NULL,
+	`TestcaseID` BIGINT NOT NULL,
+	FOREIGN KEY (`TestcaseID`)
+		REFERENCES fluffi.interesting_testcases(`ID`)
+		ON UPDATE RESTRICT ON DELETE CASCADE,
+	UNIQUE (`TestcaseID`),
+	PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS fluffi.nice_names_managed_instance (
+	`ID` BIGINT NOT NULL AUTO_INCREMENT,
+	`NiceName` VARCHAR(100) NOT NULL,
+	`ServiceDescriptorGUID` VARCHAR(50) NOT NULL,	
+	UNIQUE (`ServiceDescriptorGUID`),	
+	PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT IGNORE INTO fluffi.billing (Resource) VALUES ('RunnerSeconds');
 INSERT IGNORE INTO fluffi.billing (Resource) VALUES ('RunTestcasesNoLongerListed');

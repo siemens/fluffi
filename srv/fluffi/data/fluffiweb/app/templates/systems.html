@@ -13,16 +13,16 @@ Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
 {% extends "base.html" %}
 
 {% block scripts  %}
-§§<script src="{{ url_for('static', filename = 'javascript/modifySystemLocation.js') }}"
-§§        type="text/javascript"></script>
+<script src="{{ url_for('static', filename = 'javascript/modifySystemLocation.js') }}"
+        type="text/javascript"></script>
 {{super()}}
 {% endblock %}
 
 {% block content %}
 
 <div class="container">
-§§    <h1>Systems in FluffiNET</h1>
-§§    <hr>
+    <h1>Systems in FluffiNET</h1>
+    <hr>
 §§    {{ flashMessages() }}
 </div>
 §§
@@ -31,13 +31,13 @@ Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
     <div class="container"></div>
 </div>
 
-§§<br>
+<br>
 
 <div class="container">
-§§    <button class="btn btn-info btn-lg" data-target="#modalAddSystem" data-toggle="modal" type="button">Add System
-§§    </button>
+    <button class="btn btn-info btn-lg" data-target="#modalAddSystem" data-toggle="modal" type="button">Add System
+    </button>
 §§    <button class="btn btn-info btn-lg" data-target="#modalLemmingLair" data-toggle="modal" type="button">LEMMINGS LAIR
-§§    </button>
+    </button>
 §§    <a class="btn btn-info btn-lg" href="http://pole.fluffi:8888/" role="button" target="_blank">
 §§        <span class="glyphicon glyphicon-link"></span> Polemarch
 §§    </a>
@@ -47,73 +47,73 @@ Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
 §§    </button>
     <!-- Modal -->
     <div class="modal fade" id="modalAddSystem" role="dialog">
-§§        <div class="modal-dialog">
-§§
-§§            <!-- Modal content-->
-§§            <div class="modal-content">
-§§                <div class="modal-header">
-§§                    <button class="close" data-dismiss="modal" type="button">&times;</button>
-§§                    <h4 class="modal-title">Add new system to FluffiNET</h4>
-§§                </div>
-§§                <div class="modal-body">
-§§                    <form action="{{ url_for('addNewSystemToPolemarch') }}" method="post">
-§§                        {{addNewSystemToPolemarchForm.hostname.label }}
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="close" data-dismiss="modal" type="button">&times;</button>
+                    <h4 class="modal-title">Add new system to FluffiNET</h4>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ url_for('addNewSystemToPolemarch') }}" method="post">
+                        {{addNewSystemToPolemarchForm.hostname.label }}
 §§                        {{addNewSystemToPolemarchForm.hostname(class='form-control modal-form')}}
-§§                        {{addNewSystemToPolemarchForm.hostgroup.label }}
+                        {{addNewSystemToPolemarchForm.hostgroup.label }}
 §§                        {{addNewSystemToPolemarchForm.hostgroup(class='form-control modal-form')}}
 §§                        {{addNewSystemToPolemarchForm.add_host(class='btn btn-primary modal-button')}}
-§§                    </form>
+                    </form>
 §§                    <p>The extension .fluffi to reach the system is set automatically. Ex. TestVM1</p>
-§§                    <hr>
-§§                    <p>
-§§                    <h3>HowTo:</h3>
-§§                    See section <i>1) Adding runner systems to FUN</i> of the usage.md
-§§
-§§                    </p>
-§§                </div>
-§§                <div class="modal-footer">
+                    <hr>
+                    <p>
+                    <h3>HowTo:</h3>
+                    See section <i>1) Adding runner systems to FUN</i> of the usage.md
+
+                    </p>
+                </div>
+                <div class="modal-footer">
 §§                    <button class="btn btn-danger" data-dismiss="modal" type="button">Close</button>
-§§                </div>
-§§            </div>
+                </div>
+            </div>
         </div>
     </div>
     <div class="modal fade" id="modalLemmingLair" role="dialog">
         <div class="modal-dialog">
-§§
-§§            <!-- Modal content-->
-§§            <div class="modal-content">
-§§                <div class="modal-header">
-§§                    <button class="close" data-dismiss="modal" type="button">&times;</button>
-§§                    <h4 class="modal-title">Management of Lemming Cluster</h4>
-§§                </div>
-§§                <div class="modal-body">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="close" data-dismiss="modal" type="button">&times;</button>
+                    <h4 class="modal-title">Management of Lemming Cluster</h4>
+                </div>
+                <div class="modal-body">
 §§                    <a class="btn btn-info" href="http://lemmingpi.fluffi/" role="button" target="_blank">
 §§                        <span class="glyphicon glyphicon-link"></span> LEMMINGS LAIR
 §§                    </a>
-§§                    <hr>
-§§                    <p>
-§§                    <h3>HowTo:</h3>
-§§                    <ul>
-§§                        <li>Assure that the Odroid systems are connected to the FluffiNet</li>
-§§                        <li>Follow the link (LEMMINGS LAIR) to power on and manage the boards</li>
-§§                        <li>Check connections, hostname & dns (ping by hostname e.g. "ping lemming01.fluffi")</li>
-§§                        <li>On the Odroids an operating system has to be rolled out (Usually Linux). Automation is still
-§§                            in work. In the future, one Odroid will be manually configured and then mirrored to the
-§§                            cluster.
-§§                        </li>
-§§                        <li>Check ssh connection by connecting to the device.</li>
-§§                        <li>Final check: Use "Polemarch -> Projects -> Fluffi -> Periodic Tasks -> checkHostsAlive ->
-§§                            Execute" to check ansible connection and debug problems
-§§                        </li>
-§§                    </ul>
-§§                    </p>
-§§                </div>
-§§                <div class="modal-footer">
-§§                    <button class="btn btn-default" data-dismiss="modal" type="button">Close</button>
-§§                </div>
+                    <hr>
+                    <p>
+                    <h3>HowTo:</h3>
+                    <ul>
+                        <li>Assure that the Odroid systems are connected to the FluffiNet</li>
+                        <li>Follow the link (LEMMINGS LAIR) to power on and manage the boards</li>
+                        <li>Check connections, hostname & dns (ping by hostname e.g. "ping lemming01.fluffi")</li>
+                        <li>On the Odroids an operating system has to be rolled out (Usually Linux). Automation is still
+                            in work. In the future, one Odroid will be manually configured and then mirrored to the
+                            cluster.
+                        </li>
+                        <li>Check ssh connection by connecting to the device.</li>
+                        <li>Final check: Use "Polemarch -> Projects -> Fluffi -> Periodic Tasks -> checkHostsAlive ->
+                            Execute" to check ansible connection and debug problems
+                        </li>
+                    </ul>
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-default" data-dismiss="modal" type="button">Close</button>
+                </div>
             </div>
         </div>
-§§    </div>
+    </div>
 §§    <div class="modal fade" id="modalSettings" role="dialog">
 §§        <div class="modal-dialog">
 §§
@@ -184,68 +184,68 @@ Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
 §§    </div>
 </div>
 
-§§<hr>
+<hr>
 
 <div class="container">
-§§    {% for group in systems %}
+    {% for group in systems %}
 §§    <h2>Group: <a href="/systems/view/{{ group.Name }}/{{ group.Name }}">{{ group.Name }}</a></h2>
-§§    <div class="container" style="padding-left: 50px">
-§§        <table class="table">
-§§            <thead>
-§§            <tr>
-§§                <th style="text-align: left; width: 20%;">Name</th>
-§§                <th style="text-align: left; width: 15%;">Status</th>
-§§                <th style="text-align: left; width: 15%;">Conf. Instances</th>
-§§                <th style="text-align: left; width: 15%;">Run. Instances</th>
-§§                <th style="text-align: left; width: 23%;">Location</th>
-§§                <th class="remove"><span class="glyphicon glyphicon-trash"></span></th>
-§§            </tr>
-§§            </thead>
-§§            <tbody>
-§§            {% for host in group.hosts %}
-§§            <tr>
-§§                {% if host.isNotPersistentDevSys == True %}
-§§                <td style="text-align: left; width: 20%;"><a href="/systems/view/dev-{{ host.Name }}/{{ group.Name }}">{{
-§§                    host.Name }}</a></td>
-§§                {% else %}
-§§                <td style="text-align: left; width: 20%;"><a href="/systems/view/{{ host.Name }}/{{ group.Name }}">{{
-§§                    host.Name }}</a></td>
-§§                {% endif %}
-§§                <td style="text-align: left; width: 15%;">{{ host.Status }}</td>
+    <div class="container" style="padding-left: 50px">
+        <table class="table">
+            <thead>
+            <tr>
+                <th style="text-align: left; width: 20%;">Name</th>
+                <th style="text-align: left; width: 15%;">Status</th>
+                <th style="text-align: left; width: 15%;">Conf. Instances</th>
+                <th style="text-align: left; width: 15%;">Run. Instances</th>
+                <th style="text-align: left; width: 23%;">Location</th>
+                <th class="remove"><span class="glyphicon glyphicon-trash"></span></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for host in group.hosts %}
+            <tr>
+                {% if host.isNotPersistentDevSys == True %}
+                <td style="text-align: left; width: 20%;"><a href="/systems/view/dev-{{ host.Name }}/{{ group.Name }}">{{
+                    host.Name }}</a></td>
+                {% else %}
+                <td style="text-align: left; width: 20%;"><a href="/systems/view/{{ host.Name }}/{{ group.Name }}">{{
+                    host.Name }}</a></td>
+                {% endif %}
+                <td style="text-align: left; width: 15%;">{{ host.Status }}</td>
 §§                <td style="text-align: left; width: 15%;">
 §§                    {{ host.InstanceCount }} {% if host.confLM > 0 %} <div class="systems-lm-text">({{host.confLM}} LM)</div> {% endif %}
 §§                </td>
 §§                {% if host.InstanceCount == host.InstanceRun %}
 §§                <td class="instance-run-success">
 §§                    {{ host.InstanceRun }} {% if host.lms > 0 %} <div class="systems-lm-text">({{host.lms}} LM)</div> {% endif %}
-§§                </td>
-§§                {% else %}
+                </td>
+                {% else %}
 §§                <td class="instance-run-error">{{ host.InstanceRun }}</td>
-§§                {% endif %}
-§§                <td class="update-system-loc">
-§§                    <select class="form-control" id="SystemLocationValue-{{ host.Id }}"
-§§                            name="SystemLocationValue-{{ host.Id }}"
-§§                            onchange="updateSystemLocation('{{ host.Name }}', this.value)">
-§§                        <option selected="selected">{{ host.Location }}</option>
-§§                        {% for location in locations %}
-§§                        {% if location.Name != host.Location %}
-§§                        <option value="{{ location.id }}">{{ location.Name }}</option>
-§§                        {% endif %}
-§§                        {% endfor %}
-§§                    </select>
-§§                </td>
-§§                {% if host.isNotPersistentDevSys == True %}
-§§                <td class="remove"><a class="btn btn-secondary"
-§§                                                             href="/systems/removeDevSystem/{{ host.Name }}/{{ host.Id }}"
-§§                                                             role="button"><span
-§§                        class="glyphicon glyphicon-remove"></span></a></td>
-§§                {% endif %}
-§§            </tr>
-§§            {% endfor %}
-§§            </tbody>
-§§        </table>
-§§    </div>
-§§    {% endfor %}
+                {% endif %}
+                <td class="update-system-loc">
+                    <select class="form-control" id="SystemLocationValue-{{ host.Id }}"
+                            name="SystemLocationValue-{{ host.Id }}"
+                            onchange="updateSystemLocation('{{ host.Name }}', this.value)">
+                        <option selected="selected">{{ host.Location }}</option>
+                        {% for location in locations %}
+                        {% if location.Name != host.Location %}
+                        <option value="{{ location.id }}">{{ location.Name }}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                </td>
+                {% if host.isNotPersistentDevSys == True %}
+                <td class="remove"><a class="btn btn-secondary"
+                                                             href="/systems/removeDevSystem/{{ host.Name }}/{{ host.Id }}"
+                                                             role="button"><span
+                        class="glyphicon glyphicon-remove"></span></a></td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endfor %}
 </div>
 
 {% endblock %}

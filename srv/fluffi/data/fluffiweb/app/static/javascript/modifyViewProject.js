@@ -10,98 +10,98 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Junes Najah, Thomas Riedmaier
 */
 
-§§function deleteSetting(projId, settingId) {
-§§    var deleteUrl = "/projects/" + projId + "/delSetting/" + settingId;
-§§    window.location.replace(deleteUrl);
-§§}
-§§
-§§function deleteModule(projId, moduleId) {
-§§    var deleteUrl = "/projects/" + projId + "/delModule/" + moduleId;
-§§    window.location.replace(deleteUrl);
-§§}
-§§
-§§function deleteLocation(projId, projLocation) {
-§§    var deleteUrl = "/projects/" + projId + "/delLocation/" + projLocation;
-§§    window.location.replace(deleteUrl);
-§§}
-§§
-§§function updateSetting(projId, settingId, loopIndex) {
-§§    var changeUrl = "/projects/" + projId + "/changeSetting/" + settingId;
-§§    var data = { "SettingValue": document.getElementById("SettingValue-"+settingId).value };
-§§    var rowIdSuccess = "#successIcon" + loopIndex;
-§§    var rowIdError = "#errorIcon" + loopIndex;
-§§
-§§    $.ajax({
-§§        url: changeUrl,
-§§        type: 'POST',
-§§        data: JSON.stringify(data),
-§§        contentType: 'application/json; charset=utf-8',
-§§        dataType: 'json',
-§§        async: false,
-§§        success: function(response) {
-§§            if(response["status"] == "OK")
-§§                responseMessage(rowIdSuccess);
-§§            else
-§§                responseMessage(rowIdError);
-§§        }
-§§    });
-§§}
-§§
-§§function responseMessage(rowId){
-§§    $(rowId).css('visibility','visible'); 
-§§    setTimeout(function() {
-§§        $(rowId).fadeOut("slow", function(){
-§§            $(rowId).css('visibility','hidden');
-§§            $(rowId).show();
-§§        });
-§§        }, 1000);
-§§}
-§§
-§§function updateTypeSetting(projId, settingId, typeIDs, name) {
-§§    var typeValues = [];
-§§    var postfix = "";
-§§    typeIDs.forEach(function(typeId){
-§§        typeValue = parseInt($("#" + typeId).val());
-§§        typeValues.push(typeValue);
-§§    });
-§§    if(validate(typeValues)){
-§§        if(name == "mutator")
-§§            $('#errorMessageOfMutator').hide();
-§§        else
-§§            $('#errorMessageOfEvaluator').hide();
-§§        var changeUrl = "/projects/" + projId + "/changeSetting/" + settingId;
-§§        var settingValue = "";
-§§        typeValues.forEach(function(typeValue, i){
-§§            postfix = i == (typeValues.length-1) ? "" : "|"; 
-§§            settingValue += typeIDs[i] + "=" + typeValue + postfix; 
-§§        });
-§§        var data = { "SettingValue":  settingValue};
-§§
-§§        $.ajax({
-§§            url: changeUrl,
-§§            type: 'POST',
-§§            data: JSON.stringify(data),
-§§            contentType: 'application/json; charset=utf-8',
-§§            dataType: 'json',
-§§            async: false,
-§§            success: function(response) {
-§§                if(response["status"] == "OK")
-§§                    console.log("success");
-§§                else
-§§                    console.log("error");            
-§§            }
-§§        });
-§§        
-§§        location.reload();
-§§    }else{        
-§§        if(name == "mutator")
-§§            $('#errorMessageOfMutator').show();
-§§        else
-§§            $('#errorMessageOfEvaluator').show();
-§§    }
-§§}
-§§
-§§function validate(sequence){
-§§    var sum = sequence.reduce(function(pv, cv) { return pv + cv; }, 0);
-§§    return sum == 100;
+function deleteSetting(projId, settingId) {
+    var deleteUrl = "/projects/" + projId + "/delSetting/" + settingId;
+    window.location.replace(deleteUrl);
+}
+
+function deleteModule(projId, moduleId) {
+    var deleteUrl = "/projects/" + projId + "/delModule/" + moduleId;
+    window.location.replace(deleteUrl);
+}
+
+function deleteLocation(projId, projLocation) {
+    var deleteUrl = "/projects/" + projId + "/delLocation/" + projLocation;
+    window.location.replace(deleteUrl);
+}
+
+function updateSetting(projId, settingId, loopIndex) {
+    var changeUrl = "/projects/" + projId + "/changeSetting/" + settingId;
+    var data = { "SettingValue": document.getElementById("SettingValue-"+settingId).value };
+    var rowIdSuccess = "#successIcon" + loopIndex;
+    var rowIdError = "#errorIcon" + loopIndex;
+
+    $.ajax({
+        url: changeUrl,
+        type: 'POST',
+        data: JSON.stringify(data),
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        async: false,
+        success: function(response) {
+            if(response["status"] == "OK")
+                responseMessage(rowIdSuccess);
+            else
+                responseMessage(rowIdError);
+        }
+    });
+}
+
+function responseMessage(rowId){
+    $(rowId).css('visibility','visible'); 
+    setTimeout(function() {
+        $(rowId).fadeOut("slow", function(){
+            $(rowId).css('visibility','hidden');
+            $(rowId).show();
+        });
+        }, 1000);
+}
+
+function updateTypeSetting(projId, settingId, typeIDs, name) {
+    var typeValues = [];
+    var postfix = "";
+    typeIDs.forEach(function(typeId){
+        typeValue = parseInt($("#" + typeId).val());
+        typeValues.push(typeValue);
+    });
+    if(validate(typeValues)){
+        if(name == "mutator")
+            $('#errorMessageOfMutator').hide();
+        else
+            $('#errorMessageOfEvaluator').hide();
+        var changeUrl = "/projects/" + projId + "/changeSetting/" + settingId;
+        var settingValue = "";
+        typeValues.forEach(function(typeValue, i){
+            postfix = i == (typeValues.length-1) ? "" : "|"; 
+            settingValue += typeIDs[i] + "=" + typeValue + postfix; 
+        });
+        var data = { "SettingValue":  settingValue};
+
+        $.ajax({
+            url: changeUrl,
+            type: 'POST',
+            data: JSON.stringify(data),
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            async: false,
+            success: function(response) {
+                if(response["status"] == "OK")
+                    console.log("success");
+                else
+                    console.log("error");            
+            }
+        });
+        
+        location.reload();
+    }else{        
+        if(name == "mutator")
+            $('#errorMessageOfMutator').show();
+        else
+            $('#errorMessageOfEvaluator').show();
+    }
+}
+
+function validate(sequence){
+    var sum = sequence.reduce(function(pv, cv) { return pv + cv; }, 0);
+    return sum == 100;
 }

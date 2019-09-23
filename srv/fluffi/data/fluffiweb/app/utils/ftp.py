@@ -10,7 +10,7 @@
 
 from ftplib import FTP
 
-§§
+
 class FTPConnector:
 
     def __init__(self, ftpURL):
@@ -23,9 +23,9 @@ class FTPConnector:
         self.ftpClient.cwd(path)
         ls = []
         ls = self.ftpClient.nlst()
-§§        tupelsOfLS = zip(ls, ls)
+        tupelsOfLS = zip(ls, ls)
         self.ftpClient.quit()
-§§
+
         return tupelsOfLS
 
     def getListOfArchitecturesOnFTPServer(self, path, group):
@@ -34,13 +34,13 @@ class FTPConnector:
         self.ftpClient.cwd(path)
         ls = []
         ls = self.ftpClient.nlst()
-§§
-        for i, w in enumerate(ls):
-§§            ls[i] = group + "-" + w
 
-§§        tupelsOfLS = zip(ls, ls)
+        for i, w in enumerate(ls):
+            ls[i] = group + "-" + w
+
+        tupelsOfLS = zip(ls, ls)
         self.ftpClient.quit()
-§§
+
         return tupelsOfLS
 
     def saveTargetFileOnFTPServer(self, targetFileData, name):
@@ -56,25 +56,25 @@ class FTPConnector:
         self.ftpClient.connect(self.ftpURL)
         self.ftpClient.login()
         f = open('tmp.zip', 'rb')
-§§        self.ftpClient.storbinary("STOR /SUT/" + name.split('.', 1)[0] + ".zip", f)
+        self.ftpClient.storbinary("STOR /SUT/" + name.split('.', 1)[0] + ".zip", f)
         self.ftpClient.quit()
 
-§§        return True
-§§
-§§    def saveArchivedProjectOnFTPServer(self, fileName):
-§§        self.ftpClient.connect(self.ftpURL)
-§§        self.ftpClient.login()
-§§        myFile = open(fileName, 'rb')
-§§
-§§        if myFile:
-§§            self.ftpClient.storbinary("STOR /archive/" + fileName, myFile)
-§§        else:
-§§            print("-------------------------------------------")
-§§            print("Error: File not found")
-§§            print("-------------------------------------------")
-§§            self.ftpClient.quit()
-§§            return False
-§§
-§§        self.ftpClient.quit()
-§§
+        return True
+
+    def saveArchivedProjectOnFTPServer(self, fileName):
+        self.ftpClient.connect(self.ftpURL)
+        self.ftpClient.login()
+        myFile = open(fileName, 'rb')
+
+        if myFile:
+            self.ftpClient.storbinary("STOR /archive/" + fileName, myFile)
+        else:
+            print("-------------------------------------------")
+            print("Error: File not found")
+            print("-------------------------------------------")
+            self.ftpClient.quit()
+            return False
+
+        self.ftpClient.quit()
+
         return True

@@ -11,24 +11,24 @@ Author(s): Junes Najah, Thomas Riedmaier, Abian Blome
 -->
 
 <html>
-§§<head>
-§§    <script src="/static/3rdParty/jquery/jquery-2.1.4.js"></script>
-§§    <script src="/static/3rdParty/dagre/dagre.min.js"></script>
-§§    <script src="/static/3rdParty/cytoscape/cytoscape.min.js"></script>
-§§    <script src="/static/3rdParty/cytoscape-dagre/cytoscape-dagre.js"></script>
-§§    <script src="/static/javascript/getPopulationGraph.js"></script>
+<head>
+    <script src="/static/3rdParty/jquery/jquery-2.1.4.js"></script>
+    <script src="/static/3rdParty/dagre/dagre.min.js"></script>
+    <script src="/static/3rdParty/cytoscape/cytoscape.min.js"></script>
+    <script src="/static/3rdParty/cytoscape-dagre/cytoscape-dagre.js"></script>
+    <script src="/static/javascript/getPopulationGraph.js"></script>
 
-§§    <link href="/static/images/favicon.ico" rel="shortcut icon">
-§§    <link href="/static/css/fluffi.css" rel="stylesheet" type="text/css"/>
-§§</head>
-§§<body onload="getPopulationGraph(parseInt(window.location.hash.substr(1)))">
-§§<!-- Add labels of colors --> 
-§§<div class="label-boxes">
-§§    <span class="label population-color">Population</span>
-§§    <span class="label minimized-color">Minimized</span>
-§§    <span class="label footprint-color">Footprint</span>
-§§</div>
-§§<div id="cy"></div>
-§§</body>
+    <link href="/static/images/favicon.ico" rel="shortcut icon">
+    <link href="/static/css/fluffi.css" rel="stylesheet" type="text/css"/>
+</head>
+<body onload="getPopulationGraph(parseInt(window.location.hash.substr(1)))">
+<!-- Add labels of colors --> 
+<div class="label-boxes">
+    <span class="label population-color">Population</span>
+    <span class="label minimized-color">Minimized</span>
+    <span class="label footprint-color">Footprint</span>
+</div>
+<div id="cy"></div>
+</body>
 </html>
 

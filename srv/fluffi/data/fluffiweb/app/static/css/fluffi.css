@@ -10,13 +10,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
 */
 
-§§.dl-horizontal dt {
-§§    text-align: left;
-§§}
+.dl-horizontal dt {
+    text-align: left;
+}
 
 .jumbotron {
     margin-bottom: 0px;
-§§    background-image: url(/static/images/ci2.jpeg);
+    background-image: url(/static/images/ci2.jpeg);
     background-position: 0% 25%;
     background-size: cover;
     background-repeat: no-repeat;
@@ -31,15 +31,15 @@ Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
     0 0 15px #fff;
 }
 
-§§#infobox1 {
-§§    visibility: hidden;
-§§}
+#infobox1 {
+    visibility: hidden;
+}
 
-§§#infobox2 {
-§§    visibility: hidden;
-§§}
+#infobox2 {
+    visibility: hidden;
+}
 
-§§.hasTooltip span {
+.hasTooltip span {
     display: none;
     color: #000;
     text-decoration: none;
@@ -60,38 +60,38 @@ Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
     overflow: hidden; 
     width: 100%;
     height: auto;
-§§}
-§§
-§§.embed-container iframe {
+}
+
+.embed-container iframe {
     position: absolute; 
     top: 0; 
     left: 0; 
     width: 100%; 
     height: 100%; 
-§§}
-§§
-§§.heading {
-§§    margin-bottom:10px; border-radius:10%
-§§}
-§§
-§§.archive-form {
-§§    float: left;
-§§    margin-right: 5px;
-§§}
-§§
-§§.archive-form-2 {
-§§    float: right;
-§§    margin-right: 20px;
-§§}
-§§
+}
+
+.heading {
+    margin-bottom:10px; border-radius:10%
+}
+
+.archive-form {
+    float: left;
+    margin-right: 5px;
+}
+
+.archive-form-2 {
+    float: right;
+    margin-right: 20px;
+}
+
 §§.instance-run-success {
 §§    text-align: left;
 §§    width: 15%;
 §§}
 §§
 §§.instance-run-error {
-§§    text-align: left; 
-§§    width: 15%; 
+    text-align: left; 
+    width: 15%; 
 §§    color: red;
 §§    font-weight: bold;
 §§}
@@ -101,56 +101,56 @@ Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
 §§    font-size: 12px;
 §§    font-weight: bold;
 §§    color: #3795b1;
-§§}
-§§
-§§.update-system-loc {
-§§    text-align: left; 
-§§    width: 23%;
-§§}
-§§
-§§.remove {
-§§    text-align: left; 
-§§    width: 12%;
-§§}
-§§
-§§.kill {
-§§    color: black; 
-§§    width:250px;
-§§}
-§§
-§§.add-or-rename-btn {
-§§    border: 0;
-§§    background-color: inherit;
-§§}
-§§
-§§.btn-desgin {
-§§    border: 0; 
-§§    background-color: white;
-§§}
-§§
-§§.analysis-btn {
-§§    color: black; 
-§§    width:290px;
-§§}
-§§
-§§.select-width {
-§§    width: 90px;
-§§}
-§§
-§§/* ratio 4x3 */
-§§.embed-container.ratio4x3 {
+}
+
+.update-system-loc {
+    text-align: left; 
+    width: 23%;
+}
+
+.remove {
+    text-align: left; 
+    width: 12%;
+}
+
+.kill {
+    color: black; 
+    width:250px;
+}
+
+.add-or-rename-btn {
+    border: 0;
+    background-color: inherit;
+}
+
+.btn-desgin {
+    border: 0; 
+    background-color: white;
+}
+
+.analysis-btn {
+    color: black; 
+    width:290px;
+}
+
+.select-width {
+    width: 90px;
+}
+
+/* ratio 4x3 */
+.embed-container.ratio4x3 {
     padding-bottom: 75%;
-§§}
+}
 
-§§.odd {
-§§    background-color: green;
-§§}
+.odd {
+    background-color: green;
+}
 
-§§.even {
-§§    background-color: red;
-§§}
-§§
-§§.icon-inactive {
+.even {
+    background-color: red;
+}
+
+.icon-inactive {
     color: #98989b;
 }
 
@@ -161,60 +161,60 @@ Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
     left: 0;
     top: 0;
     z-index: 999;
-§§}
-§§
-§§#icontainer {
-§§    height: 1000px;
-§§}
-§§
-§§.btn-design {
-§§    background-color: #4CAF50;
-§§    border: none;
-§§    color: white;
-§§    padding: 15px 32px;
-§§    text-align: center;
-§§    text-decoration: none;
-§§    display: inline-block;
-§§    font-size: 22px;
-§§    margin: 4px 2px;
-§§    border-radius: 5px;
-§§}
-§§
-§§.error-msg {
-§§    display: none; 
-§§    margin-top: 5px; 
-§§    margin-bottom: 5px;
-§§}
-§§
-§§.fluffi-img {
-§§    margin-bottom:10px; 
-§§    border-radius:10%;
-§§}
-§§
-§§/* Population Graph */
-§§
-§§.label-boxes {
-§§    font-family:sans-serif; 
-§§    font-weight: bold; 
-§§    font-size: 14px; 
-§§    float:right
-§§}
-§§
-§§.label {
-§§    color: white; 
-§§    padding: 8px;
-§§}
-§§
-§§.population-color {
-§§    background-color: #143484
-§§}
-§§
-§§.minimized-color {
-§§    background-color: grey
-§§}
-§§
-§§.footprint-color {
-§§    background-color: orange
+}
+
+#icontainer {
+    height: 1000px;
+}
+
+.btn-design {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 22px;
+    margin: 4px 2px;
+    border-radius: 5px;
+}
+
+.error-msg {
+    display: none; 
+    margin-top: 5px; 
+    margin-bottom: 5px;
+}
+
+.fluffi-img {
+    margin-bottom:10px; 
+    border-radius:10%;
+}
+
+/* Population Graph */
+
+.label-boxes {
+    font-family:sans-serif; 
+    font-weight: bold; 
+    font-size: 14px; 
+    float:right
+}
+
+.label {
+    color: white; 
+    padding: 8px;
+}
+
+.population-color {
+    background-color: #143484
+}
+
+.minimized-color {
+    background-color: grey
+}
+
+.footprint-color {
+    background-color: orange
 §§}
 §§
 §§.alert-bg {

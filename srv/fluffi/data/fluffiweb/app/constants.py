@@ -8,32 +8,32 @@
 # 
 # Author(s): Junes Najah, Thomas Riedmaier
 
-§§import datetime
-§§import json
-§§import config
-§§from app import app
-§§
-§§from app.utils.ansible import AnsibleRESTConnector
-§§from app.utils.ftp import FTPConnector
-§§
-§§
-§§def getConfigJson():
-§§    with open(app.root_path + '/static/config.json') as f:
-§§        data = json.load(f)
-§§    return data
-§§
-§§
-§§JSON_CONFIG = getConfigJson()
-§§FLUFFI_VERSION = "1.0"
-§§FOOTER_SIEMENS = "Siemens AG, Corporate Technology {} | FLUFFI {}".format(datetime.datetime.now().year, FLUFFI_VERSION)
-§§TESTCASE_TYPES = {
-§§    "population": 0,
-§§    "hangs": 1,
-§§    "accessViolations": 2,
-§§    "crashes": 3,
-§§    "noResponses": 4,
-§§    "minimized": 5
+import datetime
+import json
+import config
+from app import app
+
+from app.utils.ansible import AnsibleRESTConnector
+from app.utils.ftp import FTPConnector
+
+
+def getConfigJson():
+    with open(app.root_path + '/static/config.json') as f:
+        data = json.load(f)
+    return data
+
+
+JSON_CONFIG = getConfigJson()
+FLUFFI_VERSION = "1.0"
+FOOTER_SIEMENS = "Siemens AG, Corporate Technology {} | FLUFFI {}".format(datetime.datetime.now().year, FLUFFI_VERSION)
+TESTCASE_TYPES = {
+    "population": 0,
+    "hangs": 1,
+    "accessViolations": 2,
+    "crashes": 3,
+    "noResponses": 4,
+    "minimized": 5
 }
-§§
-§§FTP_CONNECTOR = FTPConnector(config.FTP_URL)
+
+FTP_CONNECTOR = FTPConnector(config.FTP_URL)
 ANSIBLE_REST_CONNECTOR = AnsibleRESTConnector("http://pole.fluffi:8888/api/v2/", "admin", "admin")

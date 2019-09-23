@@ -8,11 +8,11 @@
 # 
 # Author(s): Junes Najah, Abian Blome, Thomas Riedmaier
 
-§§import pymysql
+import pymysql
 from flask import Flask
 from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
-§§from pytz import utc
+from pytz import utc
 
 pymysql.install_as_MySQLdb()
 
@@ -21,22 +21,22 @@ Bootstrap(app)
 app.config.from_object("config")
 db = SQLAlchemy(app)
 
-§§from .nav import nav
-§§
+from .nav import nav
+
 nav.init_app(app)
 
-§§from app import views, models, controllers
-§§
-§§from apscheduler.schedulers.background import BackgroundScheduler
-§§from .health_check import healthCheck
-§§from .helpers import deleteZipAndTempFiles
-§§from config import LOCAL_DEV
-§§
-§§scheduler = BackgroundScheduler()
-§§scheduler.configure(timezone = utc)
-§§scheduler.add_job(deleteZipAndTempFiles, 'interval', minutes=3)
-§§
-§§if not LOCAL_DEV:
-§§    scheduler.add_job(healthCheck, 'interval', minutes = 0.5)
-§§
-§§scheduler.start()
+from app import views, models, controllers
+
+from apscheduler.schedulers.background import BackgroundScheduler
+from .health_check import healthCheck
+from .helpers import deleteZipAndTempFiles
+from config import LOCAL_DEV
+
+scheduler = BackgroundScheduler()
+scheduler.configure(timezone = utc)
+scheduler.add_job(deleteZipAndTempFiles, 'interval', minutes=3)
+
+if not LOCAL_DEV:
+    scheduler.add_job(healthCheck, 'interval', minutes = 0.5)
+
+scheduler.start()

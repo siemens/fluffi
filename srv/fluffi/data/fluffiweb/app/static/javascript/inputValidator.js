@@ -10,21 +10,21 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Junes Najah, Thomas Riedmaier
 */
 
-§§$(function() {
-§§    $('.confirm').click(function() {
-§§        return window.confirm("Are you sure you want to archive this project?");
-§§    });
-§§}); 
-§§
-§§
-§§function validateFuzzjobName(){
-§§    var letterNumber = /^[0-9a-zA-Z]+$/;
-§§    
-§§    if(letterNumber.test($("#name").val())){        
-§§        $("#fuzzjobNameErrorMsg").hide();
-§§        $("#fuzzButton").attr("disabled", false);
-§§    }else{        
-§§        $("#fuzzjobNameErrorMsg").show();
-§§        $("#fuzzButton").attr("disabled", true);
-§§    }    
+$(function() {
+    $('.confirm').click(function() {
+        return window.confirm("Are you sure you want to archive this project?");
+    });
+}); 
+
+
+function validateFuzzjobName(){
+    var letterNumber = /^[0-9a-zA-Z]+$/;
+    
+    if(letterNumber.test($("#name").val())){        
+        $("#fuzzjobNameErrorMsg").hide();
+        $("#fuzzButton").attr("disabled", false);
+    }else{        
+        $("#fuzzjobNameErrorMsg").show();
+        $("#fuzzButton").attr("disabled", true);
+    }    
 }

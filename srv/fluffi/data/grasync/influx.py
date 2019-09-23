@@ -8,31 +8,31 @@
 # 
 # Author(s): Junes Najah, Thomas Riedmaier, Roman Bendt
 
-§§from influxdb import InfluxDBClient
-§§
+from influxdb import InfluxDBClient
+
 dbclient = InfluxDBClient('mon.fluffi', 8086, 'root', 'root', 'FLUFFI')
-§§
-§§def create_json_body(name, tags, now, value):
-§§    json_body = {
-§§        "measurement": name,
-§§        "tags": tags,
-§§        "time": now,
-§§        "fields": {
-§§            "value": value
-§§        }
-§§    }
-§§
-§§    return json_body    
-§§
-§§
-§§def write(json_bodies):
-§§    try:
-§§        dbclient.write_points(json_bodies) 
-§§        return "Wrote data to db client succesfully"
-§§    except Exception as e:
-§§        print(e)
-§§        return "Failed to write data"
-§§
-§§def print_result(name):
-§§    result = dbclient.query('select value from {};'.format(name))
+
+def create_json_body(name, tags, now, value):
+    json_body = {
+        "measurement": name,
+        "tags": tags,
+        "time": now,
+        "fields": {
+            "value": value
+        }
+    }
+
+    return json_body    
+
+
+def write(json_bodies):
+    try:
+        dbclient.write_points(json_bodies) 
+        return "Wrote data to db client succesfully"
+    except Exception as e:
+        print(e)
+        return "Failed to write data"
+
+def print_result(name):
+    result = dbclient.query('select value from {};'.format(name))
     print("Result: {0}".format(result))

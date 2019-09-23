@@ -10,286 +10,286 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Junes Najah, Thomas Riedmaier, Pascal Eckmann, Michael Kraus, Abian Blome
 -->
 
-§§{% extends "base.html" %}
-§§{% block scripts %}
-§§<script src="{{ url_for('static', filename = 'javascript/dynamicForm.js') }}" type="text/javascript"></script>
-§§<script src="{{ url_for('static', filename = 'javascript/inputValidator.js') }}" type="text/javascript"></script>
-§§<script src="{{ url_for('static', filename = 'javascript/templateHandler.js') }}" type="text/javascript"></script>
-§§{{super()}}
-§§{% endblock %}
+{% extends "base.html" %}
+{% block scripts %}
+<script src="{{ url_for('static', filename = 'javascript/dynamicForm.js') }}" type="text/javascript"></script>
+<script src="{{ url_for('static', filename = 'javascript/inputValidator.js') }}" type="text/javascript"></script>
+<script src="{{ url_for('static', filename = 'javascript/templateHandler.js') }}" type="text/javascript"></script>
+{{super()}}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1><u>Create new Project:</u></h1>
+</div>
+{{ flashMessages() }}
+<hr>
+<div class="jumbotron">
+    <div class="container"></div>
+</div>
 §§
-§§{% block content %}
-§§<div class="container">
-§§    <h1><u>Create new Project:</u></h1>
-§§</div>
-§§{{ flashMessages() }}
-§§<hr>
-§§<div class="jumbotron">
-§§    <div class="container"></div>
-§§</div>
-§§
-§§<br>
-§§<div class="container">
-§§    <form action="" enctype="multipart/form-data" method="POST" name="createProject">
-§§        {{ form.hidden_tag() }}
-§§        <div class="form-group">
-§§            <label for="selectTemplate">Select Template:</label>
-§§            <select class="form-control" id="selectTemplate" style="width: 90px">
-§§                <option name="choice1" value="None">None</option>
-§§                <option name="choice2" value="Qemu">Qemu</option>
-§§            </select>
-§§        </div>
-§§
-§§        <div class="form-group">
-§§            <label for="name">Name:</label>
-§§            <input class="form-control" id="name" name="name" onfocusout="validateFuzzjobName()"
-§§                   placeholder="Project Name"
-§§                   type="text">
-§§            <div style="width: 300px;">
-§§                <div class="alert alert-danger error-msg" id="fuzzjobNameErrorMsg">
-§§                    "Error! Only A-Za-z0-9 are allowed as a fuzzjob name"
-§§                </div>
-§§            </div>
-§§            <br>
-§§            <label for="subtype">Runner Type:</label>
+<br>
+<div class="container">
+    <form action="" enctype="multipart/form-data" method="POST" name="createProject">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            <label for="selectTemplate">Select Template:</label>
+            <select class="form-control" id="selectTemplate" style="width: 90px">
+                <option name="choice1" value="None">None</option>
+                <option name="choice2" value="Qemu">Qemu</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input class="form-control" id="name" name="name" onfocusout="validateFuzzjobName()"
+                   placeholder="Project Name"
+                   type="text">
+            <div style="width: 300px;">
+                <div class="alert alert-danger error-msg" id="fuzzjobNameErrorMsg">
+                    "Error! Only A-Za-z0-9 are allowed as a fuzzjob name"
+                </div>
+            </div>
+            <br>
+            <label for="subtype">Runner Type:</label>
 §§            <select class="form-control runner-type" id="subtype" name="subtype">
-§§                {% for runnerTypeOption in RunnerTypeOptions %}
-§§                <option>{{runnerTypeOption}}</option>
-§§                {% endfor %}
-§§            </select>
-§§            <br>
-§§            <label for="generatorTypes">Generator Types:</label>
-§§            <div>
+                {% for runnerTypeOption in RunnerTypeOptions %}
+                <option>{{runnerTypeOption}}</option>
+                {% endfor %}
+            </select>
+            <br>
+            <label for="generatorTypes">Generator Types:</label>
+            <div>
 §§                <div class="create-project-code" id="chosenGeneratorTypes">{{ defaultSubTypesOfGenerator }}</div>
-§§            </div>
-§§            <div style="padding-top: 5px">
-§§                <button class="btn btn-default" data-target="#addGeneratorTypes" data-toggle="modal" type="button">Set
-§§                    Generator Types
-§§                </button>
-§§            </div>
-§§            <!-- Modal -->
-§§            <div class="modal fade" id="addGeneratorTypes" role="dialog">
-§§                <div class="modal-dialog">
-§§                    <!-- Modal content-->
-§§                    <div class="modal-content">
-§§                        <div class="modal-header">
-§§                            <button class="close" data-dismiss="modal" type="button">&times;</button>
-§§                            <h4 class="modal-title">Set Generator Types</h4>
-§§                        </div>
-§§                        <div class="modal-body">
-§§                            {% for subtype in subTypesMutator %}
-§§                            <div class="form-group">
-§§                                <label for="{{subtype}}">{{ subtype }}</label>
-§§                                <!-- <input class="form-control" id="{{subtype}}{{loop.index0}}" name="generatorTypes"
-§§                                       type="text"> -->
-§§                                <input class="form-control" id="{{subtype}}{{loop.index0}}" name="generatorTypes" 
-§§                                        type="text" value="{{defaultSubTypesOfGeneratorCount[loop.index0]}}">
-§§                            </div>
-§§                            {% endfor %}
-§§                            <div>
-§§                                <input class="btn btn-primary" data-dismiss="modal" id="addGeneratorTypesButton"
-§§                                       onclick="addTypeSetting({{subTypesMutator}}, 'generator')"
-§§                                       type="button"
-§§                                       value="Add"/>
-§§                            </div>
-§§                        </div>
-§§                        <div class="modal-footer">
-§§                            <button class="btn btn-default" data-dismiss="modal" type="button">Close</button>
-§§                        </div>
-§§                    </div>
+            </div>
+            <div style="padding-top: 5px">
+                <button class="btn btn-default" data-target="#addGeneratorTypes" data-toggle="modal" type="button">Set
+                    Generator Types
+                </button>
+            </div>
+            <!-- Modal -->
+            <div class="modal fade" id="addGeneratorTypes" role="dialog">
+                <div class="modal-dialog">
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button class="close" data-dismiss="modal" type="button">&times;</button>
+                            <h4 class="modal-title">Set Generator Types</h4>
+                        </div>
+                        <div class="modal-body">
+                            {% for subtype in subTypesMutator %}
+                            <div class="form-group">
+                                <label for="{{subtype}}">{{ subtype }}</label>
+                                <!-- <input class="form-control" id="{{subtype}}{{loop.index0}}" name="generatorTypes"
+                                       type="text"> -->
+                                <input class="form-control" id="{{subtype}}{{loop.index0}}" name="generatorTypes" 
+                                        type="text" value="{{defaultSubTypesOfGeneratorCount[loop.index0]}}">
+                            </div>
+                            {% endfor %}
+                            <div>
+                                <input class="btn btn-primary" data-dismiss="modal" id="addGeneratorTypesButton"
+                                       onclick="addTypeSetting({{subTypesMutator}}, 'generator')"
+                                       type="button"
+                                       value="Add"/>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-default" data-dismiss="modal" type="button">Close</button>
+                        </div>
+                    </div>
                 </div>
-§§            </div>
-§§            <div style="width: 300px;">
-§§                <div class="alert alert-danger error-msg" id="generatorTypesErrorMsg">
-§§                    "Error! Values need to sum up to 100!"
-§§                </div>
-§§            </div>
-§§            <br>
-§§            <label for="evaluatorTypes">Evaluator Types:</label>
-§§            <div>
+            </div>
+            <div style="width: 300px;">
+                <div class="alert alert-danger error-msg" id="generatorTypesErrorMsg">
+                    "Error! Values need to sum up to 100!"
+                </div>
+            </div>
+            <br>
+            <label for="evaluatorTypes">Evaluator Types:</label>
+            <div>
 §§                <div class="create-project-code" id="chosenEvaluatorTypes">{{ defaultSubTypesOfEvaluator }}</div>
-§§            </div>
-§§            <div style="padding-top: 5px">
-§§                <button class="btn btn-default" data-target="#addEvaluatorTypes" data-toggle="modal" type="button">Set
-§§                    Evaluator Types
-§§                </button>
-§§            </div>
-§§            <!-- Modal -->
-§§            <div class="modal fade" id="addEvaluatorTypes" role="dialog">
-§§                <div class="modal-dialog">
-§§                    <!-- Modal content-->
-§§                    <div class="modal-content">
-§§                        <div class="modal-header">
-§§                            <button class="close" data-dismiss="modal" type="button">&times;</button>
-§§                            <h4 class="modal-title">Set Evaluator Types</h4>
-§§                        </div>
-§§                        <div class="modal-body">
-§§                            {% for subtype in subTypesEvaluator %}
-§§                            <div class="form-group">
-§§                                <label for="{{subtype}}">{{ subtype }}</label>
-§§                                <!-- <input class="form-control" id="{{subtype}}{{loop.index0}}" name="evaluatorTypes"
-§§                                       type="text"> -->
-§§                                <input id="{{subtype}}{{loop.index0}}" type="text" class="form-control" name="evaluatorTypes" 
-§§                                    value="{{defaultSubTypesOfEvaluatorCount[loop.index0]}}">
-§§                            </div>
-§§                            {% endfor %}
-§§                            <div>
-§§                                <input class="btn btn-primary" data-dismiss="modal" id="addEvaluatorTypesButton"
-§§                                       onclick="addTypeSetting({{subTypesEvaluator}}, 'evaluator')"
-§§                                       type="button"
-§§                                       value="Add"/>
-§§                            </div>
-§§                        </div>
-§§                        <div class="modal-footer">
-§§                            <button class="btn btn-default" data-dismiss="modal" type="button">Close</button>
-§§                        </div>
-§§                    </div>
+            </div>
+            <div style="padding-top: 5px">
+                <button class="btn btn-default" data-target="#addEvaluatorTypes" data-toggle="modal" type="button">Set
+                    Evaluator Types
+                </button>
+            </div>
+            <!-- Modal -->
+            <div class="modal fade" id="addEvaluatorTypes" role="dialog">
+                <div class="modal-dialog">
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button class="close" data-dismiss="modal" type="button">&times;</button>
+                            <h4 class="modal-title">Set Evaluator Types</h4>
+                        </div>
+                        <div class="modal-body">
+                            {% for subtype in subTypesEvaluator %}
+                            <div class="form-group">
+                                <label for="{{subtype}}">{{ subtype }}</label>
+                                <!-- <input class="form-control" id="{{subtype}}{{loop.index0}}" name="evaluatorTypes"
+                                       type="text"> -->
+                                <input id="{{subtype}}{{loop.index0}}" type="text" class="form-control" name="evaluatorTypes" 
+                                    value="{{defaultSubTypesOfEvaluatorCount[loop.index0]}}">
+                            </div>
+                            {% endfor %}
+                            <div>
+                                <input class="btn btn-primary" data-dismiss="modal" id="addEvaluatorTypesButton"
+                                       onclick="addTypeSetting({{subTypesEvaluator}}, 'evaluator')"
+                                       type="button"
+                                       value="Add"/>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-default" data-dismiss="modal" type="button">Close</button>
+                        </div>
+                    </div>
                 </div>
-§§            </div>
-§§            <div style="width: 300px;">
-§§                <div class="alert alert-danger error-msg" id="evaluatorTypesErrorMsg">
-§§                    "Error! Values need to sum up to 100!"
-§§                </div>
-§§            </div>
-§§            <br>
+            </div>
+            <div style="width: 300px;">
+                <div class="alert alert-danger error-msg" id="evaluatorTypesErrorMsg">
+                    "Error! Values need to sum up to 100!"
+                </div>
+            </div>
+            <br>
 
-§§            <label for="location">Location:</label>
-§§            <select class="form-control" id="location" multiple name="location">
-§§                {% for loc in form.location.choices %}
+            <label for="location">Location:</label>
+            <select class="form-control" id="location" multiple name="location">
+                {% for loc in form.location.choices %}
 §§                <option class="create-project-option" value="{{loc}}">{{loc}}</option>
-§§                {% endfor %}
-§§            </select>
-§§            <br>
-§§            <label for="targetCMDLine">Target Command Line:</label>
+                {% endfor %}
+            </select>
+            <br>
+            <label for="targetCMDLine">Target Command Line:</label>
 §§            <input class="form-control create-project-monospace" id="targetCMDLine" name="targetCMDLine"
-§§                   placeholder="&quot;c:\path\to\execut able\bin.exe&quot; -flag"
-§§                   type="text">
-§§            <br>
-§§            <hr>
-§§            <h3>Options:</h3>
-§§            <div data-toggle="fieldset" id="option-fieldset">
-§§                <table class="table">
-§§                    <thead>
-§§                    <tr>
-§§                        <th>
-§§                            <label for="option_module">Option Name:</label>
-§§                        </th>
-§§                        <th>
-§§                            <label for="option_module_value">Option Value:
-§§                                <span class="glyphicon glyphicon-info-sign"
-§§                                      onMouseOut="document.getElementById('infobox1').style.visibility = 'hidden'"
-§§                                      onMouseOver="document.getElementById('infobox1').style.visibility = 'visible'"></span>
-§§                                <span class="text-danger" id="infobox1">&emsp;Options for Target Application, hangTimeout must be specified (1second = 1000)</span>
-§§                            </label>
-§§                        </th>
-§§                        <th>
-§§                            <span class="glyphicon glyphicon-remove"></span>
-§§                        </th>
-§§                    </tr>
-§§                    </thead>
-§§                    <tbody>
-§§                    <tr data-toggle="fieldset-entryoption">
-§§                        <td>
-§§                            <input class="form-control" id="option_module" name="option_module" type="text"
-§§                                   value="hangTimeout">
-§§                        </td>
-§§                        <td>
-§§                            <input class="form-control" id="option_module_value" name="option_module_value" type="text"
-§§                                   value="5000">
-§§                        </td>
-§§                        <td>
+                   placeholder="&quot;c:\path\to\execut able\bin.exe&quot; -flag"
+                   type="text">
+            <br>
+            <hr>
+            <h3>Options:</h3>
+            <div data-toggle="fieldset" id="option-fieldset">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>
+                            <label for="option_module">Option Name:</label>
+                        </th>
+                        <th>
+                            <label for="option_module_value">Option Value:
+                                <span class="glyphicon glyphicon-info-sign"
+                                      onMouseOut="document.getElementById('infobox1').style.visibility = 'hidden'"
+                                      onMouseOver="document.getElementById('infobox1').style.visibility = 'visible'"></span>
+                                <span class="text-danger" id="infobox1">&emsp;Options for Target Application, hangTimeout must be specified (1second = 1000)</span>
+                            </label>
+                        </th>
+                        <th>
+                            <span class="glyphicon glyphicon-remove"></span>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr data-toggle="fieldset-entryoption">
+                        <td>
+                            <input class="form-control" id="option_module" name="option_module" type="text"
+                                   value="hangTimeout">
+                        </td>
+                        <td>
+                            <input class="form-control" id="option_module_value" name="option_module_value" type="text"
+                                   value="5000">
+                        </td>
+                        <td>
 §§                            <button data-toggle="fieldset-remove-rowoption" id="phone-removeoption" type="button" class="btn">
-§§                                <span class="glyphicon glyphicon-remove-circle"></span>
-§§                            </button>
-§§                        </td>
-§§                    </tr>
-§§                    </tbody>
-§§                </table>
-§§                <button data-target="#option-fieldset" data-toggle="fieldset-add-rowoption" id="addOptionRow"
+                                <span class="glyphicon glyphicon-remove-circle"></span>
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <button data-target="#option-fieldset" data-toggle="fieldset-add-rowoption" id="addOptionRow"
 §§                        type="button" class="btn">
-§§                    <span class="glyphicon glyphicon-plus"></span>
-§§                </button>
-§§            </div>
+                    <span class="glyphicon glyphicon-plus"></span>
+                </button>
+            </div>
 
-§§            </br>
-§§            <hr>
-§§            <h3>Targets:</h3>
-§§            <div data-toggle="fieldset" id="phone-fieldset">
-§§                <table class="table">
-§§                    <thead>
-§§                    <tr>
-§§                        <th>
-§§                            <label for="target_module">Module Name:</label>
-§§                        </th>
-§§                        <th>
-§§                            <label for="target_module_path">Module Path:
-§§                                <span class="glyphicon glyphicon-info-sign"
-§§                                      onMouseOut="document.getElementById('infobox2').style.visibility = 'hidden'"
-§§                                      onMouseOver="document.getElementById('infobox2').style.visibility = 'visible'"></span>
-§§                                <span class="text-danger" id="infobox2">&emsp;Specify Path to Target Module, Use * as Wildcard, At least 1 target</span>
-§§                            </label>
-§§                        </th>
-§§                        <th>
-§§                            <span class="glyphicon glyphicon-remove"></span>
-§§                        </th>
-§§                    </tr>
-§§                    </thead>
-§§                    <tbody>
-§§                    <tr data-toggle="fieldset-entry">
-§§                        <td>
-§§                            <input class="form-control" id="1_targetname" name="1_targetname" placeholder="example.dll"
-§§                                   type="text">
-§§                        </td>
-§§                        <td>
-§§                            <input class="form-control" id="1_targetpath" name="1_targetpath" type="text" value="*">
-§§                        </td>
-§§                        <td>
+            </br>
+            <hr>
+            <h3>Targets:</h3>
+            <div data-toggle="fieldset" id="phone-fieldset">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>
+                            <label for="target_module">Module Name:</label>
+                        </th>
+                        <th>
+                            <label for="target_module_path">Module Path:
+                                <span class="glyphicon glyphicon-info-sign"
+                                      onMouseOut="document.getElementById('infobox2').style.visibility = 'hidden'"
+                                      onMouseOver="document.getElementById('infobox2').style.visibility = 'visible'"></span>
+                                <span class="text-danger" id="infobox2">&emsp;Specify Path to Target Module, Use * as Wildcard, At least 1 target</span>
+                            </label>
+                        </th>
+                        <th>
+                            <span class="glyphicon glyphicon-remove"></span>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr data-toggle="fieldset-entry">
+                        <td>
+                            <input class="form-control" id="1_targetname" name="1_targetname" placeholder="example.dll"
+                                   type="text">
+                        </td>
+                        <td>
+                            <input class="form-control" id="1_targetpath" name="1_targetpath" type="text" value="*">
+                        </td>
+                        <td>
 §§                            <button data-toggle="fieldset-remove-row" id="phone-remove" type="button" class="btn">
-§§                                <span class="glyphicon glyphicon-remove-circle"></span>
-§§                            </button>
-§§                        </td>
-§§                    </tr>
-§§                    </tbody>
-§§                </table>
+                                <span class="glyphicon glyphicon-remove-circle"></span>
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
 §§                <button data-target="#phone-fieldset" data-toggle="fieldset-add-row" type="button" class="btn">
-§§                    <span class="glyphicon glyphicon-plus"></span>
-§§                </button>
-§§                <div style="margin-top: 30px">
-§§                    <label for="targetModulesOnCreate">Or select multiple Target Modules:</label>
-§§                    <input id="targetModulesOnCreate" multiple name="targetModulesOnCreate" type="file">
+                    <span class="glyphicon glyphicon-plus"></span>
+                </button>
+                <div style="margin-top: 30px">
+                    <label for="targetModulesOnCreate">Or select multiple Target Modules:</label>
+                    <input id="targetModulesOnCreate" multiple name="targetModulesOnCreate" type="file">
                 </div>
-§§            </div>
-§§
-§§            </br>
-§§            <hr>
-§§            <h3>Target Upload:</h3>
-§§            <p>
-§§                <label for="targetfile">(Target as zip)</label>
-§§                <br> {{ form.targetfile() }}
-§§                <br>
-§§            </p>
-§§            <hr>
-§§            <h3>Population:</h3>
-§§            <p>
-§§
-§§                <label for="filename">Initial Testcase(s) / Population</label>
-§§                <br> {{ form.filename(multiple="multiple") }}
-§§                <br>
-§§            </p>
+            </div>
+
+            </br>
+            <hr>
+            <h3>Target Upload:</h3>
+            <p>
+                <label for="targetfile">(Target as zip)</label>
+                <br> {{ form.targetfile() }}
+                <br>
+            </p>
+            <hr>
+            <h3>Population:</h3>
+            <p>
+
+                <label for="filename">Initial Testcase(s) / Population</label>
+                <br> {{ form.filename(multiple="multiple") }}
+                <br>
+            </p>
 §§            <hr>
 §§            <div class="basic-block-upload-box">
 §§                <h3>Basic Blocks:</h3>
 §§                <p>
-§§
+
 §§                    <label for="basicBlockFile">Basic Blocks for GDB</label>
 §§                    <br> {{ form.basicBlockFile() }}
 §§                    <br>
 §§                </p>
 §§            </div>
-§§        </div>
-§§        <button class="btn btn-success" id="fuzzButton" type="submit">FLUFFI FUZZ!</button>
-§§    </form>
-§§    <br>
-§§</div>
+        </div>
+        <button class="btn btn-success" id="fuzzButton" type="submit">FLUFFI FUZZ!</button>
+    </form>
+    <br>
+</div>
 
 {% endblock %}

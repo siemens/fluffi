@@ -10,85 +10,85 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Junes Najah, Thomas Riedmaier
 */
 
-§§var elemType, myId, myCommand;
-§§
-§§function addOrRenameNiceName(index, projectId, command, tcId, miId){
-§§    var url = "/projects/" + projectId + "/renameElement";
-§§    myCommand = command;
-§§
-§§    if(tcId){
-§§        myId = tcId;
-§§        elemType = "testcase";
-§§    }        
-§§    else if(miId){
-§§        myId = miId;
-§§        elemType = "managedInstance";
-§§    } else{
-§§        console.log("Error: Invalid Id argument in addOrRenameNiceName(...)!");
-§§    }      
-§§
-§§    if(command == "update"){        
-§§        var btnId = "#tcBtn";
-§§        var inputId = "#tcInput";
-§§        var inputIdHtml = "tcInput";
-§§    }        
-§§    else if(command == "insert") {        
-§§        var btnId = "#tcBtnNew";
-§§        var inputId = "#tcInputNew";
-§§        var inputIdHtml = "tcInputNew";
-§§    } else {
-§§        console.log("Error: Invalid command argument in addOrRenameNiceName(...)!")
-§§    }        
-§§
-§§    $(btnId+index).css("display", "none");
-§§    $(inputId+index).css("display", "inline");
-§§    $(inputId+index).focus();
-§§
-§§    $(inputId+index).focusout(function() {
-§§        $(inputId+index).css("display", "none");
-§§        $(btnId+index).css("display", "inline");        
-§§    });
-§§
-§§    var inputField = document.getElementById(inputIdHtml+index);
-§§    inputField.addEventListener("keydown", function (e) {
-§§        if (e.keyCode === 13) {  //checks whether the pressed key is "Enter"
-§§            validateAndSave(e, index, url, btnId, inputId);
-§§        }
-§§    });
-§§}
-§§
-§§function validateAndSave(e, i, url, btnId, inputId) {
-§§    var input = e.target.value;
-§§    var data = { "newName": input, "elemType": elemType, "myId": myId, "command": myCommand};  
-§§
-§§    if(input.length != 0){
-§§        $(inputId+i).css("display", "none");
-§§        $(btnId+i).css("display", "inline");  
-§§        
-§§        $(btnId+i).text(input);
-§§
-§§        //update in DB and view if successful
-§§        $.ajax({
-§§        url: url,
-§§        type: 'POST',
-§§        data: JSON.stringify(data),
-§§        contentType: 'application/json; charset=utf-8',
-§§        dataType: 'json',
-§§        async: true,
-§§        success: function(response) {                            
-§§                if(response["status"] == "OK"){
-§§                    console.log("Success: " + response["message"]);
-§§                    if(response["command"] == "insert"){
-§§                        location.reload();
-§§                    }
-§§                }                    
-§§                else {
-§§                    alert(response["message"]);                    
-§§                }                    
-§§            }
-§§        });
-§§    } else {
-§§        $(inputId+i).css("display", "none");
-§§        $(btnId+i).css("display", "inline");   
-§§    }           
+var elemType, myId, myCommand;
+
+function addOrRenameNiceName(index, projectId, command, tcId, miId){
+    var url = "/projects/" + projectId + "/renameElement";
+    myCommand = command;
+
+    if(tcId){
+        myId = tcId;
+        elemType = "testcase";
+    }        
+    else if(miId){
+        myId = miId;
+        elemType = "managedInstance";
+    } else{
+        console.log("Error: Invalid Id argument in addOrRenameNiceName(...)!");
+    }      
+
+    if(command == "update"){        
+        var btnId = "#tcBtn";
+        var inputId = "#tcInput";
+        var inputIdHtml = "tcInput";
+    }        
+    else if(command == "insert") {        
+        var btnId = "#tcBtnNew";
+        var inputId = "#tcInputNew";
+        var inputIdHtml = "tcInputNew";
+    } else {
+        console.log("Error: Invalid command argument in addOrRenameNiceName(...)!")
+    }        
+
+    $(btnId+index).css("display", "none");
+    $(inputId+index).css("display", "inline");
+    $(inputId+index).focus();
+
+    $(inputId+index).focusout(function() {
+        $(inputId+index).css("display", "none");
+        $(btnId+index).css("display", "inline");        
+    });
+
+    var inputField = document.getElementById(inputIdHtml+index);
+    inputField.addEventListener("keydown", function (e) {
+        if (e.keyCode === 13) {  //checks whether the pressed key is "Enter"
+            validateAndSave(e, index, url, btnId, inputId);
+        }
+    });
+}
+
+function validateAndSave(e, i, url, btnId, inputId) {
+    var input = e.target.value;
+    var data = { "newName": input, "elemType": elemType, "myId": myId, "command": myCommand};  
+
+    if(input.length != 0){
+        $(inputId+i).css("display", "none");
+        $(btnId+i).css("display", "inline");  
+        
+        $(btnId+i).text(input);
+
+        //update in DB and view if successful
+        $.ajax({
+        url: url,
+        type: 'POST',
+        data: JSON.stringify(data),
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        async: true,
+        success: function(response) {                            
+                if(response["status"] == "OK"){
+                    console.log("Success: " + response["message"]);
+                    if(response["command"] == "insert"){
+                        location.reload();
+                    }
+                }                    
+                else {
+                    alert(response["message"]);                    
+                }                    
+            }
+        });
+    } else {
+        $(inputId+i).css("display", "none");
+        $(btnId+i).css("display", "inline");   
+    }           
 }

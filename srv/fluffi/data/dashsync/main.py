@@ -9,7 +9,7 @@
 # Author(s): Michael Kraus, Thomas Riedmaier, Junes Najah
 
 from flask import Flask, render_template
-§§from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO, emit
 
 # initialize Flask
 app = Flask(__name__)
@@ -23,12 +23,12 @@ def index():
 
 @socketio.on('syncProject')
 def on_syncProject(data):
-§§    send=data['send']
-§§    project=data['project']
-§§    time=data['time']
-§§    time2=data['time2']
-§§    
-§§    emit('syncevent', {'send': send, 'project': project, 'time': time, 'time2': time2}, broadcast=True)
-§§
+    send=data['send']
+    project=data['project']
+    time=data['time']
+    time2=data['time2']
+    
+    emit('syncevent', {'send': send, 'project': project, 'time': time, 'time2': time2}, broadcast=True)
+
 if __name__ == '__main__':
     socketio.run(app, debug=True, host='0.0.0.0', port=4000)

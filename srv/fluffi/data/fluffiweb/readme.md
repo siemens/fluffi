@@ -11,43 +11,43 @@ Author(s): Junes Najah, Thomas Riedmaier, Pascal Eckmann
 -->
 
 # Fluffi Web GUI
-§§
+
 FLUFFI - A distributed evolutionary binary fuzzer for pentesters.
-§§
-§§## Local development
-§§
-§§### Prerequisites for local dev
-§§
-§§- Install Python Version >= 3.5 
-§§
+
+## Local development
+
+### Prerequisites for local dev
+
+- Install Python Version >= 3.5 
+
 §§If you a old python 2.7 version, so use pip3 and python3 to start the app and on unix `sudo` before the pip command
 §§
-§§```
+```
 §§$ pip install -r requirements.txt
-§§```
-§§
+```
+
 - Setup local mysql database with username `root` and password `toor` 
-§§- Set LOCAL_DEV to True in [config.py](config.py)
-§§
-§§To run the app on localhost:5000: 
-§§```
-§§$ python main.py
-§§```
-§§
-§§## Testing
-§§
-§§Prerequisites:
-§§
-§§- install selenium with pip install selenium
+- Set LOCAL_DEV to True in [config.py](config.py)
+
+To run the app on localhost:5000: 
+```
+$ python main.py
+```
+
+## Testing
+
+Prerequisites:
+
+- install selenium with pip install selenium
 - download [geckodriver](https://github.com/mozilla/geckodriver/releases) and add it to your PATH environment variables (if necessary)
 - add test population file for the upload under `C:\TestDev\test_files\example1.dll` or change path to your file
-§§
-§§Run unit tests:
-§§
-§§```
-§§$ python -W ignore -m unittest discover
-§§```
-§§
-§§## Config
-§§
+
+Run unit tests:
+
+```
+$ python -W ignore -m unittest discover
+```
+
+## Config
+
 Add new Runner Types, Generator Types, Evaluator Types or Templates to [config.json](app/static/config.json).

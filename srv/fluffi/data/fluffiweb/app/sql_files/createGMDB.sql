@@ -13,31 +13,31 @@ Author(s): Michael Kraus, Junes Najah, Thomas Riedmaier, Abian Blome, Pascal Eck
 CREATE DATABASE IF NOT EXISTS fluffi_gm;
 
 CREATE TABLE IF NOT EXISTS fluffi_gm.command_queue (
-§§	`ID` int(11) NOT NULL AUTO_INCREMENT,
-§§	`Command` varchar(256) NOT NULL DEFAULT '',
-§§	`Argument` varchar(4096) DEFAULT '',
-§§	`CreationDate` timestamp NOT NULL DEFAULT current_timestamp(),
-§§	`Done` int(11) NOT NULL DEFAULT 0,
-§§	`Error` VARCHAR(4096) NULL,
-§§	PRIMARY KEY (`ID`)
+	`ID` int(11) NOT NULL AUTO_INCREMENT,
+	`Command` varchar(256) NOT NULL DEFAULT '',
+	`Argument` varchar(4096) DEFAULT '',
+	`CreationDate` timestamp NOT NULL DEFAULT current_timestamp(),
+	`Done` int(11) NOT NULL DEFAULT 0,
+	`Error` VARCHAR(4096) NULL,
+	PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS fluffi_gm.fuzzjob (
-§§	`id` int(11) NOT NULL AUTO_INCREMENT,
-§§	`name` varchar(256) DEFAULT NULL,
-§§	`DBHost` varchar(256) DEFAULT NULL,
-§§	`DBUser` varchar(256) DEFAULT NULL,
-§§	`DBPass` varchar(256) DEFAULT NULL,
-§§	`DBName` varchar(256) DEFAULT NULL,
-§§	PRIMARY KEY (`id`)
+	`id` int(11) NOT NULL AUTO_INCREMENT,
+	`name` varchar(256) DEFAULT NULL,
+	`DBHost` varchar(256) DEFAULT NULL,
+	`DBUser` varchar(256) DEFAULT NULL,
+	`DBPass` varchar(256) DEFAULT NULL,
+	`DBName` varchar(256) DEFAULT NULL,
+	PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS fluffi_gm.localmanagers_statuses (
-§§	`ID` int(11) NOT NULL AUTO_INCREMENT,
-§§	`ServiceDescriptorGUID` varchar(50) DEFAULT NULL,
-§§	`TimeOfStatus` timestamp NULL DEFAULT NULL,
-§§	`Status` varchar(1000) DEFAULT NULL,
-§§	PRIMARY KEY (`ID`)
+	`ID` int(11) NOT NULL AUTO_INCREMENT,
+	`ServiceDescriptorGUID` varchar(50) DEFAULT NULL,
+	`TimeOfStatus` timestamp NULL DEFAULT NULL,
+	`Status` varchar(1000) DEFAULT NULL,
+	PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS fluffi_gm.locations (
@@ -55,14 +55,14 @@ CREATE TABLE IF NOT EXISTS fluffi_gm.systems (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS fluffi_gm.workers (
-§§	`ServiceDescriptorGUID` varchar(50) NOT NULL,
-§§	`ServiceDescriptorHostAndPort` VARCHAR(50) NOT NULL,
-§§	`FuzzJob` int(11) DEFAULT NULL,
-§§	`Location` INT(11) NOT NULL,
-§§	`TimeOfLastRequest` timestamp NOT NULL DEFAULT current_timestamp(),
-§§	`AgentType` int(11) NOT NULL,
-§§	`AgentSubTypes` varchar(1000) DEFAULT "",
-§§	PRIMARY KEY (`ServiceDescriptorGUID`)
+	`ServiceDescriptorGUID` varchar(50) NOT NULL,
+	`ServiceDescriptorHostAndPort` VARCHAR(50) NOT NULL,
+	`FuzzJob` int(11) DEFAULT NULL,
+	`Location` INT(11) NOT NULL,
+	`TimeOfLastRequest` timestamp NOT NULL DEFAULT current_timestamp(),
+	`AgentType` int(11) NOT NULL,
+	`AgentSubTypes` varchar(1000) DEFAULT "",
+	PRIMARY KEY (`ServiceDescriptorGUID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS fluffi_gm.location_fuzzjobs (
@@ -75,13 +75,13 @@ CREATE TABLE IF NOT EXISTS fluffi_gm.location_fuzzjobs (
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS fluffi_gm.localmanagers (
-§§	`ServiceDescriptorGUID` varchar(50) NOT NULL,
-§§	`ServiceDescriptorHostAndPort` varchar(256) NOT NULL,
-§§	`Location` INT(11) NOT NULL,
-§§	`FuzzJob` INT(11) NOT NULL,
-§§	PRIMARY KEY (`ServiceDescriptorGUID`),
-§§	UNIQUE KEY  `Location` (`Location`,`Fuzzjob`),
-§§	FOREIGN KEY (`Location`, `FuzzJob`) REFERENCES `location_fuzzjobs` (`Location`, `FuzzJob`) ON UPDATE CASCADE ON DELETE CASCADE
+	`ServiceDescriptorGUID` varchar(50) NOT NULL,
+	`ServiceDescriptorHostAndPort` varchar(256) NOT NULL,
+	`Location` INT(11) NOT NULL,
+	`FuzzJob` INT(11) NOT NULL,
+	PRIMARY KEY (`ServiceDescriptorGUID`),
+	UNIQUE KEY  `Location` (`Location`,`Fuzzjob`),
+	FOREIGN KEY (`Location`, `FuzzJob`) REFERENCES `location_fuzzjobs` (`Location`, `FuzzJob`) ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS fluffi_gm.deployment_packages (
@@ -109,12 +109,12 @@ CREATE TABLE IF NOT EXISTS fluffi_gm.systems_location (
 	CONSTRAINT `systems_location_FK2` FOREIGN KEY (`Location`) REFERENCES `locations` (`id`) ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-§§CREATE TABLE IF NOT EXISTS fluffi_gm.gm_options (
+CREATE TABLE IF NOT EXISTS fluffi_gm.gm_options (
 	`id` INT(11) NOT NULL AUTO_INCREMENT,
-§§	`setting` VARCHAR(150) NOT NULL,
-§§	`value` VARCHAR(150) NOT NULL DEFAULT "",
+	`setting` VARCHAR(150) NOT NULL,
+	`value` VARCHAR(150) NOT NULL DEFAULT "",
 	PRIMARY KEY (`id`),
-§§	UNIQUE (`setting`)
+	UNIQUE (`setting`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS fluffi_gm.system_fuzzjob_instances (

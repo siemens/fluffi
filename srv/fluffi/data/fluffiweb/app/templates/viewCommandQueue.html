@@ -23,38 +23,38 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier
     <div class="container"></div>
 </div>
 
-§§<br>
+<br>
 
-§§<br>
+<br>
 
 <div class="container">
-§§    <table class="table">
-§§        <thead>
-§§            <tr>
-§§                <th style="text-align: center;">Command</th>
-§§                <th style="text-align: center;">Argument</th>
-§§                <th style="text-align: center;">CreationDate</th>
-§§                <th style="text-align: center;">Done</th>
-§§                <th style="text-align: center;">Error</th>
-§§            </tr>
-§§        </thead>
-§§        <tbody>
-§§            {% for command in commands %}
-§§                <tr {% if command.Done == 1 %} bgcolor="#b3ffb3" {% else %} bgcolor="#ffff99" {% endif %} >
-§§                    <td style="text-align: center;">{{ command.Command }}</td>
-§§                    <td style="text-align: center;">{{ command.Argument }}</td>
-§§                    <td style="text-align: center;">{{ command.CreationDate }}</td>
-§§                    {% if command.Done == 1 %}
-§§                    <td style="text-align: center;"><span class="glyphicon glyphicon-ok"></span></td>
-§§                    {% else %}
-§§                    <td style="text-align: center;"><span class="glyphicon glyphicon-hourglass"></span></td>
-§§                    {% endif %}
-§§                    <td style="text-align: center;">{{ command.Error }}</td>
-§§                </tr>
-§§
-§§            {% endfor %}
-§§        </tbody>
-§§    </table>
+    <table class="table">
+        <thead>
+            <tr>
+                <th style="text-align: center;">Command</th>
+                <th style="text-align: center;">Argument</th>
+                <th style="text-align: center;">CreationDate</th>
+                <th style="text-align: center;">Done</th>
+                <th style="text-align: center;">Error</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for command in commands %}
+                <tr {% if command.Done == 1 %} bgcolor="#b3ffb3" {% else %} bgcolor="#ffff99" {% endif %} >
+                    <td style="text-align: center;">{{ command.Command }}</td>
+                    <td style="text-align: center;">{{ command.Argument }}</td>
+                    <td style="text-align: center;">{{ command.CreationDate }}</td>
+                    {% if command.Done == 1 %}
+                    <td style="text-align: center;"><span class="glyphicon glyphicon-ok"></span></td>
+                    {% else %}
+                    <td style="text-align: center;"><span class="glyphicon glyphicon-hourglass"></span></td>
+                    {% endif %}
+                    <td style="text-align: center;">{{ command.Error }}</td>
+                </tr>
+
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 
 

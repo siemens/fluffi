@@ -13,14 +13,14 @@ Author(s): Thomas Riedmaier, Junes Najah, Abian Blome
 {% extends "base.html" %}
 
 {% block content %}
-§§<h1>Upload Testcase(s)</h1>
-§§<form action="" enctype="multipart/form-data" method="POST" name="createProject">
-§§    {{ form.hidden_tag() }}
-§§    <p>
-§§        Testcase file<br>
-§§        {{ form.filename(multiple=multiple) }}<br>
-§§    </p>
-§§    <p><input type="submit" value="Upload testcase"/></p>
-§§</form>
+<h1>Upload Testcase(s)</h1>
+<form action="" enctype="multipart/form-data" method="POST" name="createProject">
+    {{ form.hidden_tag() }}
+    <p>
+        Testcase file<br>
+        {{ form.filename(multiple=multiple) }}<br>
+    </p>
+    <p><input type="submit" value="Upload testcase"/></p>
+</form>
 
 {% endblock %}

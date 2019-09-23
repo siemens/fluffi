@@ -9,52 +9,52 @@
 # Author(s): Junes Najah, Thomas Riedmaier, Abian Blome, Michael Kraus
 
 from flask_nav import Nav
-§§from flask_nav.elements import Link, Navbar, Separator, Subgroup, View
-§§
-§§from app import db, models
+from flask_nav.elements import Link, Navbar, Separator, Subgroup, View
+
+from app import db, models
 
 nav = Nav()
-§§
-§§
-§§def createLocationsNav(listLinks):
-§§    locations = db.session.query(models.Locations).distinct(models.Locations.Name)
-§§
-§§    for location in locations:
-§§        listLinks.append(Link(location.Name, '/locations/view/' + str(location.id)))
-§§
-§§    return listLinks
-§§
-§§
-§§def createFuzzjobsNav(listLinks):
-§§    projects = models.Fuzzjob.query.all()
-§§
-§§    for project in projects:
-§§        listLinks.append(Link(project.name[:15], '/projects/view/%d' % project.id))
-§§
-§§    return listLinks
-§§
-§§
-§§def createLocationsLinks():
-§§    locationsLinks = [Link('Overview', '/locations'), Separator(), Link('Create Location', '/locations/createLocation'),
-§§                      Separator()]
-§§
-§§    return createLocationsNav(locationsLinks)
-§§
-§§
-§§def createFuzzjobLinks():
-§§    fuzzjobLinks = [Link('Overview', '/projects'), Separator(), Link('Create Fuzzjob', '/projects/createProject'),
-§§                    Separator()]
-§§    return createFuzzjobsNav(fuzzjobLinks)
-§§
-§§
-§§def registerElementDynamically():
-§§    locationsLinks = createLocationsLinks()
-§§    fuzzjobLinks = createFuzzjobLinks()
-§§    nav.register_element('frontend_top', Navbar(
-§§        View('FLUFFI', '.index'),
-§§        View('Home', '.index'),
-§§        Subgroup('Locations', *locationsLinks),
-§§        Subgroup('Fuzzjobs', *fuzzjobLinks),
-§§        View('Commands', '.commands'),
+
+
+def createLocationsNav(listLinks):
+    locations = db.session.query(models.Locations).distinct(models.Locations.Name)
+
+    for location in locations:
+        listLinks.append(Link(location.Name, '/locations/view/' + str(location.id)))
+
+    return listLinks
+
+
+def createFuzzjobsNav(listLinks):
+    projects = models.Fuzzjob.query.all()
+
+    for project in projects:
+        listLinks.append(Link(project.name[:15], '/projects/view/%d' % project.id))
+
+    return listLinks
+
+
+def createLocationsLinks():
+    locationsLinks = [Link('Overview', '/locations'), Separator(), Link('Create Location', '/locations/createLocation'),
+                      Separator()]
+
+    return createLocationsNav(locationsLinks)
+
+
+def createFuzzjobLinks():
+    fuzzjobLinks = [Link('Overview', '/projects'), Separator(), Link('Create Fuzzjob', '/projects/createProject'),
+                    Separator()]
+    return createFuzzjobsNav(fuzzjobLinks)
+
+
+def registerElementDynamically():
+    locationsLinks = createLocationsLinks()
+    fuzzjobLinks = createFuzzjobLinks()
+    nav.register_element('frontend_top', Navbar(
+        View('FLUFFI', '.index'),
+        View('Home', '.index'),
+        Subgroup('Locations', *locationsLinks),
+        Subgroup('Fuzzjobs', *fuzzjobLinks),
+        View('Commands', '.commands'),
         View('Systems', '.systems')
-§§    ))
+    ))

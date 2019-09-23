@@ -8,87 +8,87 @@
 # 
 # Author(s): Junes Najah, Thomas Riedmaier
 
-§§from flask import render_template
-§§from datetime import datetime, timedelta
-§§
-§§from app import app
-§§from .nav import nav, registerElementDynamically
-§§
-§§import shutil, os
-§§
-§§# we overwrite the render function to add new elements to the navbar dynamically
-§§_renderTemplate = render_template
-§§
-§§
-§§def renderTemplate(*args, **kwargs):
-§§    registerElementDynamically()
-§§
-§§    return _renderTemplate(*args, nav = nav.elems, **kwargs)
-§§
-§§
-§§# this is needed because sqlalchemy takes forever to do "engine_connect" if we give it a hostname
-§§def fluffiResolve(possiblyHostname):
-§§    import socket
-§§
-§§    try:
-§§        socket.inet_aton(possiblyHostname)
-§§        # if we are here, this was a valid IP address
-§§        return possiblyHostname
-§§    except socket.error:
-§§        # we need to resolve the hostname
-§§        return socket.gethostbyname(possiblyHostname)
-§§
-§§
-§§def formatSubtypeInput(formData, subtypes):
-§§    formattedInput = ""
-§§
-§§    for i, value in enumerate(formData):
-§§        pipe = '' if i == len(formData) - 1 else '|'
-§§        nameAndValue = subtypes[i] + "=" + value
-§§        formattedInput += nameAndValue + pipe
-§§
-§§    return formattedInput
-§§
-§§
-§§def createDefaultSubtypes(subTypes):
-§§    default = ""
-§§    for i, t in enumerate(subTypes):
-§§        if i == 0:
-§§            default_count = "100"
-§§        else:
-§§            default_count = "0"
-§§        if i == len(subTypes)-1:
-§§            pipe = ""
-§§        else:
-§§            pipe = "|"
-§§        default += t + "=" + default_count + pipe
-§§    return default
-§§
-§§
-§§def deleteZipAndTempFiles():
-§§    rootPath = app.root_path[:-3]
-§§    tmpFolderPath = app.root_path + "/tmp"    
-§§    deleteTime = datetime.timestamp(datetime.now() - timedelta(minutes=1))
-§§    
-§§    if os.path.exists(tmpFolderPath):
-§§        folderTimestamp = os.stat(tmpFolderPath).st_mtime
-§§        if folderTimestamp < deleteTime:
-§§            shutil.rmtree(tmpFolderPath)
-§§
-§§    for file in os.listdir(rootPath):
-§§        if file.endswith(".zip"):
-§§            zipFilePath = os.path.join(rootPath, file)
-§§            zipFileTimestamp = os.stat(zipFilePath).st_mtime
-§§            if zipFileTimestamp < deleteTime:
-§§                os.remove(zipFilePath)
-§§
-§§
-§§def createDefaultSubtypesList(subTypes):
-§§    default = []
-§§    for i in range(0, len(subTypes)):
-§§        if i == 0:
-§§            default_count = "100"
-§§        else:
-§§            default_count = "0"
-§§        default.append(default_count)
-§§    return default
+from flask import render_template
+from datetime import datetime, timedelta
+
+from app import app
+from .nav import nav, registerElementDynamically
+
+import shutil, os
+
+# we overwrite the render function to add new elements to the navbar dynamically
+_renderTemplate = render_template
+
+
+def renderTemplate(*args, **kwargs):
+    registerElementDynamically()
+
+    return _renderTemplate(*args, nav = nav.elems, **kwargs)
+
+
+# this is needed because sqlalchemy takes forever to do "engine_connect" if we give it a hostname
+def fluffiResolve(possiblyHostname):
+    import socket
+
+    try:
+        socket.inet_aton(possiblyHostname)
+        # if we are here, this was a valid IP address
+        return possiblyHostname
+    except socket.error:
+        # we need to resolve the hostname
+        return socket.gethostbyname(possiblyHostname)
+
+
+def formatSubtypeInput(formData, subtypes):
+    formattedInput = ""
+
+    for i, value in enumerate(formData):
+        pipe = '' if i == len(formData) - 1 else '|'
+        nameAndValue = subtypes[i] + "=" + value
+        formattedInput += nameAndValue + pipe
+
+    return formattedInput
+
+
+def createDefaultSubtypes(subTypes):
+    default = ""
+    for i, t in enumerate(subTypes):
+        if i == 0:
+            default_count = "100"
+        else:
+            default_count = "0"
+        if i == len(subTypes)-1:
+            pipe = ""
+        else:
+            pipe = "|"
+        default += t + "=" + default_count + pipe
+    return default
+
+
+def deleteZipAndTempFiles():
+    rootPath = app.root_path[:-3]
+    tmpFolderPath = app.root_path + "/tmp"    
+    deleteTime = datetime.timestamp(datetime.now() - timedelta(minutes=1))
+    
+    if os.path.exists(tmpFolderPath):
+        folderTimestamp = os.stat(tmpFolderPath).st_mtime
+        if folderTimestamp < deleteTime:
+            shutil.rmtree(tmpFolderPath)
+
+    for file in os.listdir(rootPath):
+        if file.endswith(".zip"):
+            zipFilePath = os.path.join(rootPath, file)
+            zipFileTimestamp = os.stat(zipFilePath).st_mtime
+            if zipFileTimestamp < deleteTime:
+                os.remove(zipFilePath)
+
+
+def createDefaultSubtypesList(subTypes):
+    default = []
+    for i in range(0, len(subTypes)):
+        if i == 0:
+            default_count = "100"
+        else:
+            default_count = "0"
+        default.append(default_count)
+    return default

@@ -29,13 +29,13 @@ class AnsibleRESTConnector:
 
     def getFluffiProjectURL(self):
 §§        url = self.ansibleURL + "project/"
-§§        response = requests.get(url, auth = self.auth)
+        response = requests.get(url, auth = self.auth)
         jsonResults = json.loads(response.text)
         for result in jsonResults['results']:
             if result['name'].lower() == "fluffi":
 §§                return url + str(result['id']) + "/"
 
-§§    def executePlaybook(self, playbookName, limit, arguments = None):
+    def executePlaybook(self, playbookName, limit, arguments = None):
         inventoryID = self.getFluffiInventoryID()
         fluffiProjectURL = self.getFluffiProjectURL()
 §§        fluffiProjectURL+="execute_playbook/"
@@ -50,7 +50,7 @@ class AnsibleRESTConnector:
             extraVarsString.strip()
 §§            data['extra_vars'] = extraVarsString
         # Sending post request to execute a playbook
-§§        response = requests.post(fluffiProjectURL, json = data, auth = self.auth)
+        response = requests.post(fluffiProjectURL, json = data, auth = self.auth)
 §§        print(str(data))
         jsonResult = json.loads(response.text)
         if 'history_id' in jsonResult:
@@ -82,7 +82,7 @@ class AnsibleRESTConnector:
 
         try:   
             # Sending post request to execute playbook to add new system
-§§            response = requests.post(url, json = data, auth = self.auth)
+            response = requests.post(url, json = data, auth = self.auth)
             jsonResult = json.loads(response.text)
             print(jsonResult)
 
@@ -110,7 +110,7 @@ class AnsibleRESTConnector:
 
         try:                                              
             # Sending post request to execute playbook to add new system
-§§            response = requests.delete(url, json = data, auth = self.auth)
+            response = requests.delete(url, json = data, auth = self.auth)
             return True            
             
         except Exception as e:
@@ -131,7 +131,7 @@ class AnsibleRESTConnector:
         response = requests.get(lastHostCheckResultURL, auth=self.auth)
         jsonResults = json.loads(response.text)
         getResultURL = jsonResults['raw_stdout']# --> get result
-§§        response = requests.get(getResultURL, auth = self.auth, headers = {'User-Agent':'Python', 'Connection':'close'})
+        response = requests.get(getResultURL, auth = self.auth, headers = {'User-Agent':'Python', 'Connection':'close'})
 
         hosts = []
         resultHostData = response.text.split("PLAY")
@@ -162,7 +162,7 @@ class AnsibleRESTConnector:
                 hosts.append(host)
             
 §§        url = self.ansibleURL + 'group/'
-§§        res = requests.get(url, auth = self.auth, headers = {'Connection':'close'})
+        res = requests.get(url, auth = self.auth, headers = {'Connection':'close'})
         groups = []
         if res.ok:
             data = res.json()
@@ -176,7 +176,7 @@ class AnsibleRESTConnector:
                     continue
                 groups.append(group)
                 url = group.URL
-§§                resHosts = requests.get(url, auth = self.auth, headers = {'Connection':'close'})
+                resHosts = requests.get(url, auth = self.auth, headers = {'Connection':'close'})
                 if resHosts.ok:
                     dataHosts = resHosts.json()
 §§                    for h in dataHosts['results']:

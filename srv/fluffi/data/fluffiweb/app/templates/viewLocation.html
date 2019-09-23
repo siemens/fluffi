@@ -22,7 +22,7 @@ function deleteProject(projId, locId) {
 }
 
 function assignWorker(guid) {
-§§    var assignUrl = "/locations/assignWorker/" + guid;
+    var assignUrl = "/locations/assignWorker/" + guid;
     var data = { "ProjectID": document.getElementById("worker-" + guid).value };
 
     $.ajax({
@@ -41,8 +41,8 @@ function assignWorker(guid) {
 <div class="container">
     <h1>Location details: {{ location.name }}</h1>
 </div>
-§§{{ flashMessages() }}
-§§<hr>
+{{ flashMessages() }}
+<hr>
 
 <div class="jumbotron">
     <div class="container"></div>
@@ -53,20 +53,20 @@ function assignWorker(guid) {
     <div><a href="/locations/{{ location.id }}/addProject">Add Project</a></div>
     <table class="table">
         <thead>
-§§        <tr>
-§§            <th>Name</th>
-§§            <th>Operations</th>
-§§        </tr>
+        <tr>
+            <th>Name</th>
+            <th>Operations</th>
+        </tr>
         </thead>
         <tbody>
-§§        {% for project in location.projects %}
-§§        <tr>
-§§            <td><a href="/projects/view/{{project.id}}">{{ project.name }}</a></td>
-§§            <td>
-§§                <input onclick="deleteProject({{ project.id }}, '{{ location.id }}')" type="button" value="Delete"/>
-§§            </td>
-§§        </tr>
-§§        {% endfor %}
+        {% for project in location.projects %}
+        <tr>
+            <td><a href="/projects/view/{{project.id}}">{{ project.name }}</a></td>
+            <td>
+                <input onclick="deleteProject({{ project.id }}, '{{ location.id }}')" type="button" value="Delete"/>
+            </td>
+        </tr>
+        {% endfor %}
         </tbody>
     </table>
 </div>
@@ -75,36 +75,36 @@ function assignWorker(guid) {
     <h2>Unassigned Workers</h2>
     <table class="table">
         <thead>
-§§        <tr>
-§§            <th>Type</th>
-§§            <th>SubType</th>
-§§            <th>Last Request</th>
-§§            <th>Operations</th>
-§§        </tr>
+        <tr>
+            <th>Type</th>
+            <th>SubType</th>
+            <th>Last Request</th>
+            <th>Operations</th>
+        </tr>
         </thead>
         <tbody>
-§§        {% for worker in location.workers %}
-§§        <tr>
-§§            {% if worker.Agenttype == 1 %}
-§§            <td>Runner</td>
-§§            {% elif worker.Agenttype == 2 %}
-§§            <td>Evaluator</td>
-§§            {% else %}
-§§            <td>Generator</td>
-§§            {% endif %}
-§§            <td>{{ worker.Agentsubtypes }}</td>
-§§            <td>{{ worker.Timeoflastrequest}}</td>
-§§            <td>
-§§                <select id="worker-{{ worker.Servicedescriptorguid }}">
-§§                    <option>Unassigned</option>
-§§                    {% for project in location.projects %}
-§§                    <option value="{{ project.id }}">{{ project.name }}</option>
-§§                    {% endfor %}
-§§                </select>
-§§                <input onclick="assignWorker('{{ worker.Servicedescriptorguid }}')" type="button" value="Assign"/>
-§§            </td>
-§§        </tr>
-§§        {% endfor %}
+        {% for worker in location.workers %}
+        <tr>
+            {% if worker.Agenttype == 1 %}
+            <td>Runner</td>
+            {% elif worker.Agenttype == 2 %}
+            <td>Evaluator</td>
+            {% else %}
+            <td>Generator</td>
+            {% endif %}
+            <td>{{ worker.Agentsubtypes }}</td>
+            <td>{{ worker.Timeoflastrequest}}</td>
+            <td>
+                <select id="worker-{{ worker.Servicedescriptorguid }}">
+                    <option>Unassigned</option>
+                    {% for project in location.projects %}
+                    <option value="{{ project.id }}">{{ project.name }}</option>
+                    {% endfor %}
+                </select>
+                <input onclick="assignWorker('{{ worker.Servicedescriptorguid }}')" type="button" value="Assign"/>
+            </td>
+        </tr>
+        {% endfor %}
         </tbody>
     </table>
 </div>
