@@ -1,0 +1,16 @@
+{
+    "name":"checkHostsAlive",
+    "notes":"Check if the hosts in the fluffi infrastructure are alive",
+    "type": "INTERVAL",
+    "schedule": "300",
+    "mode": "checkHostAlive.yml",
+    "kind": "PLAYBOOK",
+    "project": 1,
+    "inventory": 1,
+    "save_result": true,
+    "template": null,
+    "enabled": true,
+    "vars":{
+
+     }
+}

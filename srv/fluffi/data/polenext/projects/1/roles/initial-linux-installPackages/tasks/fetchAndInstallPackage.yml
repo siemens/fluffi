@@ -1,0 +1,64 @@
+§§# Copyright 2017-2019 Siemens AG
+§§# 
+§§# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+§§# 
+§§# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+§§# 
+§§# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+§§# 
+§§# Author(s): Fabian Russwurm, Thomas Riedmaier, Pascal Eckmann
+§§
+§§- name: Set file path to fetch
+§§  set_fact:
+§§    filePathToFetchFromFTP: "{{ftpserverURL}}/{{initialInstallPackages}}/{{pkgName}}"
+§§
+§§- name: Extract names from file path
+§§  set_fact:
+§§    PackageFileName: "{{filePathToFetchFromFTP | basename}}"
+§§    PackageDirName: "{{filePathToFetchFromFTP | basename | splitext | first }}"
+§§
+§§- name: Fetch SUT from "{{filePathToFetchFromFTP}}"
+§§  get_url: 
+§§    url: "{{filePathToFetchFromFTP}}"
+§§    dest: "{{remoteUtilitiesFilePath}}/{{PackageFileName}}"
+§§
+§§- name: Ensure source directory exists
+§§  file:
+§§    dest: "{{remoteUtilitiesFilePath}}/{{PackageDirName}}"
+§§    mode: 00777 
+§§    state: directory
+§§    owner: "{{ansible_ssh_user}}"
+§§    group: "{{ansible_ssh_user}}"
+§§
+§§- name: Extract SUT {{remoteUtilitiesFilePath}}/{{PackageFileName}}
+§§  unarchive: 
+§§    src: "{{remoteUtilitiesFilePath}}/{{PackageFileName}}"
+§§    dest: "{{remoteUtilitiesFilePath}}/{{PackageDirName}}"
+§§    remote_src: yes
+§§
+§§- name: Get info of potential install script
+§§  stat:
+§§    path: "{{remoteUtilitiesFilePath}}/{{PackageDirName}}/{{item}}"
+§§  with_items: 
+§§    - install.sh
+§§    - install.zsh
+§§    - install.bash
+§§  register: installScriptResults
+§§
+§§- name: Check if a install script exists
+§§  set_fact: 
+§§     deploymentScriptPath: "{{item.stat.path}}"
+§§  with_items: "{{installScriptResults.results}}"
+§§  when: item.stat.exists
+§§
+§§- name: Ensure that the script is executable
+§§  file: 
+§§    path: "{{deploymentScriptPath}}"
+§§    mode: 01755
+§§
+§§- name: Execute install script of the SUT on the remote machine
+§§  sudo: yes
+§§  shell: "{{deploymentScriptPath}}"
+§§  args:
+§§    chdir: "{{remoteUtilitiesFilePath}}/{{PackageDirName}}"
+§§  when: deploymentScriptPath is defined

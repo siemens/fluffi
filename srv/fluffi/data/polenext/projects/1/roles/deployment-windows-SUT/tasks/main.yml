@@ -1,0 +1,60 @@
+§§# Copyright 2017-2019 Siemens AG
+§§# 
+§§# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+§§# 
+§§# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+§§# 
+§§# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+§§# 
+§§# Author(s): Fabian Russwurm, Thomas Riedmaier, Pascal Eckmann
+§§
+§§- name: Ensure SUT directory exists
+§§  win_file:
+§§    path: "{{SUTPath}}"
+§§    state: directory
+§§
+§§- name: Extract names from file path
+§§  set_fact:
+§§    SUTFileName: "{{filePathToFetchFromFTP | basename}}"
+§§    SUTDirName: "{{filePathToFetchFromFTP | basename | splitext | first }}"
+§§
+§§- name: Check if the {{SUTFileName}} already exists
+§§  win_stat: path="{{SUTPath}}/{{SUTDirName}}"
+§§  register: stat_result
+§§
+§§- name: Delete the file, if it already exists
+§§  win_file:
+§§    path: "{{SUTPath}}\\{{SUTDirName}}"
+§§    state: absent
+§§  when: stat_result.stat.exists == True 
+§§
+§§- name: Fetch SUT zip from "{{filePathToFetchFromFTP}}" to "{{SUTPath}}\\{{SUTFileName}}"
+§§  win_get_url: 
+§§    url: "{{filePathToFetchFromFTP}}"
+§§    dest: "{{SUTPath}}\\{{SUTFileName}}"
+§§
+§§- name: Unzip "{{SUTPath}}\\{{SUTFileName}}" to "{{SUTPath}}\\{{SUTDirName}}"
+§§  win_unzip:
+§§    src: "{{SUTPath}}\\{{SUTFileName}}"
+§§    dest: "{{SUTPath}}\\{{SUTDirName}}"
+§§    delete_archive: yes
+§§
+§§- name: Get info of potential install script
+§§  win_stat:
+§§    path: "{{SUTPath}}\\{{SUTDirName}}\\{{item}}"
+§§  with_items: 
+§§    - install.bat
+§§    - install.ps1
+§§  register: installScriptResults
+§§
+§§- name: Check if a install script exists
+§§  set_fact: 
+§§     deploymentScriptPath: "{{item.stat.path}}"
+§§  with_items: "{{installScriptResults.results}}"
+§§  when: item.stat.exists
+§§  
+§§- name: Execute install script of the SUT on the remote machine
+§§  win_shell: "{{deploymentScriptPath}}"
+§§  args:
+§§    chdir: "{{SUTPath}}\\{{SUTDirName}}"
+§§  when: deploymentScriptPath is defined

@@ -1,0 +1,57 @@
+§§# Copyright 2017-2019 Siemens AG
+§§# 
+§§# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+§§# 
+§§# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+§§# 
+§§# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+§§# 
+§§# Author(s): Thomas Riedmaier, Fabian Russwurm, Michael Kraus, Pascal Eckmann
+§§
+§§[windows]
+§§fluffi_windows1 ansible_ssh_host=fluffi_windows1.fluffi
+§§fluffi_windows2 ansible_ssh_host=fluffi_windows2.fluffi
+§§
+§§[windows:vars]
+§§ansible_user=fluffi_windows_user
+§§ansible_password=fluffi_windows_pw
+§§ansible_connection=winrm
+§§ansible_winrm_transport=ntlm
+§§ansible_ssh_port=5985
+§§
+§§
+§§[linux]
+§§fluffi_linux1 ansible_ssh_host=fluffi_linux1.fluffi
+§§fluffi_linux2 ansible_ssh_host=fluffi_linux2.fluffi
+§§
+§§[linux:vars]
+§§ansible_connection=ssh
+§§ansible_ssh_user=fluffi_linux_user
+§§ansible_ssh_pass=fluffi_linux_pw
+§§ansible_sudo_pass=fluffi_linux_pw
+§§
+§§
+§§[odroids]
+§§fluffi_odroid1 ansible_ssh_host=fluffi_odroid1.fluffi
+§§fluffi_odroid2 ansible_ssh_host=fluffi_odroid2.fluffi
+§§
+§§[odroids:vars]
+§§ansible_connection=ssh
+§§ansible_ssh_user=fluffi_odroid_user
+§§ansible_ssh_pass=fluffi_odroid_pw
+§§ansible_sudo_pass=fluffi_odroid_pw
+§§
+§§
+§§[dashboard]
+§§dashboard-right ansible_ssh_host=fluffi-right-dashboard.fluffi
+§§dashboard-left ansible_ssh_host=fluffi-left-dashboard.fluffi
+§§
+§§[dashboard:vars]
+§§ansible_connection=ssh
+§§ansible_ssh_user=pi
+§§ansible_ssh_pass=fluffi_dashboard_pw
+§§ansible_sudo_pass=fluffi_dashboard_pw
+§§
+§§
+§§[Master]
+§§master ansible_ssh_host=127.0.0.1 ansible_connection=local

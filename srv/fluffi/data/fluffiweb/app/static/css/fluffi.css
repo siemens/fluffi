@@ -1,0 +1,290 @@
+§§/*
+§§Copyright 2017-2019 Siemens AG
+§§
+§§Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+§§
+§§The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+§§
+§§THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+§§
+§§Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
+§§*/
+§§
+§§.dl-horizontal dt {
+§§    text-align: left;
+§§}
+§§
+§§.jumbotron {
+§§    margin-bottom: 0px;
+§§    background-image: url(/static/images/ci2.jpeg);
+§§    background-position: 0% 25%;
+§§    background-size: cover;
+§§    background-repeat: no-repeat;
+§§    color: black;
+§§    text-shadow: 0 0 1px #fff,
+§§    0 0 2px #fff,
+§§    0 0 3px #fff,
+§§    0 0 4px #fff,
+§§    0 0 7px #fff,
+§§    0 0 8px #fff,
+§§    0 0 10px #fff,
+§§    0 0 15px #fff;
+§§}
+§§
+§§#infobox1 {
+§§    visibility: hidden;
+§§}
+§§
+§§#infobox2 {
+§§    visibility: hidden;
+§§}
+§§
+§§.hasTooltip span {
+§§    display: none;
+§§    color: #000;
+§§    text-decoration: none;
+§§    padding: 3px;
+§§}
+§§
+§§.hasTooltip:hover span {
+§§    display: block;
+§§    position: absolute;
+§§    background-color: #FFF;
+§§    border: 1px solid #CCC;
+§§    margin: 2px 10px;
+§§}
+§§
+§§.embed-container {
+§§    padding-bottom: 56.25%; /* ratio 16x9 */
+§§    height: 0; 
+§§    overflow: hidden; 
+§§    width: 100%;
+§§    height: auto;
+§§}
+§§
+§§.embed-container iframe {
+§§    position: absolute; 
+§§    top: 0; 
+§§    left: 0; 
+§§    width: 100%; 
+§§    height: 100%; 
+§§}
+§§
+§§.heading {
+§§    margin-bottom:10px; border-radius:10%
+§§}
+§§
+§§.archive-form {
+§§    float: left;
+§§    margin-right: 5px;
+§§}
+§§
+§§.archive-form-2 {
+§§    float: right;
+§§    margin-right: 20px;
+§§}
+§§
+§§.instance-run-success {
+§§    text-align: left;
+§§    width: 15%;
+§§}
+§§
+§§.instance-run-error {
+§§    text-align: left; 
+§§    width: 15%; 
+§§    color: red;
+§§    font-weight: bold;
+§§}
+§§
+§§.systems-lm-text {
+§§    display: inline;
+§§    font-size: 12px;
+§§    font-weight: bold;
+§§    color: #3795b1;
+§§}
+§§
+§§.update-system-loc {
+§§    text-align: left; 
+§§    width: 23%;
+§§}
+§§
+§§.remove {
+§§    text-align: left; 
+§§    width: 12%;
+§§}
+§§
+§§.kill {
+§§    color: black; 
+§§    width:250px;
+§§}
+§§
+§§.add-or-rename-btn {
+§§    border: 0;
+§§    background-color: inherit;
+§§}
+§§
+§§.btn-desgin {
+§§    border: 0; 
+§§    background-color: white;
+§§}
+§§
+§§.analysis-btn {
+§§    color: black; 
+§§    width:290px;
+§§}
+§§
+§§.select-width {
+§§    width: 90px;
+§§}
+§§
+§§/* ratio 4x3 */
+§§.embed-container.ratio4x3 {
+§§    padding-bottom: 75%;
+§§}
+§§
+§§.odd {
+§§    background-color: green;
+§§}
+§§
+§§.even {
+§§    background-color: red;
+§§}
+§§
+§§.icon-inactive {
+§§    color: #98989b;
+§§}
+§§
+§§#cy {
+§§    width: 100%;
+§§    height: 100%;
+§§    position: absolute;
+§§    left: 0;
+§§    top: 0;
+§§    z-index: 999;
+§§}
+§§
+§§#icontainer {
+§§    height: 1000px;
+§§}
+§§
+§§.btn-design {
+§§    background-color: #4CAF50;
+§§    border: none;
+§§    color: white;
+§§    padding: 15px 32px;
+§§    text-align: center;
+§§    text-decoration: none;
+§§    display: inline-block;
+§§    font-size: 22px;
+§§    margin: 4px 2px;
+§§    border-radius: 5px;
+§§}
+§§
+§§.error-msg {
+§§    display: none; 
+§§    margin-top: 5px; 
+§§    margin-bottom: 5px;
+§§}
+§§
+§§.fluffi-img {
+§§    margin-bottom:10px; 
+§§    border-radius:10%;
+§§}
+§§
+§§/* Population Graph */
+§§
+§§.label-boxes {
+§§    font-family:sans-serif; 
+§§    font-weight: bold; 
+§§    font-size: 14px; 
+§§    float:right
+§§}
+§§
+§§.label {
+§§    color: white; 
+§§    padding: 8px;
+§§}
+§§
+§§.population-color {
+§§    background-color: #143484
+§§}
+§§
+§§.minimized-color {
+§§    background-color: grey
+§§}
+§§
+§§.footprint-color {
+§§    background-color: orange
+§§}
+§§
+§§.alert-bg {
+§§    border-radius: 6px;
+§§    background-color: #ff5f52 !important;
+§§}
+§§
+§§.alert-bg-table {
+§§    border-radius: 6px;
+§§    padding: 5px;
+§§    background-color: #ff5f52 !important;
+§§}
+§§
+§§.alert-bg-table-dashboard {
+§§    border-radius: 6px;
+§§    padding: 5px;
+§§    background-color: #b0180b !important;
+§§}
+§§
+§§.modal-button {
+§§    margin: 10px 0px 0px auto;
+§§    display: block;
+§§}
+§§
+§§.modal-form {
+§§    width: 80%;
+§§    margin-bottom: 15px;
+§§}
+§§
+§§.modal-badge {
+§§    background-color: #31b0d5;
+§§    font-size: 1.3em;
+§§}
+§§
+§§.system-view-lm-box {
+§§    background-color: #a1cccc;
+§§    padding: 1px 10px;
+§§    border-radius: 5px;
+§§}
+§§
+§§.system-view-lm-box>.table>thead>tr>th {
+§§    border-bottom: 2px solid #fff;
+§§}
+§§
+§§.create-project-code {
+§§    background-color: #333;
+§§    padding: 6px;
+§§    border: solid 1px #222;
+§§    border-radius: 5px;
+§§    color: #fff;
+§§    font-family: monospace;
+§§}
+§§
+§§.create-project-monospace {
+§§    font-family: monospace;
+§§}
+§§
+§§.create-project-option {
+§§    padding: 8px;
+§§    border-radius: 5px;
+§§}
+§§
+§§.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+§§    vertical-align: middle !important;
+§§}
+§§
+§§.basic-bock-box-visible {
+§§    visibility: hidden;
+§§    height: 0px;
+§§    width: 0px;
+§§    margin: 0;
+§§    padding: 0;
+§§}

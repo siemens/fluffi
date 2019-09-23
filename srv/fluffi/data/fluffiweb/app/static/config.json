@@ -1,0 +1,54 @@
+{
+  "RunnerTypeOptions": [
+    "ALL_GDB",
+    "ALL_Lin_QemuUserSingle",
+    "ARM_Lin_DynRioMulti",
+    "ARM_Lin_DynRioSingle",
+    "ARM64_Lin_DynRioMulti",
+    "ARM64_Lin_DynRioSingle",
+    "X64_Lin_DynRioMulti",
+    "X64_Lin_DynRioSingle",
+    "X64_Win_DynRioMulti",
+    "X64_Win_DynRioSingle",
+    "X86_Lin_DynRioMulti",
+    "X86_Lin_DynRioSingle",
+    "X86_Win_DynRioMulti",
+    "X86_Win_DynRioSingle"
+  ],
+  "GeneratorTypes": [
+    "RadamsaMutator",
+    "AFLMutator",
+    "CaRRoTMutator",
+    "HonggfuzzMutator",
+    "OedipusMutator"
+  ],
+  "EvaluatorTypes": [
+    "CoverageEvaluator"
+  ],
+  "DefaultSettingNames": [
+    "targetCMDLine",
+    "hangTimeout",
+    "runnerType",
+    "generatorTypes",
+    "evaluatorTypes"
+  ],
+  "Templates": [
+    {
+      "Qemu": [
+        {
+          "optionNames": [
+            "chrootDir"
+          ]
+        },
+        {
+          "optionValues": [
+            ""
+          ]
+        },
+        {
+          "targetCMDLine": "/bin/qemu-arm -trace events=/etc/qemu-events -d nochain -f -E LD_PRELOAD=\"<PRELOAD>\" <ADD>"
+        }
+      ]
+    }
+  ]
+}

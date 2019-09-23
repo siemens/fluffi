@@ -1,0 +1,146 @@
+§§﻿<?xml version="1.0" encoding="utf-8"?>
+§§<!--
+§§Copyright 2017-2019 Siemens AG
+§§
+§§Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+§§
+§§The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+§§
+§§THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+§§
+§§Author(s): Thomas Riedmaier, Abian Blome
+§§-->
+§§<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+§§  <ItemGroup>
+§§    <Filter Include="Source Files">
+§§      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+§§      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+§§    </Filter>
+§§    <Filter Include="Header Files">
+§§      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+§§      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+§§    </Filter>
+§§    <Filter Include="Resource Files">
+§§      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+§§      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+§§    </Filter>
+§§  </ItemGroup>
+§§  <ItemGroup>
+§§    <ClInclude Include="stdafx.h">
+§§      <Filter>Header Files</Filter>
+§§    </ClInclude>
+§§    <ClInclude Include="targetver.h">
+§§      <Filter>Header Files</Filter>
+§§    </ClInclude>
+§§    <ClInclude Include="GetTestcaseToMutateRequestHandler.h">
+§§      <Filter>Header Files</Filter>
+§§    </ClInclude>
+§§    <ClInclude Include="LMWorkerThreadStateBuilder.h">
+§§      <Filter>Header Files</Filter>
+§§    </ClInclude>
+§§    <ClInclude Include="LMWorkerThreadState.h">
+§§      <Filter>Header Files</Filter>
+§§    </ClInclude>
+§§    <ClInclude Include="InstanceMonitorWorker.h">
+§§      <Filter>Header Files</Filter>
+§§    </ClInclude>
+§§    <ClInclude Include="InstanceControlWorker.h">
+§§      <Filter>Header Files</Filter>
+§§    </ClInclude>
+§§    <ClInclude Include="GetNewCompletedTestcaseIDsRequestHandler.h">
+§§      <Filter>Header Files</Filter>
+§§    </ClInclude>
+§§    <ClInclude Include="ReportTestcaseWithNoResultRequestHandler.h">
+§§      <Filter>Header Files</Filter>
+§§    </ClInclude>
+§§    <ClInclude Include="PutTestEvaluationRequestHandler.h">
+§§      <Filter>Header Files</Filter>
+§§    </ClInclude>
+§§    <ClInclude Include="GetCurrentBlockCoverageRequestHandler.h">
+§§      <Filter>Header Files</Filter>
+§§    </ClInclude>
+§§    <ClInclude Include="GetFuzzJobConfigurationRequestHandler.h">
+§§      <Filter>Header Files</Filter>
+§§    </ClInclude>
+§§    <ClInclude Include="WorkerWeightCalculator.h">
+§§      <Filter>Header Files</Filter>
+§§    </ClInclude>
+§§    <ClInclude Include="StatusOfInstance.h">
+§§      <Filter>Header Files</Filter>
+§§    </ClInclude>
+§§    <ClInclude Include="RegisterAtLMRequestHandler.h">
+§§      <Filter>Header Files</Filter>
+§§    </ClInclude>
+§§    <ClInclude Include="LMDatabaseManager.h">
+§§      <Filter>Header Files</Filter>
+§§    </ClInclude>
+§§    <ClInclude Include="LMGetStatusRequestHandler.h">
+§§      <Filter>Header Files</Filter>
+§§    </ClInclude>
+§§    <ClInclude Include="IsAgentWelcomedRequestHandler.h">
+§§      <Filter>Header Files</Filter>
+§§    </ClInclude>
+§§    <ClInclude Include="DBCleanupWorker.h">
+§§      <Filter>Header Files</Filter>
+§§    </ClInclude>
+§§    <ClInclude Include="GetLMConfigurationRequestHandler.h">
+§§      <Filter>Header Files</Filter>
+§§    </ClInclude>
+§§  </ItemGroup>
+§§  <ItemGroup>
+§§    <ClCompile Include="stdafx.cpp">
+§§      <Filter>Source Files</Filter>
+§§    </ClCompile>
+§§    <ClCompile Include="LocalManager.cpp">
+§§      <Filter>Source Files</Filter>
+§§    </ClCompile>
+§§    <ClCompile Include="GetTestcaseToMutateRequestHandler.cpp">
+§§      <Filter>Source Files</Filter>
+§§    </ClCompile>
+§§    <ClCompile Include="LMWorkerThreadStateBuilder.cpp">
+§§      <Filter>Source Files</Filter>
+§§    </ClCompile>
+§§    <ClCompile Include="InstanceMonitorWorker.cpp">
+§§      <Filter>Source Files</Filter>
+§§    </ClCompile>
+§§    <ClCompile Include="InstanceControlWorker.cpp">
+§§      <Filter>Source Files</Filter>
+§§    </ClCompile>
+§§    <ClCompile Include="GetNewCompletedTestcaseIDsRequestHandler.cpp">
+§§      <Filter>Source Files</Filter>
+§§    </ClCompile>
+§§    <ClCompile Include="ReportTestcaseWithNoResultRequestHandler.cpp">
+§§      <Filter>Source Files</Filter>
+§§    </ClCompile>
+§§    <ClCompile Include="PutTestEvaluationRequestHandler.cpp">
+§§      <Filter>Source Files</Filter>
+§§    </ClCompile>
+§§    <ClCompile Include="GetCurrentBlockCoverageRequestHandler.cpp">
+§§      <Filter>Source Files</Filter>
+§§    </ClCompile>
+§§    <ClCompile Include="GetFuzzJobConfigurationRequestHandler.cpp">
+§§      <Filter>Source Files</Filter>
+§§    </ClCompile>
+§§    <ClCompile Include="WorkerWeightCalculator.cpp">
+§§      <Filter>Source Files</Filter>
+§§    </ClCompile>
+§§    <ClCompile Include="RegisterAtLMRequestHandler.cpp">
+§§      <Filter>Source Files</Filter>
+§§    </ClCompile>
+§§    <ClCompile Include="LMDatabaseManager.cpp">
+§§      <Filter>Source Files</Filter>
+§§    </ClCompile>
+§§    <ClCompile Include="LMGetStatusRequestHandler.cpp">
+§§      <Filter>Source Files</Filter>
+§§    </ClCompile>
+§§    <ClCompile Include="IsAgentWelcomedRequestHandler.cpp">
+§§      <Filter>Source Files</Filter>
+§§    </ClCompile>
+§§    <ClCompile Include="DBCleanupWorker.cpp">
+§§      <Filter>Source Files</Filter>
+§§    </ClCompile>
+§§    <ClCompile Include="GetLMConfigurationRequestHandler.cpp">
+§§      <Filter>Source Files</Filter>
+§§    </ClCompile>
+§§  </ItemGroup>
+§§</Project>

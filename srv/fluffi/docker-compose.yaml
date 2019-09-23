@@ -1,0 +1,183 @@
+§§# Copyright 2017-2019 Siemens AG
+§§# 
+§§# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+§§# 
+§§# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+§§# 
+§§# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+§§# 
+§§# Author(s): Roman Bendt, Thomas Riedmaier, Fabian Russwurm
+§§
+§§# -*- coding: utf-8 -*-
+§§# vim: ts=4 et sw=4 sts=4 expandtab
+§§version: '2'
+§§services:
+§§    # DHCP, DNS, TFPT
+§§    dnsmasq:
+§§        build: ./dnsmasq
+§§        restart: always
+§§        cap_add:
+§§            - NET_ADMIN
+§§        network_mode: host
+§§        # there are no ports here, because nwmode host lets
+§§        # the container bind to whatever it wants anyway.
+§§        volumes:
+§§            - /etc/localtime:/etc/localtime:ro
+§§            - ./data/dnsmasq/resolv.conf:/etc/resolv.conf
+§§            - ./data/dnsmasq/hosts:/etc/hosts
+§§            - ./data/dnsmasq/ethers:/etc/ethers
+§§            - ./data/dnsmasq/dnsmasq.conf:/etc/dnsmasq.conf
+§§            - ./data/dnsmasq/dnsmasq.leases:/var/lib/misc/dnsmasq.leases
+§§            - ./data/tftp:/srv/tftp
+§§              #    gitea:
+§§              #        build: ./gitea
+§§              #        #restart: always
+§§              #        environment:
+§§              #            - USER=git
+§§              #            - USER_UID=1000
+§§              #            - USER_GID=1000
+§§              #        ports:
+§§              #            - 3000:3000
+§§              #            - 2222:2222
+§§              #        user: git
+§§              #        volumes:
+§§              #            - /etc/localtime:/etc/localtime:ro
+§§              #            - ./data/gitea/varlib:/var/lib/gitea
+§§              #            - ./data/gitea/home:/home/git
+§§    ntp:
+§§        build: ./ntp
+§§        restart: always
+§§        volumes:
+§§            - /etc/localtime:/etc/localtime:ro
+§§            - ./data/ntp/ntp.conf:/etc/ntp.conf
+§§        ports:
+§§            - 123:123/udp
+§§        cap_add:
+§§            - SYS_NICE
+§§            - SYS_RESOURCE
+§§            - SYS_TIME
+§§        dns: 10.66.0.1
+§§    ftp:
+§§        build: ./ftp
+§§        restart: always
+§§        volumes:
+§§            - /etc/localtime:/etc/localtime:ro
+§§            - ./data/ftp/vsftpd.conf:/etc/vsftpd.conf
+§§            - ./data/ftp/run.sh:/run.sh
+§§            - ./data/ftp/files:/var/ftp
+§§              # - /srv/xferlog:/var/log/xferlog
+§§              # - /srv/vsftpd.log:/var/log/vsftpd.log
+§§        ports:
+§§            - 20-21:20-21
+§§            - 65500-65515:65500-65515
+§§        dns: 10.66.0.1
+§§    smb:
+§§        build: ./smb
+§§        restart: always
+§§        command: '-s "install;/files;yes;no;yes"'
+§§        volumes:
+§§            - /etc/localtime:/etc/localtime:ro
+§§            - ./data/smb/files:/files
+§§            - ./data/smb/samba.sh:/usr/bin/samba.sh
+§§        ports:
+§§            - 137:137/udp
+§§            - 138:138/udp
+§§            - 139:139/tcp
+§§            - 445:445/tcp
+§§        dns: 10.66.0.1
+§§    mon:
+§§        build: ./mon
+§§        ports:
+§§            - 1883:1883
+§§            - 8885:3000
+§§            - 8086:8086
+§§        volumes:
+§§            - /etc/localtime:/etc/localtime:ro
+§§            - ./data/mon/influxdb:/var/lib/influxdb 
+§§            - ./data/mon/scripted.js:/usr/share/grafana/public/dashboards/scripted.js
+§§            - ./data/mon/FLUFFIboard.json:/etc/grafana/provisioning/jsons/FLUFFIboard.json
+§§            - ./data/mon/FLUFFIboard1.json:/etc/grafana/provisioning/jsons/FLUFFIboard1.json
+§§            - ./data/mon/FLUFFIboard2.json:/etc/grafana/provisioning/jsons/FLUFFIboard2.json
+§§            - ./data/mon/grafana:/usr/share/grafana/data
+§§            - ./data/mon/run.sh:/run.sh
+§§            - ./data/mon/sync.py:/sync.py
+§§            - ./data/mon/mos.conf:/etc/mosquitto/conf.d/mos.conf
+§§            - ./data/mon/FLUFFIdata.yaml:/usr/share/grafana/conf/provisioning/datasources/FLUFFIdata.yaml
+§§            - ./data/mon/FLUFFIdash.yaml:/usr/share/grafana/conf/provisioning/dashboards/FLUFFIdash.yaml
+§§            - ./data/mon/defaults.ini:/usr/share/grafana/conf/defaults.ini
+§§        dns: 10.66.0.1
+§§    fluffiweb:
+§§        build: ./fluffiweb
+§§        #restart: always
+§§        volumes:
+§§            - /etc/localtime:/etc/localtime:ro
+§§            - ./data/fluffiweb:/app
+§§        ports:
+§§            - 8880:80/tcp
+§§        dns: 10.66.0.1
+§§    dashsync:
+§§        build: ./dashsync
+§§        volumes:
+§§            - /etc/localtime:/etc/localtime:ro
+§§            - ./data/dashsync:/app
+§§        ports:
+§§            - 4000:4000
+§§        dns: 10.66.0.1
+§§    fluffigm:
+§§        build: ./fluffigm
+§§        restart: always
+§§        volumes:
+§§            - /etc/localtime:/etc/localtime:ro
+§§            - ./data/fluffigm:/fluffi
+§§        ports: 
+§§            - 6669:6669
+§§        stdin_open: true
+§§        dns: 10.66.0.1
+§§    grasync:
+§§        build: ./grasync
+§§        image: grasync:latest
+§§        restart: always
+§§        volumes:
+§§            - /etc/localtime:/etc/localtime:ro
+§§            - ./data/grasync:/app
+§§        dns: 10.66.0.1
+§§    polenext:
+§§        build: ./polenext
+§§        restart: always
+§§        tty: true
+§§        stdin_open: true
+§§        command: |
+§§            /bin/bash -c "
+§§            redis-server --daemonize yes &
+§§            sleep 5
+§§            polemarchctl migrate &
+§§            sleep 5
+§§            polemarchctl webserver &
+§§            sleep 5
+§§            python3 /init.py &
+§§            wait
+§§            "
+§§        volumes:
+§§            - /etc/localtime:/etc/localtime:ro
+§§            - ./data/polenext/projects:/usr/local/lib/python3.6/dist-packages/polemarch/projects
+§§            - ./data/ftp/files/tftp-roots:/tftp-roots:ro
+§§            - ./data/tftp:/tftp
+§§            - ./data/polenext/init.py:/init.py
+§§            - ./data/polenext/settings.ini:/etc/polemarch/settings.ini
+§§            - ./data/polenext/cleanHistory.py:/cleanHistory.py
+§§            - ./data/polenext/manageAgents.py:/manageAgents.py
+§§            - ./data/polenext/requests:/requests
+§§        ports:
+§§            - 8888:8080
+§§        dns: 10.66.0.1
+§§    mariadb:
+§§        build: ./mariadb
+§§        restart: always
+§§        ports:
+§§            - 3306:3306
+§§        volumes:
+§§            - /etc/localtime:/etc/localtime:ro
+§§            - ./data/fluffiweb/app/sql_files/createGMDB.sql:/docker-entrypoint-initdb.d/createGMDB.sql
+§§            - ./data/mariadb/grantAllPrivs.sql:/docker-entrypoint-initdb.d/grantAllPrivs.sql
+§§            - ./data/mariadb/fluffi.cnf:/etc/mysql/conf.d/fluffi.cnf
+§§

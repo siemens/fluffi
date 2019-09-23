@@ -1,0 +1,16 @@
+{
+    "name":"cleanHistory",
+    "notes":"Clean the history for all periodic tasks",
+    "type": "INTERVAL",
+    "schedule": "600",
+    "mode": "cleanHistory.yml",
+    "kind": "PLAYBOOK",
+    "project": 1,
+    "inventory": 1,
+    "save_result": true,
+    "template": null,
+    "enabled": true,
+    "vars":{
+
+     }
+}

@@ -1,0 +1,8 @@
+{
+   "name":"Fluffi",
+   "notes":"The project for the fluffi infrastructure",
+   "repository":"http://127.0.0.1/dummyURL",
+   "vars":{
+      "repo_type":"MANUAL"
+   }
+}

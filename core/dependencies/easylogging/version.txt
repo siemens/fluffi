@@ -1,0 +1,1 @@
+easyloggingpp 9.96.7

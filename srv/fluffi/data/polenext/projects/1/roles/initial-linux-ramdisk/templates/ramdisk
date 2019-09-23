@@ -1,0 +1,29 @@
+#! /bin/sh 
+# /etc/init.d/ramdisk
+# init script to sync fluffi to ramdisk
+### BEGIN INIT INFO
+# Provides:          ramdisk
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Init script to sync ramdisk for fluffi
+### END INIT INFO
+
+
+ case "$1" in
+   start)
+     echo "Copying files to ramdisk"
+     rsync -av {{deploymentPath}} {{ramdiskPath}}
+     echo [`date +"%Y-%m-%d %H:%M"`] Ramdisk Synched from HD >> /var/log/ramdisk_sync.log
+     ;;
+   stop)
+     echo "Do nothing on stop"
+     ;;
+   *)
+     echo "Usage: /etc/init.d/ramdisk {start|stop|sync}"
+     exit 1
+     ;;
+ esac
+
+ exit 0

@@ -1,0 +1,1 @@
+MariaDB C Connector Release 3.0.10

@@ -1,0 +1,216 @@
+§§<!--
+§§Copyright 2017-2019 Siemens AG
+§§
+§§Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+§§
+§§The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+§§
+§§THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+§§
+§§Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier
+§§-->
+§§
+§§{% extends "base.html" %}
+§§
+§§{% block scripts  %}
+§§<script src="{{ url_for('static', filename = 'javascript/tooltip.js') }}" type="text/javascript"></script>
+§§<script src="{{ url_for('static', filename = 'javascript/renamer.js') }}" type="text/javascript"></script>
+§§<script src="{{ url_for('static', filename = 'javascript/instanceConfiguration.js') }}" type="text/javascript"></script>
+§§
+§§{{super()}}
+§§{% endblock %}
+§§
+§§{% block content %}
+§§
+§§<div class="container">
+§§    <h1><a href="/projects/view/{{fuzzjob.id}}">Managed Instances: {{ fuzzjob.name[:30] }}</a></h1>
+§§</div>
+§§{{ flashMessages() }}
+§§<hr>
+§§<div class="jumbotron">
+§§    <div class="container"></div>
+§§</div>
+§§
+§§</br>
+§§
+§§<div class="container">
+§§    <div class="container">
+§§        <div class="row">
+§§            <br>
+§§            <div class="col-xs-6 col-sm-1"></div>
+§§            <div class="col-xs-6 col-sm-10">
+§§                <form action="/systems/configureFuzzjobInstances/{{fuzzjob.name}}" enctype="multipart/form-data"
+§§                      method="POST" name="configureFuzzjobInstances">
+§§                    <hr>
+§§                    {% for system in configSystems %}
+§§                    <div>
+§§                        <h3>{{system.name}}</h3>
+§§                        <table class="table">
+§§                            <thead>
+§§                            <tr>
+§§                                <th scope="col">Type</th>
+§§                                <th scope="col">Count</th>
+§§                                <th scope="col">NewCount</th>
+§§                                <th scope="col">Architecture</th>
+§§                                <th scope="col">Delete All</th>
+§§                            </tr>
+§§                            </thead>
+§§                            <tbody>
+§§                            <tr>
+§§                                <th scope="row">TestcaseGenerator</th>
+§§                                <td><p id="{{system.name}}_tg_count">{{system.tg}}<font
+§§                                        size="1">&ensp;{{system.tgarch}}</font></p></td>
+§§                                <td><input class="form-control" id="{{system.name}}_tg" name="{{system.name}}_tg"
+§§                                           placeholder="0" type="text"></td>
+§§                                <td>
+§§                                    <select class="form-control" id="{{system.name}}_tg_arch"
+§§                                            name="{{system.name}}_tg_arch" style="width: 90px">
+§§                                        <option name="choice1" value="x64">x64</option>
+§§                                        <option name="choice2" value="x86">x86</option>
+§§                                        <option name="choice2" value="arm32">arm32</option>
+§§                                        <option name="choice2" value="arm64">arm64</option>
+§§                                    </select>
+§§                                </td>
+§§                                <td class="remove"><a class="btn btn-secondary"
+§§                                                                             onclick="removeInstances('/systems/removeConfiguredInstances/{{ system.name }}/{{ fuzzjob.name }}/tg', '{{system.name}}_tg_count');"
+§§                                                                             role="button"><span
+§§                                        class="glyphicon glyphicon-remove"></span></a></td>
+§§                            </tr>
+§§                            <tr>
+§§                                <th scope="row">TestcaseRunner</th>
+§§                                <td><p id="{{system.name}}_tr_count">{{system.tr}}<font
+§§                                        size="1">&ensp;{{system.trarch}}</font></p></td>
+§§                                <td><input class="form-control" id="{{system.name}}_tr" name="{{system.name}}_tr"
+§§                                           placeholder="0" type="text"></td>
+§§                                <td>
+§§                                    <select class="form-control" id="{{system.name}}_tr_arch"
+§§                                            name="{{system.name}}_tr_arch" style="width: 90px">
+§§                                        <option name="choice1" value="x64">x64</option>
+§§                                        <option name="choice2" value="x86">x86</option>
+§§                                        <option name="choice2" value="arm32">arm32</option>
+§§                                        <option name="choice2" value="arm64">arm64</option>
+§§                                    </select>
+§§                                </td>
+§§                                <td class="remove"><a class="btn btn-secondary"
+§§                                                                             onclick="removeInstances('/systems/removeConfiguredInstances/{{ system.name }}/{{ fuzzjob.name }}/tr', '{{system.name}}_tr_count');"
+§§                                                                             role="button"><span
+§§                                        class="glyphicon glyphicon-remove"></span></a></td>
+§§                            </tr>
+§§                            <tr>
+§§                                <th scope="row">TestcaseEvaluator</th>
+§§                                <td><p id="{{system.name}}_te_count">{{system.te}}<font
+§§                                        size="1">&ensp;{{system.tearch}}</font></p></td>
+§§                                <td><input class="form-control" id="{{system.name}}_te" name="{{system.name}}_te"
+§§                                           placeholder="0" type="text"></td>
+§§                                <td>
+§§                                    <select class="form-control" id="{{system.name}}_te_arch"
+§§                                            name="{{system.name}}_te_arch" style="width: 90px">
+§§                                        <option name="choice1" value="x64">x64</option>
+§§                                        <option name="choice2" value="x86">x86</option>
+§§                                        <option name="choice2" value="arm32">arm32</option>
+§§                                        <option name="choice2" value="arm64">arm64</option>
+§§                                    </select>
+§§                                </td>
+§§                                <td class="remove"><a class="btn btn-secondary"
+§§                                                                             onclick="removeInstances('/systems/removeConfiguredInstances/{{ system.name }}/{{ fuzzjob.name }}/te', '{{system.name}}_te_count');"
+§§                                                                             role="button"><span
+§§                                        class="glyphicon glyphicon-remove"></span></a></td>
+§§                            </tr>
+§§                            </tbody>
+§§                        </table>
+§§                    </div>
+§§                    {% endfor %}
+§§                    <hr>
+§§                    </br>
+§§                    <hr>
+§§                    {% for system in lemmingSystems %}
+§§                    <div style="background-color:lightgray">
+§§                        <h3>{{system.name}}</h3>
+§§                        <table class="table">
+§§                            <thead>
+§§                            <tr>
+§§                                <th scope="col">Type</th>
+§§                                <th scope="col">Count</th>
+§§                                <th scope="col">NewCount</th>
+§§                                <th scope="col">Architecture</th>
+§§                                <th scope="col">Delete All</th>
+§§                            </tr>
+§§                            </thead>
+§§                            <tbody>
+§§                            <tr>
+§§                                <th scope="row">TestcaseGenerator</th>
+§§                                <td><p id="{{system.name}}_tg_count">{{system.tg}}<font
+§§                                        size="1">&ensp;{{system.tgarch}}</font></p></td>
+§§                                <td><input class="form-control" id="{{system.name}}_tg" name="{{system.name}}_tg"
+§§                                           placeholder="0" type="text"></td>
+§§                                <td>
+§§                                    <select class="form-control" id="{{system.name}}_tg_arch"
+§§                                            name="{{system.name}}_tg_arch" style="width: 90px">
+§§                                        <option name="choice1" value="x64">x64</option>
+§§                                        <option name="choice2" value="x86">x86</option>
+§§                                        <option name="choice2" value="arm32">arm32</option>
+§§                                        <option name="choice2" value="arm64">arm64</option>
+§§                                    </select>
+§§                                </td>
+§§                                <td class="remove"><a class="btn btn-secondary"
+§§                                                                             onclick="removeInstances('/systems/removeConfiguredInstances/{{ system.name }}/{{ fuzzjob.name }}/tg', '{{system.name}}_tg_count');"
+§§                                                                             role="button"><span
+§§                                        class="glyphicon glyphicon-remove"></span></a></td>
+§§                            </tr>
+§§                            <tr>
+§§                                <th scope="row">TestcaseRunner</th>
+§§                                <td><p id="{{system.name}}_tr_count">{{system.tr}}<font
+§§                                        size="1">&ensp;{{system.trarch}}</font></p></td>
+§§                                <td><input class="form-control" id="{{system.name}}_tr" name="{{system.name}}_tr"
+§§                                           placeholder="0" type="text"></td>
+§§                                <td>
+§§                                    <select class="form-control" id="{{system.name}}_tr_arch"
+§§                                            name="{{system.name}}_tr_arch" style="width: 90px">
+§§                                        <option name="choice1" value="x64">x64</option>
+§§                                        <option name="choice2" value="x86">x86</option>
+§§                                        <option name="choice2" value="arm32">arm32</option>
+§§                                        <option name="choice2" value="arm64">arm64</option>
+§§                                    </select>
+§§                                </td>
+§§                                <td class="remove"><a class="btn btn-secondary"
+§§                                                                             onclick="removeInstances('/systems/removeConfiguredInstances/{{ system.name }}/{{ fuzzjob.name }}/tr', '{{system.name}}_tr_count');"
+§§                                                                             role="button"><span
+§§                                        class="glyphicon glyphicon-remove"></span></a></td>
+§§                            </tr>
+§§                            <tr>
+§§                                <th scope="row">TestcaseEvaluator</th>
+§§                                <td><p id="{{system.name}}_te_count">{{system.te}}<font
+§§                                        size="1">&ensp;{{system.tearch}}</font></p></td>
+§§                                <td><input class="form-control" id="{{system.name}}_te" name="{{system.name}}_te"
+§§                                           placeholder="0" type="text"></td>
+§§                                <td>
+§§                                    <select class="form-control" id="{{system.name}}_te_arch"
+§§                                            name="{{system.name}}_te_arch" style="width: 90px">
+§§                                        <option name="choice1" value="x64">x64</option>
+§§                                        <option name="choice2" value="x86">x86</option>
+§§                                        <option name="choice2" value="arm32">arm32</option>
+§§                                        <option name="choice2" value="arm64">arm64</option>
+§§                                    </select>
+§§                                </td>
+§§                                <td class="remove"><a class="btn btn-secondary"
+§§                                                                             onclick="removeInstances('/systems/removeConfiguredInstances/{{ system.name }}/{{ fuzzjob.name }}/te', '{{system.name}}_te_count');"
+§§                                                                             role="button"><span
+§§                                        class="glyphicon glyphicon-remove"></span></a></td>
+§§                            </tr>
+§§                            </tbody>
+§§                        </table>
+§§                    </div>
+§§                    {% endfor %}
+§§                    <button class="btn btn-success" id="configFuzzjobInstancesButton" type="submit">Save Config</button>
+§§                    </br>
+§§                    </br>
+§§            </div>
+§§            <div class="col-xs-6 col-sm-1"></div>
+§§        </div>
+§§    </div>
+§§</div>
+§§</div>
+§§</div>
+§§
+§§{% endblock %}
+§§

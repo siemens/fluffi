@@ -1,0 +1,15 @@
+POST /FormLogin HTTP/1.1
+Host: localhost:5443
+Content-Length: 54
+Cache-Control: max-age=0
+Origin: http://localhost:5001
+Upgrade-Insecure-Requests: 1
+Content-Type: application/x-www-form-urlencoded
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
+Referer: http://localhost:5001/Portal/Portal.mwsl?MainSelection=Entrance&TabSelection=Entrance&ClientArea=/Portal/Entrance.mwsl&DataFile=Entrance.xml&TemplateFile=AppNavigation.tmpl&StartPage=true
+Accept-Encoding: gzip, deflate, br
+Accept-Language: de-DE,de;q=0.9,en-US;q=0.8,en;q=0.7
+
+Redirection=asdf&Login=User&Password=User&submit=Login
+

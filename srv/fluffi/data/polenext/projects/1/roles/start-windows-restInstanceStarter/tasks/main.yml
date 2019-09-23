@@ -1,0 +1,24 @@
+§§# Copyright 2017-2019 Siemens AG
+§§# 
+§§# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+§§# 
+§§# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+§§# 
+§§# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+§§# 
+§§# Author(s): Thomas Riedmaier, Michael Kraus, Pascal Eckmann
+§§
+§§- name: Get Max Session ID
+§§  win_command: powershell.exe -ExecutionPolicy ByPass -encodedcommand VwByAGkAdABlAC0ASABvAHMAdAAgAC0ATgBvAE4AZQB3AEwAaQBuAGUAIAAoACgAKABxAHUAZQByAHkAIABzAGUAcwBzAHwAZgBpAG4AZABzAHQAcgAgACIAQQBkAG0AaQBuAGkAcwB0AHIAYQB0AG8AcgAiACkAfABmAG8AcgBlAGEAYwBoAHsAJABfAC4AUwB1AGIAcwB0AHIAaQBuAGcAKAAzADkALAA5ACkALgBUAHIAaQBtACgAKQB9ACAAfAAgAE0AZQBhAHMAdQByAGUALQBPAGIAagBlAGMAdAAgAC0AbQBhAHgAaQBtAHUAbQApAC4AbQBhAHgAaQBtAHUAbQApAA==
+§§  register: sessidOut
+§§
+§§- name: Killing all running python executables (might be a little harsh)
+§§  win_command: taskkill /F /IM python.exe
+§§  ignore_errors: True
+§§
+§§
+§§- name: Start Rest-Instance-Starter python server
+§§  win_shell: "{{PsExecLocation}}PsExec{{architecture}}.exe -accepteula -nobanner -u {{ ansible_user }} -p {{ ansible_password }} -d -i {{sessidOut.stdout}} python {{restStarterdeploymentPath}}\\main.py {{deploymentPath}}"
+§§  args:
+§§     executable: cmd
+§§  ignore_errors: True

@@ -1,0 +1,41 @@
+§§# Copyright 2017-2019 Siemens AG
+§§# 
+§§# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+§§# 
+§§# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+§§# 
+§§# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+§§# 
+§§# Author(s): Fabian Russwurm, Thomas Riedmaier, Pascal Eckmann, Michael Kraus
+§§
+§§- hosts: linux, odroids
+§§  gather_facts: False
+§§  pre_tasks:
+§§    - name: Install python for Ansible
+§§      raw: test -e /usr/bin/python || (echo {{ ansible_ssh_pass }} | sudo -S apt -y update && echo {{ ansible_ssh_pass }} | sudo -S apt install -y python-minimal)
+§§      changed_when: False
+§§  roles:
+§§    - initial-linux-prepareEnvironment
+§§    - initial-linux-swap
+§§    - initial-linux-ntp
+§§    - initial-linux-ramdisk
+§§    - initial-linux-ASLR
+§§    - initial-linux-crashNotifiers
+§§    - initial-linux-cpuScaling
+§§    - initial-linux-installPackages
+§§    - initial-linux-deployRestInstanceStarter
+§§
+§§- hosts: windows
+§§  roles:
+§§    - initial-windows-Timezone
+§§    - initial-windows-GFlags
+§§    - initial-windows-PrepareEnvironment
+§§    - initial-windows-GroupPolicy
+§§    - initial-windows-pagefile
+§§    - initial-windows-Imdisk
+§§    - initial-windows-desktopBackground
+§§    - { role: initial-windows-VCRedistributables, architecture: "x86"}
+§§    - { role: initial-windows-VCRedistributables, architecture: "x64"}
+§§    - initial-windows-installPackages
+§§    - initial-windows-installDrivers
+§§    - initial-windows-deployRestInstanceStarter

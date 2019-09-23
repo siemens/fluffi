@@ -1,0 +1,236 @@
+§§<!--
+§§Copyright 2017-2019 Siemens AG
+§§
+§§Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+§§
+§§The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+§§
+§§THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+§§
+§§Author(s): Pascal Eckmann, Fabian Russwurm, Junes Najah, Michael Kraus, Thomas Riedmaier
+§§-->
+§§
+§§{% extends "base.html" %}
+§§{% block scripts %}
+§§<script src="{{ url_for('static', filename = 'javascript/instanceConfiguration.js') }}" type="text/javascript"></script>
+§§
+§§{{super()}}
+§§{% endblock %}
+§§{% block content %}
+§§
+§§
+§§<div class="container">
+§§    <div class="container">
+§§        <h1>
+§§            {% if system.IsGroup %}
+§§            <u>Group: {{system.Name}}</u>
+§§            {% else %}
+§§            <u>System: {{system.Name}}</u>
+§§            {% endif %}
+§§        </h1>
+§§    </div>
+§§</div>
+§§{{ flashMessages() }}
+§§<hr>
+§§<div class="jumbotron">
+§§</div>
+§§
+§§<br>
+§§<div class="container">
+§§    <ul class="nav nav-tabs">
+§§        <li class="active"><a data-toggle="tab" href="#menu1">1. Initial setup</a></li>
+§§        <li><a data-toggle="tab" href="#menu2">2. Deploy Fluffi</a></li>
+§§        <li><a data-toggle="tab" href="#menu3">3. Deploy SUT/Dependency</a></li>
+§§        <li><a data-toggle="tab" href="#menu4">4. Configure Instances</a></li>
+§§    </ul>
+§§
+§§    <div class="tab-content">
+§§        <div class="tab-pane fade in active" id="menu1">
+§§            <br>
+§§            <form action="{{ url_for('viewSystemInitialSetup', hostname=system.Name) }}" method="post">
+§§                <table>
+§§                    <tr>
+§§                        <td>{{ initialSetupForm.ram_disk_size.label }}</td>
+§§                        <td>{{ initialSetupForm.ram_disk_size }}</td>
+§§                    </tr>
+§§                    <tr>
+§§                        <td>{{ initialSetupForm.execute_initial_submit }}</td>
+§§                    </tr>
+§§                </table>
+§§            </form>
+§§        </div>
+§§        <div class="tab-pane fade" id="menu2">
+§§            <br>
+§§            <form action="{{ url_for('viewDeployFluffi', hostname=system.Name) }}" method="post">
+§§                <table>
+§§                    <tr>
+§§                        <td>{{ fluffiDeployForm.architecture.label }}</td>
+§§                        <td>{{ fluffiDeployForm.architecture }}</td>
+§§                    </tr>
+§§                    <tr>
+§§                        <td>{{ fluffiDeployForm.execute_deploy_fluffi }}</td>
+§§                    </tr>
+§§                </table>
+§§            </form>
+§§        </div>
+§§        <div class="tab-pane fade" id="menu3">
+§§            <br>
+§§            <form action="{{ url_for('viewInstallFuzzjobPackage', hostname=system.Name) }}" method="post">
+§§                <table>
+§§                    <tr>
+§§                        <td>{{ deployFuzzjobPackageForm.fuzzingJob.label }}</td>
+§§                        <td>{{deployFuzzjobPackageForm.fuzzingJob}}</td>
+§§                    </tr>
+§§                    <tr>
+§§                        <td>{{deployFuzzjobPackageForm.execute_deploy_package}}</td>
+§§                    </tr>
+§§                </table>
+§§            </form>
+§§            <br>
+§§            <br>
+§§            <form action="{{ url_for('viewInstallPackage', hostname=system.Name) }}" method="post">
+§§                <table>
+§§                    <tr>
+§§                        <td>{{ deployPackageForm.installPackage.label }}</td>
+§§                        <td>{{deployPackageForm.installPackage}}</td>
+§§                    </tr>
+§§                    <tr>
+§§                        <td>{{deployPackageForm.execute_deploy_package}}</td>
+§§                    </tr>
+§§                </table>
+§§            </form>
+§§        </div>
+§§        <div class="tab-pane fade" id="menu4">
+§§            <br>
+§§                <form action="/systems/configureSystemInstances/{{system.Name}}" enctype="multipart/form-data"
+§§                      method="POST" name="configureSystemInstances">
+§§                    <div class="system-view-lm-box">
+§§                        <h3>System LocalManagers:</h3>
+§§                        <table class="table">
+§§                            <thead>
+§§                            <tr>
+§§                                <th scope="col">Type</th>
+§§                                <th scope="col">Count</th>
+§§                                <th scope="col">NewCount</th>
+§§                                <th scope="col">Architecture</th>
+§§                                <th scope="col">Delete All</th>
+§§                            </tr>
+§§                            </thead>
+§§                            <tbody>
+§§                            <tr>
+§§                                <th scope="row">LocalManager</th>
+§§                                <td><p id="localManager_lm_count">{{lmCount}}</p></td>
+§§                                <td><input class="form-control" id="localManager_lm" name="localManager_lm"
+§§                                           placeholder="0" type="text"></td>
+§§                                <td>
+§§                                    <select class="form-control select-width" id="localManager_lm_arch"
+§§                                            name="localManager_lm_arch">
+§§                                        <option name="choice1" value="x64">x64</option>
+§§                                        <option name="choice2" value="x86">x86</option>
+§§                                        <option name="choice2" value="arm32">arm32</option>
+§§                                        <option name="choice2" value="arm64">arm64</option>
+§§                                    </select>
+§§                                </td>
+§§                                <td class="remove"><a class="btn btn-secondary"
+§§                                                                             onclick="removeInstances('/systems/removeConfiguredInstances/{{ system.Name }}/lm/lm', 'localManager_lm_count');"
+§§                                                                             role="button"><span
+§§                                        class="glyphicon glyphicon-remove"></span></a></td>
+§§                            </tr>
+§§                            </tbody>
+§§                        </table>
+§§                    </div>
+§§                    <hr>
+§§                    {% for fuzzjob in configFuzzjobs %}
+§§                    <div>
+§§                        <h3>{{fuzzjob.name}}</h3>
+§§                        <table class="table">
+§§                            <thead>
+§§                            <tr>
+§§                                <th scope="col">Type</th>
+§§                                <th scope="col">Count</th>
+§§                                <th scope="col">NewCount</th>
+§§                                <th scope="col">Architecture</th>
+§§                                <th scope="col">Delete All</th>
+§§                            </tr>
+§§                            </thead>
+§§                            <tbody>
+§§                            <tr>
+§§                                <th scope="row">TestcaseGenerator</th>
+§§                                <td><p id="{{fuzzjob.name}}_tg_count">{{fuzzjob.tg}}<font size="1">&ensp;{{fuzzjob.tgarch}}</font>
+§§                                </p></td>
+§§                                <td><input class="form-control" id="{{fuzzjob.name}}_tg"
+§§                                           name="{{fuzzjob.name}}_tg"
+§§                                           placeholder="0" type="text"></td>
+§§                                <td>
+§§                                    <select class="form-control select-width" id="{{fuzzjob.name}}_tg_arch"
+§§                                            name="{{fuzzjob.name}}_tg_arch">
+§§                                        <option name="choice1" value="x64">x64</option>
+§§                                        <option name="choice2" value="x86">x86</option>
+§§                                        <option name="choice2" value="arm32">arm32</option>
+§§                                        <option name="choice2" value="arm64">arm64</option>
+§§                                    </select>
+§§                                </td>
+§§                                <td class="remove"><a class="btn btn-secondary"
+§§                                                                             onclick="removeInstances('/systems/removeConfiguredInstances/{{ system.Name }}/{{ fuzzjob.name }}/tg', '{{fuzzjob.name}}_tg_count');"
+§§                                                                             role="button"><span
+§§                                        class="glyphicon glyphicon-remove"></span></a></td>
+§§                            </tr>
+§§                            <tr>
+§§                                <th scope="row">TestcaseRunner</th>
+§§                                <td><p id="{{fuzzjob.name}}_tr_count">{{fuzzjob.tr}}<font size="1">&ensp;{{fuzzjob.trarch}}</font>
+§§                                </p></td>
+§§                                <td><input class="form-control" id="{{fuzzjob.name}}_tr"
+§§                                           name="{{fuzzjob.name}}_tr"
+§§                                           placeholder="0" type="text"></td>
+§§                                <td>
+§§                                    <select class="form-control select-width" id="{{fuzzjob.name}}_tr_arch"
+§§                                            name="{{fuzzjob.name}}_tr_arch">
+§§                                        <option name="choice1" value="x64">x64</option>
+§§                                        <option name="choice2" value="x86">x86</option>
+§§                                        <option name="choice2" value="arm32">arm32</option>
+§§                                        <option name="choice2" value="arm64">arm64</option>
+§§                                    </select>
+§§                                </td>
+§§                                <td class="remove"><a class="btn btn-secondary"
+§§                                                                             onclick="removeInstances('/systems/removeConfiguredInstances/{{ system.Name }}/{{ fuzzjob.name }}/tr', '{{fuzzjob.name}}_tr_count');"
+§§                                                                             role="button"><span
+§§                                        class="glyphicon glyphicon-remove"></span></a></td>
+§§                            </tr>
+§§                            <tr>
+§§                                <th scope="row">TestcaseEvaluator</th>
+§§                                <td><p id="{{fuzzjob.name}}_te_count">{{fuzzjob.te}}<font size="1">&ensp;{{fuzzjob.tearch}}</font>
+§§                                </p></td>
+§§                                <td><input class="form-control" id="{{fuzzjob.name}}_te"
+§§                                           name="{{fuzzjob.name}}_te"
+§§                                           placeholder="0" type="text"></td>
+§§                                <td>
+§§                                    <select class="form-control select-width" id="{{fuzzjob.name}}_te_arch"
+§§                                            name="{{fuzzjob.name}}_te_arch">
+§§                                        <option name="choice1" value="x64">x64</option>
+§§                                        <option name="choice2" value="x86">x86</option>
+§§                                        <option name="choice2" value="arm32">arm32</option>
+§§                                        <option name="choice2" value="arm64">arm64</option>
+§§                                    </select>
+§§                                </td>
+§§                                <td class="remove"><a class="btn btn-secondary"
+§§                                                                             onclick="removeInstances('/systems/removeConfiguredInstances/{{ system.Name }}/{{ fuzzjob.name }}/te', '{{fuzzjob.name}}_te_count');"
+§§                                                                             role="button"><span
+§§                                        class="glyphicon glyphicon-remove"></span></a></td>
+§§                            </tr>
+§§                            </tbody>
+§§                        </table>
+§§                    </div>
+§§                    {% endfor %}
+§§                    <button class="btn btn-success" id="configSystemsButton" type="submit">Save Config</button>
+§§                    <br>
+§§                    <br>
+§§        </div>
+§§    </div>
+§§</div>
+§§
+§§</div>
+§§<br>
+§§<br>
+§§
+§§
+§§{% endblock %}

@@ -1,0 +1,16 @@
+{
+    "name":"manageAgents",
+    "notes":"Manage Fluffi Agents",
+    "type": "INTERVAL",
+    "schedule": "180",
+    "mode": "manageAgents.yml",
+    "kind": "PLAYBOOK",
+    "project": 1,
+    "inventory": 1,
+    "save_result": true,
+    "template": null,
+    "enabled": true,
+    "vars":{
+
+     }
+}

@@ -1,0 +1,301 @@
+§§﻿<?xml version="1.0" encoding="utf-8"?>
+§§<!--
+§§Copyright 2017-2019 Siemens AG
+§§
+§§Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+§§
+§§The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+§§
+§§THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+§§
+§§Author(s): Roman Bendt, Thomas Riedmaier
+§§-->
+§§<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+§§  <ItemGroup Label="ProjectConfigurations">
+§§    <ProjectConfiguration Include="Debug|Win32">
+§§      <Configuration>Debug</Configuration>
+§§      <Platform>Win32</Platform>
+§§    </ProjectConfiguration>
+§§    <ProjectConfiguration Include="Release|Win32">
+§§      <Configuration>Release</Configuration>
+§§      <Platform>Win32</Platform>
+§§    </ProjectConfiguration>
+§§    <ProjectConfiguration Include="Debug|x64">
+§§      <Configuration>Debug</Configuration>
+§§      <Platform>x64</Platform>
+§§    </ProjectConfiguration>
+§§    <ProjectConfiguration Include="Release|x64">
+§§      <Configuration>Release</Configuration>
+§§      <Platform>x64</Platform>
+§§    </ProjectConfiguration>
+§§    <ProjectConfiguration Include="Test|Win32">
+§§      <Configuration>Test</Configuration>
+§§      <Platform>Win32</Platform>
+§§    </ProjectConfiguration>
+§§    <ProjectConfiguration Include="Test|x64">
+§§      <Configuration>Test</Configuration>
+§§      <Platform>x64</Platform>
+§§    </ProjectConfiguration>
+§§  </ItemGroup>
+§§  <PropertyGroup Label="Globals">
+§§    <ProjectGuid>{A89B1B0B-6541-482A-8CC8-24AE802889EE}</ProjectGuid>
+§§    <Keyword>Win32Proj</Keyword>
+§§    <RootNamespace>LocalManager</RootNamespace>
+§§    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+§§  </PropertyGroup>
+§§  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+§§  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+§§    <ConfigurationType>Application</ConfigurationType>
+§§    <UseDebugLibraries>true</UseDebugLibraries>
+§§    <PlatformToolset>v140</PlatformToolset>
+§§    <CharacterSet>MultiByte</CharacterSet>
+§§  </PropertyGroup>
+§§  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test|Win32'" Label="Configuration">
+§§    <ConfigurationType>Application</ConfigurationType>
+§§    <UseDebugLibraries>true</UseDebugLibraries>
+§§    <PlatformToolset>v140</PlatformToolset>
+§§    <CharacterSet>MultiByte</CharacterSet>
+§§  </PropertyGroup>
+§§  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+§§    <ConfigurationType>Application</ConfigurationType>
+§§    <UseDebugLibraries>false</UseDebugLibraries>
+§§    <PlatformToolset>v140</PlatformToolset>
+§§    <WholeProgramOptimization>true</WholeProgramOptimization>
+§§    <CharacterSet>MultiByte</CharacterSet>
+§§  </PropertyGroup>
+§§  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+§§    <ConfigurationType>Application</ConfigurationType>
+§§    <UseDebugLibraries>true</UseDebugLibraries>
+§§    <PlatformToolset>v140</PlatformToolset>
+§§    <CharacterSet>MultiByte</CharacterSet>
+§§  </PropertyGroup>
+§§  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'" Label="Configuration">
+§§    <ConfigurationType>StaticLibrary</ConfigurationType>
+§§    <UseDebugLibraries>true</UseDebugLibraries>
+§§    <PlatformToolset>v140</PlatformToolset>
+§§    <CharacterSet>MultiByte</CharacterSet>
+§§  </PropertyGroup>
+§§  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+§§    <ConfigurationType>Application</ConfigurationType>
+§§    <UseDebugLibraries>false</UseDebugLibraries>
+§§    <PlatformToolset>v140</PlatformToolset>
+§§    <WholeProgramOptimization>true</WholeProgramOptimization>
+§§    <CharacterSet>MultiByte</CharacterSet>
+§§  </PropertyGroup>
+§§  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+§§  <ImportGroup Label="ExtensionSettings">
+§§  </ImportGroup>
+§§  <ImportGroup Label="Shared">
+§§  </ImportGroup>
+§§  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+§§    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+§§  </ImportGroup>
+§§  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Test|Win32'" Label="PropertySheets">
+§§    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+§§  </ImportGroup>
+§§  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+§§    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+§§  </ImportGroup>
+§§  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+§§    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+§§  </ImportGroup>
+§§  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'" Label="PropertySheets">
+§§    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+§§  </ImportGroup>
+§§  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+§§    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+§§  </ImportGroup>
+§§  <PropertyGroup Label="UserMacros" />
+§§  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+§§    <LinkIncremental>true</LinkIncremental>
+§§    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+§§    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+§§    <IncludePath>$(SolutionDir)\dependencies\easylogging\include;$(SolutionDir)\dependencies\mariadb\include;$(SolutionDir)\dependencies\zeromq\include;$(SolutionDir)\SharedCode;$(SolutionDir)\dependencies\libprotoc\include\siemens\cpp;$(SolutionDir)\dependencies\libprotoc\include;$(IncludePath)</IncludePath>
+§§    <LibraryPath>$(SolutionDir)\dependencies\zeromq\lib\x86;$(OutDir);$(SolutionDir)\dependencies\mariadb\lib\x86;$(SolutionDir)\dependencies\easylogging\lib\x86;$(SolutionDir)\dependencies\libprotoc\lib\x86;$(LibraryPath)</LibraryPath>
+§§  </PropertyGroup>
+§§  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">
+§§    <LinkIncremental>true</LinkIncremental>
+§§    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+§§    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+§§    <IncludePath>$(SolutionDir)\dependencies\easylogging\include;$(SolutionDir)\dependencies\mariadb\include;$(SolutionDir)\dependencies\zeromq\include;$(SolutionDir)\SharedCode;$(SolutionDir)\dependencies\libprotoc\include\siemens\cpp;$(SolutionDir)\dependencies\libprotoc\include;$(IncludePath)</IncludePath>
+§§    <LibraryPath>$(SolutionDir)\dependencies\zeromq\lib\x86;$(OutDir);$(SolutionDir)\dependencies\mariadb\lib\x86;$(SolutionDir)\dependencies\easylogging\lib\x86;$(SolutionDir)\dependencies\libprotoc\lib\x86;$(LibraryPath)</LibraryPath>
+§§  </PropertyGroup>
+§§  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+§§    <LinkIncremental>true</LinkIncremental>
+§§    <IncludePath>$(SolutionDir)\dependencies\easylogging\include;$(SolutionDir)\dependencies\mariadb\include;$(SolutionDir)\dependencies\zeromq\include;$(SolutionDir)\SharedCode;$(SolutionDir)\dependencies\libprotoc\include\siemens\cpp;$(SolutionDir)\dependencies\libprotoc\include;$(IncludePath)</IncludePath>
+§§    <LibraryPath>$(SolutionDir)\dependencies\zeromq\lib\x64;$(SolutionDir)\dependencies\mariadb\lib\x64;$(OutDir);$(SolutionDir)\dependencies\easylogging\lib\x64;$(SolutionDir)\dependencies\libprotoc\lib\x64;$(LibraryPath)</LibraryPath>
+§§  </PropertyGroup>
+§§  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'">
+§§    <LinkIncremental>true</LinkIncremental>
+§§    <IncludePath>$(SolutionDir)\dependencies\easylogging\include;$(SolutionDir)\dependencies\mariadb\include;$(SolutionDir)\dependencies\zeromq\include;$(SolutionDir)\SharedCode;$(SolutionDir)\dependencies\libprotoc\include\siemens\cpp;$(SolutionDir)\dependencies\libprotoc\include;$(IncludePath)</IncludePath>
+§§    <LibraryPath>$(SolutionDir)\dependencies\zeromq\lib\x64;$(SolutionDir)\dependencies\mariadb\lib\x64;$(OutDir);$(SolutionDir)\dependencies\easylogging\lib\x86;$(SolutionDir)\dependencies\libprotoc\lib\x64;$(LibraryPath)</LibraryPath>
+§§  </PropertyGroup>
+§§  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+§§    <LinkIncremental>false</LinkIncremental>
+§§    <IncludePath>$(SolutionDir)\dependencies\easylogging\include;$(SolutionDir)\dependencies\mariadb\include;$(SolutionDir)\dependencies\zeromq\include;$(SolutionDir)\SharedCode;$(SolutionDir)\dependencies\libprotoc\include\siemens\cpp;$(SolutionDir)\dependencies\libprotoc\include;$(IncludePath)</IncludePath>
+§§    <LibraryPath>$(SolutionDir)\dependencies\zeromq\lib\x86;$(SolutionDir)$(Platform)\$(Configuration)\;$(SolutionDir)\dependencies\mariadb\lib\x86;$(SolutionDir)\dependencies\easylogging\lib\x86;$(SolutionDir)\dependencies\libprotoc\lib\x86;$(LibraryPath)</LibraryPath>
+§§    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+§§    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+§§  </PropertyGroup>
+§§  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+§§    <LinkIncremental>false</LinkIncremental>
+§§    <IncludePath>$(SolutionDir)\dependencies\easylogging\include;$(SolutionDir)\dependencies\mariadb\include;$(SolutionDir)\dependencies\zeromq\include;$(SolutionDir)\SharedCode;$(SolutionDir)\dependencies\libprotoc\include\siemens\cpp;$(SolutionDir)\dependencies\libprotoc\include;$(IncludePath)</IncludePath>
+§§    <LibraryPath>$(SolutionDir)\dependencies\zeromq\lib\x64;$(SolutionDir)\dependencies\mariadb\lib\x64;$(OutDir);$(SolutionDir)\dependencies\easylogging\lib\x64;$(SolutionDir)\dependencies\libprotoc\lib\x64;$(LibraryPath)</LibraryPath>
+§§  </PropertyGroup>
+§§  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+§§    <ClCompile>
+§§      <PrecompiledHeader>Use</PrecompiledHeader>
+§§      <WarningLevel>Level3</WarningLevel>
+§§      <Optimization>Disabled</Optimization>
+§§      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+§§      <SDLCheck>true</SDLCheck>
+§§      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+§§      <AdditionalOptions>/wd4146</AdditionalOptions>
+§§    </ClCompile>
+§§    <Link>
+§§      <SubSystem>Console</SubSystem>
+§§      <GenerateDebugInformation>true</GenerateDebugInformation>
+§§      <AdditionalDependencies>easyloggingppd.lib;libprotobufd.lib;libzmq-v140-mt-gd-4_3_1.lib;SharedCoded.lib;Ws2_32.lib;Iphlpapi.lib;libmariadbd.lib;Pdh.lib;Rpcrt4.lib;Shlwapi.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+§§    </Link>
+§§  </ItemDefinitionGroup>
+§§  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">
+§§    <ClCompile>
+§§      <PrecompiledHeader>Use</PrecompiledHeader>
+§§      <WarningLevel>Level3</WarningLevel>
+§§      <Optimization>Disabled</Optimization>
+§§      <PreprocessorDefinitions>WIN32;_DEBUG;_VSTEST;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+§§      <SDLCheck>true</SDLCheck>
+§§      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+§§      <AdditionalOptions>/wd4146</AdditionalOptions>
+§§    </ClCompile>
+§§    <Link>
+§§      <SubSystem>Console</SubSystem>
+§§      <GenerateDebugInformation>true</GenerateDebugInformation>
+§§      <AdditionalDependencies>easyloggingppd.lib;libprotobufd.lib;libzmq-v140-mt-gd-4_3_1.lib;SharedCoded.lib;Ws2_32.lib;Iphlpapi.lib;libmariadbd.lib;Pdh.lib;Rpcrt4.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+§§    </Link>
+§§  </ItemDefinitionGroup>
+§§  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+§§    <ClCompile>
+§§      <PrecompiledHeader>Use</PrecompiledHeader>
+§§      <WarningLevel>Level3</WarningLevel>
+§§      <Optimization>Disabled</Optimization>
+§§      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+§§      <SDLCheck>true</SDLCheck>
+§§      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+§§      <AdditionalOptions>/wd4146</AdditionalOptions>
+§§    </ClCompile>
+§§    <Link>
+§§      <SubSystem>Console</SubSystem>
+§§      <GenerateDebugInformation>true</GenerateDebugInformation>
+§§      <AdditionalDependencies>easyloggingppd.lib;libprotobufd.lib;libzmq-v140-mt-gd-4_3_1.lib;SharedCoded.lib;Ws2_32.lib;Iphlpapi.lib;libmariadbd.lib;Pdh.lib;Rpcrt4.lib;Shlwapi.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+§§    </Link>
+§§  </ItemDefinitionGroup>
+§§  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'">
+§§    <ClCompile>
+§§      <PrecompiledHeader>Use</PrecompiledHeader>
+§§      <WarningLevel>Level3</WarningLevel>
+§§      <Optimization>Disabled</Optimization>
+§§      <PreprocessorDefinitions>_DEBUG;_VSTEST;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+§§      <SDLCheck>true</SDLCheck>
+§§      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+§§      <AdditionalOptions>/wd4146</AdditionalOptions>
+§§    </ClCompile>
+§§    <Link>
+§§      <SubSystem>Console</SubSystem>
+§§      <GenerateDebugInformation>true</GenerateDebugInformation>
+§§      <AdditionalDependencies>easyloggingppd.lib;libprotobufd.lib;libzmq-v140-mt-gd-4_3_1.lib;SharedCoded.lib;Ws2_32.lib;Iphlpapi.lib;libmariadbd.lib;Pdh.lib;Rpcrt4.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+§§    </Link>
+§§  </ItemDefinitionGroup>
+§§  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+§§    <ClCompile>
+§§      <WarningLevel>Level3</WarningLevel>
+§§      <PrecompiledHeader>Use</PrecompiledHeader>
+§§      <Optimization>MaxSpeed</Optimization>
+§§      <FunctionLevelLinking>true</FunctionLevelLinking>
+§§      <IntrinsicFunctions>true</IntrinsicFunctions>
+§§      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+§§      <SDLCheck>true</SDLCheck>
+§§      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+§§      <AdditionalOptions>/wd4146</AdditionalOptions>
+§§    </ClCompile>
+§§    <Link>
+§§      <SubSystem>Console</SubSystem>
+§§      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+§§      <OptimizeReferences>true</OptimizeReferences>
+§§      <GenerateDebugInformation>No</GenerateDebugInformation>
+§§      <AdditionalDependencies>easyloggingpp.lib;libprotobuf.lib;libzmq-v140-mt-4_3_1.lib;SharedCode.lib;Ws2_32.lib;Iphlpapi.lib;libmariadb.lib;Pdh.lib;Rpcrt4.lib;Shlwapi.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+§§    </Link>
+§§  </ItemDefinitionGroup>
+§§  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+§§    <ClCompile>
+§§      <WarningLevel>Level3</WarningLevel>
+§§      <PrecompiledHeader>Use</PrecompiledHeader>
+§§      <Optimization>MaxSpeed</Optimization>
+§§      <FunctionLevelLinking>true</FunctionLevelLinking>
+§§      <IntrinsicFunctions>true</IntrinsicFunctions>
+§§      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+§§      <SDLCheck>true</SDLCheck>
+§§      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+§§      <AdditionalOptions>/wd4146</AdditionalOptions>
+§§    </ClCompile>
+§§    <Link>
+§§      <SubSystem>Console</SubSystem>
+§§      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+§§      <OptimizeReferences>true</OptimizeReferences>
+§§      <GenerateDebugInformation>No</GenerateDebugInformation>
+§§      <AdditionalDependencies>easyloggingpp.lib;libprotobuf.lib;libzmq-v140-mt-4_3_1.lib;SharedCode.lib;Ws2_32.lib;Iphlpapi.lib;libmariadb.lib;Pdh.lib;Rpcrt4.lib;Shlwapi.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+§§    </Link>
+§§  </ItemDefinitionGroup>
+§§  <ItemGroup>
+§§    <ClInclude Include="DBCleanupWorker.h" />
+§§    <ClInclude Include="GetLMConfigurationRequestHandler.h" />
+§§    <ClInclude Include="IsAgentWelcomedRequestHandler.h" />
+§§    <ClInclude Include="LMDatabaseManager.h" />
+§§    <ClInclude Include="GetCurrentBlockCoverageRequestHandler.h" />
+§§    <ClInclude Include="GetFuzzJobConfigurationRequestHandler.h" />
+§§    <ClInclude Include="GetNewCompletedTestcaseIDsRequestHandler.h" />
+§§    <ClInclude Include="LMGetStatusRequestHandler.h" />
+§§    <ClInclude Include="ReportTestcaseWithNoResultRequestHandler.h" />
+§§    <ClInclude Include="GetTestcaseToMutateRequestHandler.h" />
+§§    <ClInclude Include="InstanceControlWorker.h" />
+§§    <ClInclude Include="InstanceMonitorWorker.h" />
+§§    <ClInclude Include="LMWorkerThreadState.h" />
+§§    <ClInclude Include="LMWorkerThreadStateBuilder.h" />
+§§    <ClInclude Include="PutTestEvaluationRequestHandler.h" />
+§§    <ClInclude Include="RegisterAtLMRequestHandler.h" />
+§§    <ClInclude Include="StatusOfInstance.h" />
+§§    <ClInclude Include="stdafx.h" />
+§§    <ClInclude Include="targetver.h" />
+§§    <ClInclude Include="WorkerWeightCalculator.h" />
+§§  </ItemGroup>
+§§  <ItemGroup>
+§§    <ClCompile Include="DBCleanupWorker.cpp" />
+§§    <ClCompile Include="GetLMConfigurationRequestHandler.cpp" />
+§§    <ClCompile Include="IsAgentWelcomedRequestHandler.cpp" />
+§§    <ClCompile Include="LMDatabaseManager.cpp" />
+§§    <ClCompile Include="GetCurrentBlockCoverageRequestHandler.cpp" />
+§§    <ClCompile Include="GetFuzzJobConfigurationRequestHandler.cpp" />
+§§    <ClCompile Include="GetNewCompletedTestcaseIDsRequestHandler.cpp" />
+§§    <ClCompile Include="LMGetStatusRequestHandler.cpp" />
+§§    <ClCompile Include="ReportTestcaseWithNoResultRequestHandler.cpp" />
+§§    <ClCompile Include="GetTestcaseToMutateRequestHandler.cpp" />
+§§    <ClCompile Include="InstanceControlWorker.cpp" />
+§§    <ClCompile Include="InstanceMonitorWorker.cpp" />
+§§    <ClCompile Include="LMWorkerThreadStateBuilder.cpp" />
+§§    <ClCompile Include="LocalManager.cpp" />
+§§    <ClCompile Include="PutTestEvaluationRequestHandler.cpp" />
+§§    <ClCompile Include="RegisterAtLMRequestHandler.cpp" />
+§§    <ClCompile Include="stdafx.cpp">
+§§      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+§§      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">Create</PrecompiledHeader>
+§§      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+§§      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">Create</PrecompiledHeader>
+§§      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+§§      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+§§    </ClCompile>
+§§    <ClCompile Include="WorkerWeightCalculator.cpp" />
+§§  </ItemGroup>
+§§  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+§§  <ImportGroup Label="ExtensionTargets">
+§§  </ImportGroup>
+§§</Project>

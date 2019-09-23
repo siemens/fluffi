@@ -1,0 +1,30 @@
+§§#    zeromq build script
+§§#    Copyright (C) 2017-2019 Siemens AG
+§§#
+§§#    This script is free software: you can redistribute it and/or modify
+§§#    it under the terms of the GNU General Public License as published by
+§§#    the Free Software Foundation, either version 3 of the License, or
+§§#    (at your option) any later version.
+§§#
+§§#    This script is distributed in the hope that it will be useful,
+§§#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+§§#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+§§#    GNU General Public License for more details.
+§§#
+§§#    You should have received a copy of the GNU General Public License
+§§#    along with this script.  If not, see <https://www.gnu.org/licenses/>.
+§§#
+§§# Author(s): Thomas Riedmaier
+§§diff --git a/CMakeLists.txt b/CMakeLists.txt
+§§index f0fea167..332a613f 100644
+§§--- CMakeLists.txt
+§§+++ CMakeLists.txt
+§§@@ -1,6 +1,8 @@
+§§ # CMake build script for ZeroMQ
+§§ project(ZeroMQ)
+§§ 
+§§+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libgcc -static-libstdc++")
+§§+
+§§ if(${CMAKE_SYSTEM_NAME} STREQUAL Darwin)
+§§   cmake_minimum_required(VERSION 3.0.2)
+§§ else()

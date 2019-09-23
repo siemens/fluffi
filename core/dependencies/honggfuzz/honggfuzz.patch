@@ -1,0 +1,1695 @@
+§§#   Copyright 2017-2019 Siemens AG
+§§#
+§§#   Licensed under the Apache License, Version 2.0 (the "License");
+§§#   you may not use this file except in compliance with the License.
+§§#   You may obtain a copy of the License at
+§§#
+§§#       http://www.apache.org/licenses/LICENSE-2.0
+§§#
+§§#   Unless required by applicable law or agreed to in writing, software
+§§#   distributed under the License is distributed on an "AS IS" BASIS,
+§§#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+§§#   See the License for the specific language governing permissions and
+§§#   limitations under the License.
+§§# 
+§§# Author(s): Thomas Riedmaier
+§§diff --git a/honggfuzz.h b/honggfuzz.h
+§§index d0a219e6..13e77b1b 100644
+§§--- honggfuzz.h
+§§+++ honggfuzz.h
+§§@@ -24,15 +24,10 @@
+§§ #ifndef _HF_HONGGFUZZ_H_
+§§ #define _HF_HONGGFUZZ_H_
+§§ 
+§§-#include <dirent.h>
+§§ #include <inttypes.h>
+§§ #include <limits.h>
+§§-#include <pthread.h>
+§§ #include <stdbool.h>
+§§ #include <stdint.h>
+§§-#include <sys/param.h>
+§§-#include <sys/queue.h>
+§§-#include <sys/types.h>
+§§ #include <time.h>
+§§ 
+§§ #include "libhfcommon/util.h"
+§§@@ -118,30 +113,11 @@ typedef struct {
+§§     uint32_t nChunks;
+§§ } bitmap_t;
+§§ 
+§§-/* Memory map struct */
+§§-typedef struct __attribute__((packed)) {
+§§-    uint64_t start;          // region start addr
+§§-    uint64_t end;            // region end addr
+§§-    uint64_t base;           // region base addr
+§§-    char mapName[NAME_MAX];  // bin/DSO name
+§§-    uint64_t bbCnt;
+§§-    uint64_t newBBCnt;
+§§-} memMap_t;
+§§-
+§§-/* Trie node data struct */
+§§-typedef struct __attribute__((packed)) {
+§§-    bitmap_t* pBM;
+§§-} trieData_t;
+§§-
+§§-/* Trie node struct */
+§§-typedef struct node {
+§§-    char key;
+§§-    trieData_t data;
+§§-    struct node* next;
+§§-    struct node* prev;
+§§-    struct node* children;
+§§-    struct node* parent;
+§§-} node_t;
+§§+#if defined(_MSC_VER)
+§§+#include <BaseTsd.h>
+§§+typedef SSIZE_T ssize_t;
+§§+#endif
+§§+
+§§ 
+§§ /* EOF Sanitizer coverage specific data structures */
+§§ 
+§§@@ -153,19 +129,6 @@ typedef enum {
+§§     _HF_STATE_DYNAMIC_MAIN = 4,
+§§ } fuzzState_t;
+§§ 
+§§-struct dynfile_t {
+§§-    uint8_t* data;
+§§-    size_t size;
+§§-    TAILQ_ENTRY(dynfile_t)
+§§-    pointers;
+§§-};
+§§-
+§§-struct strings_t {
+§§-    char* s;
+§§-    size_t len;
+§§-    TAILQ_ENTRY(strings_t)
+§§-    pointers;
+§§-};
+§§ 
+§§ typedef struct {
+§§     bool pcGuardMap[_HF_PC_GUARD_MAX];
+§§@@ -177,132 +140,15 @@ typedef struct {
+§§ } feedback_t;
+§§ 
+§§ typedef struct {
+§§-    struct {
+§§-        size_t threadsMax;
+§§-        size_t threadsFinished;
+§§-        uint32_t threadsActiveCnt;
+§§-        pthread_t mainThread;
+§§-        pid_t mainPid;
+§§-        pthread_t threads[_HF_THREAD_MAX];
+§§-    } threads;
+§§-    struct {
+§§-        const char* inputDir;
+§§-        DIR* inputDirPtr;
+§§-        size_t fileCnt;
+§§-        const char* fileExtn;
+§§-        bool fileCntDone;
+§§-        const char* workDir;
+§§-        const char* crashDir;
+§§-        const char* covDirAll;
+§§-        const char* covDirNew;
+§§-        bool saveUnique;
+§§-        size_t dynfileqCnt;
+§§-        pthread_rwlock_t dynfileq_mutex;
+§§-        TAILQ_HEAD(dyns_t, dynfile_t) dynfileq;
+§§-    } io;
+§§-    struct {
+§§-        int argc;
+§§-        const char* const* cmdline;
+§§-        bool nullifyStdio;
+§§-        bool fuzzStdin;
+§§-        const char* externalCommand;
+§§-        const char* postExternalCommand;
+§§-        const char* feedbackMutateCommand;
+§§-        bool netDriver;
+§§-        bool persistent;
+§§-        uint64_t asLimit;
+§§-        uint64_t rssLimit;
+§§-        uint64_t dataLimit;
+§§-        uint64_t coreLimit;
+§§-        bool clearEnv;
+§§-        char* envs[128];
+§§-        sigset_t waitSigSet;
+§§-    } exe;
+§§-    struct {
+§§-        time_t timeStart;
+§§-        time_t runEndTime;
+§§-        time_t tmOut;
+§§-        time_t lastCovUpdate;
+§§-        bool tmoutVTALRM;
+§§-    } timing;
+§§-    struct {
+§§-        const char* dictionaryFile;
+§§-        TAILQ_HEAD(strq_t, strings_t) dictq;
+§§-        size_t dictionaryCnt;
+§§-        size_t mutationsMax;
+§§-        unsigned mutationsPerRun;
+§§-        size_t maxFileSz;
+§§-    } mutate;
+§§-    struct {
+§§-        bool useScreen;
+§§-        char cmdline_txt[65];
+§§-        int64_t lastDisplayMillis;
+§§-    } display;
+§§-    struct {
+§§-        bool useVerifier;
+§§-        bool exitUponCrash;
+§§-        const char* reportFile;
+§§-        pthread_mutex_t report_mutex;
+§§-        bool monitorSIGABRT;
+§§-        size_t dynFileIterExpire;
+§§-        bool only_printable;
+§§-    } cfg;
+§§-    struct {
+§§-        bool enable;
+§§-    } sanitizer;
+§§-    struct {
+§§-        fuzzState_t state;
+§§-        feedback_t* feedbackMap;
+§§-        int bbFd;
+§§-        pthread_mutex_t feedback_mutex;
+§§-        const char* blacklistFile;
+§§-        uint64_t* blacklist;
+§§-        size_t blacklistCnt;
+§§-        bool skipFeedbackOnTimeout;
+§§-        dynFileMethod_t dynFileMethod;
+§§-    } feedback;
+§§-    struct {
+§§-        size_t mutationsCnt;
+§§-        size_t crashesCnt;
+§§-        size_t uniqueCrashesCnt;
+§§-        size_t verifiedCrashesCnt;
+§§-        size_t blCrashesCnt;
+§§-        size_t timeoutedCnt;
+§§-    } cnts;
+§§-    struct {
+§§-        bool enabled;
+§§-        int serverSocket;
+§§-        int clientSocket;
+§§-    } socketFuzzer;
+§§-    /* For the Linux code */
+§§-    struct {
+§§-        int exeFd;
+§§-        hwcnt_t hwCnts;
+§§-        uint64_t dynamicCutOffAddr;
+§§-        bool disableRandomization;
+§§-        void* ignoreAddr;
+§§-        size_t numMajorFrames;
+§§-        const char* symsBlFile;
+§§-        char** symsBl;
+§§-        size_t symsBlCnt;
+§§-        const char* symsWlFile;
+§§-        char** symsWl;
+§§-        size_t symsWlCnt;
+§§-        uintptr_t cloneFlags;
+§§-        bool kernelOnly;
+§§-        bool useClone;
+§§-    } linux;
+§§-    /* For the NetBSD code */
+§§-    struct {
+§§-        void* ignoreAddr;
+§§-        size_t numMajorFrames;
+§§-        const char* symsBlFile;
+§§-        char** symsBl;
+§§-        size_t symsBlCnt;
+§§-        const char* symsWlFile;
+§§-        char** symsWl;
+§§-        size_t symsWlCnt;
+§§-    } netbsd;
+§§+	struct {
+§§+		const char* dictionaryFile;
+§§+		size_t dictionaryCnt;
+§§+		unsigned mutationsPerRun;
+§§+		size_t maxFileSz;
+§§+	} mutate;
+§§+	struct {
+§§+		bool only_printable;
+§§+	} cfg;
+§§ } honggfuzz_t;
+§§ 
+§§ typedef enum {
+§§@@ -313,51 +159,10 @@ typedef enum {
+§§ } runState_t;
+§§ 
+§§ typedef struct {
+§§-    honggfuzz_t* global;
+§§-    pid_t pid;
+§§-    int64_t timeStartedMillis;
+§§-    char origFileName[PATH_MAX];
+§§-    char crashFileName[PATH_MAX];
+§§-    uint64_t pc;
+§§-    uint64_t backtrace;
+§§-    uint64_t access;
+§§-    int exception;
+§§-    char report[_HF_REPORT_SIZE];
+§§-    bool mainWorker;
+§§-    unsigned mutationsPerRun;
+§§-    struct dynfile_t* dynfileqCurrent;
+§§-    uint8_t* dynamicFile;
+§§-    size_t dynamicFileSz;
+§§-    int dynamicFileFd;
+§§-    int dynamicFileCopyFd;
+§§-    uint32_t fuzzNo;
+§§-    int persistentSock;
+§§-    bool waitingForReady;
+§§-    runState_t runState;
+§§-    bool tmOutSignaled;
+§§-#if !defined(_HF_ARCH_DARWIN)
+§§-    timer_t timerId;
+§§-#endif  // !defined(_HF_ARCH_DARWIN)
+§§-
+§§-    struct {
+§§-        /* For Linux code */
+§§-        uint8_t* perfMmapBuf;
+§§-        uint8_t* perfMmapAux;
+§§-        hwcnt_t hwCnts;
+§§-        int cpuInstrFd;
+§§-        int cpuBranchFd;
+§§-        int cpuIptBtsFd;
+§§-    } linux;
+§§-
+§§-    struct {
+§§-        /* For NetBSD code */
+§§-        uint8_t* perfMmapBuf;
+§§-        uint8_t* perfMmapAux;
+§§-        hwcnt_t hwCnts;
+§§-        int cpuInstrFd;
+§§-        int cpuBranchFd;
+§§-        int cpuIptBtsFd;
+§§-    } netbsd;
+§§+	honggfuzz_t global;
+§§+	uint8_t* dynamicFile;
+§§+	size_t dynamicFileSz;
+§§+	unsigned mutationsPerRun;
+§§ } run_t;
+§§ 
+§§ /*
+§§diff --git a/mangle.c b/mangle.c
+§§index 0a20d587..b9360b7e 100644
+§§--- mangle.c
+§§+++ mangle.i
+§§@@ -29,15 +29,14 @@
+§§ #include <stdio.h>
+§§ #include <stdlib.h>
+§§ #include <string.h>
+§§-#include <sys/mman.h>
+§§-#include <sys/stat.h>
+§§-#include <sys/types.h>
+§§-#include <unistd.h>
+§§ 
+§§ #include "input.h"
+§§-#include "libhfcommon/common.h"
+§§-#include "libhfcommon/log.h"
+§§-#include "libhfcommon/util.h"
+§§+
+§§+#include "../../easylogging/include/easylogging++.h"
+§§+
+§§+#ifndef ARRAYSIZE
+§§+#define ARRAYSIZE(x) (sizeof(x) / sizeof(*x))
+§§+#endif /* ifndef ARRAYSIZE */
+§§ 
+§§ static inline void mangle_Overwrite(run_t* run, const uint8_t* src, size_t off, size_t sz) {
+§§     size_t maxToCopy = run->dynamicFileSz - off;
+§§@@ -70,11 +65,11 @@ static inline void mangle_Move(run_t* run, size_t off_from, size_t off_to, size_
+§§ }
+§§ 
+§§ static void mangle_Inflate(run_t* run, size_t off, size_t len) {
+§§-    if (run->dynamicFileSz >= run->global->mutate.maxFileSz) {
+§§+    if (run->dynamicFileSz >= run->global.mutate.maxFileSz) {
+§§         return;
+§§     }
+§§-    if (len > (run->global->mutate.maxFileSz - run->dynamicFileSz)) {
+§§-        len = run->global->mutate.maxFileSz - run->dynamicFileSz;
+§§+    if (len > (run->global.mutate.maxFileSz - run->dynamicFileSz)) {
+§§+        len = run->global.mutate.maxFileSz - run->dynamicFileSz;
+§§     }
+§§ 
+§§     input_setSize(run, run->dynamicFileSz + len);
+§§@@ -129,68 +124,11 @@ static void mangle_BitPrintable(run_t* run) {
+§§     util_turnToPrintable(&(run->dynamicFile[off]), 1);
+§§ }
+§§ 
+§§-static void mangle_DictionaryInsertNoCheck(run_t* run) {
+§§-    uint64_t choice = util_rndGet(0, run->global->mutate.dictionaryCnt - 1);
+§§-    struct strings_t* str = TAILQ_FIRST(&run->global->mutate.dictq);
+§§-    for (uint64_t i = 0; i < choice; i++) {
+§§-        str = TAILQ_NEXT(str, pointers);
+§§-    }
+§§-
+§§-    size_t off = util_rndGet(0, run->dynamicFileSz - 1);
+§§-    mangle_Inflate(run, off, str->len);
+§§-    mangle_Move(run, off, off + str->len, str->len);
+§§-    mangle_Overwrite(run, (uint8_t*)str->s, off, str->len);
+§§-}
+§§-
+§§-static void mangle_DictionaryInsert(run_t* run) {
+§§-    if (run->global->mutate.dictionaryCnt == 0) {
+§§-        mangle_Bit(run);
+§§-        return;
+§§-    }
+§§-    mangle_DictionaryInsertNoCheck(run);
+§§-}
+§§-
+§§-static void mangle_DictionaryInsertPrintable(run_t* run) {
+§§-    if (run->global->mutate.dictionaryCnt == 0) {
+§§-        mangle_BitPrintable(run);
+§§-        return;
+§§-    }
+§§-    mangle_DictionaryInsertNoCheck(run);
+§§-}
+§§-
+§§-static void mangle_DictionaryNoCheck(run_t* run) {
+§§-    size_t off = util_rndGet(0, run->dynamicFileSz - 1);
+§§-
+§§-    uint64_t choice = util_rndGet(0, run->global->mutate.dictionaryCnt - 1);
+§§-    struct strings_t* str = TAILQ_FIRST(&run->global->mutate.dictq);
+§§-    for (uint64_t i = 0; i < choice; i++) {
+§§-        str = TAILQ_NEXT(str, pointers);
+§§-    }
+§§-
+§§-    mangle_Overwrite(run, (uint8_t*)str->s, off, str->len);
+§§-}
+§§-
+§§-static void mangle_Dictionary(run_t* run) {
+§§-    if (run->global->mutate.dictionaryCnt == 0) {
+§§-        mangle_Bit(run);
+§§-        return;
+§§-    }
+§§-
+§§-    mangle_DictionaryNoCheck(run);
+§§-}
+§§-
+§§-static void mangle_DictionaryPrintable(run_t* run) {
+§§-    if (run->global->mutate.dictionaryCnt == 0) {
+§§-        mangle_BitPrintable(run);
+§§-        return;
+§§-    }
+§§-
+§§-    mangle_DictionaryNoCheck(run);
+§§-}
+§§+//Dictionary Mangling is not integrated into FLUFFI
+§§ 
+§§ static void mangle_Magic(run_t* run) {
+§§     static const struct {
+§§-        const uint8_t val[8];
+§§+        const uint8_t val[9];
+§§         const size_t size;
+§§     } mangleMagicVals[] = {
+§§         /* 1B - No endianness */
+§§@@ -433,7 +371,7 @@ static void mangle_Magic(run_t* run) {
+§§ 
+§§ static void mangle_MagicPrintable(run_t* run) {
+§§     static const struct {
+§§-        const uint8_t val[8];
+§§+        const uint8_t val[9];
+§§         const size_t size;
+§§     } mangleMagicVals[] = {
+§§         /* 1B - No endianness */
+§§@@ -719,9 +657,15 @@ static void mangle_AddSubWithRange(run_t* run, size_t off, uint64_t varLen) {
+§§                 val += delta;
+§§             } else {
+§§                 /* Foreign endianess */
+§§+#if defined(_WIN32) || defined(_WIN64)
+§§+                val = _byteswap_ushort(val);
+§§+                val += delta;
+§§+                val = _byteswap_ushort(val);
+§§+#else
+§§                 val = __builtin_bswap16(val);
+§§                 val += delta;
+§§                 val = __builtin_bswap16(val);
+§§+#endif
+§§             }
+§§             mangle_Overwrite(run, (uint8_t*)&val, off, varLen);
+§§             return;
+§§@@ -734,9 +678,15 @@ static void mangle_AddSubWithRange(run_t* run, size_t off, uint64_t varLen) {
+§§                 val += delta;
+§§             } else {
+§§                 /* Foreign endianess */
+§§+#if defined(_WIN32) || defined(_WIN64)
+§§+                val = _byteswap_ulong(val);
+§§+                val += delta;
+§§+                val = _byteswap_ulong(val);
+§§+#else
+§§                 val = __builtin_bswap32(val);
+§§                 val += delta;
+§§                 val = __builtin_bswap32(val);
+§§+#endif
+§§             }
+§§             mangle_Overwrite(run, (uint8_t*)&val, off, varLen);
+§§             return;
+§§@@ -749,16 +699,22 @@ static void mangle_AddSubWithRange(run_t* run, size_t off, uint64_t varLen) {
+§§                 val += delta;
+§§             } else {
+§§                 /* Foreign endianess */
+§§+#if defined(_WIN32) || defined(_WIN64)
+§§+                val = _byteswap_uint64(val);
+§§+                val += delta;
+§§+                val = _byteswap_uint64(val);
+§§+#else
+§§                 val = __builtin_bswap64(val);
+§§                 val += delta;
+§§                 val = __builtin_bswap64(val);
+§§+#endif
+§§             }
+§§             mangle_Overwrite(run, (uint8_t*)&val, off, varLen);
+§§             return;
+§§             break;
+§§         }
+§§         default: {
+§§-            LOG_F("Unknown variable length size: %" PRIu64, varLen);
+§§+            LOG(ERROR) << ("Unknown variable length size: %" PRIu64, varLen);
+§§             break;
+§§         }
+§§     }
+§§@@ -819,7 +775,7 @@ static void mangle_NegBytePrintable(run_t* run) {
+§§     run->dynamicFile[off] = 94 - (run->dynamicFile[off] - 32) + 32;
+§§ }
+§§ 
+§§-static void mangle_CloneByte(run_t* run) {
+§§+void mangle_CloneByte(run_t* run) {
+§§     size_t off1 = util_rndGet(0, run->dynamicFileSz - 1);
+§§     size_t off2 = util_rndGet(0, run->dynamicFileSz - 1);
+§§ 
+§§@@ -828,7 +784,7 @@ static void mangle_CloneByte(run_t* run) {
+§§     run->dynamicFile[off2] = tmp;
+§§ }
+§§ 
+§§-static void mangle_Expand(run_t* run) {
+§§+void mangle_Expand(run_t* run) {
+§§     size_t off = util_rndGet(0, run->dynamicFileSz - 1);
+§§     size_t len = util_rndGet(1, run->dynamicFileSz - off);
+§§ 
+§§@@ -836,7 +792,7 @@ static void mangle_Expand(run_t* run) {
+§§     mangle_Move(run, off, off + len, run->dynamicFileSz);
+§§ }
+§§ 
+§§-static void mangle_Shrink(run_t* run) {
+§§+void mangle_Shrink(run_t* run) {
+§§     if (run->dynamicFileSz <= 1U) {
+§§         return;
+§§     }
+§§@@ -848,7 +804,7 @@ static void mangle_Shrink(run_t* run) {
+§§     mangle_Move(run, off + len, off, run->dynamicFileSz);
+§§ }
+§§ 
+§§-static void mangle_InsertRnd(run_t* run) {
+§§+void mangle_InsertRnd(run_t* run) {
+§§     size_t off = util_rndGet(0, run->dynamicFileSz - 1);
+§§     size_t len = util_rndGet(1, run->dynamicFileSz - off);
+§§ 
+§§@@ -857,7 +813,7 @@ static void mangle_InsertRnd(run_t* run) {
+§§     util_rndBuf(&run->dynamicFile[off], len);
+§§ }
+§§ 
+§§-static void mangle_InsertRndPrintable(run_t* run) {
+§§+void mangle_InsertRndPrintable(run_t* run) {
+§§     size_t off = util_rndGet(0, run->dynamicFileSz - 1);
+§§     size_t len = util_rndGet(1, run->dynamicFileSz - off);
+§§ 
+§§@@ -866,7 +822,7 @@ static void mangle_InsertRndPrintable(run_t* run) {
+§§     util_rndBufPrintable(&run->dynamicFile[off], len);
+§§ }
+§§ 
+§§-static void mangle_ASCIIVal(run_t* run) {
+§§+void mangle_ASCIIVal(run_t* run) {
+§§     char buf[32];
+§§     snprintf(buf, sizeof(buf), "%" PRId64, (int64_t)util_rnd64());
+§§     size_t off = util_rndGet(0, run->dynamicFileSz - 1);
+§§@@ -884,8 +840,6 @@ void mangle_mangleContent(run_t* run) {
+§§         mangle_DecByte,
+§§         mangle_NegByte,
+§§         mangle_AddSub,
+§§-        mangle_Dictionary,
+§§-        mangle_DictionaryInsert,
+§§         mangle_MemMove,
+§§         mangle_MemSet,
+§§         mangle_Random,
+§§@@ -905,8 +859,6 @@ void mangle_mangleContent(run_t* run) {
+§§         mangle_DecBytePrintable,
+§§         mangle_NegBytePrintable,
+§§         mangle_AddSubPrintable,
+§§-        mangle_DictionaryPrintable,
+§§-        mangle_DictionaryInsertPrintable,
+§§         mangle_MemMove,
+§§         mangle_MemSetPrintable,
+§§         mangle_RandomPrintable,
+§§@@ -927,9 +879,9 @@ void mangle_mangleContent(run_t* run) {
+§§     }
+§§ 
+§§     /* Max number of stacked changes is, by default, 6 */
+§§-    uint64_t changesCnt = util_rndGet(1, run->global->mutate.mutationsPerRun);
+§§+    uint64_t changesCnt = util_rndGet(1, run->global.mutate.mutationsPerRun);
+§§ 
+§§-    if (run->global->cfg.only_printable) {
+§§+    if (run->global.cfg.only_printable) {
+§§         for (uint64_t x = 0; x < changesCnt; x++) {
+§§             uint64_t choice = util_rndGet(0, ARRAYSIZE(manglePrintableFuncs) - 1);
+§§             manglePrintableFuncs[choice](run);
+§§diff --git a/libhfcommon/util.h b/libhfcommon/util.h
+§§index fd389712..56168d6c 100644
+§§--- libhfcommon/util.h
+§§+++ libhfcommon/util.h
+§§@@ -24,7 +24,6 @@
+§§ #ifndef _HF_COMMON_UTIL_H_
+§§ #define _HF_COMMON_UTIL_H_
+§§
+§§-#include <pthread.h>
+§§ #include <stdarg.h>
+§§ #ifdef __clang__
+§§ #include <stdatomic.h>
+§§@@ -66,12 +65,6 @@
+§§ #define ATOMIC_PRE_INC_RELAXED(x) __atomic_add_fetch(&(x), 1, __ATOMIC_RELAXED)
+§§ #define ATOMIC_POST_OR_RELAXED(x, y) __atomic_fetch_or(&(x), y, __ATOMIC_RELAXED)
+§§
+§§-__attribute__((always_inline)) static inline uint8_t ATOMIC_BTS(uint8_t* addr, size_t offset) {
+§§-    uint8_t oldbit;
+§§-    addr += (offset / 8);
+§§-    oldbit = ATOMIC_POST_OR_RELAXED(*addr, ((uint8_t)1U << (offset % 8)));
+§§-    return oldbit;
+§§-}
+§§
+§§ extern void* util_Malloc(size_t sz);
+§§
+§§@@ -95,8 +88,6 @@ extern uint8_t util_rndPrintable(void);
+§§
+§§ extern void util_turnToPrintable(uint8_t* buf, size_t sz);
+§§
+§§-extern int util_ssnprintf(char* str, size_t size, const char* format, ...)
+§§-    __attribute__((format(printf, 3, 4)));
+§§
+§§ extern int util_vssnprintf(char* str, size_t size, const char* format, va_list ap);
+§§
+§§@@ -114,12 +105,6 @@ extern void util_sleepForMSec(uint64_t msec);
+§§ extern uint64_t util_getUINT32(const uint8_t* buf);
+§§ extern uint64_t util_getUINT64(const uint8_t* buf);
+§§
+§§-extern void util_mutexLock(pthread_mutex_t* mutex, const char* func, int line);
+§§-extern void util_mutexUnlock(pthread_mutex_t* mutex, const char* func, int line);
+§§-
+§§-extern void util_mutexRWLockRead(pthread_rwlock_t* mutex, const char* func, int line);
+§§-extern void util_mutexRWLockWrite(pthread_rwlock_t* mutex, const char* func, int line);
+§§-extern void util_mutexRWUnlock(pthread_rwlock_t* mutex, const char* func, int line);
+§§
+§§ extern int64_t fastArray64Search(uint64_t* array, size_t arraySz, uint64_t key);
+§§
+§§diff --git a/libhfcommon/util.c b/libhfcommon/util.c
+§§index 51ec608e..0e3e7a2d 100644
+§§--- libhfcommon/util.c
+§§+++ libhfcommon/util.c
+§§@@ -21,117 +21,36 @@
+§§  *
+§§  */
+§§ 
+§§-#include "libhfcommon/util.h"
+§§ 
+§§ #include <ctype.h>
+§§ #include <errno.h>
+§§ #include <fcntl.h>
+§§ #include <inttypes.h>
+§§ #include <math.h>
+§§-#include <pthread.h>
+§§ #include <stdarg.h>
+§§ #include <stdint.h>
+§§ #include <stdio.h>
+§§ #include <stdlib.h>
+§§ #include <string.h>
+§§-#include <sys/mman.h>
+§§-#include <sys/stat.h>
+§§-#include <sys/time.h>
+§§-#include <sys/types.h>
+§§ #include <time.h>
+§§-#include <unistd.h>
+§§ 
+§§-#include "libhfcommon/common.h"
+§§-#include "libhfcommon/files.h"
+§§-#include "libhfcommon/log.h"
+§§+#include <random>
+§§ 
+§§-void* util_Malloc(size_t sz) {
+§§-    void* p = malloc(sz);
+§§-    if (p == NULL) {
+§§-        LOG_F("malloc(size='%zu')", sz);
+§§-    }
+§§-    return p;
+§§-}
+§§-
+§§-void* util_Calloc(size_t sz) {
+§§-    void* p = util_Malloc(sz);
+§§-    memset(p, '\0', sz);
+§§-    return p;
+§§-}
+§§-
+§§-extern void* util_Realloc(void* ptr, size_t sz) {
+§§-    void* ret = realloc(ptr, sz);
+§§-    if (ret == NULL) {
+§§-        PLOG_W("realloc(%p, %zu)", ptr, sz);
+§§-        free(ptr);
+§§-        return NULL;
+§§-    }
+§§-    return ret;
+§§-}
+§§-
+§§-void* util_MMap(size_t sz) {
+§§-    void* p = mmap(NULL, sz, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
+§§-    if (p == MAP_FAILED) {
+§§-        LOG_F("mmap(size='%zu')", sz);
+§§-    }
+§§-    return p;
+§§-}
+§§-
+§§-char* util_StrDup(const char* s) {
+§§-    char* ret = strdup(s);
+§§-    if (ret == NULL) {
+§§-        LOG_F("strdup(size=%zu)", strlen(s));
+§§-    }
+§§-    return ret;
+§§-}
+§§-
+§§-static __thread pthread_once_t rndThreadOnce = PTHREAD_ONCE_INIT;
+§§-static __thread uint64_t rndState[2];
+§§-
+§§-static void util_rndInitThread(void) {
+§§-    int fd = open("/dev/urandom", O_RDONLY | O_CLOEXEC);
+§§-    if (fd == -1) {
+§§-        PLOG_F("Couldn't open /dev/urandom for reading");
+§§-    }
+§§-    if (files_readFromFd(fd, (uint8_t*)rndState, sizeof(rndState)) != sizeof(rndState)) {
+§§-        PLOG_F("Couldn't read '%zu' bytes from /dev/urandom", sizeof(rndState));
+§§-    }
+§§-    close(fd);
+§§-}
+§§-
+§§-/*
+§§- * xoroshiro128plus by David Blackman and Sebastiano Vigna
+§§- */
+§§-static inline uint64_t util_RotL(const uint64_t x, int k) {
+§§-    return (x << k) | (x >> (64 - k));
+§§-}
+§§+std::random_device m_rd2;  //Will be used to obtain a seed for the random number engine
+§§+std::mt19937 m_gen2(m_rd2()); //Standard mersenne_twister_engine seeded with rd()
+§§ 
+§§ static inline uint64_t util_InternalRnd64(void) {
+§§-    const uint64_t s0 = rndState[0];
+§§-    uint64_t s1 = rndState[1];
+§§-    const uint64_t result = s0 + s1;
+§§-    s1 ^= s0;
+§§-    rndState[0] = util_RotL(s0, 55) ^ s1 ^ (s1 << 14);
+§§-    rndState[1] = util_RotL(s1, 36);
+§§-
+§§-    return result;
+§§+    std::uniform_int_distribution<uint64_t> dist(0, UINT64_MAX);
+§§+    return dist(m_gen2);
+§§ }
+§§ 
+§§ uint64_t util_rnd64(void) {
+§§-    pthread_once(&rndThreadOnce, util_rndInitThread);
+§§     return util_InternalRnd64();
+§§ }
+§§ 
+§§ uint64_t util_rndGet(uint64_t min, uint64_t max) {
+§§-    if (min > max) {
+§§-        LOG_F("min:%" PRIu64 " > max:%" PRIu64, min, max);
+§§-    }
+§§-
+§§-    if (max == UINT64_MAX) {
+§§-        return util_rnd64();
+§§-    }
+§§-
+§§-    return ((util_rnd64() % (max - min + 1)) + min);
+§§+    std::uniform_int_distribution<uint64_t> dist(min, max);
+§§+    return dist(m_gen2);
+§§ }
+§§ 
+§§ /* Generate random printable ASCII */
+§§@@ -153,7 +72,6 @@ void util_rndBufPrintable(uint8_t* buf, size_t sz) {
+§§ }
+§§ 
+§§ void util_rndBuf(uint8_t* buf, size_t sz) {
+§§-    pthread_once(&rndThreadOnce, util_rndInitThread);
+§§     if (sz == 0) {
+§§         return;
+§§     }
+§§@@ -162,503 +80,5 @@ void util_rndBuf(uint8_t* buf, size_t sz) {
+§§     }
+§§ }
+§§ 
+§§-int util_vssnprintf(char* str, size_t size, const char* format, va_list ap) {
+§§-    size_t len = strlen(str);
+§§-    if (len >= size) {
+§§-        return len;
+§§-    }
+§§-
+§§-    size_t left = size - len;
+§§-    return vsnprintf(&str[len], left, format, ap);
+§§-}
+§§-
+§§-int util_ssnprintf(char* str, size_t size, const char* format, ...) {
+§§-    va_list args;
+§§-    va_start(args, format);
+§§-    int ret = util_vssnprintf(str, size, format, args);
+§§-    va_end(args);
+§§-
+§§-    return ret;
+§§-}
+§§-
+§§-bool util_strStartsWith(const char* str, const char* tofind) {
+§§-    if (strncmp(str, tofind, strlen(tofind)) == 0) {
+§§-        return true;
+§§-    }
+§§-    return false;
+§§-}
+§§ 
+§§-void util_getLocalTime(const char* fmt, char* buf, size_t len, time_t tm) {
+§§-    struct tm ltime;
+§§-    localtime_r(&tm, &ltime);
+§§-    if (strftime(buf, len, fmt, &ltime) < 1) {
+§§-        snprintf(buf, len, "[date fetch error]");
+§§-    }
+§§-}
+§§-
+§§-void util_closeStdio(bool close_stdin, bool close_stdout, bool close_stderr) {
+§§-    int fd = open("/dev/null", O_RDWR);
+§§-
+§§-    if (fd == -1) {
+§§-        PLOG_E("Couldn't open '/dev/null'");
+§§-        return;
+§§-    }
+§§-
+§§-    if (close_stdin) {
+§§-        TEMP_FAILURE_RETRY(dup2(fd, STDIN_FILENO));
+§§-    }
+§§-    if (close_stdout) {
+§§-        TEMP_FAILURE_RETRY(dup2(fd, STDOUT_FILENO));
+§§-    }
+§§-    if (close_stderr) {
+§§-        TEMP_FAILURE_RETRY(dup2(fd, STDERR_FILENO));
+§§-    }
+§§-
+§§-    if (fd > STDERR_FILENO) {
+§§-        close(fd);
+§§-    }
+§§-}
+§§-
+§§-/*
+§§- * This is not a cryptographically secure hash
+§§- */
+§§-uint64_t util_hash(const char* buf, size_t len) {
+§§-    uint64_t ret = 0;
+§§-
+§§-    for (size_t i = 0; i < len; i++) {
+§§-        ret += buf[i];
+§§-        ret += (ret << 10);
+§§-        ret ^= (ret >> 6);
+§§-    }
+§§ 
+§§-    return ret;
+§§-}
+§§-
+§§-int64_t util_timeNowMillis(void) {
+§§-    struct timeval tv;
+§§-    if (gettimeofday(&tv, NULL) == -1) {
+§§-        PLOG_F("gettimeofday()");
+§§-    }
+§§-
+§§-    return (((int64_t)tv.tv_sec * 1000LL) + ((int64_t)tv.tv_usec / 1000LL));
+§§-}
+§§-
+§§-void util_sleepForMSec(uint64_t msec) {
+§§-    if (msec == 0) {
+§§-        return;
+§§-    }
+§§-    struct timespec ts = {
+§§-        .tv_sec = msec / 1000U,
+§§-        .tv_nsec = (msec % 1000U) * 1000000U,
+§§-    };
+§§-    TEMP_FAILURE_RETRY(nanosleep(&ts, &ts));
+§§-}
+§§-
+§§-uint64_t util_getUINT32(const uint8_t* buf) {
+§§-    uint32_t r;
+§§-    memcpy(&r, buf, sizeof(r));
+§§-    return (uint64_t)r;
+§§-}
+§§-
+§§-uint64_t util_getUINT64(const uint8_t* buf) {
+§§-    uint64_t r;
+§§-    memcpy(&r, buf, sizeof(r));
+§§-    return r;
+§§-}
+§§-
+§§-void util_mutexLock(pthread_mutex_t* mutex, const char* func, int line) {
+§§-    if (pthread_mutex_lock(mutex)) {
+§§-        PLOG_F("%s():%d pthread_mutex_lock(%p)", func, line, (void*)mutex);
+§§-    }
+§§-}
+§§-
+§§-void util_mutexUnlock(pthread_mutex_t* mutex, const char* func, int line) {
+§§-    if (pthread_mutex_unlock(mutex)) {
+§§-        PLOG_F("%s():%d pthread_mutex_unlock(%p)", func, line, (void*)mutex);
+§§-    }
+§§-}
+§§-
+§§-void util_mutexRWLockRead(pthread_rwlock_t* mutex, const char* func, int line) {
+§§-    if (pthread_rwlock_rdlock(mutex)) {
+§§-        PLOG_F("%s():%d pthread_rwlock_rdlock(%p)", func, line, (void*)mutex);
+§§-    }
+§§-}
+§§-
+§§-void util_mutexRWLockWrite(pthread_rwlock_t* mutex, const char* func, int line) {
+§§-    if (pthread_rwlock_wrlock(mutex)) {
+§§-        PLOG_F("%s():%d pthread_rwlock_wrlock(%p)", func, line, (void*)mutex);
+§§-    }
+§§-}
+§§-
+§§-void util_mutexRWUnlock(pthread_rwlock_t* mutex, const char* func, int line) {
+§§-    if (pthread_rwlock_unlock(mutex)) {
+§§-        PLOG_F("%s():%d pthread_rwlock_unlock(%p)", func, line, (void*)mutex);
+§§-    }
+§§-}
+§§-
+§§-int64_t fastArray64Search(uint64_t* array, size_t arraySz, uint64_t key) {
+§§-    size_t low = 0;
+§§-    size_t high = arraySz - 1;
+§§-    size_t mid;
+§§-
+§§-    while (array[high] != array[low] && key >= array[low] && key <= array[high]) {
+§§-        mid = low + (key - array[low]) * ((high - low) / (array[high] - array[low]));
+§§-
+§§-        if (array[mid] < key) {
+§§-            low = mid + 1;
+§§-        } else if (key < array[mid]) {
+§§-            high = mid - 1;
+§§-        } else {
+§§-            return mid;
+§§-        }
+§§-    }
+§§-
+§§-    if (key == array[low]) {
+§§-        return low;
+§§-    } else {
+§§-        return -1;
+§§-    }
+§§-}
+§§-
+§§-bool util_isANumber(const char* s) {
+§§-    if (!isdigit((unsigned char)s[0])) {
+§§-        return false;
+§§-    }
+§§-    for (int i = 0; s[i]; s++) {
+§§-        if (!isdigit((unsigned char)s[i]) && s[i] != 'x') {
+§§-            return false;
+§§-        }
+§§-    }
+§§-    return true;
+§§-}
+§§-
+§§-size_t util_decodeCString(char* s) {
+§§-    size_t o = 0;
+§§-    for (size_t i = 0; s[i] != '\0' && s[i] != '"'; i++, o++) {
+§§-        switch (s[i]) {
+§§-            case '\\': {
+§§-                i++;
+§§-                if (!s[i]) {
+§§-                    continue;
+§§-                }
+§§-                switch (s[i]) {
+§§-                    case 'a':
+§§-                        s[o] = '\a';
+§§-                        break;
+§§-                    case 'r':
+§§-                        s[o] = '\r';
+§§-                        break;
+§§-                    case 'n':
+§§-                        s[o] = '\n';
+§§-                        break;
+§§-                    case 't':
+§§-                        s[o] = '\t';
+§§-                        break;
+§§-                    case '0':
+§§-                        s[o] = '\0';
+§§-                        break;
+§§-                    case 'x': {
+§§-                        if (s[i + 1] && s[i + 2]) {
+§§-                            char hex[] = {s[i + 1], s[i + 2], 0};
+§§-                            s[o] = strtoul(hex, NULL, 16);
+§§-                            i += 2;
+§§-                        } else {
+§§-                            s[o] = s[i];
+§§-                        }
+§§-                        break;
+§§-                    }
+§§-                    default:
+§§-                        s[o] = s[i];
+§§-                        break;
+§§-                }
+§§-                break;
+§§-            }
+§§-            default: {
+§§-                s[o] = s[i];
+§§-                break;
+§§-            }
+§§-        }
+§§-    }
+§§-    s[o] = '\0';
+§§-    return o;
+§§-}
+§§-
+§§-/* ISO 3309 CRC-64 Poly table */
+§§-static const uint64_t util_CRC64ISOPoly[] = {
+§§-    0x0000000000000000ULL,
+§§-    0x01B0000000000000ULL,
+§§-    0x0360000000000000ULL,
+§§-    0x02D0000000000000ULL,
+§§-    0x06C0000000000000ULL,
+§§-    0x0770000000000000ULL,
+§§-    0x05A0000000000000ULL,
+§§-    0x0410000000000000ULL,
+§§-    0x0D80000000000000ULL,
+§§-    0x0C30000000000000ULL,
+§§-    0x0EE0000000000000ULL,
+§§-    0x0F50000000000000ULL,
+§§-    0x0B40000000000000ULL,
+§§-    0x0AF0000000000000ULL,
+§§-    0x0820000000000000ULL,
+§§-    0x0990000000000000ULL,
+§§-    0x1B00000000000000ULL,
+§§-    0x1AB0000000000000ULL,
+§§-    0x1860000000000000ULL,
+§§-    0x19D0000000000000ULL,
+§§-    0x1DC0000000000000ULL,
+§§-    0x1C70000000000000ULL,
+§§-    0x1EA0000000000000ULL,
+§§-    0x1F10000000000000ULL,
+§§-    0x1680000000000000ULL,
+§§-    0x1730000000000000ULL,
+§§-    0x15E0000000000000ULL,
+§§-    0x1450000000000000ULL,
+§§-    0x1040000000000000ULL,
+§§-    0x11F0000000000000ULL,
+§§-    0x1320000000000000ULL,
+§§-    0x1290000000000000ULL,
+§§-    0x3600000000000000ULL,
+§§-    0x37B0000000000000ULL,
+§§-    0x3560000000000000ULL,
+§§-    0x34D0000000000000ULL,
+§§-    0x30C0000000000000ULL,
+§§-    0x3170000000000000ULL,
+§§-    0x33A0000000000000ULL,
+§§-    0x3210000000000000ULL,
+§§-    0x3B80000000000000ULL,
+§§-    0x3A30000000000000ULL,
+§§-    0x38E0000000000000ULL,
+§§-    0x3950000000000000ULL,
+§§-    0x3D40000000000000ULL,
+§§-    0x3CF0000000000000ULL,
+§§-    0x3E20000000000000ULL,
+§§-    0x3F90000000000000ULL,
+§§-    0x2D00000000000000ULL,
+§§-    0x2CB0000000000000ULL,
+§§-    0x2E60000000000000ULL,
+§§-    0x2FD0000000000000ULL,
+§§-    0x2BC0000000000000ULL,
+§§-    0x2A70000000000000ULL,
+§§-    0x28A0000000000000ULL,
+§§-    0x2910000000000000ULL,
+§§-    0x2080000000000000ULL,
+§§-    0x2130000000000000ULL,
+§§-    0x23E0000000000000ULL,
+§§-    0x2250000000000000ULL,
+§§-    0x2640000000000000ULL,
+§§-    0x27F0000000000000ULL,
+§§-    0x2520000000000000ULL,
+§§-    0x2490000000000000ULL,
+§§-    0x6C00000000000000ULL,
+§§-    0x6DB0000000000000ULL,
+§§-    0x6F60000000000000ULL,
+§§-    0x6ED0000000000000ULL,
+§§-    0x6AC0000000000000ULL,
+§§-    0x6B70000000000000ULL,
+§§-    0x69A0000000000000ULL,
+§§-    0x6810000000000000ULL,
+§§-    0x6180000000000000ULL,
+§§-    0x6030000000000000ULL,
+§§-    0x62E0000000000000ULL,
+§§-    0x6350000000000000ULL,
+§§-    0x6740000000000000ULL,
+§§-    0x66F0000000000000ULL,
+§§-    0x6420000000000000ULL,
+§§-    0x6590000000000000ULL,
+§§-    0x7700000000000000ULL,
+§§-    0x76B0000000000000ULL,
+§§-    0x7460000000000000ULL,
+§§-    0x75D0000000000000ULL,
+§§-    0x71C0000000000000ULL,
+§§-    0x7070000000000000ULL,
+§§-    0x72A0000000000000ULL,
+§§-    0x7310000000000000ULL,
+§§-    0x7A80000000000000ULL,
+§§-    0x7B30000000000000ULL,
+§§-    0x79E0000000000000ULL,
+§§-    0x7850000000000000ULL,
+§§-    0x7C40000000000000ULL,
+§§-    0x7DF0000000000000ULL,
+§§-    0x7F20000000000000ULL,
+§§-    0x7E90000000000000ULL,
+§§-    0x5A00000000000000ULL,
+§§-    0x5BB0000000000000ULL,
+§§-    0x5960000000000000ULL,
+§§-    0x58D0000000000000ULL,
+§§-    0x5CC0000000000000ULL,
+§§-    0x5D70000000000000ULL,
+§§-    0x5FA0000000000000ULL,
+§§-    0x5E10000000000000ULL,
+§§-    0x5780000000000000ULL,
+§§-    0x5630000000000000ULL,
+§§-    0x54E0000000000000ULL,
+§§-    0x5550000000000000ULL,
+§§-    0x5140000000000000ULL,
+§§-    0x50F0000000000000ULL,
+§§-    0x5220000000000000ULL,
+§§-    0x5390000000000000ULL,
+§§-    0x4100000000000000ULL,
+§§-    0x40B0000000000000ULL,
+§§-    0x4260000000000000ULL,
+§§-    0x43D0000000000000ULL,
+§§-    0x47C0000000000000ULL,
+§§-    0x4670000000000000ULL,
+§§-    0x44A0000000000000ULL,
+§§-    0x4510000000000000ULL,
+§§-    0x4C80000000000000ULL,
+§§-    0x4D30000000000000ULL,
+§§-    0x4FE0000000000000ULL,
+§§-    0x4E50000000000000ULL,
+§§-    0x4A40000000000000ULL,
+§§-    0x4BF0000000000000ULL,
+§§-    0x4920000000000000ULL,
+§§-    0x4890000000000000ULL,
+§§-    0xD800000000000000ULL,
+§§-    0xD9B0000000000000ULL,
+§§-    0xDB60000000000000ULL,
+§§-    0xDAD0000000000000ULL,
+§§-    0xDEC0000000000000ULL,
+§§-    0xDF70000000000000ULL,
+§§-    0xDDA0000000000000ULL,
+§§-    0xDC10000000000000ULL,
+§§-    0xD580000000000000ULL,
+§§-    0xD430000000000000ULL,
+§§-    0xD6E0000000000000ULL,
+§§-    0xD750000000000000ULL,
+§§-    0xD340000000000000ULL,
+§§-    0xD2F0000000000000ULL,
+§§-    0xD020000000000000ULL,
+§§-    0xD190000000000000ULL,
+§§-    0xC300000000000000ULL,
+§§-    0xC2B0000000000000ULL,
+§§-    0xC060000000000000ULL,
+§§-    0xC1D0000000000000ULL,
+§§-    0xC5C0000000000000ULL,
+§§-    0xC470000000000000ULL,
+§§-    0xC6A0000000000000ULL,
+§§-    0xC710000000000000ULL,
+§§-    0xCE80000000000000ULL,
+§§-    0xCF30000000000000ULL,
+§§-    0xCDE0000000000000ULL,
+§§-    0xCC50000000000000ULL,
+§§-    0xC840000000000000ULL,
+§§-    0xC9F0000000000000ULL,
+§§-    0xCB20000000000000ULL,
+§§-    0xCA90000000000000ULL,
+§§-    0xEE00000000000000ULL,
+§§-    0xEFB0000000000000ULL,
+§§-    0xED60000000000000ULL,
+§§-    0xECD0000000000000ULL,
+§§-    0xE8C0000000000000ULL,
+§§-    0xE970000000000000ULL,
+§§-    0xEBA0000000000000ULL,
+§§-    0xEA10000000000000ULL,
+§§-    0xE380000000000000ULL,
+§§-    0xE230000000000000ULL,
+§§-    0xE0E0000000000000ULL,
+§§-    0xE150000000000000ULL,
+§§-    0xE540000000000000ULL,
+§§-    0xE4F0000000000000ULL,
+§§-    0xE620000000000000ULL,
+§§-    0xE790000000000000ULL,
+§§-    0xF500000000000000ULL,
+§§-    0xF4B0000000000000ULL,
+§§-    0xF660000000000000ULL,
+§§-    0xF7D0000000000000ULL,
+§§-    0xF3C0000000000000ULL,
+§§-    0xF270000000000000ULL,
+§§-    0xF0A0000000000000ULL,
+§§-    0xF110000000000000ULL,
+§§-    0xF880000000000000ULL,
+§§-    0xF930000000000000ULL,
+§§-    0xFBE0000000000000ULL,
+§§-    0xFA50000000000000ULL,
+§§-    0xFE40000000000000ULL,
+§§-    0xFFF0000000000000ULL,
+§§-    0xFD20000000000000ULL,
+§§-    0xFC90000000000000ULL,
+§§-    0xB400000000000000ULL,
+§§-    0xB5B0000000000000ULL,
+§§-    0xB760000000000000ULL,
+§§-    0xB6D0000000000000ULL,
+§§-    0xB2C0000000000000ULL,
+§§-    0xB370000000000000ULL,
+§§-    0xB1A0000000000000ULL,
+§§-    0xB010000000000000ULL,
+§§-    0xB980000000000000ULL,
+§§-    0xB830000000000000ULL,
+§§-    0xBAE0000000000000ULL,
+§§-    0xBB50000000000000ULL,
+§§-    0xBF40000000000000ULL,
+§§-    0xBEF0000000000000ULL,
+§§-    0xBC20000000000000ULL,
+§§-    0xBD90000000000000ULL,
+§§-    0xAF00000000000000ULL,
+§§-    0xAEB0000000000000ULL,
+§§-    0xAC60000000000000ULL,
+§§-    0xADD0000000000000ULL,
+§§-    0xA9C0000000000000ULL,
+§§-    0xA870000000000000ULL,
+§§-    0xAAA0000000000000ULL,
+§§-    0xAB10000000000000ULL,
+§§-    0xA280000000000000ULL,
+§§-    0xA330000000000000ULL,
+§§-    0xA1E0000000000000ULL,
+§§-    0xA050000000000000ULL,
+§§-    0xA440000000000000ULL,
+§§-    0xA5F0000000000000ULL,
+§§-    0xA720000000000000ULL,
+§§-    0xA690000000000000ULL,
+§§-    0x8200000000000000ULL,
+§§-    0x83B0000000000000ULL,
+§§-    0x8160000000000000ULL,
+§§-    0x80D0000000000000ULL,
+§§-    0x84C0000000000000ULL,
+§§-    0x8570000000000000ULL,
+§§-    0x87A0000000000000ULL,
+§§-    0x8610000000000000ULL,
+§§-    0x8F80000000000000ULL,
+§§-    0x8E30000000000000ULL,
+§§-    0x8CE0000000000000ULL,
+§§-    0x8D50000000000000ULL,
+§§-    0x8940000000000000ULL,
+§§-    0x88F0000000000000ULL,
+§§-    0x8A20000000000000ULL,
+§§-    0x8B90000000000000ULL,
+§§-    0x9900000000000000ULL,
+§§-    0x98B0000000000000ULL,
+§§-    0x9A60000000000000ULL,
+§§-    0x9BD0000000000000ULL,
+§§-    0x9FC0000000000000ULL,
+§§-    0x9E70000000000000ULL,
+§§-    0x9CA0000000000000ULL,
+§§-    0x9D10000000000000ULL,
+§§-    0x9480000000000000ULL,
+§§-    0x9530000000000000ULL,
+§§-    0x97E0000000000000ULL,
+§§-    0x9650000000000000ULL,
+§§-    0x9240000000000000ULL,
+§§-    0x93F0000000000000ULL,
+§§-    0x9120000000000000ULL,
+§§-    0x9090000000000000ULL,
+§§-};
+§§-
+§§-uint64_t util_CRC64(const uint8_t* buf, size_t len) {
+§§-    uint64_t res = 0ULL;
+§§-
+§§-    for (size_t i = 0; i < len; i++) {
+§§-        res = util_CRC64ISOPoly[(uint8_t)res ^ buf[i]] ^ (res >> 8);
+§§-    }
+§§-
+§§-    return res;
+§§-}
+§§-
+§§-uint64_t util_CRC64Rev(const uint8_t* buf, size_t len) {
+§§-    uint64_t res = 0ULL;
+§§-
+§§-    for (ssize_t i = (ssize_t)len - 1; i >= 0; i--) {
+§§-        res = util_CRC64ISOPoly[(uint8_t)res ^ buf[i]] ^ (res >> 8);
+§§-    }
+§§-
+§§-    return res;
+§§-}
+§§diff --git a/input.c b/input.c
+§§index 372ee055..b82c1ebf 100644
+§§--- input.c
+§§+++ input.c
+§§@@ -23,433 +23,14 @@
+§§ 
+§§ #include "input.h"
+§§ 
+§§-#include <dirent.h>
+§§-#include <errno.h>
+§§-#include <fcntl.h>
+§§-#include <inttypes.h>
+§§-#include <stdint.h>
+§§-#include <stdio.h>
+§§-#include <stdlib.h>
+§§-#include <string.h>
+§§-#include <sys/mman.h>
+§§-#include <sys/socket.h>
+§§-#include <sys/stat.h>
+§§-#include <sys/types.h>
+§§-#include <unistd.h>
+§§ 
+§§-#include "libhfcommon/common.h"
+§§-#include "libhfcommon/files.h"
+§§-#include "mangle.h"
+§§-#include "subproc.h"
+§§+#include "../../easylogging/include/easylogging++.h"
+§§ 
+§§-#if defined(_HF_ARCH_LINUX)
+§§-#include <sys/syscall.h>
+§§-#if defined(__NR_memfd_create)
+§§-#include <linux/memfd.h>
+§§-#endif /* defined(__NR_memfd_create) */
+§§-#endif /* defined(_HF_ARCH_LINUX) */
+§§-
+§§-#include "libhfcommon/log.h"
+§§-#include "libhfcommon/util.h"
+§§ 
+§§ void input_setSize(run_t* run, size_t sz) {
+§§-    if (sz > run->global->mutate.maxFileSz) {
+§§-        PLOG_F("Too large size requested: %zu > maxSize: %zu", sz, run->global->mutate.maxFileSz);
+§§-    }
+§§-    /* ftruncate of a mmaped file fails under CygWin, it's also painfully slow under MacOS X */
+§§-#if !defined(__CYGWIN__) && !defined(_HF_ARCH_DARWIN)
+§§-    if (TEMP_FAILURE_RETRY(ftruncate(run->dynamicFileFd, sz)) == -1) {
+§§-        PLOG_W("ftruncate(run->dynamicFileFd=%d, sz=%zu)", run->dynamicFileFd, sz);
+§§+    if (sz > run->global.mutate.maxFileSz) {
+§§+        LOG(ERROR) << "Too large size requested: "<<sz<<" > maxSize: " << run->global.mutate.maxFileSz;
+§§     }
+§§-#endif /* !defined(__CYGWIN__) && !defined(_HF_ARCH_DARWIN) */
+§§     run->dynamicFileSz = sz;
+§§ }
+§§ 
+§§-static bool input_getDirStatsAndRewind(honggfuzz_t* hfuzz) {
+§§-    rewinddir(hfuzz->io.inputDirPtr);
+§§-
+§§-    size_t maxSize = 0U;
+§§-    size_t fileCnt = 0U;
+§§-    for (;;) {
+§§-        errno = 0;
+§§-        struct dirent* entry = readdir(hfuzz->io.inputDirPtr);
+§§-        if (entry == NULL && errno == EINTR) {
+§§-            continue;
+§§-        }
+§§-        if (entry == NULL && errno != 0) {
+§§-            PLOG_W("readdir('%s')", hfuzz->io.inputDir);
+§§-            return false;
+§§-        }
+§§-        if (entry == NULL) {
+§§-            break;
+§§-        }
+§§-
+§§-        char fname[PATH_MAX];
+§§-        snprintf(fname, sizeof(fname), "%s/%s", hfuzz->io.inputDir, entry->d_name);
+§§-        LOG_D("Analyzing file '%s'", fname);
+§§-
+§§-        struct stat st;
+§§-        if (stat(fname, &st) == -1) {
+§§-            LOG_W("Couldn't stat() the '%s' file", fname);
+§§-            continue;
+§§-        }
+§§-        if (!S_ISREG(st.st_mode)) {
+§§-            LOG_D("'%s' is not a regular file, skipping", fname);
+§§-            continue;
+§§-        }
+§§-        if (hfuzz->mutate.maxFileSz != 0UL && st.st_size > (off_t)hfuzz->mutate.maxFileSz) {
+§§-            LOG_D("File '%s' is bigger than maximal defined file size (-F): %" PRId64 " > %" PRId64,
+§§-                fname, (int64_t)st.st_size, (int64_t)hfuzz->mutate.maxFileSz);
+§§-        }
+§§-        if ((size_t)st.st_size > maxSize) {
+§§-            maxSize = st.st_size;
+§§-        }
+§§-        fileCnt++;
+§§-    }
+§§-
+§§-    ATOMIC_SET(hfuzz->io.fileCnt, fileCnt);
+§§-    if (hfuzz->mutate.maxFileSz == 0U) {
+§§-        if (maxSize < 8192) {
+§§-            hfuzz->mutate.maxFileSz = 8192;
+§§-        } else if (maxSize > _HF_INPUT_MAX_SIZE) {
+§§-            hfuzz->mutate.maxFileSz = _HF_INPUT_MAX_SIZE;
+§§-        } else {
+§§-            hfuzz->mutate.maxFileSz = maxSize;
+§§-        }
+§§-    }
+§§-
+§§-    if (hfuzz->io.fileCnt == 0U) {
+§§-        LOG_W("No usable files in the input directory '%s'", hfuzz->io.inputDir);
+§§-    }
+§§-
+§§-    LOG_D("Re-read the '%s', maxFileSz:%zu, number of usable files:%zu", hfuzz->io.inputDir,
+§§-        hfuzz->mutate.maxFileSz, hfuzz->io.fileCnt);
+§§-
+§§-    rewinddir(hfuzz->io.inputDirPtr);
+§§-
+§§-    return true;
+§§-}
+§§-
+§§-bool input_getNext(run_t* run, char* fname, bool rewind) {
+§§-    static pthread_mutex_t input_mutex = PTHREAD_MUTEX_INITIALIZER;
+§§-    MX_SCOPED_LOCK(&input_mutex);
+§§-
+§§-    if (run->global->io.fileCnt == 0U) {
+§§-        LOG_W("No useful files in the input directory");
+§§-        return false;
+§§-    }
+§§-
+§§-    for (;;) {
+§§-        errno = 0;
+§§-        struct dirent* entry = readdir(run->global->io.inputDirPtr);
+§§-        if (entry == NULL && errno == EINTR) {
+§§-            continue;
+§§-        }
+§§-        if (entry == NULL && errno != 0) {
+§§-            PLOG_W("readdir_r('%s')", run->global->io.inputDir);
+§§-            return false;
+§§-        }
+§§-        if (entry == NULL && rewind == false) {
+§§-            return false;
+§§-        }
+§§-        if (entry == NULL && rewind == true) {
+§§-            if (input_getDirStatsAndRewind(run->global) == false) {
+§§-                LOG_E("input_getDirStatsAndRewind('%s')", run->global->io.inputDir);
+§§-                return false;
+§§-            }
+§§-            continue;
+§§-        }
+§§-
+§§-        snprintf(fname, PATH_MAX, "%s/%s", run->global->io.inputDir, entry->d_name);
+§§-
+§§-        struct stat st;
+§§-        if (stat(fname, &st) == -1) {
+§§-            LOG_W("Couldn't stat() the '%s' file", fname);
+§§-            continue;
+§§-        }
+§§-        if (!S_ISREG(st.st_mode)) {
+§§-            LOG_D("'%s' is not a regular file, skipping", fname);
+§§-            continue;
+§§-        }
+§§-        return true;
+§§-    }
+§§-}
+§§-
+§§-bool input_init(honggfuzz_t* hfuzz) {
+§§-    hfuzz->io.fileCnt = 0U;
+§§-
+§§-    if (!hfuzz->io.inputDir) {
+§§-        LOG_W("No input file/dir specified");
+§§-        return false;
+§§-    }
+§§-
+§§-    int dir_fd = TEMP_FAILURE_RETRY(open(hfuzz->io.inputDir, O_DIRECTORY | O_RDONLY | O_CLOEXEC));
+§§-    if (dir_fd == -1) {
+§§-        PLOG_W("open('%s', O_DIRECTORY|O_RDONLY|O_CLOEXEC)", hfuzz->io.inputDir);
+§§-        return false;
+§§-    }
+§§-    if ((hfuzz->io.inputDirPtr = fdopendir(dir_fd)) == NULL) {
+§§-        close(dir_fd);
+§§-        PLOG_W("opendir('%s')", hfuzz->io.inputDir);
+§§-        return false;
+§§-    }
+§§-    if (input_getDirStatsAndRewind(hfuzz) == false) {
+§§-        hfuzz->io.fileCnt = 0U;
+§§-        LOG_W("input_getDirStatsAndRewind('%s')", hfuzz->io.inputDir);
+§§-        return false;
+§§-    }
+§§-
+§§-    return true;
+§§-}
+§§-
+§§-bool input_parseDictionary(honggfuzz_t* hfuzz) {
+§§-    FILE* fDict = fopen(hfuzz->mutate.dictionaryFile, "rb");
+§§-    if (fDict == NULL) {
+§§-        PLOG_W("Couldn't open '%s' - R/O mode", hfuzz->mutate.dictionaryFile);
+§§-        return false;
+§§-    }
+§§-    defer {
+§§-        fclose(fDict);
+§§-    };
+§§-
+§§-    char* lineptr = NULL;
+§§-    size_t n = 0;
+§§-    defer {
+§§-        free(lineptr);
+§§-    };
+§§-    for (;;) {
+§§-        ssize_t len = getdelim(&lineptr, &n, '\n', fDict);
+§§-        if (len == -1) {
+§§-            break;
+§§-        }
+§§-        if (len > 1 && lineptr[len - 1] == '\n') {
+§§-            lineptr[len - 1] = '\0';
+§§-            len--;
+§§-        }
+§§-        if (lineptr[0] == '#') {
+§§-            continue;
+§§-        }
+§§-        if (lineptr[0] == '\n') {
+§§-            continue;
+§§-        }
+§§-        if (lineptr[0] == '\0') {
+§§-            continue;
+§§-        }
+§§-        char bufn[1025] = {};
+§§-        char bufv[1025] = {};
+§§-        if (sscanf(lineptr, "\"%1024s", bufv) != 1 &&
+§§-            sscanf(lineptr, "%1024[^=]=\"%1024s", bufn, bufv) != 2) {
+§§-            LOG_W("Incorrect dictionary entry: '%s'. Skipping", lineptr);
+§§-            continue;
+§§-        }
+§§-
+§§-        LOG_D("Parsing word: '%s'", bufv);
+§§-
+§§-        char* s = util_StrDup(bufv);
+§§-        struct strings_t* str = (struct strings_t*)util_Malloc(sizeof(struct strings_t));
+§§-        str->len = util_decodeCString(s);
+§§-        str->s = s;
+§§-        hfuzz->mutate.dictionaryCnt += 1;
+§§-        TAILQ_INSERT_TAIL(&hfuzz->mutate.dictq, str, pointers);
+§§-
+§§-        LOG_D("Dictionary: loaded word: '%s' (len=%zu)", str->s, str->len);
+§§-    }
+§§-    LOG_I("Loaded %zu words from the dictionary", hfuzz->mutate.dictionaryCnt);
+§§-    return true;
+§§-}
+§§-
+§§-bool input_parseBlacklist(honggfuzz_t* hfuzz) {
+§§-    FILE* fBl = fopen(hfuzz->feedback.blacklistFile, "rb");
+§§-    if (fBl == NULL) {
+§§-        PLOG_W("Couldn't open '%s' - R/O mode", hfuzz->feedback.blacklistFile);
+§§-        return false;
+§§-    }
+§§-    defer {
+§§-        fclose(fBl);
+§§-    };
+§§-
+§§-    char* lineptr = NULL;
+§§-    /* lineptr can be NULL, but it's fine for free() */
+§§-    defer {
+§§-        free(lineptr);
+§§-    };
+§§-    size_t n = 0;
+§§-    for (;;) {
+§§-        if (getline(&lineptr, &n, fBl) == -1) {
+§§-            break;
+§§-        }
+§§-
+§§-        if ((hfuzz->feedback.blacklist = util_Realloc(hfuzz->feedback.blacklist,
+§§-                 (hfuzz->feedback.blacklistCnt + 1) * sizeof(hfuzz->feedback.blacklist[0]))) ==
+§§-            NULL) {
+§§-            PLOG_W("realloc failed (sz=%zu)",
+§§-                (hfuzz->feedback.blacklistCnt + 1) * sizeof(hfuzz->feedback.blacklist[0]));
+§§-            return false;
+§§-        }
+§§-
+§§-        hfuzz->feedback.blacklist[hfuzz->feedback.blacklistCnt] = strtoull(lineptr, 0, 16);
+§§-        LOG_D("Blacklist: loaded %'" PRIu64 "'",
+§§-            hfuzz->feedback.blacklist[hfuzz->feedback.blacklistCnt]);
+§§-
+§§-        /* Verify entries are sorted so we can use interpolation search */
+§§-        if (hfuzz->feedback.blacklistCnt > 1) {
+§§-            if (hfuzz->feedback.blacklist[hfuzz->feedback.blacklistCnt - 1] >
+§§-                hfuzz->feedback.blacklist[hfuzz->feedback.blacklistCnt]) {
+§§-                LOG_F("Blacklist file not sorted. Use 'tools/createStackBlacklist.sh' to sort "
+§§-                      "records");
+§§-                return false;
+§§-            }
+§§-        }
+§§-        hfuzz->feedback.blacklistCnt += 1;
+§§-    }
+§§-
+§§-    if (hfuzz->feedback.blacklistCnt > 0) {
+§§-        LOG_I("Loaded %zu stack hash(es) from the blacklist file", hfuzz->feedback.blacklistCnt);
+§§-    } else {
+§§-        LOG_F("Empty stack hashes blacklist file '%s'", hfuzz->feedback.blacklistFile);
+§§-    }
+§§-    return true;
+§§-}
+§§-
+§§-bool input_prepareDynamicInput(run_t* run, bool need_mangele) {
+§§-    {
+§§-        MX_SCOPED_RWLOCK_READ(&run->global->io.dynfileq_mutex);
+§§-
+§§-        if (run->global->io.dynfileqCnt == 0) {
+§§-            LOG_F("The dynamic file corpus is empty. This shouldn't happen");
+§§-        }
+§§-
+§§-        if (run->dynfileqCurrent == NULL) {
+§§-            run->dynfileqCurrent = TAILQ_FIRST(&run->global->io.dynfileq);
+§§-        } else {
+§§-            if (run->dynfileqCurrent == TAILQ_LAST(&run->global->io.dynfileq, dyns_t)) {
+§§-                run->dynfileqCurrent = TAILQ_FIRST(&run->global->io.dynfileq);
+§§-            } else {
+§§-                run->dynfileqCurrent = TAILQ_NEXT(run->dynfileqCurrent, pointers);
+§§-            }
+§§-        }
+§§-    }
+§§-
+§§-    input_setSize(run, run->dynfileqCurrent->size);
+§§-    memcpy(run->dynamicFile, run->dynfileqCurrent->data, run->dynfileqCurrent->size);
+§§-    if (need_mangele) mangle_mangleContent(run);
+§§-
+§§-    return true;
+§§-}
+§§-
+§§-bool input_prepareStaticFile(run_t* run, bool rewind, bool need_mangele) {
+§§-    char fname[PATH_MAX];
+§§-    if (!input_getNext(run, fname, /* rewind= */ rewind)) {
+§§-        return false;
+§§-    }
+§§-    snprintf(run->origFileName, sizeof(run->origFileName), "%s", fname);
+§§-
+§§-    input_setSize(run, run->global->mutate.maxFileSz);
+§§-    ssize_t fileSz = files_readFileToBufMax(fname, run->dynamicFile, run->global->mutate.maxFileSz);
+§§-    if (fileSz < 0) {
+§§-        LOG_E("Couldn't read contents of '%s'", fname);
+§§-        return false;
+§§-    }
+§§-
+§§-    input_setSize(run, fileSz);
+§§-    if (need_mangele) mangle_mangleContent(run);
+§§-
+§§-    return true;
+§§-}
+§§-
+§§-bool input_prepareExternalFile(run_t* run) {
+§§-    snprintf(run->origFileName, sizeof(run->origFileName), "[EXTERNAL]");
+§§-
+§§-    int fd = files_writeBufToTmpFile(run->global->io.workDir, (const uint8_t*)"", 0, 0);
+§§-    if (fd == -1) {
+§§-        LOG_E("Couldn't write input file to a temporary buffer");
+§§-        return false;
+§§-    }
+§§-    defer {
+§§-        close(fd);
+§§-    };
+§§-
+§§-    char fname[PATH_MAX];
+§§-    snprintf(fname, sizeof(fname), "/dev/fd/%d", fd);
+§§-
+§§-    const char* const argv[] = {run->global->exe.externalCommand, fname, NULL};
+§§-    if (subproc_System(run, argv) != 0) {
+§§-        LOG_E("Subprocess '%s' returned abnormally", run->global->exe.externalCommand);
+§§-        return false;
+§§-    }
+§§-    LOG_D("Subporcess '%s' finished with success", run->global->exe.externalCommand);
+§§-
+§§-    input_setSize(run, run->global->mutate.maxFileSz);
+§§-    ssize_t sz = files_readFromFdSeek(fd, run->dynamicFile, run->global->mutate.maxFileSz, 0);
+§§-    if (sz == -1) {
+§§-        LOG_E("Couldn't read file from fd=%d", fd);
+§§-        return false;
+§§-    }
+§§-
+§§-    input_setSize(run, (size_t)sz);
+§§-    return true;
+§§-}
+§§-
+§§-bool input_postProcessFile(run_t* run) {
+§§-    int fd =
+§§-        files_writeBufToTmpFile(run->global->io.workDir, run->dynamicFile, run->dynamicFileSz, 0);
+§§-    if (fd == -1) {
+§§-        LOG_E("Couldn't write input file to a temporary buffer");
+§§-        return false;
+§§-    }
+§§-    defer {
+§§-        close(fd);
+§§-    };
+§§-
+§§-    char fname[PATH_MAX];
+§§-    snprintf(fname, sizeof(fname), "/dev/fd/%d", fd);
+§§-
+§§-    const char* const argv[] = {run->global->exe.postExternalCommand, fname, NULL};
+§§-    if (subproc_System(run, argv) != 0) {
+§§-        LOG_E("Subprocess '%s' returned abnormally", run->global->exe.postExternalCommand);
+§§-        return false;
+§§-    }
+§§-    LOG_D("Subporcess '%s' finished with success", run->global->exe.externalCommand);
+§§-
+§§-    input_setSize(run, run->global->mutate.maxFileSz);
+§§-    ssize_t sz = files_readFromFdSeek(fd, run->dynamicFile, run->global->mutate.maxFileSz, 0);
+§§-    if (sz == -1) {
+§§-        LOG_E("Couldn't read file from fd=%d", fd);
+§§-        return false;
+§§-    }
+§§-
+§§-    input_setSize(run, (size_t)sz);
+§§-    return true;
+§§-}
+§§-
+§§-bool input_feedbackMutateFile(run_t* run) {
+§§-    int fd =
+§§-        files_writeBufToTmpFile(run->global->io.workDir, run->dynamicFile, run->dynamicFileSz, 0);
+§§-    if (fd == -1) {
+§§-        LOG_E("Couldn't write input file to a temporary buffer");
+§§-        return false;
+§§-    }
+§§-    defer {
+§§-        close(fd);
+§§-    };
+§§-
+§§-    char fname[PATH_MAX];
+§§-    snprintf(fname, sizeof(fname), "/dev/fd/%d", fd);
+§§-
+§§-    const char* const argv[] = {run->global->exe.feedbackMutateCommand, fname, NULL};
+§§-    if (subproc_System(run, argv) != 0) {
+§§-        LOG_E("Subprocess '%s' returned abnormally", run->global->exe.feedbackMutateCommand);
+§§-        return false;
+§§-    }
+§§-    LOG_D("Subporcess '%s' finished with success", run->global->exe.externalCommand);
+§§-
+§§-    input_setSize(run, run->global->mutate.maxFileSz);
+§§-    ssize_t sz = files_readFromFdSeek(fd, run->dynamicFile, run->global->mutate.maxFileSz, 0);
+§§-    if (sz == -1) {
+§§-        LOG_E("Couldn't read file from fd=%d", fd);
+§§-        return false;
+§§-    }
+§§-
+§§-    input_setSize(run, (size_t)sz);
+§§-    return true;
+§§-}
+§§diff --git a/mangle.h b/mangle.h
+§§index e38f339e..5a8ca3b3 100644
+§§--- mangle.h
+§§+++ mangle.h
+§§@@ -27,5 +27,11 @@
+§§ #include "honggfuzz.h"
+§§
+§§ extern void mangle_mangleContent(run_t* run);
+§§+extern void mangle_ASCIIVal(run_t* run);
+§§+extern void mangle_InsertRndPrintable(run_t* run);
+§§+extern void mangle_InsertRnd(run_t* run);
+§§+extern void mangle_Shrink(run_t* run);
+§§+extern void mangle_Expand(run_t* run);
+§§+extern void mangle_CloneByte(run_t* run);
+§§
+§§ #endif
