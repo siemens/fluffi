@@ -1,39 +1,39 @@
-§§# Copyright 2017-2019 Siemens AG
-§§# 
-§§# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-§§# 
-§§# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-§§# 
-§§# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-§§# 
-§§# Author(s): Thomas Riedmaier
-§§--- easyloggingpp\src\easylogging++.cc
-§§+++ easyloggingpp\src\easylogging++.cc
-§§@@ -1144,9 +1144,25 @@
-§§ 
-§§ bool OS::termSupportsColor(void) {
-§§   std::string term = getEnvironmentVariable("TERM", "");
-§§-  return term == "xterm" || term == "xterm-color" || term == "xterm-256color"
-§§+  bool easyloggingDefault = term == "xterm" || term == "xterm-color" || term == "xterm-256color"
-§§          || term == "screen" || term == "linux" || term == "cygwin"
-§§          || term == "screen-256color";
-§§+
-§§+#if defined(_WIN32) || defined(_WIN64)
-§§+#ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
-§§+#define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
-§§+#endif
-§§+  //check if we are on a windows system on which console coloring can be enabled
-§§+  HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-§§+  DWORD origConsoleMode;
-§§+  GetConsoleMode(hConsole, &origConsoleMode);
-§§+  bool windowsConsoleSupportsColoring = 0 != SetConsoleMode(hConsole, origConsoleMode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
-§§+  SetConsoleMode(hConsole, origConsoleMode);
-§§+
-§§+#else
-§§+  bool windowsConsoleSupportsColoring = false;
-§§+#endif
-§§+  return easyloggingDefault || windowsConsoleSupportsColoring;
-§§ }
-§§ 
-§§ // DateTime
-§§
+# Copyright 2017-2019 Siemens AG
+# 
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# 
+# Author(s): Thomas Riedmaier
+--- easyloggingpp\src\easylogging++.cc
++++ easyloggingpp\src\easylogging++.cc
+@@ -1144,9 +1144,25 @@
+ 
+ bool OS::termSupportsColor(void) {
+   std::string term = getEnvironmentVariable("TERM", "");
+-  return term == "xterm" || term == "xterm-color" || term == "xterm-256color"
++  bool easyloggingDefault = term == "xterm" || term == "xterm-color" || term == "xterm-256color"
+          || term == "screen" || term == "linux" || term == "cygwin"
+          || term == "screen-256color";
++
++#if defined(_WIN32) || defined(_WIN64)
++#ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
++#define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
++#endif
++  //check if we are on a windows system on which console coloring can be enabled
++  HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
++  DWORD origConsoleMode;
++  GetConsoleMode(hConsole, &origConsoleMode);
++  bool windowsConsoleSupportsColoring = 0 != SetConsoleMode(hConsole, origConsoleMode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
++  SetConsoleMode(hConsole, origConsoleMode);
++
++#else
++  bool windowsConsoleSupportsColoring = false;
++#endif
++  return easyloggingDefault || windowsConsoleSupportsColoring;
+ }
+ 
+ // DateTime
+

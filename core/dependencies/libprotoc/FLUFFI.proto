@@ -1,225 +1,225 @@
-§§/*
-§§ ***************************************************************************
-§§ Copyright (c) 2017-2019 Siemens AG  All rights reserved.
-§§ ***************************************************************************
+/*
+ ***************************************************************************
+ Copyright (c) 2017-2019 Siemens AG  All rights reserved.
+ ***************************************************************************
+
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice,
+  this list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL Siemens AG OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+DAMAGE.
+
+Author(s): Thomas Riedmaier, Pascal Eckmann, Abian Blome
+*/
+
+syntax = "proto3";
 §§
-§§
-§§Redistribution and use in source and binary forms, with or without
-§§modification, are permitted provided that the following conditions are met:
-§§
-§§* Redistributions of source code must retain the above copyright notice,
-§§  this list of conditions and the following disclaimer.
-§§
-§§* Redistributions in binary form must reproduce the above copyright notice,
-§§  this list of conditions and the following disclaimer in the documentation
-§§  and/or other materials provided with the distribution.
-§§
-§§THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-§§AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-§§IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-§§ARE DISCLAIMED. IN NO EVENT SHALL Siemens AG OR CONTRIBUTORS BE LIABLE
-§§FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-§§DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-§§SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-§§CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-§§LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
-§§OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
-§§DAMAGE.
-§§
-§§Author(s): Thomas Riedmaier, Pascal Eckmann, Abian Blome
-§§*/
-§§
-§§syntax = "proto3";
-§§
-§§message FLUFFIMessage {
-§§oneof fluff {
-§§  GetStatusRequest getStatusRequest = 1;
-§§  GetStatusResponse getStatusResponse = 2;
-§§
-§§  SetTGsAndTEsRequest setTGsAndTEsRequest = 3;
-§§  SetTGsAndTEsResponse setTGsAndTEsResponse = 4;
-§§
+message FLUFFIMessage {
+oneof fluff {
+  GetStatusRequest getStatusRequest = 1;
+  GetStatusResponse getStatusResponse = 2;
+
+  SetTGsAndTEsRequest setTGsAndTEsRequest = 3;
+  SetTGsAndTEsResponse setTGsAndTEsResponse = 4;
+
 §§  RegisterAtLMRequest registerAtLMRequest = 5;
 §§  RegisterAtLMResponse registerAtLMResponse = 6;
-§§
+
 §§  GetTestcaseRequest getTestcaseRequest = 7;
 §§  GetTestcaseResponse getTestcaseResponse = 8;
-§§
+
 §§  PutTestResultRequest putTestResultRequest = 9;
 §§  PutTestResultResponse putTestResultResponse = 10;
-§§
+
 §§  PutTestEvaluationRequest putTestEvaluationRequest = 11;
 §§  PutTestEvaluationResponse putTestEvaluationResponse = 12;
-§§
+
 §§  GetCurrentBlockCoverageRequest getCurrentBlockCoverageRequest = 13;
 §§  GetCurrentBlockCoverageResponse getCurrentBlockCoverageResponse = 14;
-§§
+
 §§  GetNewCompletedTestcaseIDsRequest getNewCompletedTestcaseIDsRequest = 15;
 §§  GetNewCompletedTestcaseIDsResponse getNewCompletedTestcaseIDsResponse = 16;
-§§
+
 §§  GetTestcaseToMutateRequest getTestcaseToMutateRequest = 17;
 §§  GetTestcaseToMutateResponse getTestcaseToMutateResponse = 18;
-§§
+
 §§  ReportTestcaseWithNoResultRequest reportTestcaseWithNoResultRequest = 19;
 §§  ReportTestcaseWithNoResultResponse reportTestcaseWithNoResultResponse = 20;
-§§
+
 §§  GetTestCaseChunkRequest getTestCaseChunkRequest = 21;
 §§  GetTestCaseChunkResponse getTestCaseChunkResponse = 22;
-§§
+
 §§  GetFuzzJobConfigurationRequest getFuzzJobConfigurationRequest = 23;
 §§  GetFuzzJobConfigurationResponse getFuzzJobConfigurationResponse = 24;
-§§
+
 §§  RequestTypeNotImplementedRequest requestTypeNotImplementedRequest = 25;
 §§  RequestTypeNotImplementedResponse requestTypeNotImplementedResponse = 26;
-§§
+
 §§  RegisterAtGMRequest registerAtGMRequest = 27;
 §§  RegisterAtGMResponse registerAtGMResponse = 28;
 §§
 §§  KillInstanceRequest killInstanceRequest = 29;
 §§  KillInstanceResponse killInstanceResponse = 30;
-§§
-§§  IsAgentWelcomedRequest isAgentWelcomedRequest = 31;
-§§  IsAgentWelcomedResponse isAgentWelcomedResponse = 32;
-§§
-§§  GetLMConfigurationRequest getLMConfigurationRequest = 33;
-§§  GetLMConfigurationResponse getLMConfigurationResponse = 34;
-§§
-§§}
-§§}
-§§
-§§message GetStatusRequest {
-§§  ServiceDescriptor requesterServiceDescriptor = 1;
-§§}
-§§
-§§message GetStatusResponse {
-§§  string status = 1;
-§§}
-§§
-§§message SetTGsAndTEsRequest {
+
+  IsAgentWelcomedRequest isAgentWelcomedRequest = 31;
+  IsAgentWelcomedResponse isAgentWelcomedResponse = 32;
+
+  GetLMConfigurationRequest getLMConfigurationRequest = 33;
+  GetLMConfigurationResponse getLMConfigurationResponse = 34;
+
+}
+}
+
+message GetStatusRequest {
+  ServiceDescriptor requesterServiceDescriptor = 1;
+}
+
+message GetStatusResponse {
+  string status = 1;
+}
+
+message SetTGsAndTEsRequest {
 §§  repeated ServiceAndWeigth tgs = 1;
 §§  repeated ServiceAndWeigth tes = 2;
-§§}
-§§
-§§message SetTGsAndTEsResponse {
-§§  bool success = 1;
-§§}
-§§
-§§
-§§message ServiceAndWeigth{
+}
+
+message SetTGsAndTEsResponse {
+  bool success = 1;
+}
+
+
+message ServiceAndWeigth{
 §§  ServiceDescriptor serviceDescriptor = 1;
 §§  uint32 weight = 2;	
-§§}
-§§
-§§message ServiceDescriptor{
-§§ string serviceHostAndPort = 1;
+}
+
+message ServiceDescriptor{
+ string serviceHostAndPort = 1;
 §§ string guid = 2;
-§§}
-§§
-§§enum AgentType {
-§§    TestcaseGenerator = 0;
-§§    TestcaseRunner = 1;
-§§    TestcaseEvaluator = 2;
+}
+
+enum AgentType {
+    TestcaseGenerator = 0;
+    TestcaseRunner = 1;
+    TestcaseEvaluator = 2;
 §§    GlobalManager = 3;
 §§    LocalManager = 4;
-§§}
-§§
-§§message RegisterAtLMRequest{
-§§  AgentType type = 1;
+}
+
+message RegisterAtLMRequest{
+  AgentType type = 1;
 §§  repeated string implementedAgentSubTypes = 2;
 §§  ServiceDescriptor serviceDescriptor = 3;
 §§  string location = 4;
-§§}
-§§
-§§
-§§message RegisterAtLMResponse{
-§§  bool success = 1;
-§§  string fuzzJobName = 2;
-§§}
-§§
-§§message RegisterAtGMRequest{
-§§  AgentType type = 1;
+}
+
+
+message RegisterAtLMResponse{
+  bool success = 1;
+  string fuzzJobName = 2;
+}
+
+message RegisterAtGMRequest{
+  AgentType type = 1;
 §§  repeated string implementedAgentSubTypes = 2;
-§§  ServiceDescriptor serviceDescriptor = 3;
-§§  string location = 4;
-§§}
-§§
-§§message LMConfiguration{
-§§  string dbHost = 1;
-§§  string dbUser = 2;
-§§  string dbPassword = 3;
-§§  string dbName = 4;
-§§  string fuzzJobName = 5;
-§§}
-§§
-§§message RegisterAtGMResponse{
-§§  oneof gmResponse {
+  ServiceDescriptor serviceDescriptor = 3;
+  string location = 4;
+}
+
+message LMConfiguration{
+  string dbHost = 1;
+  string dbUser = 2;
+  string dbPassword = 3;
+  string dbName = 4;
+  string fuzzJobName = 5;
+}
+
+message RegisterAtGMResponse{
+  oneof gmResponse {
 §§    bool retryLater = 1;
-§§    ServiceDescriptor lmServiceDescriptor = 2;
-§§    LMConfiguration lmConfiguration = 3;
-§§  }
-§§}
-§§
-§§message GetTestcaseRequest{
-§§}
-§§
-§§message TestcaseID{
+    ServiceDescriptor lmServiceDescriptor = 2;
+    LMConfiguration lmConfiguration = 3;
+  }
+}
+
+message GetTestcaseRequest{
+}
+
+message TestcaseID{
 §§  ServiceDescriptor serviceDescriptor = 1;
 §§  uint64 localID = 2;
-§§}
-§§
-§§message GetTestcaseResponse{
-§§  bool success = 1;
+}
+
+message GetTestcaseResponse{
+  bool success = 1;
 §§  TestcaseID id = 2;
 §§  TestcaseID parentId = 3;
 §§  bytes testCaseFirstChunk = 4; //up to CommInt::chunkSizeInBytes bytes
 §§  bool isLastChunk = 5;
 §§  bool forceFullCoverage= 6;
-§§}
-§§
-§§enum ExitType {
+}
+
+enum ExitType {
 §§   CleanExit = 0;
-§§   Hang = 1;
+   Hang = 1;
 §§   Exception_AccessViolation = 2;
 §§   Exception_Other = 3;
-§§}
-§§
-§§message ModuleNameToID{
+}
+
+message ModuleNameToID{
 §§  string moduleName = 1;
 §§  int32 moduleID = 2;
 §§  string modulePath = 3; //Only for modules where paths are important (i.e. when multiple modules exist with the same name) - if not wanted set to '*'
-§§}
-§§
-§§message BasicBlock{
+}
+
+message BasicBlock{
 §§  uint64 RVA = 1;
 §§  int32 moduleID = 2;
-§§}
-§§
-§§message TestResult{
+}
+
+message TestResult{
 §§  ExitType exitType = 1;
 §§  repeated BasicBlock blocks = 2;
 §§  string crashFootprint = 3; //optional! Only set if ExitType Exception_AccessViolation or Exception_Other
 §§  bool hasFullCoverage = 4;
-§§}
-§§
-§§message PutTestResultRequest{
+}
+
+message PutTestResultRequest{
 §§  TestcaseID id = 1;
 §§  TestcaseID parentId = 2; 
 §§  TestResult result = 3;
 §§  bytes testCaseFirstChunk = 4; //up to CommInt::chunkSizeInBytes bytes
 §§  bool isLastChunk = 5;
-§§  ServiceDescriptor sdOfRunner = 6; 
-§§}
-§§
-§§message PutTestResultResponse{
-§§  bool success = 1;
-§§}
-§§
-§§enum TestEvaluation{
+  ServiceDescriptor sdOfRunner = 6; 
+}
+
+message PutTestResultResponse{
+  bool success = 1;
+}
+
+enum TestEvaluation{
 §§   Keep = 0;
-§§   Discard = 1;
-§§}
-§§
-§§message PutTestEvaluationRequest{
+   Discard = 1;
+}
+
+message PutTestEvaluationRequest{
 §§  TestcaseID id = 1;
 §§  TestcaseID parentId = 2;
 §§  TestEvaluation eval = 3;
@@ -227,84 +227,84 @@
 §§  TestResult result = 5; //optional! If TestEvaluation says discard will not be set!
 §§  bytes testCaseFirstChunk = 6; //up to CommInt::chunkSizeInBytes bytes,  optional! If TestEvaluation says discard will not be set!
 §§  bool isLastChunk = 7; //optional! If TestEvaluation says discard will not be set!
-§§  ServiceDescriptor sdOfEvaluator = 8; //optional! If TestEvaluation says discard will not be set!
-§§}
-§§
-§§message PutTestEvaluationResponse{
-§§  bool success = 1;
-§§}
-§§
-§§message GetCurrentBlockCoverageRequest{
-§§}
-§§
-§§message GetCurrentBlockCoverageResponse{
+  ServiceDescriptor sdOfEvaluator = 8; //optional! If TestEvaluation says discard will not be set!
+}
+
+message PutTestEvaluationResponse{
+  bool success = 1;
+}
+
+message GetCurrentBlockCoverageRequest{
+}
+
+message GetCurrentBlockCoverageResponse{
 §§  repeated BasicBlock blocks = 1;
-§§}
-§§
-§§message GetNewCompletedTestcaseIDsRequest{
+}
+
+message GetNewCompletedTestcaseIDsRequest{
 §§  uint64 lastUpdateTimeStamp = 1;
-§§}
-§§
-§§message GetNewCompletedTestcaseIDsResponse{
+}
+
+message GetNewCompletedTestcaseIDsResponse{
 §§  uint64 updateTimeStamp = 1;
 §§  repeated TestcaseID IDs = 2;
-§§}
-§§
-§§message GetTestcaseToMutateRequest{
-§§  int32 howManyWillBeGeneratedFromParent = 1;
-§§}
-§§
-§§message GetTestcaseToMutateResponse{
+}
+
+message GetTestcaseToMutateRequest{
+  int32 howManyWillBeGeneratedFromParent = 1;
+}
+
+message GetTestcaseToMutateResponse{
 §§  TestcaseID id = 1;
 §§  bytes testCaseFirstChunk = 2; //up to CommInt::chunkSizeInBytes bytes
 §§  bool isLastChunk = 3;
-§§  bool alsoRunWithoutMutation = 4;
-§§}
-§§
-§§message ReportTestcaseWithNoResultRequest{
+  bool alsoRunWithoutMutation = 4;
+}
+
+message ReportTestcaseWithNoResultRequest{
 §§  TestcaseID id = 1;
 §§  TestcaseID parentId = 2;
 §§  bytes testCaseFirstChunk = 3; //up to CommInt::chunkSizeInBytes bytes
 §§  bool isLastChunk = 4;
-§§}
-§§
-§§message ReportTestcaseWithNoResultResponse{
-§§  bool success = 1;
-§§}
-§§
-§§message GetTestCaseChunkRequest{
+}
+
+message ReportTestcaseWithNoResultResponse{
+  bool success = 1;
+}
+
+message GetTestCaseChunkRequest{
 §§  TestcaseID id = 1;
 §§  int32 chunkID = 2; 
-§§}
-§§
-§§message GetTestCaseChunkResponse{
+}
+
+message GetTestCaseChunkResponse{
 §§  int32 chunkID = 1; 
 §§  bytes testCaseChunk = 2; //up to CommInt::chunkSizeInBytes bytes
 §§  bool isLastChunk = 3;
-§§}
-§§
-§§
-§§message RequestTypeNotImplementedRequest{
-§§	//Dummy message! Should never be seen :D
-§§}
-§§
-§§message RequestTypeNotImplementedResponse{
-§§}
-§§
-§§message GetFuzzJobConfigurationRequest{
+}
+
+
+message RequestTypeNotImplementedRequest{
+	//Dummy message! Should never be seen :D
+}
+
+message RequestTypeNotImplementedResponse{
+}
+
+message GetFuzzJobConfigurationRequest{
 §§  ServiceDescriptor serviceDescriptor = 1; //There are settings that depend on who is asking
-§§}
-§§
-§§message Setting{
+}
+
+message Setting{
 §§  string settingName = 1;
 §§  string settingValue = 2;
-§§}
-§§
-§§message GetFuzzJobConfigurationResponse{
+}
+
+message GetFuzzJobConfigurationResponse{
 §§  repeated ModuleNameToID targetModules = 1;
 §§  repeated BasicBlock targetBlocks = 2;
 §§  repeated Setting settings = 3;
-§§}
+}
 §§
 §§message KillInstanceRequest{
 §§}
@@ -312,19 +312,19 @@
 §§message KillInstanceResponse{
 §§  bool success = 1;
 §§}
-§§
-§§message IsAgentWelcomedRequest{
-§§  AgentType type = 1;
+
+message IsAgentWelcomedRequest{
+  AgentType type = 1;
 §§  repeated string implementedAgentSubTypes = 2;
-§§}
-§§
-§§message IsAgentWelcomedResponse{
-§§  bool isWelcomed = 1;
-§§}
-§§
-§§message GetLMConfigurationRequest{
-§§}
-§§
-§§message GetLMConfigurationResponse{
-§§  LMConfiguration lmConfiguration = 1;
-§§}
+}
+
+message IsAgentWelcomedResponse{
+  bool isWelcomed = 1;
+}
+
+message GetLMConfigurationRequest{
+}
+
+message GetLMConfigurationResponse{
+  LMConfiguration lmConfiguration = 1;
+}

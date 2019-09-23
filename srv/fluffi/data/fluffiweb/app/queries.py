@@ -1,13 +1,13 @@
-§§# Copyright 2017-2019 Siemens AG
-§§# 
-§§# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-§§# 
-§§# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-§§# 
-§§# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-§§# 
-§§# Author(s): Junes Najah, Thomas Riedmaier, Pascal Eckmann, Abian Blome
-§§
+# Copyright 2017-2019 Siemens AG
+# 
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# 
+# Author(s): Junes Najah, Thomas Riedmaier, Pascal Eckmann, Abian Blome
+
 §§INSERT_SETTINGS = (
 §§    "INSERT INTO settings(SettingName, SettingValue) VALUES(:SettingName, :SettingValue)")
 §§INSERT_MODULE = (
@@ -74,21 +74,21 @@
 §§
 §§GET_VIOLATIONS_AND_CRASHES = (
 §§    "SELECT count(*), cd.CrashFootprint, it.TestCaseType, MIN(it.ID) AS group_min FROM interesting_testcases AS it "
-§§    "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
+    "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
 §§    "GROUP BY cd.CrashFootprint, it.TestCaseType ORDER BY group_min;")
 §§
 §§GET_SMALLEST_VIO_OR_CRASH_TC = (
 §§    "SELECT it.RawBytes "
 §§    "FROM interesting_testcases AS it "
-§§    "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
+    "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
 §§    "WHERE cd.CrashFootprint=:footprint ORDER BY LENGTH(it.RawBytes) ASC LIMIT 1;")
 §§
 §§NUM_UNIQUE_ACCESS_VIOLATION = (
 §§    "SELECT count(*) FROM "
 §§    "(SELECT cd.CrashFootprint, it.TestCaseType "
 §§    "FROM interesting_testcases AS it "
-§§    "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
-§§    "WHERE it.TestCaseType=2 Group by cd.CrashFootprint) "
+    "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
+    "WHERE it.TestCaseType=2 Group by cd.CrashFootprint) "
 §§    "violations")
 §§
 §§UNIQUE_ACCESS_VIOLATION = (
@@ -98,15 +98,15 @@
 §§    "(SELECT cd.CrashFootprint, it.TestCaseType, it.CreatorServiceDescriptorGUID, it.CreatorLocalID, it.Rating, "
 §§    "it.TimeOfInsertion, it.ID, it.RawBytes"
 §§    " FROM interesting_testcases AS it"
-§§    " JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
-§§    " WHERE it.TestCaseType=2 Group by cd.CrashFootprint) av "     
+    " JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
+    " WHERE it.TestCaseType=2 Group by cd.CrashFootprint) av "     
 §§    "LEFT JOIN nice_names_testcase AS nn ON av.ID = nn.TestcaseID")
 §§
 §§NUM_UNIQUE_CRASH = (
 §§    "SELECT count(*) "
 §§    "FROM (SELECT cd.CrashFootprint, it.TestCaseType FROM interesting_testcases AS it "
-§§    "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
-§§    "GROUP BY cd.CrashFootprint) " 
+    "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
+    "GROUP BY cd.CrashFootprint) " 
 §§    "observedCrashes WHERE TestCaseType=3")
 §§
 §§UNIQUE_CRASHES = (
@@ -117,16 +117,16 @@
 §§    "it.Rating, it.TimeOfInsertion, it.ID, it.RawBytes"
 §§    " FROM interesting_testcases AS it"
 §§    " JOIN crash_descriptions AS cd"
-§§    " ON it.ID = cd.CreatorTestcaseID "
-§§    " GROUP BY cd.CrashFootprint) oc " 
+    " ON it.ID = cd.CreatorTestcaseID "
+    " GROUP BY cd.CrashFootprint) oc " 
 §§    "LEFT JOIN nice_names_testcase AS nn ON oc.ID = nn.TestcaseID "
 §§    "WHERE TestCaseType=3")
 §§
 §§NUM_UNIQUE_ACCESS_VIOLATION_TYPE_2 = (
 §§    "SELECT count(*) "
 §§    "FROM (SELECT cd.CrashFootprint, it.TestCaseType FROM interesting_testcases AS it "
-§§    "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
-§§    "GROUP BY cd.CrashFootprint) "
+    "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
+    "GROUP BY cd.CrashFootprint) "
 §§    "observedCrashes WHERE TestCaseType=2")
 §§
 §§MANAGED_INSTANCES_HOST_AND_PORT_AGENT_TYPE = (
@@ -171,7 +171,7 @@
 §§
 §§GET_CRASH_PARENTS = (
 §§    "SELECT it.ParentServiceDescriptorGUID, it.ParentLocalID, COUNT(*) AS NumberEdges FROM interesting_testcases as it "
-§§    "JOIN crash_descriptions as cd ON it.ID = cd.CreatorTestcaseID "
+    "JOIN crash_descriptions as cd ON it.ID = cd.CreatorTestcaseID "
 §§    "WHERE cd.CrashFootprint = :CrashFootprint AND (it.TestCaseType=3 OR it.TestCaseType=2) "
 §§    "GROUP BY it.ParentServiceDescriptorGUID, it.ParentLocalID;")
 §§
@@ -196,19 +196,19 @@
 §§
 §§ResetFuzzjobStmts = [
 §§    "UPDATE billing SET amount = 0",
-§§    "TRUNCATE TABLE completed_testcases",
-§§    "TRUNCATE TABLE covered_blocks",
-§§    "TRUNCATE TABLE crash_descriptions",
-§§    "TRUNCATE TABLE managed_instances",
-§§    "TRUNCATE TABLE managed_instances_statuses",
-§§    "TRUNCATE TABLE nice_names_managed_instance"]
+    "TRUNCATE TABLE completed_testcases",
+    "TRUNCATE TABLE covered_blocks",
+    "TRUNCATE TABLE crash_descriptions",
+    "TRUNCATE TABLE managed_instances",
+    "TRUNCATE TABLE managed_instances_statuses",
+    "TRUNCATE TABLE nice_names_managed_instance"]
 §§
 §§
 §§def getCrashesOrViosOfFootprint(footprint):
 §§    return (
 §§        "SELECT it.CreatorServiceDescriptorGUID, it.RawBytes, it.ID, nn.NiceName "
 §§        "FROM interesting_testcases AS it "
-§§        "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
+        "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
 §§        "LEFT JOIN nice_names_testcase AS nn ON it.ID = nn.TestcaseID "
 §§        "WHERE cd.CrashFootprint='{}' AND (it.TestCaseType=2 OR it.TestCaseType=3);".format(footprint)
 §§    )
@@ -218,7 +218,7 @@
 §§    return (
 §§        "SELECT it.CreatorServiceDescriptorGUID, it.RawBytes, it.ID, nn.NiceName "
 §§        "FROM interesting_testcases AS it "
-§§        "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
+        "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
 §§        "LEFT JOIN nice_names_testcase AS nn ON it.ID = nn.TestcaseID "
 §§        "WHERE cd.CrashFootprint='{}' AND it.TestCaseType={};".format(footprint, testCaseType)
 §§    )

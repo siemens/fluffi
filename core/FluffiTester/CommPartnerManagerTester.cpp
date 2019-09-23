@@ -1,19 +1,19 @@
-§§/*
-§§Copyright 2017-2019 Siemens AG
-§§
-§§Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-§§
-§§The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-§§
-§§THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-§§
-§§Author(s): Michael Kraus, Thomas Riedmaier, Pascal Eckmann
-§§*/
-§§
+/*
+Copyright 2017-2019 Siemens AG
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Author(s): Michael Kraus, Thomas Riedmaier, Pascal Eckmann
+*/
+
 §§#include "stdafx.h"
 §§#include "CppUnitTest.h"
-§§#include "Util.h"
-§§#include "CommPartnerManager.h"
+#include "Util.h"
+#include "CommPartnerManager.h"
 §§
 §§using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 §§
@@ -27,7 +27,7 @@
 §§
 §§		TEST_METHOD_INITIALIZE(ModuleInitialize)
 §§		{
-§§			Util::setDefaultLogOptions("logs" + Util::pathSeperator + "Test.log");
+			Util::setDefaultLogOptions("logs" + Util::pathSeperator + "Test.log");
 §§			cPManager = new CommPartnerManager();
 §§		}
 §§
@@ -38,7 +38,7 @@
 §§			cPManager = nullptr;
 §§		}
 §§
-§§		TEST_METHOD(CommPartnerManager_getNextPartner)
+		TEST_METHOD(CommPartnerManager_getNextPartner)
 §§		{
 §§			// Proove GetPartner from empty CommPartnerManager
 §§			// Test Method
@@ -49,7 +49,7 @@
 §§
 §§			// Configure:
 §§			const int numberOfPartner = 10;
-§§			uint32_t weightOfEachPartner = 10;
+			uint32_t weightOfEachPartner = 10;
 §§			int numberOfPartnerCalculations = 10000;
 §§			int resultedPartnerRatio[numberOfPartner] = {};
 §§
@@ -88,7 +88,7 @@
 §§			}
 §§		}
 §§
-§§		TEST_METHOD(CommPartnerManager_updateCommPartners)
+		TEST_METHOD(CommPartnerManager_updateCommPartners)
 §§		{
 §§			// Update with empy Partner list
 §§			for (int i = 0; i < 5; i++) {
@@ -146,4 +146,4 @@
 §§			}
 §§		}
 §§	};
-§§}
+}

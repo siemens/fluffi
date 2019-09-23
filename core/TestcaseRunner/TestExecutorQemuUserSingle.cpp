@@ -1,15 +1,15 @@
-§§/*
-§§Copyright 2017-2019 Siemens AG
-§§
-§§Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-§§
-§§The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-§§
-§§THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-§§
+/*
+Copyright 2017-2019 Siemens AG
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 §§Author(s): Roman Bendt, Thomas Riedmaier, Abian Blome
-§§*/
-§§
+*/
+
 §§#include "stdafx.h"
 §§#include "TestExecutorQemuUserSingle.h"
 §§#include "FluffiTestcaseID.h"
@@ -21,8 +21,8 @@
 §§TestExecutorQemuUserSingle::TestExecutorQemuUserSingle(const std::string targetCMDline, int hangTimeoutMS, const std::set<Module> modulesToCover,
 §§	const std::string testcaseDir, ExternalProcess::CHILD_OUTPUT_TYPE child_output_mode, GarbageCollectorWorker* garbageCollectorWorker,
 §§	bool treatAnyAccessViolationAsFatal, const std::string rootfs)
-§§	: FluffiTestExecutor(targetCMDline, hangTimeoutMS, modulesToCover, testcaseDir, child_output_mode, "", garbageCollectorWorker), //Environment parameters are handled by QEMU's -E switch
-§§	m_treatAnyAccessViolationAsFatal(treatAnyAccessViolationAsFatal),
+	: FluffiTestExecutor(targetCMDline, hangTimeoutMS, modulesToCover, testcaseDir, child_output_mode, "", garbageCollectorWorker), //Environment parameters are handled by QEMU's -E switch
+	m_treatAnyAccessViolationAsFatal(treatAnyAccessViolationAsFatal),
 §§	m_rootfs(rootfs),
 §§	m_was_initialized{ false }
 §§{
@@ -34,9 +34,9 @@
 §§bool TestExecutorQemuUserSingle::isSetupFunctionable() {
 §§	return false;
 §§}
-§§std::shared_ptr<DebugExecutionOutput> TestExecutorQemuUserSingle::execute(const FluffiTestcaseID testcaseId, bool forceFullCoverage) {
-§§	(void)(forceFullCoverage); //avoid unused parameter warning: forceFullCoverage is not relevant for qemu runners
-§§
+std::shared_ptr<DebugExecutionOutput> TestExecutorQemuUserSingle::execute(const FluffiTestcaseID testcaseId, bool forceFullCoverage) {
+	(void)(forceFullCoverage); //avoid unused parameter warning: forceFullCoverage is not relevant for qemu runners
+
 §§	std::shared_ptr<DebugExecutionOutput>  t = std::make_shared<DebugExecutionOutput>();
 §§	t->m_terminationType = DebugExecutionOutput::ERR;
 §§	t->m_terminationDescription = "Windows not supported by qemu runner!";
@@ -112,31 +112,31 @@
 §§	// check if we are root for chroot
 §§	setupFunctionable &= geteuid() == 0;
 §§	LOG(DEBUG) << (setupFunctionable ? "everything fine" : "not root");
-§§	if (!setupFunctionable) return false;
+	if (!setupFunctionable) return false;
 §§
 §§	// check if necessary files exists
 §§	setupFunctionable &= std::experimental::filesystem::is_directory(m_rootfs);
 §§	LOG(DEBUG) << (setupFunctionable ? "everything fine" : "no rootfs");
-§§	if (!setupFunctionable) return false;
+	if (!setupFunctionable) return false;
 §§
 §§	// check that we can safely call system
 §§	setupFunctionable &= (system(NULL) ? true : false);
 §§	LOG(DEBUG) << (setupFunctionable ? "everything fine" : "no shell callable");
-§§	if (!setupFunctionable) return false;
+	if (!setupFunctionable) return false;
 §§
 §§	// check if the testcase directory exists
 §§	setupFunctionable &= std::experimental::filesystem::exists(m_testcaseDir);
 §§	LOG(DEBUG) << (setupFunctionable ? "everything fine" : "no testcasedir");
-§§	if (!setupFunctionable) return false;
+	if (!setupFunctionable) return false;
 §§
 §§	return setupFunctionable;
 §§}
 §§
-§§void TestExecutorQemuUserSingle::DebugCommandLineInChrootEnv(std::string commandline, std::string rootfs, ExternalProcess::CHILD_OUTPUT_TYPE child_output_mode, int timeoutMS, std::shared_ptr<DebugExecutionOutput> exResult, bool treatAnyAccessViolationAsFatal) {
+void TestExecutorQemuUserSingle::DebugCommandLineInChrootEnv(std::string commandline, std::string rootfs, ExternalProcess::CHILD_OUTPUT_TYPE child_output_mode, int timeoutMS, std::shared_ptr<DebugExecutionOutput> exResult, bool treatAnyAccessViolationAsFatal) {
 §§	exResult->m_terminationType = DebugExecutionOutput::PROCESS_TERMINATION_TYPE::ERR;
 §§	exResult->m_terminationDescription = "The target did not run!";
 §§
-§§	ExternalProcess debuggeeProcess(commandline, child_output_mode);
+	ExternalProcess debuggeeProcess(commandline, child_output_mode);
 §§	if (!debuggeeProcess.initProcessInChrootEnv(rootfs)) {
 §§		exResult->m_terminationType = DebugExecutionOutput::PROCESS_TERMINATION_TYPE::ERR;
 §§		exResult->m_terminationDescription = "Error creating the Process";
@@ -144,19 +144,19 @@
 §§		return;
 §§	}
 §§
-§§	debuggeeProcess.debug(timeoutMS, exResult, false, treatAnyAccessViolationAsFatal);
+	debuggeeProcess.debug(timeoutMS, exResult, false, treatAnyAccessViolationAsFatal);
 §§
 §§	return;
 §§}
 §§
 §§/**
-§§  Execute child with qemu and return trace information.
+  Execute child with qemu and return trace information.
 §§  User is responsible for freeing the returned Trace object.
 §§  */
-§§std::shared_ptr<DebugExecutionOutput> TestExecutorQemuUserSingle::execute(const FluffiTestcaseID testcaseId, bool forceFullCoverage)
+std::shared_ptr<DebugExecutionOutput> TestExecutorQemuUserSingle::execute(const FluffiTestcaseID testcaseId, bool forceFullCoverage)
 §§{
-§§	(void)(forceFullCoverage); //avoid unused parameter warning: forceFullCoverage is not relevant for qemu runners
-§§
+	(void)(forceFullCoverage); //avoid unused parameter warning: forceFullCoverage is not relevant for qemu runners
+
 §§	std::shared_ptr<DebugExecutionOutput> result = std::make_shared<DebugExecutionOutput>();
 §§
 §§	if (!m_was_initialized) {
@@ -173,7 +173,7 @@
 §§		return result;
 §§	}
 §§
-§§	DebugCommandLineInChrootEnv(m_targetCMDline + " /testcaseFiles/fuzzcase", m_rootfs, m_child_output_mode, m_hangTimeoutMS, result, m_treatAnyAccessViolationAsFatal);
+	DebugCommandLineInChrootEnv(m_targetCMDline + " /testcaseFiles/fuzzcase", m_rootfs, m_child_output_mode, m_hangTimeoutMS, result, m_treatAnyAccessViolationAsFatal);
 §§	lret = unlink((m_rootfs / "testcaseFiles/fuzzcase").c_str());
 §§	if (result->m_terminationType == DebugExecutionOutput::PROCESS_TERMINATION_TYPE::ERR) {
 §§		return result;
@@ -198,24 +198,24 @@
 §§		int signal2 = 0;
 §§		uint64_t pc1 = 0, pc2 = 0, start = 0, stop = 0;
 §§		if (std::getline(is, line)) {
-§§#if ( __WORDSIZE == 64 )
-§§			int ret = sscanf(line.c_str(), "FLUFFI: first signal %d pc %lx", &signal1, &pc1);
-§§#else
-§§			int ret = sscanf(line.c_str(), "FLUFFI: first signal %d pc %llx", &signal1, &pc1);
-§§#endif
-§§			if (ret != 2) {
-§§				LOG(ERROR) << "sscanf failed to parse the first signal";
-§§			}
+#if ( __WORDSIZE == 64 )
+			int ret = sscanf(line.c_str(), "FLUFFI: first signal %d pc %lx", &signal1, &pc1);
+#else
+			int ret = sscanf(line.c_str(), "FLUFFI: first signal %d pc %llx", &signal1, &pc1);
+#endif
+			if (ret != 2) {
+				LOG(ERROR) << "sscanf failed to parse the first signal";
+			}
 §§		}
 §§		if (std::getline(is, line)) {
-§§#if ( __WORDSIZE == 64 )
-§§			int ret = sscanf(line.c_str(), "FLUFFI: last signal %d pc %lx", &signal2, &pc2);
-§§#else
-§§			int ret = sscanf(line.c_str(), "FLUFFI: last signal %d pc %llx", &signal2, &pc2);
-§§#endif
-§§			if (ret != 2) {
-§§				LOG(ERROR) << "sscanf failed to parse the last signal";
-§§			}
+#if ( __WORDSIZE == 64 )
+			int ret = sscanf(line.c_str(), "FLUFFI: last signal %d pc %lx", &signal2, &pc2);
+#else
+			int ret = sscanf(line.c_str(), "FLUFFI: last signal %d pc %llx", &signal2, &pc2);
+#endif
+			if (ret != 2) {
+				LOG(ERROR) << "sscanf failed to parse the last signal";
+			}
 §§		}
 §§
 §§		std::getline(is, line);
@@ -223,15 +223,15 @@
 §§			// yes, this could be leveraged for a buffer overflow.
 §§			// well, security was not a requirement.
 §§			std::string mod(1024, ' ');
-§§#if ( __WORDSIZE == 64 )
-§§			int ret = sscanf(line.c_str(), "FLUFFI: %lx - %lx %s", &start, &stop, &mod[0]);
-§§#else
-§§			int ret = sscanf(line.c_str(), "FLUFFI: %llx - %llx %s", &start, &stop, &mod[0]);
-§§#endif
-§§			if (ret != 3) {
-§§				LOG(ERROR) << "sscanf failed parsing";
-§§			}
-§§
+#if ( __WORDSIZE == 64 )
+			int ret = sscanf(line.c_str(), "FLUFFI: %lx - %lx %s", &start, &stop, &mod[0]);
+#else
+			int ret = sscanf(line.c_str(), "FLUFFI: %llx - %llx %s", &start, &stop, &mod[0]);
+#endif
+			if (ret != 3) {
+				LOG(ERROR) << "sscanf failed parsing";
+			}
+
 §§			mod = std::string(mod.c_str());
 §§
 §§			if (result->m_terminationType != DebugExecutionOutput::PROCESS_TERMINATION_TYPE::CLEAN) {
@@ -363,7 +363,7 @@
 §§
 §§	std::map<uint64_t, std::string> eventmap;
 §§	eventmap.insert(std::pair<uint64_t, std::string>(0xfffffffffffffffe, std::string("dropped")));
-§§	std::set<uint64_t> bbs;
+	std::set<uint64_t> bbs;
 §§
 §§	// parse event table
 §§	uint64_t num_events = 0;
@@ -421,7 +421,7 @@
 §§				LOG(DEBUG) << "trace file read got an error6";
 §§				break;
 §§			}
-§§			//uint64_t timestamp = *reinterpret_cast<uint64_t*>(b8f);
+			//uint64_t timestamp = *reinterpret_cast<uint64_t*>(b8f);
 §§			// 4 byte ???
 §§			// 4 byte pid
 §§			ifs.read(b8f, 8);
@@ -441,7 +441,7 @@
 §§					LOG(DEBUG) << "trace file read got an error8";
 §§					break;
 §§				}
-§§				//uint64_t tb_addr = *reinterpret_cast<uint64_t*>(b8f);
+				//uint64_t tb_addr = *reinterpret_cast<uint64_t*>(b8f);
 §§				// 8 byte program counter
 §§				ifs.read(b8f, 8);
 §§				if (!ifs) {
@@ -451,7 +451,7 @@
 §§				uint64_t progcnt = *reinterpret_cast<uint64_t*>(b8f);
 §§
 §§				// add basic block to list of covered basic blocks
-§§				bbs.insert(progcnt);
+				bbs.insert(progcnt);
 §§			}
 §§			else if (eventmap[eventnum] == "dropped") {
 §§				// 8 byte dropped event count
@@ -484,8 +484,8 @@
 §§	// match bbs to modules, fill covered block table
 §§	for (auto& me : modt) {
 §§		uint32_t id = me.first;
-§§		uint64_t start = me.second.first;
-§§		uint64_t stop = me.second.second;
+		uint64_t start = me.second.first;
+		uint64_t stop = me.second.second;
 §§		for (auto i : bbs) {
 §§			if (i <= stop && i >= start) {
 §§				result->addCoveredBasicBlock(FluffiBasicBlock(i - start, id));
@@ -496,4 +496,4 @@
 §§	LOG(DEBUG) << "unique bbs outside of interesting modules: " << bbs.size();
 §§	return result;
 §§}
-§§#endif
+#endif

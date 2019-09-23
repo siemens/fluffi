@@ -1,15 +1,15 @@
-§§/*
-§§Copyright 2017-2019 Siemens AG
-§§
-§§Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-§§
-§§The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-§§
-§§THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-§§
+/*
+Copyright 2017-2019 Siemens AG
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 §§Author(s): Roman Bendt, Thomas Riedmaier, Abian Blome
-§§*/
-§§
+*/
+
 §§#include "stdafx.h"
 §§#include "OedipusMutator.h"
 §§#include "FluffiTestcaseID.h"
@@ -20,9 +20,9 @@
 §§#include "FluffiLMConfiguration.h"
 §§
 §§OedipusMutator::OedipusMutator(FluffiServiceDescriptor serviceDescriptor, std::string testcaseDirectory, CommInt* commInt, TGWorkerThreadState* workerThreadState)
-§§	: FluffiMutator(serviceDescriptor, testcaseDirectory),
-§§	m_commInt(commInt),
-§§	m_workerThreadState(workerThreadState)
+	: FluffiMutator(serviceDescriptor, testcaseDirectory),
+	m_commInt(commInt),
+	m_workerThreadState(workerThreadState)
 §§{}
 §§
 §§OedipusMutator::~OedipusMutator()
@@ -61,13 +61,13 @@
 §§		// ask lm for creds
 §§		GetLMConfigurationRequest* glmcr = new GetLMConfigurationRequest();
 §§		req.set_allocated_getlmconfigurationrequest(glmcr);
-§§		bool respReceived = m_commInt->sendReqAndRecvResp(&req, &resp, m_workerThreadState, m_commInt->getMyLMServiceDescriptor().m_serviceHostAndPort, CommInt::timeoutNormalMessage);
+		bool respReceived = m_commInt->sendReqAndRecvResp(&req, &resp, m_workerThreadState, m_commInt->getMyLMServiceDescriptor().m_serviceHostAndPort, CommInt::timeoutNormalMessage);
 §§
 §§		std::stringstream ss;
 §§		if (respReceived) {
-§§			LOG(DEBUG) << "OedipusMutator::batchMutate received respose for GetLMConfigurationRequest: " << (resp.has_getlmconfigurationresponse() ? "true" : "false");
+			LOG(DEBUG) << "OedipusMutator::batchMutate received respose for GetLMConfigurationRequest: " << (resp.has_getlmconfigurationresponse() ? "true" : "false");
 §§			const FluffiLMConfiguration lmConfig = FluffiLMConfiguration(resp.getlmconfigurationresponse().lmconfiguration());
-§§			// format: "fluffi_gm:fluffi_gm@tcp(db.fluffi:3306)/fluffi_miniweb"
+			// format: "fluffi_gm:fluffi_gm@tcp(db.fluffi:3306)/fluffi_miniweb"
 §§			ss << lmConfig.m_dbUser << ":" << lmConfig.m_dbPassword << "@tcp(";
 §§			ss << lmConfig.m_dbHost << ":3306)/" << lmConfig.m_dbName;
 §§		}
@@ -77,7 +77,7 @@
 §§		}
 §§
 §§		// encode creds for easy passing
-§§		this->encodedDBcredentials = string2hex(ss.str());
+		this->encodedDBcredentials = string2hex(ss.str());
 §§		LOG(DEBUG) << "GetLMConfigurationResponse successfully received: " << ss.str();
 §§	}
 §§
@@ -93,7 +93,7 @@
 §§
 §§	LOG(DEBUG) << "CMD: " << cmdline;
 §§
-§§	if (!executeProcessAndWaitForCompletion(cmdline, 60 * 1000))
+	if (!executeProcessAndWaitForCompletion(cmdline, 60 * 1000))
 §§	{
 §§		if (!std::experimental::filesystem::exists(parentPathAndFilename))
 §§		{
@@ -114,7 +114,7 @@
 §§		FluffiTestcaseID testcaseID = genNewLocalFluffiTestcaseID();
 §§		std::string pathAndFilename = Util::generateTestcasePathAndFilename(testcaseID, m_testcaseDir);
 §§		if (!std::experimental::filesystem::exists(currentOedipusFile)) {
-§§			LOG(WARNING) << "Oedipus failed to generate the expected file " << currentOedipusFile << " which we wanted to rename to " << pathAndFilename << ". We will break here.";
+			LOG(WARNING) << "Oedipus failed to generate the expected file " << currentOedipusFile << " which we wanted to rename to " << pathAndFilename << ". We will break here.";
 §§			break;
 §§		}
 §§
@@ -134,14 +134,14 @@
 §§}
 §§
 §§std::string OedipusMutator::string2hex(const std::string& s) {
-§§	static const char* const LUT = "0123456789abcdef";
-§§	std::string enc;
-§§	enc.reserve(s.length() * 2);
-§§
-§§	for (size_t i = 0; i < s.length(); ++i) {
-§§		const unsigned char c = s[i];
-§§		enc.push_back(LUT[c >> 4]);
-§§		enc.push_back(LUT[c & 15]);
-§§	}
-§§	return enc;
-§§}
+	static const char* const LUT = "0123456789abcdef";
+	std::string enc;
+	enc.reserve(s.length() * 2);
+
+	for (size_t i = 0; i < s.length(); ++i) {
+		const unsigned char c = s[i];
+		enc.push_back(LUT[c >> 4]);
+		enc.push_back(LUT[c & 15]);
+	}
+	return enc;
+}

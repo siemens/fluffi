@@ -1,13 +1,13 @@
-§§# Copyright 2017-2019 Siemens AG
-§§# 
-§§# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-§§# 
-§§# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-§§# 
-§§# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-§§# 
-§§# Author(s): Junes Najah, Michael Kraus, Abian Blome, Pascal Eckmann, Fabian Russwurm, Thomas Riedmaier
-§§
+# Copyright 2017-2019 Siemens AG
+# 
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# 
+# Author(s): Junes Najah, Michael Kraus, Abian Blome, Pascal Eckmann, Fabian Russwurm, Thomas Riedmaier
+
 §§from flask import flash, redirect, url_for, request, session, g, send_file, abort, Markup
 §§from werkzeug.exceptions import HTTPException
 §§from app import app, db, models
@@ -529,7 +529,7 @@
 §§                    s['tearch'] = "(" + conf.Architecture + ")"
 §§
 §§    for conf in dbconfiguredFuzzjobInstances:
-§§        if conf.AgentType == 4:
+        if conf.AgentType == 4:
 §§            lmCount = lmCount + conf.InstanceCount
 §§
 §§    return renderTemplate("viewConfigSystemInstances.html",
@@ -1064,7 +1064,7 @@
 §§                    fj['tearch'] = "(" + conf.Architecture + ")"
 §§
 §§    for conf in dbconfiguredFuzzjobInstances:
-§§        if conf.AgentType == 4:
+        if conf.AgentType == 4:
 §§            lmCount = lmCount + conf.InstanceCount
 §§
 §§    return renderTemplate("viewSystem.html",
@@ -1122,7 +1122,7 @@
 §§            agenttype = 2
 §§        if "lm" in type:
 §§            agenttype = 4
-§§        if agenttype != 4:
+        if agenttype != 4:
 §§            fj = models.Fuzzjob.query.filter_by(name = fuzzjob).first()
 §§            fuzzjobId = fj.id
 §§

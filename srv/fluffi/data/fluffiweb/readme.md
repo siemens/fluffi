@@ -1,18 +1,18 @@
-§§<!---
-§§Copyright 2017-2019 Siemens AG
+<!---
+Copyright 2017-2019 Siemens AG
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Author(s): Junes Najah, Thomas Riedmaier, Pascal Eckmann
+-->
+
+# Fluffi Web GUI
 §§
-§§Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-§§
-§§The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-§§
-§§THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-§§
-§§Author(s): Junes Najah, Thomas Riedmaier, Pascal Eckmann
-§§-->
-§§
-§§# Fluffi Web GUI
-§§
-§§FLUFFI - A distributed evolutionary binary fuzzer for pentesters.
+FLUFFI - A distributed evolutionary binary fuzzer for pentesters.
 §§
 §§## Local development
 §§
@@ -26,7 +26,7 @@
 §§$ pip install -r requirements.txt
 §§```
 §§
-§§- Setup local mysql database with username `root` and password `toor` 
+- Setup local mysql database with username `root` and password `toor` 
 §§- Set LOCAL_DEV to True in [config.py](config.py)
 §§
 §§To run the app on localhost:5000: 
@@ -39,8 +39,8 @@
 §§Prerequisites:
 §§
 §§- install selenium with pip install selenium
-§§- download [geckodriver](https://github.com/mozilla/geckodriver/releases) and add it to your PATH environment variables (if necessary)
-§§- add test population file for the upload under `C:\TestDev\test_files\example1.dll` or change path to your file
+- download [geckodriver](https://github.com/mozilla/geckodriver/releases) and add it to your PATH environment variables (if necessary)
+- add test population file for the upload under `C:\TestDev\test_files\example1.dll` or change path to your file
 §§
 §§Run unit tests:
 §§
@@ -50,4 +50,4 @@
 §§
 §§## Config
 §§
-§§Add new Runner Types, Generator Types, Evaluator Types or Templates to [config.json](app/static/config.json).
+Add new Runner Types, Generator Types, Evaluator Types or Templates to [config.json](app/static/config.json).

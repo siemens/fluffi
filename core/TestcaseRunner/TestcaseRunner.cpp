@@ -1,14 +1,14 @@
-§§/*
-§§Copyright 2017-2019 Siemens AG
-§§
-§§Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-§§
-§§The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-§§
-§§THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-§§
+/*
+Copyright 2017-2019 Siemens AG
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 §§Author(s): Roman Bendt, Thomas Riedmaier, Abian Blome
-§§*/
+*/
 §§
 §§#include "stdafx.h"
 §§#include "CommInt.h"
@@ -46,15 +46,15 @@
 §§	Util::setDefaultLogOptions("logs" + Util::pathSeperator + "TestcaseRunner_" + std::to_string(GETPID()) + ".log");
 §§
 §§	if (argc < 2) {
-§§		LOG(ERROR) << "Usage: TestcaseRunner <LOCATION> [<CommaSeparatedListOfSubtypes>]";
+		LOG(ERROR) << "Usage: TestcaseRunner <LOCATION> [<CommaSeparatedListOfSubtypes>]";
 §§		google::protobuf::ShutdownProtobufLibrary();
-§§		return EXIT_FAILURE;
+		return EXIT_FAILURE;
 §§	}
 §§
 §§	std::string location = argv[1];
 §§
 §§	std::set<std::string> myAgentSubTypes;
-§§	myAgentSubTypes.insert("ALL_GDB");
+	myAgentSubTypes.insert("ALL_GDB");
 §§#if defined(_WIN64)
 §§	myAgentSubTypes.insert("X64_Win_DynRioSingle");
 §§	myAgentSubTypes.insert("X64_Win_DynRioMulti");
@@ -63,39 +63,39 @@
 §§	myAgentSubTypes.insert("X86_Win_DynRioMulti");
 §§#elif defined(__ia64__) || defined(__x86_64__)
 §§	myAgentSubTypes.insert("X64_Lin_DynRioSingle");
-§§	myAgentSubTypes.insert("X64_Lin_DynRioMulti");
+	myAgentSubTypes.insert("X64_Lin_DynRioMulti");
 §§	myAgentSubTypes.insert("ALL_Lin_QemuUserSingle");
 §§#elif defined(__i386__)
 §§	myAgentSubTypes.insert("X86_Lin_DynRioSingle");
-§§	myAgentSubTypes.insert("X86_Lin_DynRioMulti");
+	myAgentSubTypes.insert("X86_Lin_DynRioMulti");
 §§	myAgentSubTypes.insert("ALL_Lin_QemuUserSingle");
 §§#elif defined(__arm__)
 §§	myAgentSubTypes.insert("ARM_Lin_DynRioSingle");
-§§	myAgentSubTypes.insert("ARM_Lin_DynRioMulti");
+	myAgentSubTypes.insert("ARM_Lin_DynRioMulti");
 §§	myAgentSubTypes.insert("ALL_Lin_QemuUserSingle");
 §§#elif defined(__aarch64__)
 §§	myAgentSubTypes.insert("ARM64_Lin_DynRioSingle");
-§§	myAgentSubTypes.insert("ARM64_Lin_DynRioMulti");
+	myAgentSubTypes.insert("ARM64_Lin_DynRioMulti");
 §§	myAgentSubTypes.insert("ALL_Lin_QemuUserSingle");
 §§#endif
 §§
-§§	if (argc >= 3) {
-§§		//Get the Subtypes specified on the commandline as set
-§§		std::vector<std::string> desiredSubtypes = Util::splitString(argv[2], ",");
-§§		std::set<std::string> desiredSubtypes_set(desiredSubtypes.begin(), desiredSubtypes.end());
-§§
-§§		//See what subtypes we can actually do
-§§		std::set<std::string> intersect;
-§§		set_intersection(desiredSubtypes_set.begin(), desiredSubtypes_set.end(), myAgentSubTypes.begin(), myAgentSubTypes.end(), std::inserter(intersect, intersect.begin()));
-§§
-§§		//Update the myAgentSubTypes
-§§		myAgentSubTypes = intersect;
-§§	}
-§§
-§§	int intervallBetweenTwoRegistrationRoundsInMillisec = 20 * 1000;
+	if (argc >= 3) {
+		//Get the Subtypes specified on the commandline as set
+		std::vector<std::string> desiredSubtypes = Util::splitString(argv[2], ",");
+		std::set<std::string> desiredSubtypes_set(desiredSubtypes.begin(), desiredSubtypes.end());
+
+		//See what subtypes we can actually do
+		std::set<std::string> intersect;
+		set_intersection(desiredSubtypes_set.begin(), desiredSubtypes_set.end(), myAgentSubTypes.begin(), myAgentSubTypes.end(), std::inserter(intersect, intersect.begin()));
+
+		//Update the myAgentSubTypes
+		myAgentSubTypes = intersect;
+	}
+
+	int intervallBetweenTwoRegistrationRoundsInMillisec = 20 * 1000;
 §§	int delayToWaitUntilConfigIsCompleteInMS = 1000;
 §§	int intervallBetweenTwoCollectionRoundsInMillisec = 3 * 60 * 1000;
-§§	unsigned long maxAllowedTimeOfManagerInactivityMS = 10 * 60 * 1000;
+	unsigned long maxAllowedTimeOfManagerInactivityMS = 10 * 60 * 1000;
 §§
 §§	//The garbage collector needs to be initialized as early as possible and deleted as late as possible
 §§	GarbageCollectorWorker* garbageCollectorWorker = new GarbageCollectorWorker(intervallBetweenTwoCollectionRoundsInMillisec);
@@ -139,20 +139,20 @@
 §§#endif
 §§
 §§	// Register at Global Manager
-§§	WorkerThreadState* workerThreadState = workerStateBuilder->constructState();
+	WorkerThreadState* workerThreadState = workerStateBuilder->constructState();
 §§	bool didGMRegistrationSucceed = comm->waitForGMRegistration(workerThreadState, AgentType::TestcaseRunner, myAgentSubTypes, location, intervallBetweenTwoRegistrationRoundsInMillisec);
 §§	workerStateBuilder->destructState(workerThreadState);
 §§
-§§	//Register at Local Manager
-§§	bool didLMRegistrationSucceed = false;
+	//Register at Local Manager
+	bool didLMRegistrationSucceed = false;
 §§	if (didGMRegistrationSucceed) {
-§§		workerThreadState = workerStateBuilder->constructState();
-§§		didLMRegistrationSucceed = comm->waitForLMRegistration(workerThreadState, AgentType::TestcaseRunner, myAgentSubTypes, location, intervallBetweenTwoRegistrationRoundsInMillisec);
-§§		workerStateBuilder->destructState(workerThreadState);
-§§	}
-§§
-§§	//Only start the main logic if no key was pressed
-§§	if (didGMRegistrationSucceed && didLMRegistrationSucceed) {
+		workerThreadState = workerStateBuilder->constructState();
+		didLMRegistrationSucceed = comm->waitForLMRegistration(workerThreadState, AgentType::TestcaseRunner, myAgentSubTypes, location, intervallBetweenTwoRegistrationRoundsInMillisec);
+		workerStateBuilder->destructState(workerThreadState);
+	}
+
+	//Only start the main logic if no key was pressed
+	if (didGMRegistrationSucceed && didLMRegistrationSucceed) {
 §§		//Start worker threads
 §§
 §§		//The Garbage Collector thread
@@ -166,24 +166,24 @@
 §§
 §§		// Wait for a keypress or a kill message
 §§		int checkAgainMS = 250;
-§§		while (true)
+		while (true)
 §§		{
-§§			if (Util::kbhit() != 0) {
-§§				LOG(INFO) << "Key Pressed -> Shutting down ...";
-§§				break;
-§§			}
-§§			if (m_killInstanceRequestHandler->shouldCommitSuicide()) {
-§§				LOG(INFO) << "Should Commit Suicide -> Shutting down ...";
-§§				break;
-§§			}
-§§			if (!m_getStatusRequestHandler->isManagerActive(maxAllowedTimeOfManagerInactivityMS)) {
-§§				LOG(INFO) << "Could not reach manager -> Shutting down ...";
-§§				break;
-§§			}
-§§			if (m_getStatusRequestHandler->wasManagerReplaced()) {
-§§				LOG(INFO) << "It looks like my LocalManager was replaced -> Shutting down ...";
-§§				break;
-§§			}
+			if (Util::kbhit() != 0) {
+				LOG(INFO) << "Key Pressed -> Shutting down ...";
+				break;
+			}
+			if (m_killInstanceRequestHandler->shouldCommitSuicide()) {
+				LOG(INFO) << "Should Commit Suicide -> Shutting down ...";
+				break;
+			}
+			if (!m_getStatusRequestHandler->isManagerActive(maxAllowedTimeOfManagerInactivityMS)) {
+				LOG(INFO) << "Could not reach manager -> Shutting down ...";
+				break;
+			}
+			if (m_getStatusRequestHandler->wasManagerReplaced()) {
+				LOG(INFO) << "It looks like my LocalManager was replaced -> Shutting down ...";
+				break;
+			}
 §§			std::this_thread::sleep_for(std::chrono::milliseconds(checkAgainMS));
 §§		}
 §§
@@ -237,7 +237,7 @@
 §§		LOG(ERROR) << "Could not delete the temp directory: Most likely it's not empty!";
 §§	}
 §§	else {
-§§		LOG(DEBUG) << "Deleting the temp directory succeeded ;)";
+		LOG(DEBUG) << "Deleting the temp directory succeeded ;)";
 §§	}
 §§
 §§	// Optional:  Delete all global objects allocated by libprotobuf.
@@ -247,4 +247,4 @@
 §§
 §§	LOG(DEBUG) << "Program terminated normally :)";
 §§	return 0;
-§§}
+}

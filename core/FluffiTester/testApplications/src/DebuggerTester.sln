@@ -1,78 +1,78 @@
-§§﻿
-§§Microsoft Visual Studio Solution File, Format Version 12.00
-§§# Copyright 2017-2019 Siemens AG
-§§# 
-§§# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-§§# 
-§§# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-§§# 
-§§# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-§§# 
-§§# Author(s): Thomas Riedmaier, Abian Blome
-§§#
-§§# Visual Studio 14
-§§VisualStudioVersion = 14.0.25420.1
-§§MinimumVisualStudioVersion = 10.0.40219.1
-§§Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DebuggerTester", "DebuggerTester\DebuggerTester.vcxproj", "{3567B827-02F4-4222-9966-C71049709FC8}"
-§§EndProject
-§§Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExternalProcessTester", "ExternalProcessTester\ExternalProcessTester.vcxproj", "{24A63DE0-9D1F-471E-B9DE-9B499EE061A1}"
-§§EndProject
-§§Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InstrumentedDebuggerTester", "InstrumentedTarget\InstrumentedTarget.vcxproj", "{66E85B39-3589-45F7-8769-B527A419BB55}"
-§§EndProject
-§§Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DebuggerTesterTCP", "DebuggerTesterTCP\DebuggerTesterTCP.vcxproj", "{A1A93DE4-11B3-4A9C-AFF9-D6EED4892EA5}"
-§§EndProject
-§§Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ConsoleReflector", "ConsoleReflector\ConsoleReflector.vcxproj", "{B4669376-C23A-421E-AE9B-4B3667340C93}"
-§§EndProject
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Copyright 2017-2019 Siemens AG
+# 
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# 
+# Author(s): Thomas Riedmaier, Abian Blome
+#
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DebuggerTester", "DebuggerTester\DebuggerTester.vcxproj", "{3567B827-02F4-4222-9966-C71049709FC8}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExternalProcessTester", "ExternalProcessTester\ExternalProcessTester.vcxproj", "{24A63DE0-9D1F-471E-B9DE-9B499EE061A1}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InstrumentedDebuggerTester", "InstrumentedTarget\InstrumentedTarget.vcxproj", "{66E85B39-3589-45F7-8769-B527A419BB55}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DebuggerTesterTCP", "DebuggerTesterTCP\DebuggerTesterTCP.vcxproj", "{A1A93DE4-11B3-4A9C-AFF9-D6EED4892EA5}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ConsoleReflector", "ConsoleReflector\ConsoleReflector.vcxproj", "{B4669376-C23A-421E-AE9B-4B3667340C93}"
+EndProject
 §§Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReportingCrashSharedMemFeeder", "ReportingCrashSharedMemFeeder\ReportingCrashSharedMemFeeder.vcxproj", "{3A03E4D2-0B78-448C-97C2-729ECA1DBF9E}"
 §§EndProject
-§§Global
-§§	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-§§		Debug|x64 = Debug|x64
-§§		Debug|x86 = Debug|x86
-§§		Release|x64 = Release|x64
-§§		Release|x86 = Release|x86
-§§	EndGlobalSection
-§§	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-§§		{3567B827-02F4-4222-9966-C71049709FC8}.Debug|x64.ActiveCfg = Debug|x64
-§§		{3567B827-02F4-4222-9966-C71049709FC8}.Debug|x64.Build.0 = Debug|x64
-§§		{3567B827-02F4-4222-9966-C71049709FC8}.Debug|x86.ActiveCfg = Debug|Win32
-§§		{3567B827-02F4-4222-9966-C71049709FC8}.Debug|x86.Build.0 = Debug|Win32
-§§		{3567B827-02F4-4222-9966-C71049709FC8}.Release|x64.ActiveCfg = Release|x64
-§§		{3567B827-02F4-4222-9966-C71049709FC8}.Release|x64.Build.0 = Release|x64
-§§		{3567B827-02F4-4222-9966-C71049709FC8}.Release|x86.ActiveCfg = Release|Win32
-§§		{3567B827-02F4-4222-9966-C71049709FC8}.Release|x86.Build.0 = Release|Win32
-§§		{24A63DE0-9D1F-471E-B9DE-9B499EE061A1}.Debug|x64.ActiveCfg = Debug|x64
-§§		{24A63DE0-9D1F-471E-B9DE-9B499EE061A1}.Debug|x64.Build.0 = Debug|x64
-§§		{24A63DE0-9D1F-471E-B9DE-9B499EE061A1}.Debug|x86.ActiveCfg = Debug|Win32
-§§		{24A63DE0-9D1F-471E-B9DE-9B499EE061A1}.Debug|x86.Build.0 = Debug|Win32
-§§		{24A63DE0-9D1F-471E-B9DE-9B499EE061A1}.Release|x64.ActiveCfg = Release|x64
-§§		{24A63DE0-9D1F-471E-B9DE-9B499EE061A1}.Release|x64.Build.0 = Release|x64
-§§		{24A63DE0-9D1F-471E-B9DE-9B499EE061A1}.Release|x86.ActiveCfg = Release|Win32
-§§		{24A63DE0-9D1F-471E-B9DE-9B499EE061A1}.Release|x86.Build.0 = Release|Win32
-§§		{66E85B39-3589-45F7-8769-B527A419BB55}.Debug|x64.ActiveCfg = Debug|x64
-§§		{66E85B39-3589-45F7-8769-B527A419BB55}.Debug|x64.Build.0 = Debug|x64
-§§		{66E85B39-3589-45F7-8769-B527A419BB55}.Debug|x86.ActiveCfg = Debug|Win32
-§§		{66E85B39-3589-45F7-8769-B527A419BB55}.Debug|x86.Build.0 = Debug|Win32
-§§		{66E85B39-3589-45F7-8769-B527A419BB55}.Release|x64.ActiveCfg = Release|x64
-§§		{66E85B39-3589-45F7-8769-B527A419BB55}.Release|x64.Build.0 = Release|x64
-§§		{66E85B39-3589-45F7-8769-B527A419BB55}.Release|x86.ActiveCfg = Release|Win32
-§§		{66E85B39-3589-45F7-8769-B527A419BB55}.Release|x86.Build.0 = Release|Win32
-§§		{A1A93DE4-11B3-4A9C-AFF9-D6EED4892EA5}.Debug|x64.ActiveCfg = Debug|x64
-§§		{A1A93DE4-11B3-4A9C-AFF9-D6EED4892EA5}.Debug|x64.Build.0 = Debug|x64
-§§		{A1A93DE4-11B3-4A9C-AFF9-D6EED4892EA5}.Debug|x86.ActiveCfg = Debug|Win32
-§§		{A1A93DE4-11B3-4A9C-AFF9-D6EED4892EA5}.Debug|x86.Build.0 = Debug|Win32
-§§		{A1A93DE4-11B3-4A9C-AFF9-D6EED4892EA5}.Release|x64.ActiveCfg = Release|x64
-§§		{A1A93DE4-11B3-4A9C-AFF9-D6EED4892EA5}.Release|x64.Build.0 = Release|x64
-§§		{A1A93DE4-11B3-4A9C-AFF9-D6EED4892EA5}.Release|x86.ActiveCfg = Release|Win32
-§§		{A1A93DE4-11B3-4A9C-AFF9-D6EED4892EA5}.Release|x86.Build.0 = Release|Win32
-§§		{B4669376-C23A-421E-AE9B-4B3667340C93}.Debug|x64.ActiveCfg = Debug|x64
-§§		{B4669376-C23A-421E-AE9B-4B3667340C93}.Debug|x64.Build.0 = Debug|x64
-§§		{B4669376-C23A-421E-AE9B-4B3667340C93}.Debug|x86.ActiveCfg = Debug|Win32
-§§		{B4669376-C23A-421E-AE9B-4B3667340C93}.Debug|x86.Build.0 = Debug|Win32
-§§		{B4669376-C23A-421E-AE9B-4B3667340C93}.Release|x64.ActiveCfg = Release|x64
-§§		{B4669376-C23A-421E-AE9B-4B3667340C93}.Release|x64.Build.0 = Release|x64
-§§		{B4669376-C23A-421E-AE9B-4B3667340C93}.Release|x86.ActiveCfg = Release|Win32
-§§		{B4669376-C23A-421E-AE9B-4B3667340C93}.Release|x86.Build.0 = Release|Win32
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3567B827-02F4-4222-9966-C71049709FC8}.Debug|x64.ActiveCfg = Debug|x64
+		{3567B827-02F4-4222-9966-C71049709FC8}.Debug|x64.Build.0 = Debug|x64
+		{3567B827-02F4-4222-9966-C71049709FC8}.Debug|x86.ActiveCfg = Debug|Win32
+		{3567B827-02F4-4222-9966-C71049709FC8}.Debug|x86.Build.0 = Debug|Win32
+		{3567B827-02F4-4222-9966-C71049709FC8}.Release|x64.ActiveCfg = Release|x64
+		{3567B827-02F4-4222-9966-C71049709FC8}.Release|x64.Build.0 = Release|x64
+		{3567B827-02F4-4222-9966-C71049709FC8}.Release|x86.ActiveCfg = Release|Win32
+		{3567B827-02F4-4222-9966-C71049709FC8}.Release|x86.Build.0 = Release|Win32
+		{24A63DE0-9D1F-471E-B9DE-9B499EE061A1}.Debug|x64.ActiveCfg = Debug|x64
+		{24A63DE0-9D1F-471E-B9DE-9B499EE061A1}.Debug|x64.Build.0 = Debug|x64
+		{24A63DE0-9D1F-471E-B9DE-9B499EE061A1}.Debug|x86.ActiveCfg = Debug|Win32
+		{24A63DE0-9D1F-471E-B9DE-9B499EE061A1}.Debug|x86.Build.0 = Debug|Win32
+		{24A63DE0-9D1F-471E-B9DE-9B499EE061A1}.Release|x64.ActiveCfg = Release|x64
+		{24A63DE0-9D1F-471E-B9DE-9B499EE061A1}.Release|x64.Build.0 = Release|x64
+		{24A63DE0-9D1F-471E-B9DE-9B499EE061A1}.Release|x86.ActiveCfg = Release|Win32
+		{24A63DE0-9D1F-471E-B9DE-9B499EE061A1}.Release|x86.Build.0 = Release|Win32
+		{66E85B39-3589-45F7-8769-B527A419BB55}.Debug|x64.ActiveCfg = Debug|x64
+		{66E85B39-3589-45F7-8769-B527A419BB55}.Debug|x64.Build.0 = Debug|x64
+		{66E85B39-3589-45F7-8769-B527A419BB55}.Debug|x86.ActiveCfg = Debug|Win32
+		{66E85B39-3589-45F7-8769-B527A419BB55}.Debug|x86.Build.0 = Debug|Win32
+		{66E85B39-3589-45F7-8769-B527A419BB55}.Release|x64.ActiveCfg = Release|x64
+		{66E85B39-3589-45F7-8769-B527A419BB55}.Release|x64.Build.0 = Release|x64
+		{66E85B39-3589-45F7-8769-B527A419BB55}.Release|x86.ActiveCfg = Release|Win32
+		{66E85B39-3589-45F7-8769-B527A419BB55}.Release|x86.Build.0 = Release|Win32
+		{A1A93DE4-11B3-4A9C-AFF9-D6EED4892EA5}.Debug|x64.ActiveCfg = Debug|x64
+		{A1A93DE4-11B3-4A9C-AFF9-D6EED4892EA5}.Debug|x64.Build.0 = Debug|x64
+		{A1A93DE4-11B3-4A9C-AFF9-D6EED4892EA5}.Debug|x86.ActiveCfg = Debug|Win32
+		{A1A93DE4-11B3-4A9C-AFF9-D6EED4892EA5}.Debug|x86.Build.0 = Debug|Win32
+		{A1A93DE4-11B3-4A9C-AFF9-D6EED4892EA5}.Release|x64.ActiveCfg = Release|x64
+		{A1A93DE4-11B3-4A9C-AFF9-D6EED4892EA5}.Release|x64.Build.0 = Release|x64
+		{A1A93DE4-11B3-4A9C-AFF9-D6EED4892EA5}.Release|x86.ActiveCfg = Release|Win32
+		{A1A93DE4-11B3-4A9C-AFF9-D6EED4892EA5}.Release|x86.Build.0 = Release|Win32
+		{B4669376-C23A-421E-AE9B-4B3667340C93}.Debug|x64.ActiveCfg = Debug|x64
+		{B4669376-C23A-421E-AE9B-4B3667340C93}.Debug|x64.Build.0 = Debug|x64
+		{B4669376-C23A-421E-AE9B-4B3667340C93}.Debug|x86.ActiveCfg = Debug|Win32
+		{B4669376-C23A-421E-AE9B-4B3667340C93}.Debug|x86.Build.0 = Debug|Win32
+		{B4669376-C23A-421E-AE9B-4B3667340C93}.Release|x64.ActiveCfg = Release|x64
+		{B4669376-C23A-421E-AE9B-4B3667340C93}.Release|x64.Build.0 = Release|x64
+		{B4669376-C23A-421E-AE9B-4B3667340C93}.Release|x86.ActiveCfg = Release|Win32
+		{B4669376-C23A-421E-AE9B-4B3667340C93}.Release|x86.Build.0 = Release|Win32
 §§		{3A03E4D2-0B78-448C-97C2-729ECA1DBF9E}.Debug|x64.ActiveCfg = Debug|x64
 §§		{3A03E4D2-0B78-448C-97C2-729ECA1DBF9E}.Debug|x64.Build.0 = Debug|x64
 §§		{3A03E4D2-0B78-448C-97C2-729ECA1DBF9E}.Debug|x86.ActiveCfg = Debug|Win32
@@ -81,8 +81,8 @@
 §§		{3A03E4D2-0B78-448C-97C2-729ECA1DBF9E}.Release|x64.Build.0 = Release|x64
 §§		{3A03E4D2-0B78-448C-97C2-729ECA1DBF9E}.Release|x86.ActiveCfg = Release|Win32
 §§		{3A03E4D2-0B78-448C-97C2-729ECA1DBF9E}.Release|x86.Build.0 = Release|Win32
-§§	EndGlobalSection
-§§	GlobalSection(SolutionProperties) = preSolution
-§§		HideSolutionNode = FALSE
-§§	EndGlobalSection
-§§EndGlobal
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

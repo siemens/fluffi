@@ -1,15 +1,15 @@
-§§/*
-§§Copyright 2017-2019 Siemens AG
-§§
-§§Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-§§
-§§The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-§§
-§§THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-§§
-§§Author(s): Abian Blome, Thomas Riedmaier
-§§*/
-§§
+/*
+Copyright 2017-2019 Siemens AG
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Author(s): Abian Blome, Thomas Riedmaier
+*/
+
 §§#include "stdafx.h"
 §§#include "CppUnitTest.h"
 §§#include "Util.h"
@@ -18,8 +18,8 @@
 §§#include "TestcaseDescriptor.h"
 §§#include "GarbageCollectorWorker.h"
 §§
-§§#include "mangle.h"
-§§
+#include "mangle.h"
+
 §§using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 §§
 §§namespace FluffiTester
@@ -74,18 +74,18 @@
 §§		TEST_METHOD(HonggfuzzMutator_rnd64)
 §§		{
 §§			FluffiServiceDescriptor selfServiceDescriptor("myhap", "myguid");
-§§			int currand = (int)util_rndGet(0, 1);
+			int currand = (int)util_rndGet(0, 1);
 §§			while (currand != 0) { //will hang if 0 never shows up
 §§				if (currand != 0 && currand != 1) {
 §§					Assert::Fail(L"Rand produced a number that was not expected");
 §§				}
-§§				currand = (int)util_rndGet(0, 1);
+				currand = (int)util_rndGet(0, 1);
 §§			}
 §§			while (currand != 1) {//will hang if 1 never shows up
 §§				if (currand != 0 && currand != 1) {
 §§					Assert::Fail(L"Rand produced a number that was not expected");
 §§				}
-§§				currand = (int)util_rndGet(0, 1);
+				currand = (int)util_rndGet(0, 1);
 §§			}
 §§		}
 §§
@@ -94,7 +94,7 @@
 §§			FluffiServiceDescriptor selfServiceDescriptor("myhap", "myguid");
 §§
 §§			std::vector<uint8_t> input = { 1,2,3,4,5,6,7,8,9,0 };
-§§
+
 §§			run_t run;
 §§			run.dynamicFileSz = input.size();
 §§			input.resize(128);
@@ -105,7 +105,7 @@
 §§
 §§			//just make sure it doesn't crash ;)
 §§			for (int i = 0; i < 1000; i++) {
-§§				mangle_mangleContent(&run);
+				mangle_mangleContent(&run);
 §§			}
 §§		}
 §§
@@ -122,10 +122,10 @@
 §§			run.global.cfg.only_printable = false;
 §§			run.global.mutate.maxFileSz = HONGGFUZZ_MAXSIZE - 1;
 §§			run.global.mutate.mutationsPerRun = 6;
-§§
+
 §§			//just make sure it doesn't crash ;)
 §§			for (int i = 0; i < 25; i++) {
-§§				mangle_ASCIIVal(&run);
+				mangle_ASCIIVal(&run);
 §§			}
 §§		}
 §§
@@ -133,7 +133,7 @@
 §§		{
 §§			FluffiServiceDescriptor selfServiceDescriptor("myhap", "myguid");
 §§			std::vector<uint8_t> input = { 1,2,3,4,5,6,7,8,9,0 };
-§§
+
 §§			run_t run;
 §§			run.dynamicFileSz = input.size();
 §§			input.resize(128);
@@ -144,7 +144,7 @@
 §§
 §§			//just make sure it doesn't crash ;)
 §§			for (int i = 0; i < 25; i++) {
-§§				mangle_InsertRndPrintable(&run);
+				mangle_InsertRndPrintable(&run);
 §§			}
 §§		}
 §§
@@ -164,7 +164,7 @@
 §§
 §§			//just make sure it doesn't crash ;)
 §§			for (int i = 0; i < 25; i++) {
-§§				mangle_InsertRnd(&run);
+				mangle_InsertRnd(&run);
 §§			}
 §§		}
 §§
@@ -184,7 +184,7 @@
 §§
 §§			//just make sure it doesn't crash ;)
 §§			for (int i = 0; i < 25; i++) {
-§§				mangle_Shrink(&run);
+				mangle_Shrink(&run);
 §§			}
 §§		}
 §§
@@ -204,7 +204,7 @@
 §§
 §§			//just make sure it doesn't crash ;)
 §§			for (int i = 0; i < 25; i++) {
-§§				mangle_Expand(&run);
+				mangle_Expand(&run);
 §§			}
 §§		}
 §§
@@ -224,8 +224,8 @@
 §§
 §§			//just make sure it doesn't crash ;)
 §§			for (int i = 0; i < 25; i++) {
-§§				mangle_CloneByte(&run);
+				mangle_CloneByte(&run);
 §§			}
 §§		}
 §§	};
-§§}
+}

@@ -1,1641 +1,1641 @@
-§§# Copyright 2017-2019 Siemens AG. All Rights Reserved.
-§§#
-§§# Licensed under the Apache License 2.0 (the "License").  You may not use
-§§# this file except in compliance with the License.  You can obtain a copy
-§§# in the file LICENSE in the source distribution or at
-§§# https://www.openssl.org/source/license.html
-§§#
-§§# Author(s): Thomas Riedmaier
-§§--- apps/build.info
-§§+++ apps/build.info
-§§@@ -20,7 +20,7 @@ IF[{- !$disabled{apps} -}]
-§§   SOURCE[openssl]={- join(" ", @apps_init_src) -}
-§§   SOURCE[openssl]={- join(" ", @apps_openssl_src) -}
-§§   INCLUDE[openssl]=.. ../include
-§§-  DEPEND[openssl]=libapps.a ../libssl
-§§+  DEPEND[openssl]=libapps.a ../libssl{- $config{suffix} -}
-§§
-§§ IF[{- $config{target} =~ /^(?:Cygwin|mingw|VC-)/ -}]
-§§   GENERATE[openssl.rc]=../util/mkrc.pl openssl
-§§--- build.info
-§§+++ build.info
-§§@@ -8,10 +8,30 @@
-§§          if $config{target} =~ /^vms/;
-§§      "";
-§§ -}
-§§-LIBS=libcrypto libssl
-§§-INCLUDE[libcrypto]=. crypto/include include
-§§-INCLUDE[libssl]=. include
-§§-DEPEND[libssl]=libcrypto
-§§+{-
-§§+       if (join(" ", @{$config{ex_libs}}) =~ /-static/) {
-§§+               $config{suffix} = "MT";
-§§+       } else {
-§§+               $config{suffix} = "MD";
-§§+       }
-§§+
-§§+       if ($config{build_type} eq "debug") {
-§§+               $config{suffix} .= "d";
-§§+       }
-§§+
-§§+       print "==================================================\n";
-§§+       foreach my $name (sort keys %config) { printf "%-30s %s\n", $name, $config{$name}; }
-§§+       print "==================================================\n";
-§§+       foreach my $name (sort keys %target) { printf "%-30s %s\n", $name, $target{$name}; }
-§§+       print "==================================================\n";
-§§+
-§§+       ""
-§§+-}
-§§+
-§§+LIBS=libcrypto{- $config{suffix} -}  libssl{- $config{suffix} -}
-§§+INCLUDE[libcrypto{- $config{suffix} -}]=. crypto/include include
-§§+INCLUDE[libssl{- $config{suffix} -}]=. include
-§§+DEPEND[libssl{- $config{suffix} -}]=libcrypto{- $config{suffix} -}
-§§
-§§ # Empty DEPEND "indices" means the dependencies are expected to be built
-§§ # unconditionally before anything else.
-§§@@ -31,24 +51,24 @@ IF[{- defined $target{shared_defflag} -}]
-§§     GENERATE[libssl.def]=util/mkdef.pl ssl 32
-§§     DEPEND[libssl.def]=util/libssl.num
-§§
-§§-    SHARED_SOURCE[libcrypto]=libcrypto.def
-§§-    SHARED_SOURCE[libssl]=libssl.def
-§§+    SHARED_SOURCE[libcrypto{- $config{suffix} -}]=libcrypto.def
-§§+    SHARED_SOURCE[libssl{- $config{suffix} -}]=libssl.def
-§§   ELSIF[{- $config{target} =~ /^aix/ -}]
-§§     GENERATE[libcrypto.map]=util/mkdef.pl crypto aix
-§§     DEPEND[libcrypto.map]=util/libcrypto.num
-§§     GENERATE[libssl.map]=util/mkdef.pl ssl aix
-§§     DEPEND[libssl.map]=util/libssl.num
-§§
-§§-    SHARED_SOURCE[libcrypto]=libcrypto.map
-§§-    SHARED_SOURCE[libssl]=libssl.map
-§§+    SHARED_SOURCE[libcrypto{- $config{suffix} -}]=libcrypto.map
-§§+    SHARED_SOURCE[libssl{- $config{suffix} -}]=libssl.map
-§§   ELSE
-§§     GENERATE[libcrypto.map]=util/mkdef.pl crypto linux
-§§     DEPEND[libcrypto.map]=util/libcrypto.num
-§§     GENERATE[libssl.map]=util/mkdef.pl ssl linux
-§§     DEPEND[libssl.map]=util/libssl.num
-§§
-§§-    SHARED_SOURCE[libcrypto]=libcrypto.map
-§§-    SHARED_SOURCE[libssl]=libssl.map
-§§+    SHARED_SOURCE[libcrypto{- $config{suffix} -}]=libcrypto.map
-§§+    SHARED_SOURCE[libssl{- $config{suffix} -}]=libssl.map
-§§   ENDIF
-§§ ENDIF
-§§ # VMS and VC don't have parametrised .def / .symvec generation, so they get
-§§@@ -59,35 +79,33 @@ IF[{- $config{target} =~ /^VC-/ -}]
-§§   GENERATE[libssl.def]=util/mkdef.pl ssl 32
-§§   DEPEND[libssl.def]=util/libssl.num
-§§
-§§-  SHARED_SOURCE[libcrypto]=libcrypto.def
-§§-  SHARED_SOURCE[libssl]=libssl.def
-§§+  SHARED_SOURCE[libcrypto{- $config{suffix} -}]=libcrypto.def
-§§+  SHARED_SOURCE[libssl{- $config{suffix} -}]=libssl.def
-§§ ELSIF[{- $config{target} =~ /^vms/ -}]
-§§   GENERATE[libcrypto.opt]=util/mkdef.pl crypto "VMS"
-§§   DEPEND[libcrypto.opt]=util/libcrypto.num
-§§   GENERATE[libssl.opt]=util/mkdef.pl ssl "VMS"
-§§   DEPEND[libssl.opt]=util/libssl.num
-§§
-§§-  SHARED_SOURCE[libcrypto]=libcrypto.opt
-§§-  SHARED_SOURCE[libssl]=libssl.opt
-§§+  SHARED_SOURCE[libcrypto{- $config{suffix} -}]=libcrypto.opt
-§§+  SHARED_SOURCE[libssl{- $config{suffix} -}]=libssl.opt
-§§ ENDIF
-§§
-§§ IF[{- $config{target} =~ /^(?:Cygwin|mingw|VC-)/ -}]
-§§-  GENERATE[libcrypto.rc]=util/mkrc.pl libcrypto
-§§-  GENERATE[libssl.rc]=util/mkrc.pl libssl
-§§+  GENERATE[libcrypto.rc]=util/mkrc.pl libcrypto{- $config{suffix} -}
-§§+  GENERATE[libssl.rc]=util/mkrc.pl libssl{- $config{suffix} -}
-§§
-§§-  SHARED_SOURCE[libcrypto]=libcrypto.rc
-§§-  SHARED_SOURCE[libssl]=libssl.rc
-§§+  SHARED_SOURCE[libcrypto{- $config{suffix} -}]=libcrypto.rc
-§§+  SHARED_SOURCE[libssl{- $config{suffix} -}]=libssl.rc
-§§ ENDIF
-§§
-§§ IF[{- $config{target} =~ /^Cygwin/ -}]
-§§- SHARED_NAME[libcrypto]=cygcrypto-{- $sover_filename -}
-§§- SHARED_NAME[libssl]=cygssl-{- $sover_filename -}
-§§+ SHARED_NAME[libcrypto{- $config{suffix} -}]=cygcrypto-{- $sover_filename -}
-§§+ SHARED_NAME[libssl{- $config{suffix} -}]=cygssl-{- $sover_filename -}
-§§ ELSIF[{- $config{target} =~ /^mingw/ -}]
-§§- SHARED_NAME[libcrypto]=libcrypto-{- $sover_filename -}{- $config{target} eq "mingw64" ? "-x64" : "" -}
-§§- SHARED_NAME[libssl]=libssl-{- $sover_filename -}{- $config{target} eq "mingw64" ? "-x64" : "" -}
-§§+ SHARED_NAME[libcrypto{- $config{suffix} -}]=libcrypto-{- $sover_filename -}{- $config{target} eq "mingw64" ? "-x64" : "" -}
-§§+ SHARED_NAME[libssl{- $config{suffix} -}]=libssl-{- $sover_filename -}{- $config{target} eq "mingw64" ? "-x64" : "" -}
-§§ ELSIF[{- $config{target} =~ /^VC-/ -}]
-§§- SHARED_NAME[libcrypto]=libcrypto-{- $sover_filename -}{- $target{multilib} -}
-§§- SHARED_NAME[libssl]=libssl-{- $sover_filename -}{- $target{multilib} -}
-§§ ENDIF
-§§
-§§ # VMS has a cultural standard where all libraries are prefixed.
-§§@@ -96,8 +114,8 @@ ENDIF
-§§ # Also, it seems it's usual to have the pointer size the libraries
-§§ # were built for as part of the name.
-§§ IF[{- $config{target} =~ /^vms/ -}]
-§§- RENAME[libcrypto]=ossl$libcrypto{- $target{pointer_size} -}
-§§- RENAME[libssl]=ossl$libssl{- $target{pointer_size} -}
-§§- SHARED_NAME[libcrypto]=ossl$libcrypto{- $sover_filename -}_shr{- $target{pointer_size} -}
-§§- SHARED_NAME[libssl]=ossl$libssl{- $sover_filename -}_shr{- $target{pointer_size} -}
-§§+ RENAME[libcrypto{- $config{suffix} -}]=ossl$libcrypto{- $target{pointer_size} -}
-§§+ RENAME[libssl{- $config{suffix} -}]=ossl$libssl{- $target{pointer_size} -}
-§§+ SHARED_NAME[libcrypto{- $config{suffix} -}]=ossl$libcrypto{- $sover_filename -}_shr{- $target{pointer_size} -}
-§§+ SHARED_NAME[libssl{- $config{suffix} -}]=ossl$libssl{- $sover_filename -}_shr{- $target{pointer_size} -}
-§§ ENDIF
-§§--- Configurations\00-base-templates.conf
-§§+++ Configurations\00-base-templates.conf
-§§@@ -33,7 +33,8 @@
-§§ 	modes_asm_src	=> "",
-§§ 	padlock_asm_src	=> "",
-§§ 	chacha_asm_src	=> "chacha_enc.c",
-§§-	poly1305_asm_src	=> "",
-§§+	poly1305_asm_src	=> "",
-§§+	suffix			=> "",
-§§ 	keccak1600_asm_src	=> "keccak1600.c",
-§§ 
-§§ 	unistd		=> "<unistd.h>",
-§§
-§§
-§§--- Configurations\windows-makefile.tmpl
-§§+++ Configurations\windows-makefile.tmpl
-§§@@ -35,7 +35,7 @@
-§§      my $lib = shift;
-§§      return () if $disabled{shared} || $lib =~ /\.a$/;
-§§      return () unless defined $unified_info{sharednames}->{$lib};
-§§-     return $unified_info{sharednames}->{$lib} . $shlibext;
-§§+     return $unified_info{sharednames}->{$lib}. $shlibext;
-§§  }
-§§ 
-§§  sub lib {
-§§
-§§diff --git a/crypto/aes/build.info b/crypto/aes/build.info
-§§index 0f04863640..58a9947ae3 100644
-§§--- crypto/aes/build.info
-§§+++ crypto/aes/build.info
-§§@@ -1,5 +1,4 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         aes_misc.c aes_ecb.c aes_cfb.c aes_ofb.c \
-§§         aes_ige.c aes_wrap.c {- $target{aes_asm_src} -}
-§§ 
-§§diff --git a/crypto/aria/build.info b/crypto/aria/build.info
-§§index 218d0612f7..5eab36fec6 100644
-§§--- crypto/aria/build.info
-§§+++ crypto/aria/build.info
-§§@@ -1,4 +1,3 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         aria.c
-§§ 
-§§diff --git a/crypto/asn1/build.info b/crypto/asn1/build.info
-§§index d3e92c81ac..1d5648e01f 100644
-§§--- crypto/asn1/build.info
-§§+++ crypto/asn1/build.info
-§§@@ -1,5 +1,4 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         a_object.c a_bitstr.c a_utctm.c a_gentm.c a_time.c a_int.c a_octet.c \
-§§         a_print.c a_type.c a_dup.c a_d2i_fp.c a_i2d_fp.c \
-§§         a_utf8.c a_sign.c a_digest.c a_verify.c a_mbstr.c a_strex.c \
-§§diff --git a/crypto/async/build.info b/crypto/async/build.info
-§§index 278e3e9f89..28c3e31b9e 100644
-§§--- crypto/async/build.info
-§§+++ crypto/async/build.info
-§§@@ -1,4 +1,3 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         async.c async_wait.c async_err.c arch/async_posix.c arch/async_win.c \
-§§         arch/async_null.c
-§§diff --git a/crypto/bf/build.info b/crypto/bf/build.info
-§§index 29adc8ce50..d0ea733998 100644
-§§--- crypto/bf/build.info
-§§+++ crypto/bf/build.info
-§§@@ -1,5 +1,4 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=bf_skey.c bf_ecb.c bf_cfb64.c bf_ofb64.c \
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=bf_skey.c bf_ecb.c bf_cfb64.c bf_ofb64.c \
-§§         {- $target{bf_asm_src} -}
-§§ 
-§§ GENERATE[bf-586.s]=asm/bf-586.pl \
-§§diff --git a/crypto/bio/build.info b/crypto/bio/build.info
-§§index d1e7d73c55..487daf5cac 100644
-§§--- crypto/bio/build.info
-§§+++ crypto/bio/build.info
-§§@@ -1,5 +1,4 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         bio_lib.c bio_cb.c bio_err.c \
-§§         bss_mem.c bss_null.c bss_fd.c \
-§§         bss_file.c bss_sock.c bss_conn.c \
-§§diff --git a/crypto/blake2/build.info b/crypto/blake2/build.info
-§§index 0036f08482..050b60f73d 100644
-§§--- crypto/blake2/build.info
-§§+++ crypto/blake2/build.info
-§§@@ -1,3 +1,2 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         blake2b.c blake2s.c m_blake2b.c m_blake2s.c
-§§diff --git a/crypto/bn/build.info b/crypto/bn/build.info
-§§index a463eddabb..95b0a9c26d 100644
-§§--- crypto/bn/build.info
-§§+++ crypto/bn/build.info
-§§@@ -1,12 +1,11 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         bn_add.c bn_div.c bn_exp.c bn_lib.c bn_ctx.c bn_mul.c bn_mod.c \
-§§         bn_print.c bn_rand.c bn_shift.c bn_word.c bn_blind.c \
-§§         bn_kron.c bn_sqrt.c bn_gcd.c bn_prime.c bn_err.c bn_sqr.c \
-§§         {- $target{bn_asm_src} -} \
-§§         bn_recp.c bn_mont.c bn_mpi.c bn_exp2.c bn_gf2m.c bn_nist.c \
-§§         bn_depr.c bn_const.c bn_x931p.c bn_intern.c bn_dh.c bn_srp.c
-§§-INCLUDE[../../libcrypto]=../../crypto/include
-§§+INCLUDE[../../libcrypto{- $config{suffix} -}]=../../crypto/include
-§§ 
-§§ INCLUDE[bn_exp.o]=..
-§§ 
-§§diff --git a/crypto/buffer/build.info b/crypto/buffer/build.info
-§§index 54da1f92a8..aea124b786 100644
-§§--- crypto/buffer/build.info
-§§+++ crypto/buffer/build.info
-§§@@ -1,2 +1 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=buffer.c buf_err.c
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=buffer.c buf_err.c
-§§--- crypto\build.info
-§§+++ crypto\build.info
-§§@@ -1,5 +1,4 @@
-§§-LIBS=../libcrypto
-§§-SOURCE[../libcrypto]=\
-§§+SOURCE[../libcrypto{- $config{suffix} -}]=\
-§§         cryptlib.c mem.c mem_dbg.c cversion.c ex_data.c cpt_err.c \
-§§         ebcdic.c uid.c o_time.c o_str.c o_dir.c o_fopen.c ctype.c \
-§§         threads_pthread.c threads_win.c threads_none.c getenv.c \
-§§@@ -35,5 +34,5 @@
-§§ INCLUDE[s390xcpuid.o]=.
-§§ 
-§§ IF[{- $config{target} =~ /^(?:Cygwin|mingw|VC-)/ -}]
-§§-  SHARED_SOURCE[../libcrypto]=dllmain.c
-§§+  SHARED_SOURCE[../libcrypto{- $config{suffix} -}]=dllmain.c
-§§ ENDIF
-§§diff --git a/crypto/camellia/build.info b/crypto/camellia/build.info
-§§index e36a19bd4d..049fab284a 100644
-§§--- crypto/camellia/build.info
-§§+++ crypto/camellia/build.info
-§§@@ -1,5 +1,4 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         cmll_ecb.c cmll_ofb.c cmll_cfb.c cmll_ctr.c \
-§§         {- $target{cmll_asm_src} -}
-§§ 
-§§diff --git a/crypto/cast/build.info b/crypto/cast/build.info
-§§index b0f59f3800..ee9f4b0283 100644
-§§--- crypto/cast/build.info
-§§+++ crypto/cast/build.info
-§§@@ -1,5 +1,4 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         c_skey.c c_ecb.c {- $target{cast_asm_src} -} c_cfb64.c c_ofb64.c
-§§ 
-§§ GENERATE[cast-586.s]=asm/cast-586.pl \
-§§diff --git a/crypto/chacha/build.info b/crypto/chacha/build.info
-§§index e75ca72b67..f84ec2c551 100644
-§§--- crypto/chacha/build.info
-§§+++ crypto/chacha/build.info
-§§@@ -1,5 +1,4 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]={- $target{chacha_asm_src} -}
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]={- $target{chacha_asm_src} -}
-§§ 
-§§ GENERATE[chacha-x86.s]=asm/chacha-x86.pl \
-§§         $(PERLASM_SCHEME) $(LIB_CFLAGS) $(LIB_CPPFLAGS) $(PROCESSOR)
-§§diff --git a/crypto/cmac/build.info b/crypto/cmac/build.info
-§§index c8a4949a07..28793ead69 100644
-§§--- crypto/cmac/build.info
-§§+++ crypto/cmac/build.info
-§§@@ -1,2 +1 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=cmac.c cm_ameth.c cm_pmeth.c
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=cmac.c cm_ameth.c cm_pmeth.c
-§§diff --git a/crypto/cms/build.info b/crypto/cms/build.info
-§§index cb675436ef..6dbe5bf619 100644
-§§--- crypto/cms/build.info
-§§+++ crypto/cms/build.info
-§§@@ -1,5 +1,4 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]= \
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]= \
-§§         cms_lib.c cms_asn1.c cms_att.c cms_io.c cms_smime.c cms_err.c \
-§§         cms_sd.c cms_dd.c cms_cd.c cms_env.c cms_enc.c cms_ess.c \
-§§         cms_pwri.c cms_kari.c
-§§diff --git a/crypto/comp/build.info b/crypto/comp/build.info
-§§index 65df46a175..82b564f55e 100644
-§§--- crypto/comp/build.info
-§§+++ crypto/comp/build.info
-§§@@ -1,4 +1,3 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]= \
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]= \
-§§         comp_lib.c comp_err.c \
-§§         c_zlib.c
-§§diff --git a/crypto/conf/build.info b/crypto/conf/build.info
-§§index ff367994ea..789c16bb46 100644
-§§--- crypto/conf/build.info
-§§+++ crypto/conf/build.info
-§§@@ -1,4 +1,3 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]= \
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]= \
-§§         conf_err.c conf_lib.c conf_api.c conf_def.c conf_mod.c \
-§§         conf_mall.c conf_sap.c conf_ssl.c
-§§diff --git a/crypto/ct/build.info b/crypto/ct/build.info
-§§index 3ca0e31608..de3074f9ce 100644
-§§--- crypto/ct/build.info
-§§+++ crypto/ct/build.info
-§§@@ -1,3 +1,2 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]= ct_b64.c ct_err.c ct_log.c ct_oct.c ct_policy.c \
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]= ct_b64.c ct_err.c ct_log.c ct_oct.c ct_policy.c \
-§§                          ct_prn.c ct_sct.c ct_sct_ctx.c ct_vfy.c ct_x509v3.c
-§§diff --git a/crypto/des/build.info b/crypto/des/build.info
-§§index 05cb154cd4..63f02462f8 100644
-§§--- crypto/des/build.info
-§§+++ crypto/des/build.info
-§§@@ -1,5 +1,4 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         set_key.c  ecb_enc.c  cbc_enc.c \
-§§         ecb3_enc.c cfb64enc.c cfb64ede.c cfb_enc.c \
-§§         ofb64ede.c ofb64enc.c ofb_enc.c \
-§§diff --git a/crypto/dh/build.info b/crypto/dh/build.info
-§§index b19ff6dbac..0085c82f1a 100644
-§§--- crypto/dh/build.info
-§§+++ crypto/dh/build.info
-§§@@ -1,5 +1,4 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         dh_asn1.c dh_gen.c dh_key.c dh_lib.c dh_check.c dh_err.c dh_depr.c \
-§§         dh_ameth.c dh_pmeth.c dh_prn.c dh_rfc5114.c dh_kdf.c dh_meth.c \
-§§         dh_rfc7919.c
-§§diff --git a/crypto/dsa/build.info b/crypto/dsa/build.info
-§§index 2e759853a2..0a64542a1f 100644
-§§--- crypto/dsa/build.info
-§§+++ crypto/dsa/build.info
-§§@@ -1,5 +1,4 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         dsa_gen.c dsa_key.c dsa_lib.c dsa_asn1.c dsa_vrf.c dsa_sign.c \
-§§         dsa_err.c dsa_ossl.c dsa_depr.c dsa_ameth.c dsa_pmeth.c dsa_prn.c \
-§§         dsa_meth.c
-§§diff --git a/crypto/dso/build.info b/crypto/dso/build.info
-§§index 82b592d9a1..d5d2b8eb3d 100644
-§§--- crypto/dso/build.info
-§§+++ crypto/dso/build.info
-§§@@ -1,4 +1,3 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         dso_dl.c dso_dlfcn.c dso_err.c dso_lib.c \
-§§         dso_openssl.c dso_win32.c dso_vms.c
-§§diff --git a/crypto/ec/build.info b/crypto/ec/build.info
-§§index a1e673e347..8cd4661f9d 100644
-§§--- crypto/ec/build.info
-§§+++ crypto/ec/build.info
-§§@@ -1,5 +1,4 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         ec_lib.c ecp_smpl.c ecp_mont.c ecp_nist.c ec_cvt.c ec_mult.c \
-§§         ec_err.c ec_curve.c ec_check.c ec_print.c ec_asn1.c ec_key.c \
-§§         ec2_smpl.c ec_ameth.c ec_pmeth.c eck_prn.c \
-§§diff --git a/crypto/engine/build.info b/crypto/engine/build.info
-§§index e00802a3fd..de3602fcd0 100644
-§§--- crypto/engine/build.info
-§§+++ crypto/engine/build.info
-§§@@ -1,5 +1,4 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         eng_err.c eng_lib.c eng_list.c eng_init.c eng_ctrl.c \
-§§         eng_table.c eng_pkey.c eng_fat.c eng_all.c \
-§§         tb_rsa.c tb_dsa.c tb_dh.c tb_rand.c \
-§§@@ -7,5 +7,5 @@ SOURCE[../../libcrypto]=\
-§§         eng_openssl.c eng_cnf.c eng_dyn.c \
-§§         eng_rdrand.c
-§§ IF[{- !$disabled{devcryptoeng} -}]
-§§-  SOURCE[../../libcrypto]=eng_devcrypto.c
-§§+  SOURCE[../../libcrypto{- $config{suffix} -}]=eng_devcrypto.c
-§§ ENDIF
-§§diff --git a/crypto/err/build.info b/crypto/err/build.info
-§§index 6163d95b74..6d7112562f 100644
-§§--- crypto/err/build.info
-§§+++ crypto/err/build.info
-§§@@ -1,3 +1,2 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         err.c err_all.c err_prn.c
-§§diff --git a/crypto/evp/build.info b/crypto/evp/build.info
-§§index cc33ac3c49..6a63d4f0ff 100644
-§§--- crypto/evp/build.info
-§§+++ crypto/evp/build.info
-§§@@ -1,5 +1,4 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         encode.c digest.c evp_enc.c evp_key.c evp_cnf.c \
-§§         e_des.c e_bf.c e_idea.c e_des3.c e_camellia.c\
-§§         e_rc4.c e_aes.c names.c e_seed.c e_aria.c e_sm4.c \
-§§diff --git a/crypto/hmac/build.info b/crypto/hmac/build.info
-§§index 09f67c2a02..e1c732b115 100644
-§§--- crypto/hmac/build.info
-§§+++ crypto/hmac/build.info
-§§@@ -1,3 +1,2 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         hmac.c hm_ameth.c hm_pmeth.c
-§§diff --git a/crypto/idea/build.info b/crypto/idea/build.info
-§§index 2326123797..559092c9cb 100644
-§§--- crypto/idea/build.info
-§§+++ crypto/idea/build.info
-§§@@ -1,3 +1,2 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         i_cbc.c i_cfb64.c i_ofb64.c i_ecb.c i_skey.c
-§§diff --git a/crypto/kdf/build.info b/crypto/kdf/build.info
-§§index c166399d0c..50edb641e9 100644
-§§--- crypto/kdf/build.info
-§§+++ crypto/kdf/build.info
-§§@@ -1,3 +1,2 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         tls1_prf.c kdf_err.c hkdf.c scrypt.c
-§§diff --git a/crypto/lhash/build.info b/crypto/lhash/build.info
-§§index 30797f2caf..78628a0bcf 100644
-§§--- crypto/lhash/build.info
-§§+++ crypto/lhash/build.info
-§§@@ -1,3 +1,2 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         lhash.c lh_stats.c
-§§diff --git a/crypto/md2/build.info b/crypto/md2/build.info
-§§index e31948c23f..c98f550f16 100644
-§§--- crypto/md2/build.info
-§§+++ crypto/md2/build.info
-§§@@ -1,3 +1,2 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         md2_dgst.c md2_one.c
-§§diff --git a/crypto/md4/build.info b/crypto/md4/build.info
-§§index 20846e0dce..4a384bba64 100644
-§§--- crypto/md4/build.info
-§§+++ crypto/md4/build.info
-§§@@ -1,3 +1,2 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         md4_dgst.c md4_one.c
-§§diff --git a/crypto/md5/build.info b/crypto/md5/build.info
-§§index e641fecd0d..67f2f00280 100644
-§§--- crypto/md5/build.info
-§§+++ crypto/md5/build.info
-§§@@ -1,5 +1,4 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         md5_dgst.c md5_one.c {- $target{md5_asm_src} -}
-§§ 
-§§ GENERATE[md5-586.s]=asm/md5-586.pl \
-§§diff --git a/crypto/mdc2/build.info b/crypto/mdc2/build.info
-§§index 8fe6878d60..0f74344622 100644
-§§--- crypto/mdc2/build.info
-§§+++ crypto/mdc2/build.info
-§§@@ -1,3 +1,2 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         mdc2dgst.c mdc2_one.c
-§§diff --git a/crypto/modes/build.info b/crypto/modes/build.info
-§§index 821340eb90..57f5161a73 100644
-§§--- crypto/modes/build.info
-§§+++ crypto/modes/build.info
-§§@@ -1,5 +1,4 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         cbc128.c ctr128.c cts128.c cfb128.c ofb128.c gcm128.c \
-§§         ccm128.c xts128.c wrap128.c ocb128.c \
-§§         {- $target{modes_asm_src} -}
-§§diff --git a/crypto/objects/build.info b/crypto/objects/build.info
-§§index 38e290756b..21378db0b9 100644
-§§--- crypto/objects/build.info
-§§+++ crypto/objects/build.info
-§§@@ -1,3 +1,2 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         o_names.c obj_dat.c obj_lib.c obj_err.c obj_xref.c
-§§diff --git a/crypto/ocsp/build.info b/crypto/ocsp/build.info
-§§index 0902caae3d..e07a166462 100644
-§§--- crypto/ocsp/build.info
-§§+++ crypto/ocsp/build.info
-§§@@ -1,4 +1,3 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         ocsp_asn.c ocsp_ext.c ocsp_ht.c ocsp_lib.c ocsp_cl.c \
-§§         ocsp_srv.c ocsp_prn.c ocsp_vfy.c ocsp_err.c v3_ocsp.c
-§§diff --git a/crypto/pem/build.info b/crypto/pem/build.info
-§§index 357b32833b..f094e4596f 100644
-§§--- crypto/pem/build.info
-§§+++ crypto/pem/build.info
-§§@@ -1,4 +1,3 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         pem_sign.c pem_info.c pem_lib.c pem_all.c pem_err.c \
-§§         pem_x509.c pem_xaux.c pem_oth.c pem_pk8.c pem_pkey.c pvkfmt.c
-§§diff --git a/crypto/pkcs12/build.info b/crypto/pkcs12/build.info
-§§index b87299e6cb..aa3cc79f8d 100644
-§§--- crypto/pkcs12/build.info
-§§+++ crypto/pkcs12/build.info
-§§@@ -1,5 +1,4 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         p12_add.c p12_asn.c p12_attr.c p12_crpt.c p12_crt.c p12_decr.c \
-§§         p12_init.c p12_key.c p12_kiss.c p12_mutl.c p12_sbag.c \
-§§         p12_utl.c p12_npas.c pk12err.c p12_p8d.c p12_p8e.c
-§§diff --git a/crypto/pkcs7/build.info b/crypto/pkcs7/build.info
-§§index 2029d538fc..c86379edbb 100644
-§§--- crypto/pkcs7/build.info
-§§+++ crypto/pkcs7/build.info
-§§@@ -1,4 +1,3 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         pk7_asn1.c pk7_lib.c pkcs7err.c pk7_doit.c pk7_smime.c pk7_attr.c \
-§§         pk7_mime.c bio_pk7.c
-§§diff --git a/crypto/poly1305/build.info b/crypto/poly1305/build.info
-§§index 4e4dcca521..a315a3c8e7 100644
-§§--- crypto/poly1305/build.info
-§§+++ crypto/poly1305/build.info
-§§@@ -1,5 +1,4 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         poly1305_pmeth.c \
-§§         poly1305_ameth.c \
-§§         poly1305.c {- $target{poly1305_asm_src} -}
-§§diff --git a/crypto/rand/build.info b/crypto/rand/build.info
-§§index df9bac67f0..dad4e5e93b 100644
-§§--- crypto/rand/build.info
-§§+++ crypto/rand/build.info
-§§@@ -1,4 +1,3 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         randfile.c rand_lib.c rand_err.c rand_egd.c \
-§§         rand_win.c rand_unix.c rand_vms.c drbg_lib.c drbg_ctr.c
-§§diff --git a/crypto/rc2/build.info b/crypto/rc2/build.info
-§§index 47a3fd0d4e..cf0e19f762 100644
-§§--- crypto/rc2/build.info
-§§+++ crypto/rc2/build.info
-§§@@ -1,3 +1,2 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         rc2_ecb.c rc2_skey.c rc2_cbc.c rc2cfb64.c rc2ofb64.c
-§§diff --git a/crypto/rc4/build.info b/crypto/rc4/build.info
-§§index 913942b5e9..34d1d3db59 100644
-§§--- crypto/rc4/build.info
-§§+++ crypto/rc4/build.info
-§§@@ -1,5 +1,4 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         {- $target{rc4_asm_src} -}
-§§ 
-§§ GENERATE[rc4-586.s]=asm/rc4-586.pl \
-§§diff --git a/crypto/rc5/build.info b/crypto/rc5/build.info
-§§index 928a62cd85..d3485f13e3 100644
-§§--- crypto/rc5/build.info
-§§+++ crypto/rc5/build.info
-§§@@ -1,5 +1,4 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         rc5_skey.c rc5_ecb.c {- $target{rc5_asm_src} -} rc5cfb64.c rc5ofb64.c
-§§ 
-§§ GENERATE[rc5-586.s]=asm/rc5-586.pl \
-§§diff --git a/crypto/ripemd/build.info b/crypto/ripemd/build.info
-§§index a4a894e2d1..480317c356 100644
-§§--- crypto/ripemd/build.info
-§§+++ crypto/ripemd/build.info
-§§@@ -1,5 +1,4 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         rmd_dgst.c rmd_one.c {- $target{rmd160_asm_src} -}
-§§ 
-§§ GENERATE[rmd-586.s]=asm/rmd-586.pl \
-§§diff --git a/crypto/rsa/build.info b/crypto/rsa/build.info
-§§index 87f924922f..f6a3d43f47 100644
-§§--- crypto/rsa/build.info
-§§+++ crypto/rsa/build.info
-§§@@ -1,5 +1,4 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         rsa_ossl.c rsa_gen.c rsa_lib.c rsa_sign.c rsa_saos.c rsa_err.c \
-§§         rsa_pk1.c rsa_ssl.c rsa_none.c rsa_oaep.c rsa_chk.c \
-§§         rsa_pss.c rsa_x931.c rsa_asn1.c rsa_depr.c rsa_ameth.c rsa_prn.c \
-§§diff --git a/crypto/seed/build.info b/crypto/seed/build.info
-§§index abdcbcaa94..df24b583bb 100644
-§§--- crypto/seed/build.info
-§§+++ crypto/seed/build.info
-§§@@ -1,2 +1 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=seed.c seed_ecb.c seed_cbc.c seed_cfb.c seed_ofb.c
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=seed.c seed_ecb.c seed_cbc.c seed_cfb.c seed_ofb.c
-§§diff --git a/crypto/sha/build.info b/crypto/sha/build.info
-§§index 5dd5a9941d..1b180ad578 100644
-§§--- crypto/sha/build.info
-§§+++ crypto/sha/build.info
-§§@@ -1,5 +1,4 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         sha1dgst.c sha1_one.c sha256.c sha512.c {- $target{sha1_asm_src} -} \
-§§         {- $target{keccak1600_asm_src} -}
-§§ 
-§§diff --git a/crypto/siphash/build.info b/crypto/siphash/build.info
-§§index 4166344a5b..b6ca4351f9 100644
-§§--- crypto/siphash/build.info
-§§+++ crypto/siphash/build.info
-§§@@ -1,5 +1,4 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§ 	siphash.c \
-§§ 	siphash_pmeth.c \
-§§ 	siphash_ameth.c
-§§diff --git a/crypto/sm2/build.info b/crypto/sm2/build.info
-§§index be76d96d31..e387a54810 100644
-§§--- crypto/sm2/build.info
-§§+++ crypto/sm2/build.info
-§§@@ -1,5 +1,4 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         sm2_sign.c sm2_crypt.c sm2_err.c sm2_pmeth.c
-§§ 
-§§ 
-§§diff --git a/crypto/sm3/build.info b/crypto/sm3/build.info
-§§index 6009b1949e..7930b3677c 100644
-§§--- crypto/sm3/build.info
-§§+++ crypto/sm3/build.info
-§§@@ -1,2 +1 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=sm3.c m_sm3.c
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=sm3.c m_sm3.c
-§§diff --git a/crypto/sm4/build.info b/crypto/sm4/build.info
-§§index b65a7d149e..328a8ff654 100644
-§§--- crypto/sm4/build.info
-§§+++ crypto/sm4/build.info
-§§@@ -1,4 +1,3 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         sm4.c
-§§ 
-§§diff --git a/crypto/srp/build.info b/crypto/srp/build.info
-§§index b6c7fe7adc..80a2ae520e 100644
-§§--- crypto/srp/build.info
-§§+++ crypto/srp/build.info
-§§@@ -1,2 +1 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=srp_lib.c srp_vfy.c
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=srp_lib.c srp_vfy.c
-§§diff --git a/crypto/stack/build.info b/crypto/stack/build.info
-§§index e5870210ac..8d7598dbd4 100644
-§§--- crypto/stack/build.info
-§§+++ crypto/stack/build.info
-§§@@ -1,2 +1 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=stack.c
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=stack.c
-§§diff --git a/crypto/store/build.info b/crypto/store/build.info
-§§index 7d882f313e..d9150d8546 100644
-§§--- crypto/store/build.info
-§§+++ crypto/store/build.info
-§§@@ -1,4 +1,3 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         store_err.c store_init.c store_lib.c store_register.c store_strings.c \
-§§         loader_file.c
-§§diff --git a/crypto/ts/build.info b/crypto/ts/build.info
-§§index 98e633d57a..c038661327 100644
-§§--- crypto/ts/build.info
-§§+++ crypto/ts/build.info
-§§@@ -1,5 +1,4 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         ts_err.c ts_req_utils.c ts_req_print.c ts_rsp_utils.c ts_rsp_print.c \
-§§         ts_rsp_sign.c ts_rsp_verify.c ts_verify_ctx.c ts_lib.c ts_conf.c \
-§§         ts_asn1.c
-§§diff --git a/crypto/txt_db/build.info b/crypto/txt_db/build.info
-§§index 4379d5f1b0..45527f6ec1 100644
-§§--- crypto/txt_db/build.info
-§§+++ crypto/txt_db/build.info
-§§@@ -1,2 +1 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=txt_db.c
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=txt_db.c
-§§diff --git a/crypto/ui/build.info b/crypto/ui/build.info
-§§index c5d17fb744..291840199d 100644
-§§--- crypto/ui/build.info
-§§+++ crypto/ui/build.info
-§§@@ -1,3 +1,2 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         ui_err.c ui_lib.c ui_openssl.c ui_null.c ui_util.c
-§§diff --git a/crypto/whrlpool/build.info b/crypto/whrlpool/build.info
-§§index 4b167b504e..95ad3dee2a 100644
-§§--- crypto/whrlpool/build.info
-§§+++ crypto/whrlpool/build.info
-§§@@ -1,5 +1,4 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=wp_dgst.c {- $target{wp_asm_src} -}
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=wp_dgst.c {- $target{wp_asm_src} -}
-§§ 
-§§ GENERATE[wp-mmx.s]=asm/wp-mmx.pl \
-§§         $(PERLASM_SCHEME) $(LIB_CFLAGS) $(LIB_CPPFLAGS) $(PROCESSOR)
-§§diff --git a/crypto/x509/build.info b/crypto/x509/build.info
-§§index afd0b6134e..773817b688 100644
-§§--- crypto/x509/build.info
-§§+++ crypto/x509/build.info
-§§@@ -1,5 +1,4 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§         x509_def.c x509_d2.c x509_r2x.c x509_cmp.c \
-§§         x509_obj.c x509_req.c x509spki.c x509_vfy.c \
-§§         x509_set.c x509cset.c x509rset.c x509_err.c \
-§§diff --git a/crypto/x509v3/build.info b/crypto/x509v3/build.info
-§§index 4ab6488493..5fced51289 100644
-§§--- crypto/x509v3/build.info
-§§+++ crypto/x509v3/build.info
-§§@@ -1,5 +1,4 @@
-§§-LIBS=../../libcrypto
-§§-SOURCE[../../libcrypto]=\
-§§+SOURCE[../../libcrypto{- $config{suffix} -}]=\
-§§   v3_bcons.c v3_bitst.c v3_conf.c v3_extku.c v3_ia5.c v3_lib.c \
-§§   v3_prn.c v3_utl.c v3err.c v3_genn.c v3_alt.c v3_skey.c v3_akey.c v3_pku.c \
-§§   v3_int.c v3_enum.c v3_sxnet.c v3_cpols.c v3_crld.c v3_purp.c v3_info.c \
-§§--- engines\build.info
-§§+++ engines\build.info
-§§@@ -1,39 +1,38 @@
-§§ IF[{- !$disabled{"engine"} -}]
-§§
-§§   IF[{- $disabled{"dynamic-engine"} -}]
-§§-    LIBS=../libcrypto
-§§-    SOURCE[../libcrypto]=\
-§§+    SOURCE[../libcrypto{- $config{suffix} -}]=\
-§§             e_padlock.c {- $target{padlock_asm_src} -}
-§§     IF[{- !$disabled{capieng} -}]
-§§-      SOURCE[../libcrypto]=e_capi.c
-§§+      SOURCE[../libcrypto{- $config{suffix} -}]=e_capi.c
-§§     ENDIF
-§§     IF[{- !$disabled{afalgeng} -}]
-§§-      SOURCE[../libcrypto]=e_afalg.c
-§§+      SOURCE[../libcrypto{- $config{suffix} -}]=e_afalg.c
-§§     ENDIF
-§§   ELSE
-§§     ENGINES=padlock
-§§     SOURCE[padlock]=e_padlock.c {- $target{padlock_asm_src} -}
-§§-    DEPEND[padlock]=../libcrypto
-§§+    DEPEND[padlock]=../libcrypto{- $config{suffix} -}
-§§     INCLUDE[padlock]=../include
-§§     IF[{- !$disabled{capieng} -}]
-§§       ENGINES=capi
-§§       SOURCE[capi]=e_capi.c
-§§-      DEPEND[capi]=../libcrypto
-§§+      DEPEND[capi]=../libcrypto{- $config{suffix} -}
-§§       INCLUDE[capi]=../include
-§§     ENDIF
-§§     IF[{- !$disabled{afalgeng} -}]
-§§       ENGINES=afalg
-§§       SOURCE[afalg]=e_afalg.c
-§§-      DEPEND[afalg]=../libcrypto
-§§+      DEPEND[afalg]=../libcrypto{- $config{suffix} -}
-§§       INCLUDE[afalg]= ../include
-§§     ENDIF
-§§
-§§     ENGINES_NO_INST=ossltest dasync
-§§     SOURCE[dasync]=e_dasync.c
-§§-    DEPEND[dasync]=../libcrypto
-§§+    DEPEND[dasync]=../libcrypto{- $config{suffix} -}
-§§     INCLUDE[dasync]=../include
-§§     SOURCE[ossltest]=e_ossltest.c
-§§-    DEPEND[ossltest]=../libcrypto
-§§+    DEPEND[ossltest]=../libcrypto{- $config{suffix} -}
-§§     INCLUDE[ossltest]=../include
-§§   ENDIF
-§§ 
-§§diff --git a/fuzz/build.info b/fuzz/build.info
-§§index cde03d3447..ae57dded3e 100644
-§§--- fuzz/build.info
-§§+++ fuzz/build.info
-§§@@ -21,47 +21,47 @@ IF[{- !$disabled{"fuzz-afl"} || !$disabled{"fuzz-libfuzzer"} -}]
-§§ 
-§§   SOURCE[asn1]=asn1.c driver.c
-§§   INCLUDE[asn1]=../include {- $ex_inc -}
-§§-  DEPEND[asn1]=../libcrypto ../libssl {- $ex_lib -}
-§§+  DEPEND[asn1]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} {- $ex_lib -}
-§§ 
-§§   SOURCE[asn1parse]=asn1parse.c driver.c
-§§   INCLUDE[asn1parse]=../include {- $ex_inc -}
-§§-  DEPEND[asn1parse]=../libcrypto {- $ex_lib -}
-§§+  DEPEND[asn1parse]=../libcrypto{- $config{suffix} -} {- $ex_lib -}
-§§ 
-§§   SOURCE[bignum]=bignum.c driver.c
-§§   INCLUDE[bignum]=../include {- $ex_inc -}
-§§-  DEPEND[bignum]=../libcrypto {- $ex_lib -}
-§§+  DEPEND[bignum]=../libcrypto{- $config{suffix} -} {- $ex_lib -}
-§§ 
-§§   SOURCE[bndiv]=bndiv.c driver.c
-§§   INCLUDE[bndiv]=../include {- $ex_inc -}
-§§-  DEPEND[bndiv]=../libcrypto {- $ex_lib -}
-§§+  DEPEND[bndiv]=../libcrypto{- $config{suffix} -} {- $ex_lib -}
-§§ 
-§§   SOURCE[client]=client.c driver.c
-§§   INCLUDE[client]=../include {- $ex_inc -}
-§§-  DEPEND[client]=../libcrypto ../libssl {- $ex_lib -}
-§§+  DEPEND[client]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} {- $ex_lib -}
-§§ 
-§§   SOURCE[cms]=cms.c driver.c
-§§   INCLUDE[cms]=../include {- $ex_inc -}
-§§-  DEPEND[cms]=../libcrypto {- $ex_lib -}
-§§+  DEPEND[cms]=../libcrypto{- $config{suffix} -} {- $ex_lib -}
-§§ 
-§§   SOURCE[conf]=conf.c driver.c
-§§   INCLUDE[conf]=../include {- $ex_inc -}
-§§-  DEPEND[conf]=../libcrypto {- $ex_lib -}
-§§+  DEPEND[conf]=../libcrypto{- $config{suffix} -} {- $ex_lib -}
-§§ 
-§§   SOURCE[crl]=crl.c driver.c
-§§   INCLUDE[crl]=../include {- $ex_inc -}
-§§-  DEPEND[crl]=../libcrypto {- $ex_lib -}
-§§+  DEPEND[crl]=../libcrypto{- $config{suffix} -} {- $ex_lib -}
-§§ 
-§§   SOURCE[ct]=ct.c driver.c
-§§   INCLUDE[ct]=../include {- $ex_inc -}
-§§-  DEPEND[ct]=../libcrypto {- $ex_lib -}
-§§+  DEPEND[ct]=../libcrypto{- $config{suffix} -} {- $ex_lib -}
-§§ 
-§§   SOURCE[server]=server.c driver.c
-§§   INCLUDE[server]=../include {- $ex_inc -}
-§§-  DEPEND[server]=../libcrypto ../libssl {- $ex_lib -}
-§§+  DEPEND[server]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} {- $ex_lib -}
-§§ 
-§§   SOURCE[x509]=x509.c driver.c
-§§   INCLUDE[x509]=../include {- $ex_inc -}
-§§-  DEPEND[x509]=../libcrypto {- $ex_lib -}
-§§+  DEPEND[x509]=../libcrypto{- $config{suffix} -} {- $ex_lib -}
-§§ ENDIF
-§§ 
-§§ IF[{- !$disabled{tests} -}]
-§§@@ -77,45 +77,45 @@ IF[{- !$disabled{tests} -}]
-§§ 
-§§   SOURCE[asn1-test]=asn1.c test-corpus.c
-§§   INCLUDE[asn1-test]=../include
-§§-  DEPEND[asn1-test]=../libcrypto ../libssl
-§§+  DEPEND[asn1-test]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -}
-§§ 
-§§   SOURCE[asn1parse-test]=asn1parse.c test-corpus.c
-§§   INCLUDE[asn1parse-test]=../include
-§§-  DEPEND[asn1parse-test]=../libcrypto
-§§+  DEPEND[asn1parse-test]=../libcrypto{- $config{suffix} -}
-§§ 
-§§   SOURCE[bignum-test]=bignum.c test-corpus.c
-§§   INCLUDE[bignum-test]=../include
-§§-  DEPEND[bignum-test]=../libcrypto
-§§+  DEPEND[bignum-test]=../libcrypto{- $config{suffix} -}
-§§ 
-§§   SOURCE[bndiv-test]=bndiv.c test-corpus.c
-§§   INCLUDE[bndiv-test]=../include
-§§-  DEPEND[bndiv-test]=../libcrypto
-§§+  DEPEND[bndiv-test]=../libcrypto{- $config{suffix} -}
-§§ 
-§§   SOURCE[client-test]=client.c test-corpus.c
-§§   INCLUDE[client-test]=../include
-§§-  DEPEND[client-test]=../libcrypto ../libssl
-§§+  DEPEND[client-test]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -}
-§§ 
-§§   SOURCE[cms-test]=cms.c test-corpus.c
-§§   INCLUDE[cms-test]=../include
-§§-  DEPEND[cms-test]=../libcrypto
-§§+  DEPEND[cms-test]=../libcrypto{- $config{suffix} -}
-§§ 
-§§   SOURCE[conf-test]=conf.c test-corpus.c
-§§   INCLUDE[conf-test]=../include
-§§-  DEPEND[conf-test]=../libcrypto
-§§+  DEPEND[conf-test]=../libcrypto{- $config{suffix} -}
-§§ 
-§§   SOURCE[crl-test]=crl.c test-corpus.c
-§§   INCLUDE[crl-test]=../include
-§§-  DEPEND[crl-test]=../libcrypto
-§§+  DEPEND[crl-test]=../libcrypto{- $config{suffix} -}
-§§ 
-§§   SOURCE[ct-test]=ct.c test-corpus.c
-§§   INCLUDE[ct-test]=../include
-§§-  DEPEND[ct-test]=../libcrypto
-§§+  DEPEND[ct-test]=../libcrypto{- $config{suffix} -}
-§§ 
-§§   SOURCE[server-test]=server.c test-corpus.c
-§§   INCLUDE[server-test]=../include
-§§-  DEPEND[server-test]=../libcrypto ../libssl
-§§+  DEPEND[server-test]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -}
-§§ 
-§§   SOURCE[x509-test]=x509.c test-corpus.c
-§§   INCLUDE[x509-test]=../include
-§§-  DEPEND[x509-test]=../libcrypto
-§§+  DEPEND[x509-test]=../libcrypto{- $config{suffix} -}
-§§ ENDIF
-§§--- ssl\build.info
-§§+++ ssl\build.info
-§§@@ -1,5 +1,4 @@
-§§-LIBS=../libssl
-§§-SOURCE[../libssl]=\
-§§+SOURCE[../libssl{- $config{suffix} -}]=\
-§§         pqueue.c packet.c \
-§§         statem/statem_srvr.c statem/statem_clnt.c  s3_lib.c  s3_enc.c record/rec_layer_s3.c \
-§§         statem/statem_lib.c statem/extensions.c statem/extensions_srvr.c \
-§§
-§§diff --git a/test/build.info b/test/build.info
-§§index a2fb0e2e1e..339bd42b5b 100644
-§§--- test/build.info
-§§+++ test/build.info
-§§@@ -14,7 +14,7 @@ IF[{- !$disabled{tests} -}]
-§§           testutil/format_output.c testutil/tap_bio.c \
-§§           testutil/test_cleanup.c testutil/main.c testutil/init.c
-§§   INCLUDE[libtestutil.a]=../include
-§§-  DEPEND[libtestutil.a]=../libcrypto
-§§+  DEPEND[libtestutil.a]=../libcrypto{- $config{suffix} -}
-§§ 
-§§   # Special hack for descrip.mms to include the MAIN object module
-§§   # explicitly.  This will only be done if there isn't a MAIN in the
-§§@@ -54,234 +54,234 @@ INCLUDE_MAIN___test_libtestutil_OLB = /INCLUDE=MAIN
-§§ 
-§§   SOURCE[versions]=versions.c
-§§   INCLUDE[versions]=../include
-§§-  DEPEND[versions]=../libcrypto
-§§+  DEPEND[versions]=../libcrypto{- $config{suffix} -}
-§§ 
-§§   SOURCE[aborttest]=aborttest.c
-§§   INCLUDE[aborttest]=../include
-§§-  DEPEND[aborttest]=../libcrypto
-§§+  DEPEND[aborttest]=../libcrypto{- $config{suffix} -}
-§§ 
-§§   SOURCE[sanitytest]=sanitytest.c
-§§   INCLUDE[sanitytest]=../include
-§§-  DEPEND[sanitytest]=../libcrypto libtestutil.a
-§§+  DEPEND[sanitytest]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[rsa_complex]=rsa_complex.c
-§§   INCLUDE[rsa_complex]=../include
-§§ 
-§§   SOURCE[test_test]=test_test.c
-§§   INCLUDE[test_test]=../include
-§§-  DEPEND[test_test]=../libcrypto libtestutil.a
-§§+  DEPEND[test_test]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[exdatatest]=exdatatest.c
-§§   INCLUDE[exdatatest]=../include
-§§-  DEPEND[exdatatest]=../libcrypto libtestutil.a
-§§+  DEPEND[exdatatest]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[bntest]=bntest.c
-§§   INCLUDE[bntest]=../include
-§§-  DEPEND[bntest]=../libcrypto libtestutil.a
-§§+  DEPEND[bntest]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[ectest]=ectest.c
-§§   INCLUDE[ectest]=../include
-§§-  DEPEND[ectest]=../libcrypto libtestutil.a
-§§+  DEPEND[ectest]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[ecstresstest]=ecstresstest.c
-§§   INCLUDE[ecstresstest]=../include
-§§-  DEPEND[ecstresstest]=../libcrypto libtestutil.a
-§§+  DEPEND[ecstresstest]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[ecdsatest]=ecdsatest.c
-§§   INCLUDE[ecdsatest]=../include
-§§-  DEPEND[ecdsatest]=../libcrypto libtestutil.a
-§§+  DEPEND[ecdsatest]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[gmdifftest]=gmdifftest.c
-§§   INCLUDE[gmdifftest]=../include
-§§-  DEPEND[gmdifftest]=../libcrypto libtestutil.a
-§§+  DEPEND[gmdifftest]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[pbelutest]=pbelutest.c
-§§   INCLUDE[pbelutest]=../include
-§§-  DEPEND[pbelutest]=../libcrypto libtestutil.a
-§§+  DEPEND[pbelutest]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[ideatest]=ideatest.c
-§§   INCLUDE[ideatest]=../include
-§§-  DEPEND[ideatest]=../libcrypto libtestutil.a
-§§+  DEPEND[ideatest]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[md2test]=md2test.c
-§§   INCLUDE[md2test]=../include
-§§-  DEPEND[md2test]=../libcrypto libtestutil.a
-§§+  DEPEND[md2test]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[hmactest]=hmactest.c
-§§   INCLUDE[hmactest]=../include
-§§-  DEPEND[hmactest]=../libcrypto libtestutil.a
-§§+  DEPEND[hmactest]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[rc2test]=rc2test.c
-§§   INCLUDE[rc2test]=../include
-§§-  DEPEND[rc2test]=../libcrypto libtestutil.a
-§§+  DEPEND[rc2test]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[rc4test]=rc4test.c
-§§   INCLUDE[rc4test]=../include
-§§-  DEPEND[rc4test]=../libcrypto libtestutil.a
-§§+  DEPEND[rc4test]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[rc5test]=rc5test.c
-§§   INCLUDE[rc5test]=../include
-§§-  DEPEND[rc5test]=../libcrypto libtestutil.a
-§§+  DEPEND[rc5test]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[destest]=destest.c
-§§   INCLUDE[destest]=../include
-§§-  DEPEND[destest]=../libcrypto libtestutil.a
-§§+  DEPEND[destest]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[mdc2test]=mdc2test.c
-§§   INCLUDE[mdc2test]=../include
-§§-  DEPEND[mdc2test]=../libcrypto libtestutil.a
-§§+  DEPEND[mdc2test]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[dhtest]=dhtest.c
-§§   INCLUDE[dhtest]=../include
-§§-  DEPEND[dhtest]=../libcrypto libtestutil.a
-§§+  DEPEND[dhtest]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[enginetest]=enginetest.c
-§§   INCLUDE[enginetest]=../include
-§§-  DEPEND[enginetest]=../libcrypto libtestutil.a
-§§+  DEPEND[enginetest]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[casttest]=casttest.c
-§§   INCLUDE[casttest]=../include
-§§-  DEPEND[casttest]=../libcrypto libtestutil.a
-§§+  DEPEND[casttest]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[bftest]=bftest.c
-§§   INCLUDE[bftest]=../include
-§§-  DEPEND[bftest]=../libcrypto libtestutil.a
-§§+  DEPEND[bftest]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[ssltest_old]=ssltest_old.c
-§§   INCLUDE[ssltest_old]=.. ../include
-§§-  DEPEND[ssltest_old]=../libcrypto ../libssl
-§§+  DEPEND[ssltest_old]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -}
-§§ 
-§§   SOURCE[dsatest]=dsatest.c
-§§   INCLUDE[dsatest]=../include
-§§-  DEPEND[dsatest]=../libcrypto libtestutil.a
-§§+  DEPEND[dsatest]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[dsa_no_digest_size_test]=dsa_no_digest_size_test.c
-§§   INCLUDE[dsa_no_digest_size_test]=../include
-§§-  DEPEND[dsa_no_digest_size_test]=../libcrypto libtestutil.a
-§§+  DEPEND[dsa_no_digest_size_test]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[exptest]=exptest.c
-§§   INCLUDE[exptest]=../include
-§§-  DEPEND[exptest]=../libcrypto libtestutil.a
-§§+  DEPEND[exptest]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[rsa_test]=rsa_test.c
-§§   INCLUDE[rsa_test]=../include
-§§-  DEPEND[rsa_test]=../libcrypto libtestutil.a
-§§+  DEPEND[rsa_test]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[rsa_mp_test]=rsa_mp_test.c
-§§   INCLUDE[rsa_mp_test]=../include
-§§-  DEPEND[rsa_mp_test]=../libcrypto libtestutil.a
-§§+  DEPEND[rsa_mp_test]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[fatalerrtest]=fatalerrtest.c ssltestlib.c
-§§   INCLUDE[fatalerrtest]=../include
-§§-  DEPEND[fatalerrtest]=../libcrypto ../libssl libtestutil.a
-§§+  DEPEND[fatalerrtest]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[tls13ccstest]=tls13ccstest.c ssltestlib.c
-§§   INCLUDE[tls13ccstest]=../include
-§§-  DEPEND[tls13ccstest]=../libcrypto ../libssl libtestutil.a
-§§+  DEPEND[tls13ccstest]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[evp_test]=evp_test.c
-§§   INCLUDE[evp_test]=../include
-§§-  DEPEND[evp_test]=../libcrypto libtestutil.a
-§§+  DEPEND[evp_test]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[evp_extra_test]=evp_extra_test.c
-§§   INCLUDE[evp_extra_test]=../include ../crypto/include
-§§-  DEPEND[evp_extra_test]=../libcrypto libtestutil.a
-§§+  DEPEND[evp_extra_test]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[igetest]=igetest.c
-§§   INCLUDE[igetest]=../include
-§§-  DEPEND[igetest]=../libcrypto libtestutil.a
-§§+  DEPEND[igetest]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[v3nametest]=v3nametest.c
-§§   INCLUDE[v3nametest]=../include
-§§-  DEPEND[v3nametest]=../libcrypto libtestutil.a
-§§+  DEPEND[v3nametest]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[crltest]=crltest.c
-§§   INCLUDE[crltest]=../include
-§§-  DEPEND[crltest]=../libcrypto libtestutil.a
-§§+  DEPEND[crltest]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[v3ext]=v3ext.c
-§§   INCLUDE[v3ext]=../include
-§§-  DEPEND[v3ext]=../libcrypto libtestutil.a
-§§+  DEPEND[v3ext]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[danetest]=danetest.c
-§§   INCLUDE[danetest]=../include
-§§-  DEPEND[danetest]=../libcrypto ../libssl libtestutil.a
-§§+  DEPEND[danetest]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[constant_time_test]=constant_time_test.c
-§§   INCLUDE[constant_time_test]=../include
-§§-  DEPEND[constant_time_test]=../libcrypto libtestutil.a
-§§+  DEPEND[constant_time_test]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[verify_extra_test]=verify_extra_test.c
-§§   INCLUDE[verify_extra_test]=../include
-§§-  DEPEND[verify_extra_test]=../libcrypto libtestutil.a
-§§+  DEPEND[verify_extra_test]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[clienthellotest]=clienthellotest.c
-§§   INCLUDE[clienthellotest]=../include
-§§-  DEPEND[clienthellotest]=../libcrypto ../libssl libtestutil.a
-§§+  DEPEND[clienthellotest]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[bad_dtls_test]=bad_dtls_test.c
-§§   INCLUDE[bad_dtls_test]=../include
-§§-  DEPEND[bad_dtls_test]=../libcrypto ../libssl libtestutil.a
-§§+  DEPEND[bad_dtls_test]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[packettest]=packettest.c
-§§   INCLUDE[packettest]=../include
-§§-  DEPEND[packettest]=../libcrypto libtestutil.a
-§§+  DEPEND[packettest]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[asynctest]=asynctest.c
-§§   INCLUDE[asynctest]=../include
-§§-  DEPEND[asynctest]=../libcrypto
-§§+  DEPEND[asynctest]=../libcrypto{- $config{suffix} -}
-§§ 
-§§   SOURCE[secmemtest]=secmemtest.c
-§§   INCLUDE[secmemtest]=../include
-§§-  DEPEND[secmemtest]=../libcrypto libtestutil.a
-§§+  DEPEND[secmemtest]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[srptest]=srptest.c
-§§   INCLUDE[srptest]=../include
-§§-  DEPEND[srptest]=../libcrypto libtestutil.a
-§§+  DEPEND[srptest]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[memleaktest]=memleaktest.c
-§§   INCLUDE[memleaktest]=../include
-§§-  DEPEND[memleaktest]=../libcrypto libtestutil.a
-§§+  DEPEND[memleaktest]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[stack_test]=stack_test.c
-§§   INCLUDE[stack_test]=../include
-§§-  DEPEND[stack_test]=../libcrypto libtestutil.a
-§§+  DEPEND[stack_test]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[lhash_test]=lhash_test.c
-§§   INCLUDE[lhash_test]=../include
-§§-  DEPEND[lhash_test]=../libcrypto libtestutil.a
-§§+  DEPEND[lhash_test]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[dtlsv1listentest]=dtlsv1listentest.c
-§§   INCLUDE[dtlsv1listentest]=../include
-§§-  DEPEND[dtlsv1listentest]=../libssl libtestutil.a
-§§+  DEPEND[dtlsv1listentest]=../libssl{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[ct_test]=ct_test.c
-§§   INCLUDE[ct_test]=../include
-§§-  DEPEND[ct_test]=../libcrypto libtestutil.a
-§§+  DEPEND[ct_test]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[threadstest]=threadstest.c
-§§   INCLUDE[threadstest]=../include
-§§-  DEPEND[threadstest]=../libcrypto libtestutil.a
-§§+  DEPEND[threadstest]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[afalgtest]=afalgtest.c
-§§   INCLUDE[afalgtest]=../include
-§§-  DEPEND[afalgtest]=../libcrypto libtestutil.a
-§§+  DEPEND[afalgtest]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[d2i_test]=d2i_test.c
-§§   INCLUDE[d2i_test]=../include
-§§-  DEPEND[d2i_test]=../libcrypto libtestutil.a
-§§+  DEPEND[d2i_test]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[ssl_test_ctx_test]=ssl_test_ctx_test.c ssl_test_ctx.c
-§§   INCLUDE[ssl_test_ctx_test]=../include
-§§-  DEPEND[ssl_test_ctx_test]=../libcrypto ../libssl libtestutil.a
-§§+  DEPEND[ssl_test_ctx_test]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[ssl_test]=ssl_test.c ssl_test_ctx.c handshake_helper.c
-§§   INCLUDE[ssl_test]=../include
-§§-  DEPEND[ssl_test]=../libcrypto ../libssl libtestutil.a
-§§+  DEPEND[ssl_test]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[cipherlist_test]=cipherlist_test.c
-§§   INCLUDE[cipherlist_test]=../include
-§§-  DEPEND[cipherlist_test]=../libcrypto ../libssl libtestutil.a
-§§+  DEPEND[cipherlist_test]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
-§§ 
-§§   INCLUDE[ssl_test_ctx.o]=../include
-§§   INCLUDE[handshake_helper.o]=.. ../include
-§§@@ -289,104 +289,104 @@ INCLUDE_MAIN___test_libtestutil_OLB = /INCLUDE=MAIN
-§§ 
-§§   SOURCE[x509aux]=x509aux.c
-§§   INCLUDE[x509aux]=../include
-§§-  DEPEND[x509aux]=../libcrypto libtestutil.a
-§§+  DEPEND[x509aux]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[asynciotest]=asynciotest.c ssltestlib.c
-§§   INCLUDE[asynciotest]=../include
-§§-  DEPEND[asynciotest]=../libcrypto ../libssl libtestutil.a
-§§+  DEPEND[asynciotest]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[bio_callback_test]=bio_callback_test.c
-§§   INCLUDE[bio_callback_test]=../include
-§§-  DEPEND[bio_callback_test]=../libcrypto libtestutil.a
-§§+  DEPEND[bio_callback_test]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[bio_memleak_test]=bio_memleak_test.c
-§§   INCLUDE[bio_memleak_test]=../include
-§§-  DEPEND[bio_memleak_test]=../libcrypto libtestutil.a
-§§+  DEPEND[bio_memleak_test]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[bioprinttest]=bioprinttest.c
-§§   INCLUDE[bioprinttest]=../include
-§§-  DEPEND[bioprinttest]=../libcrypto libtestutil.a
-§§+  DEPEND[bioprinttest]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[sslapitest]=sslapitest.c ssltestlib.c
-§§   INCLUDE[sslapitest]=../include ..
-§§-  DEPEND[sslapitest]=../libcrypto ../libssl libtestutil.a
-§§+  DEPEND[sslapitest]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[ocspapitest]=ocspapitest.c
-§§   INCLUDE[ocspapitest]=../include
-§§-  DEPEND[ocspapitest]=../libcrypto libtestutil.a
-§§+  DEPEND[ocspapitest]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[dtlstest]=dtlstest.c ssltestlib.c
-§§   INCLUDE[dtlstest]=../include
-§§-  DEPEND[dtlstest]=../libcrypto ../libssl libtestutil.a
-§§+  DEPEND[dtlstest]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[sslcorrupttest]=sslcorrupttest.c ssltestlib.c
-§§   INCLUDE[sslcorrupttest]=../include
-§§-  DEPEND[sslcorrupttest]=../libcrypto ../libssl libtestutil.a
-§§+  DEPEND[sslcorrupttest]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[bio_enc_test]=bio_enc_test.c
-§§   INCLUDE[bio_enc_test]=../include
-§§-  DEPEND[bio_enc_test]=../libcrypto libtestutil.a
-§§+  DEPEND[bio_enc_test]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[pkey_meth_test]=pkey_meth_test.c
-§§   INCLUDE[pkey_meth_test]=../include
-§§-  DEPEND[pkey_meth_test]=../libcrypto libtestutil.a
-§§+  DEPEND[pkey_meth_test]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[pkey_meth_kdf_test]=pkey_meth_kdf_test.c
-§§   INCLUDE[pkey_meth_kdf_test]=../include
-§§-  DEPEND[pkey_meth_kdf_test]=../libcrypto libtestutil.a
-§§+  DEPEND[pkey_meth_kdf_test]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[x509_time_test]=x509_time_test.c
-§§   INCLUDE[x509_time_test]=../include
-§§-  DEPEND[x509_time_test]=../libcrypto libtestutil.a
-§§+  DEPEND[x509_time_test]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[recordlentest]=recordlentest.c ssltestlib.c
-§§   INCLUDE[recordlentest]=../include
-§§-  DEPEND[recordlentest]=../libcrypto ../libssl libtestutil.a
-§§+  DEPEND[recordlentest]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[drbgtest]=drbgtest.c
-§§   INCLUDE[drbgtest]=../include
-§§-  DEPEND[drbgtest]=../libcrypto.a libtestutil.a
-§§+  DEPEND[drbgtest]=../libcrypto{- $config{suffix} -}.a libtestutil.a
-§§ 
-§§   SOURCE[drbg_cavs_test]=drbg_cavs_test.c drbg_cavs_data.c
-§§   INCLUDE[drbg_cavs_test]=../include . ..
-§§-  DEPEND[drbg_cavs_test]=../libcrypto libtestutil.a
-§§+  DEPEND[drbg_cavs_test]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[x509_dup_cert_test]=x509_dup_cert_test.c
-§§   INCLUDE[x509_dup_cert_test]=../include
-§§-  DEPEND[x509_dup_cert_test]=../libcrypto libtestutil.a
-§§+  DEPEND[x509_dup_cert_test]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[x509_check_cert_pkey_test]=x509_check_cert_pkey_test.c
-§§   INCLUDE[x509_check_cert_pkey_test]=../include
-§§-  DEPEND[x509_check_cert_pkey_test]=../libcrypto libtestutil.a
-§§+  DEPEND[x509_check_cert_pkey_test]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[pemtest]=pemtest.c
-§§   INCLUDE[pemtest]=../include
-§§-  DEPEND[pemtest]=../libcrypto libtestutil.a
-§§+  DEPEND[pemtest]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[ssl_cert_table_internal_test]=ssl_cert_table_internal_test.c
-§§   INCLUDE[ssl_cert_table_internal_test]=.. ../include
-§§-  DEPEND[ssl_cert_table_internal_test]=../libcrypto libtestutil.a
-§§+  DEPEND[ssl_cert_table_internal_test]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[ciphername_test]=ciphername_test.c
-§§   INCLUDE[ciphername_test]=../include
-§§-  DEPEND[ciphername_test]=../libcrypto ../libssl libtestutil.a
-§§+  DEPEND[ciphername_test]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[servername_test]=servername_test.c ssltestlib.c
-§§   INCLUDE[servername_test]=../include
-§§-  DEPEND[servername_test]=../libcrypto ../libssl libtestutil.a
-§§+  DEPEND[servername_test]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
-§§ 
-§§   IF[{- !$disabled{cms} -}]
-§§     PROGRAMS_NO_INST=cmsapitest
-§§     SOURCE[cmsapitest]=cmsapitest.c
-§§     INCLUDE[cmsapitest]=../include
-§§-    DEPEND[cmsapitest]=../libcrypto libtestutil.a
-§§+    DEPEND[cmsapitest]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§   ENDIF
-§§ 
-§§   IF[{- !$disabled{psk} -}]
-§§     PROGRAMS_NO_INST=dtls_mtu_test
-§§     SOURCE[dtls_mtu_test]=dtls_mtu_test.c ssltestlib.c
-§§     INCLUDE[dtls_mtu_test]=.. ../include
-§§-    DEPEND[dtls_mtu_test]=../libcrypto ../libssl libtestutil.a
-§§+    DEPEND[dtls_mtu_test]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
-§§   ENDIF
-§§ 
-§§   IF[{- !$disabled{shared} -}]
-§§@@ -399,38 +399,38 @@ INCLUDE_MAIN___test_libtestutil_OLB = /INCLUDE=MAIN
-§§     PROGRAMS_NO_INST=cipher_overhead_test
-§§     SOURCE[cipher_overhead_test]=cipher_overhead_test.c
-§§     INCLUDE[cipher_overhead_test]=.. ../include
-§§-    DEPEND[cipher_overhead_test]=../libcrypto ../libssl libtestutil.a
-§§+    DEPEND[cipher_overhead_test]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
-§§   ENDIF
-§§ 
-§§   SOURCE[uitest]=uitest.c \
-§§                  {- rebase_files("../apps",
-§§                                  split(/\s+/, $target{apps_init_src})) -}
-§§   INCLUDE[uitest]=.. ../include ../apps
-§§-  DEPEND[uitest]=../apps/libapps.a ../libcrypto ../libssl libtestutil.a
-§§+  DEPEND[uitest]=../apps/libapps.a ../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[cipherbytes_test]=cipherbytes_test.c
-§§   INCLUDE[cipherbytes_test]=../include
-§§-  DEPEND[cipherbytes_test]=../libcrypto ../libssl libtestutil.a
-§§+  DEPEND[cipherbytes_test]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[asn1_encode_test]=asn1_encode_test.c
-§§   INCLUDE[asn1_encode_test]=../include
-§§-  DEPEND[asn1_encode_test]=../libcrypto libtestutil.a
-§§+  DEPEND[asn1_encode_test]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[asn1_decode_test]=asn1_decode_test.c
-§§   INCLUDE[asn1_decode_test]=../include
-§§-  DEPEND[asn1_decode_test]=../libcrypto libtestutil.a
-§§+  DEPEND[asn1_decode_test]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[asn1_string_table_test]=asn1_string_table_test.c
-§§   INCLUDE[asn1_string_table_test]=../include
-§§-  DEPEND[asn1_string_table_test]=../libcrypto libtestutil.a
-§§+  DEPEND[asn1_string_table_test]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[time_offset_test]=time_offset_test.c
-§§   INCLUDE[time_offset_test]=../include
-§§-  DEPEND[time_offset_test]=../libcrypto libtestutil.a
-§§+  DEPEND[time_offset_test]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[conf_include_test]=conf_include_test.c
-§§   INCLUDE[conf_include_test]=../include
-§§-  DEPEND[conf_include_test]=../libcrypto libtestutil.a
-§§+  DEPEND[conf_include_test]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   # Internal test programs.  These are essentially a collection of internal
-§§   # test routines.  Some of them need to reach internal symbols that aren't
-§§@@ -463,59 +463,59 @@ INCLUDE_MAIN___test_libtestutil_OLB = /INCLUDE=MAIN
-§§ 
-§§     SOURCE[poly1305_internal_test]=poly1305_internal_test.c
-§§     INCLUDE[poly1305_internal_test]=.. ../include ../crypto/include
-§§-    DEPEND[poly1305_internal_test]=../libcrypto.a libtestutil.a
-§§+    DEPEND[poly1305_internal_test]=../libcrypto{- $config{suffix} -}.a libtestutil.a
-§§ 
-§§     SOURCE[chacha_internal_test]=chacha_internal_test.c
-§§     INCLUDE[chacha_internal_test]=.. ../include ../crypto/include
-§§-    DEPEND[chacha_internal_test]=../libcrypto.a libtestutil.a
-§§+    DEPEND[chacha_internal_test]=../libcrypto{- $config{suffix} -}.a libtestutil.a
-§§ 
-§§     SOURCE[asn1_internal_test]=asn1_internal_test.c
-§§     INCLUDE[asn1_internal_test]=.. ../include ../crypto/include
-§§-    DEPEND[asn1_internal_test]=../libcrypto.a libtestutil.a
-§§+    DEPEND[asn1_internal_test]=../libcrypto{- $config{suffix} -}.a libtestutil.a
-§§ 
-§§     SOURCE[modes_internal_test]=modes_internal_test.c
-§§     INCLUDE[modes_internal_test]=.. ../include
-§§-    DEPEND[modes_internal_test]=../libcrypto.a libtestutil.a
-§§+    DEPEND[modes_internal_test]=../libcrypto{- $config{suffix} -}.a libtestutil.a
-§§ 
-§§     SOURCE[x509_internal_test]=x509_internal_test.c
-§§     INCLUDE[x509_internal_test]=.. ../include
-§§-    DEPEND[x509_internal_test]=../libcrypto.a libtestutil.a
-§§+    DEPEND[x509_internal_test]=../libcrypto{- $config{suffix} -}.a libtestutil.a
-§§ 
-§§     SOURCE[tls13encryptiontest]=tls13encryptiontest.c
-§§     INCLUDE[tls13encryptiontest]=.. ../include
-§§-    DEPEND[tls13encryptiontest]=../libcrypto ../libssl.a libtestutil.a
-§§+    DEPEND[tls13encryptiontest]=../libcrypto{- $config{suffix} -} ../libssl.a libtestutil.a
-§§ 
-§§     SOURCE[wpackettest]=wpackettest.c
-§§     INCLUDE[wpackettest]=../include
-§§-    DEPEND[wpackettest]=../libcrypto ../libssl.a libtestutil.a
-§§+    DEPEND[wpackettest]=../libcrypto{- $config{suffix} -} ../libssl.a libtestutil.a
-§§ 
-§§     SOURCE[ctype_internal_test]=ctype_internal_test.c
-§§     INCLUDE[ctype_internal_test]=.. ../crypto/include ../include
-§§-    DEPEND[ctype_internal_test]=../libcrypto.a libtestutil.a
-§§+    DEPEND[ctype_internal_test]=../libcrypto{- $config{suffix} -}.a libtestutil.a
-§§ 
-§§     SOURCE[siphash_internal_test]=siphash_internal_test.c
-§§     INCLUDE[siphash_internal_test]=.. ../include ../crypto/include
-§§-    DEPEND[siphash_internal_test]=../libcrypto.a libtestutil.a
-§§+    DEPEND[siphash_internal_test]=../libcrypto{- $config{suffix} -}.a libtestutil.a
-§§ 
-§§     SOURCE[sm2_internal_test]=sm2_internal_test.c
-§§     INCLUDE[sm2_internal_test]=../include ../crypto/include
-§§-    DEPEND[sm2_internal_test]=../libcrypto.a libtestutil.a
-§§+    DEPEND[sm2_internal_test]=../libcrypto{- $config{suffix} -}.a libtestutil.a
-§§ 
-§§     SOURCE[sm4_internal_test]=sm4_internal_test.c
-§§     INCLUDE[sm4_internal_test]=.. ../include ../crypto/include
-§§-    DEPEND[sm4_internal_test]=../libcrypto.a libtestutil.a
-§§+    DEPEND[sm4_internal_test]=../libcrypto{- $config{suffix} -}.a libtestutil.a
-§§ 
-§§     SOURCE[ec_internal_test]=ec_internal_test.c
-§§     INCLUDE[ec_internal_test]=../include ../crypto/ec ../crypto/include
-§§-    DEPEND[ec_internal_test]=../libcrypto.a libtestutil.a
-§§+    DEPEND[ec_internal_test]=../libcrypto{- $config{suffix} -}.a libtestutil.a
-§§ 
-§§     SOURCE[curve448_internal_test]=curve448_internal_test.c
-§§     INCLUDE[curve448_internal_test]=.. ../include ../crypto/ec/curve448
-§§-    DEPEND[curve448_internal_test]=../libcrypto.a libtestutil.a
-§§+    DEPEND[curve448_internal_test]=../libcrypto{- $config{suffix} -}.a libtestutil.a
-§§ 
-§§     SOURCE[rdrand_sanitytest]=rdrand_sanitytest.c
-§§     INCLUDE[rdrand_sanitytest]=../include
-§§-    DEPEND[rdrand_sanitytest]=../libcrypto.a libtestutil.a
-§§+    DEPEND[rdrand_sanitytest]=../libcrypto{- $config{suffix} -}.a libtestutil.a
-§§   ENDIF
-§§ 
-§§   IF[{- !$disabled{mdc2} -}]
-§§@@ -524,12 +524,12 @@ INCLUDE_MAIN___test_libtestutil_OLB = /INCLUDE=MAIN
-§§ 
-§§   SOURCE[mdc2_internal_test]=mdc2_internal_test.c
-§§   INCLUDE[mdc2_internal_test]=.. ../include
-§§-  DEPEND[mdc2_internal_test]=../libcrypto libtestutil.a
-§§+  DEPEND[mdc2_internal_test]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   PROGRAMS_NO_INST=asn1_time_test
-§§   SOURCE[asn1_time_test]=asn1_time_test.c
-§§   INCLUDE[asn1_time_test]=../include
-§§-  DEPEND[asn1_time_test]=../libcrypto libtestutil.a
-§§+  DEPEND[asn1_time_test]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   # We disable this test completely in a shared build because it deliberately
-§§   # redefines some internal libssl symbols. This doesn't work in a non-shared
-§§@@ -539,24 +539,24 @@ INCLUDE_MAIN___test_libtestutil_OLB = /INCLUDE=MAIN
-§§     SOURCE[tls13secretstest]=tls13secretstest.c
-§§     SOURCE[tls13secretstest]= ../ssl/tls13_enc.c ../ssl/packet.c
-§§     INCLUDE[tls13secretstest]=.. ../include
-§§-    DEPEND[tls13secretstest]=../libcrypto ../libssl libtestutil.a
-§§+    DEPEND[tls13secretstest]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
-§§   ENDIF
-§§ 
-§§   SOURCE[sslbuffertest]=sslbuffertest.c ssltestlib.c
-§§   INCLUDE[sslbuffertest]=../include
-§§-  DEPEND[sslbuffertest]=../libcrypto ../libssl libtestutil.a
-§§+  DEPEND[sslbuffertest]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[sysdefaulttest]=sysdefaulttest.c
-§§   INCLUDE[sysdefaulttest]=../include
-§§-  DEPEND[sysdefaulttest]=../libcrypto ../libssl libtestutil.a
-§§+  DEPEND[sysdefaulttest]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[errtest]=errtest.c
-§§   INCLUDE[errtest]=../include
-§§-  DEPEND[errtest]=../libcrypto libtestutil.a
-§§+  DEPEND[errtest]=../libcrypto{- $config{suffix} -} libtestutil.a
-§§ 
-§§   SOURCE[gosttest]=gosttest.c ssltestlib.c
-§§   INCLUDE[gosttest]=../include ..
-§§-  DEPEND[gosttest]=../libcrypto ../libssl libtestutil.a
-§§+  DEPEND[gosttest]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
-§§ ENDIF
-§§ 
-§§ {-
-§§@@ -583,7 +583,7 @@ ENDIF
-§§   SOURCE[buildtest_c_$name]=buildtest_$name.c
-§§   GENERATE[buildtest_$name.c]=generate_buildtest.pl $name
-§§   INCLUDE[buildtest_c_$name]=../include
-§§-  DEPEND[buildtest_c_$name]=../libssl ../libcrypto
-§§+  DEPEND[buildtest_c_$name]=../libssl$config{suffix} ../libcrypto$config{suffix}
-§§ _____
-§§        $OUT .= <<"_____" if $config{CXX} && !$disabled{"buildtest-c++"};
-§§ 
-§§@@ -591,7 +591,7 @@ _____
-§§   SOURCE[buildtest_cc_$name]=buildtest_$name.cc
-§§   GENERATE[buildtest_$name.cc]=generate_buildtest.pl $name
-§§   INCLUDE[buildtest_cc_$name]=../include
-§§-  DEPEND[buildtest_cc_$name]=../libssl ../libcrypto
-§§+  DEPEND[buildtest_cc_$name]=../libssl$config{suffix} ../libcrypto$config{suffix}
-§§ _____
-§§    }
-§§ -}
-§§
-§§--- util\mkdef.pl
-§§+++ mkdef.pl
-§§@@ -186,8 +186,8 @@
-§§ 		$zlib = 1;
-§§ 	}
-§§ 
-§§-	$do_crypto=1 if $_ eq "libcrypto" || $_ eq "crypto";
-§§-	$do_ssl=1 if $_ eq "libssl" || $_ eq "ssl";
-§§+	$do_crypto=1 if $_ =~ m/^libcrypto/ || $_ =~ m/^crypto/;
-§§+	$do_ssl=1 if $_ =~ m/^libssl/ || $_ =~ m/^ssl/;
-§§ 
-§§ 	$do_update=1 if $_ eq "update";
-§§ 	$do_rewrite=1 if $_ eq "rewrite";
-§§diff --git a/test/ossl_shim/build.info b/test/ossl_shim/build.info
-§§index 12250600b9..b38b987212 100644
-§§--- test/ossl_shim/build.info
-§§+++ test/ossl_shim/build.info
-§§@@ -2,5 +2,5 @@ IF[{- defined $target{CXX} && !$disabled{"external-tests"} -}]
-§§   PROGRAMS_NO_INST=ossl_shim
-§§   SOURCE[ossl_shim]=ossl_shim.cc async_bio.cc packeted_bio.cc test_config.cc
-§§   INCLUDE[ossl_shim]=. include ../../include
-§§-  DEPEND[ossl_shim]=../../libssl ../../libcrypto
-§§+  DEPEND[ossl_shim]=../../libssl{- $config{suffix} -} ../../libcrypto{- $config{suffix} -}
-§§ ENDIF
+# Copyright 2017-2019 Siemens AG. All Rights Reserved.
+#
+# Licensed under the Apache License 2.0 (the "License").  You may not use
+# this file except in compliance with the License.  You can obtain a copy
+# in the file LICENSE in the source distribution or at
+# https://www.openssl.org/source/license.html
+#
+# Author(s): Thomas Riedmaier
+--- apps/build.info
++++ apps/build.info
+@@ -20,7 +20,7 @@ IF[{- !$disabled{apps} -}]
+   SOURCE[openssl]={- join(" ", @apps_init_src) -}
+   SOURCE[openssl]={- join(" ", @apps_openssl_src) -}
+   INCLUDE[openssl]=.. ../include
+-  DEPEND[openssl]=libapps.a ../libssl
++  DEPEND[openssl]=libapps.a ../libssl{- $config{suffix} -}
+
+ IF[{- $config{target} =~ /^(?:Cygwin|mingw|VC-)/ -}]
+   GENERATE[openssl.rc]=../util/mkrc.pl openssl
+--- build.info
++++ build.info
+@@ -8,10 +8,30 @@
+          if $config{target} =~ /^vms/;
+      "";
+ -}
+-LIBS=libcrypto libssl
+-INCLUDE[libcrypto]=. crypto/include include
+-INCLUDE[libssl]=. include
+-DEPEND[libssl]=libcrypto
++{-
++       if (join(" ", @{$config{ex_libs}}) =~ /-static/) {
++               $config{suffix} = "MT";
++       } else {
++               $config{suffix} = "MD";
++       }
++
++       if ($config{build_type} eq "debug") {
++               $config{suffix} .= "d";
++       }
++
++       print "==================================================\n";
++       foreach my $name (sort keys %config) { printf "%-30s %s\n", $name, $config{$name}; }
++       print "==================================================\n";
++       foreach my $name (sort keys %target) { printf "%-30s %s\n", $name, $target{$name}; }
++       print "==================================================\n";
++
++       ""
++-}
++
++LIBS=libcrypto{- $config{suffix} -}  libssl{- $config{suffix} -}
++INCLUDE[libcrypto{- $config{suffix} -}]=. crypto/include include
++INCLUDE[libssl{- $config{suffix} -}]=. include
++DEPEND[libssl{- $config{suffix} -}]=libcrypto{- $config{suffix} -}
+
+ # Empty DEPEND "indices" means the dependencies are expected to be built
+ # unconditionally before anything else.
+@@ -31,24 +51,24 @@ IF[{- defined $target{shared_defflag} -}]
+     GENERATE[libssl.def]=util/mkdef.pl ssl 32
+     DEPEND[libssl.def]=util/libssl.num
+
+-    SHARED_SOURCE[libcrypto]=libcrypto.def
+-    SHARED_SOURCE[libssl]=libssl.def
++    SHARED_SOURCE[libcrypto{- $config{suffix} -}]=libcrypto.def
++    SHARED_SOURCE[libssl{- $config{suffix} -}]=libssl.def
+   ELSIF[{- $config{target} =~ /^aix/ -}]
+     GENERATE[libcrypto.map]=util/mkdef.pl crypto aix
+     DEPEND[libcrypto.map]=util/libcrypto.num
+     GENERATE[libssl.map]=util/mkdef.pl ssl aix
+     DEPEND[libssl.map]=util/libssl.num
+
+-    SHARED_SOURCE[libcrypto]=libcrypto.map
+-    SHARED_SOURCE[libssl]=libssl.map
++    SHARED_SOURCE[libcrypto{- $config{suffix} -}]=libcrypto.map
++    SHARED_SOURCE[libssl{- $config{suffix} -}]=libssl.map
+   ELSE
+     GENERATE[libcrypto.map]=util/mkdef.pl crypto linux
+     DEPEND[libcrypto.map]=util/libcrypto.num
+     GENERATE[libssl.map]=util/mkdef.pl ssl linux
+     DEPEND[libssl.map]=util/libssl.num
+
+-    SHARED_SOURCE[libcrypto]=libcrypto.map
+-    SHARED_SOURCE[libssl]=libssl.map
++    SHARED_SOURCE[libcrypto{- $config{suffix} -}]=libcrypto.map
++    SHARED_SOURCE[libssl{- $config{suffix} -}]=libssl.map
+   ENDIF
+ ENDIF
+ # VMS and VC don't have parametrised .def / .symvec generation, so they get
+@@ -59,35 +79,33 @@ IF[{- $config{target} =~ /^VC-/ -}]
+   GENERATE[libssl.def]=util/mkdef.pl ssl 32
+   DEPEND[libssl.def]=util/libssl.num
+
+-  SHARED_SOURCE[libcrypto]=libcrypto.def
+-  SHARED_SOURCE[libssl]=libssl.def
++  SHARED_SOURCE[libcrypto{- $config{suffix} -}]=libcrypto.def
++  SHARED_SOURCE[libssl{- $config{suffix} -}]=libssl.def
+ ELSIF[{- $config{target} =~ /^vms/ -}]
+   GENERATE[libcrypto.opt]=util/mkdef.pl crypto "VMS"
+   DEPEND[libcrypto.opt]=util/libcrypto.num
+   GENERATE[libssl.opt]=util/mkdef.pl ssl "VMS"
+   DEPEND[libssl.opt]=util/libssl.num
+
+-  SHARED_SOURCE[libcrypto]=libcrypto.opt
+-  SHARED_SOURCE[libssl]=libssl.opt
++  SHARED_SOURCE[libcrypto{- $config{suffix} -}]=libcrypto.opt
++  SHARED_SOURCE[libssl{- $config{suffix} -}]=libssl.opt
+ ENDIF
+
+ IF[{- $config{target} =~ /^(?:Cygwin|mingw|VC-)/ -}]
+-  GENERATE[libcrypto.rc]=util/mkrc.pl libcrypto
+-  GENERATE[libssl.rc]=util/mkrc.pl libssl
++  GENERATE[libcrypto.rc]=util/mkrc.pl libcrypto{- $config{suffix} -}
++  GENERATE[libssl.rc]=util/mkrc.pl libssl{- $config{suffix} -}
+
+-  SHARED_SOURCE[libcrypto]=libcrypto.rc
+-  SHARED_SOURCE[libssl]=libssl.rc
++  SHARED_SOURCE[libcrypto{- $config{suffix} -}]=libcrypto.rc
++  SHARED_SOURCE[libssl{- $config{suffix} -}]=libssl.rc
+ ENDIF
+
+ IF[{- $config{target} =~ /^Cygwin/ -}]
+- SHARED_NAME[libcrypto]=cygcrypto-{- $sover_filename -}
+- SHARED_NAME[libssl]=cygssl-{- $sover_filename -}
++ SHARED_NAME[libcrypto{- $config{suffix} -}]=cygcrypto-{- $sover_filename -}
++ SHARED_NAME[libssl{- $config{suffix} -}]=cygssl-{- $sover_filename -}
+ ELSIF[{- $config{target} =~ /^mingw/ -}]
+- SHARED_NAME[libcrypto]=libcrypto-{- $sover_filename -}{- $config{target} eq "mingw64" ? "-x64" : "" -}
+- SHARED_NAME[libssl]=libssl-{- $sover_filename -}{- $config{target} eq "mingw64" ? "-x64" : "" -}
++ SHARED_NAME[libcrypto{- $config{suffix} -}]=libcrypto-{- $sover_filename -}{- $config{target} eq "mingw64" ? "-x64" : "" -}
++ SHARED_NAME[libssl{- $config{suffix} -}]=libssl-{- $sover_filename -}{- $config{target} eq "mingw64" ? "-x64" : "" -}
+ ELSIF[{- $config{target} =~ /^VC-/ -}]
+- SHARED_NAME[libcrypto]=libcrypto-{- $sover_filename -}{- $target{multilib} -}
+- SHARED_NAME[libssl]=libssl-{- $sover_filename -}{- $target{multilib} -}
+ ENDIF
+
+ # VMS has a cultural standard where all libraries are prefixed.
+@@ -96,8 +114,8 @@ ENDIF
+ # Also, it seems it's usual to have the pointer size the libraries
+ # were built for as part of the name.
+ IF[{- $config{target} =~ /^vms/ -}]
+- RENAME[libcrypto]=ossl$libcrypto{- $target{pointer_size} -}
+- RENAME[libssl]=ossl$libssl{- $target{pointer_size} -}
+- SHARED_NAME[libcrypto]=ossl$libcrypto{- $sover_filename -}_shr{- $target{pointer_size} -}
+- SHARED_NAME[libssl]=ossl$libssl{- $sover_filename -}_shr{- $target{pointer_size} -}
++ RENAME[libcrypto{- $config{suffix} -}]=ossl$libcrypto{- $target{pointer_size} -}
++ RENAME[libssl{- $config{suffix} -}]=ossl$libssl{- $target{pointer_size} -}
++ SHARED_NAME[libcrypto{- $config{suffix} -}]=ossl$libcrypto{- $sover_filename -}_shr{- $target{pointer_size} -}
++ SHARED_NAME[libssl{- $config{suffix} -}]=ossl$libssl{- $sover_filename -}_shr{- $target{pointer_size} -}
+ ENDIF
+--- Configurations\00-base-templates.conf
++++ Configurations\00-base-templates.conf
+@@ -33,7 +33,8 @@
+ 	modes_asm_src	=> "",
+ 	padlock_asm_src	=> "",
+ 	chacha_asm_src	=> "chacha_enc.c",
+-	poly1305_asm_src	=> "",
++	poly1305_asm_src	=> "",
++	suffix			=> "",
+ 	keccak1600_asm_src	=> "keccak1600.c",
+ 
+ 	unistd		=> "<unistd.h>",
+
+
+--- Configurations\windows-makefile.tmpl
++++ Configurations\windows-makefile.tmpl
+@@ -35,7 +35,7 @@
+      my $lib = shift;
+      return () if $disabled{shared} || $lib =~ /\.a$/;
+      return () unless defined $unified_info{sharednames}->{$lib};
+-     return $unified_info{sharednames}->{$lib} . $shlibext;
++     return $unified_info{sharednames}->{$lib}. $shlibext;
+  }
+ 
+  sub lib {
+
+diff --git a/crypto/aes/build.info b/crypto/aes/build.info
+index 0f04863640..58a9947ae3 100644
+--- crypto/aes/build.info
++++ crypto/aes/build.info
+@@ -1,5 +1,4 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         aes_misc.c aes_ecb.c aes_cfb.c aes_ofb.c \
+         aes_ige.c aes_wrap.c {- $target{aes_asm_src} -}
+ 
+diff --git a/crypto/aria/build.info b/crypto/aria/build.info
+index 218d0612f7..5eab36fec6 100644
+--- crypto/aria/build.info
++++ crypto/aria/build.info
+@@ -1,4 +1,3 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         aria.c
+ 
+diff --git a/crypto/asn1/build.info b/crypto/asn1/build.info
+index d3e92c81ac..1d5648e01f 100644
+--- crypto/asn1/build.info
++++ crypto/asn1/build.info
+@@ -1,5 +1,4 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         a_object.c a_bitstr.c a_utctm.c a_gentm.c a_time.c a_int.c a_octet.c \
+         a_print.c a_type.c a_dup.c a_d2i_fp.c a_i2d_fp.c \
+         a_utf8.c a_sign.c a_digest.c a_verify.c a_mbstr.c a_strex.c \
+diff --git a/crypto/async/build.info b/crypto/async/build.info
+index 278e3e9f89..28c3e31b9e 100644
+--- crypto/async/build.info
++++ crypto/async/build.info
+@@ -1,4 +1,3 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         async.c async_wait.c async_err.c arch/async_posix.c arch/async_win.c \
+         arch/async_null.c
+diff --git a/crypto/bf/build.info b/crypto/bf/build.info
+index 29adc8ce50..d0ea733998 100644
+--- crypto/bf/build.info
++++ crypto/bf/build.info
+@@ -1,5 +1,4 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=bf_skey.c bf_ecb.c bf_cfb64.c bf_ofb64.c \
++SOURCE[../../libcrypto{- $config{suffix} -}]=bf_skey.c bf_ecb.c bf_cfb64.c bf_ofb64.c \
+         {- $target{bf_asm_src} -}
+ 
+ GENERATE[bf-586.s]=asm/bf-586.pl \
+diff --git a/crypto/bio/build.info b/crypto/bio/build.info
+index d1e7d73c55..487daf5cac 100644
+--- crypto/bio/build.info
++++ crypto/bio/build.info
+@@ -1,5 +1,4 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         bio_lib.c bio_cb.c bio_err.c \
+         bss_mem.c bss_null.c bss_fd.c \
+         bss_file.c bss_sock.c bss_conn.c \
+diff --git a/crypto/blake2/build.info b/crypto/blake2/build.info
+index 0036f08482..050b60f73d 100644
+--- crypto/blake2/build.info
++++ crypto/blake2/build.info
+@@ -1,3 +1,2 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         blake2b.c blake2s.c m_blake2b.c m_blake2s.c
+diff --git a/crypto/bn/build.info b/crypto/bn/build.info
+index a463eddabb..95b0a9c26d 100644
+--- crypto/bn/build.info
++++ crypto/bn/build.info
+@@ -1,12 +1,11 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         bn_add.c bn_div.c bn_exp.c bn_lib.c bn_ctx.c bn_mul.c bn_mod.c \
+         bn_print.c bn_rand.c bn_shift.c bn_word.c bn_blind.c \
+         bn_kron.c bn_sqrt.c bn_gcd.c bn_prime.c bn_err.c bn_sqr.c \
+         {- $target{bn_asm_src} -} \
+         bn_recp.c bn_mont.c bn_mpi.c bn_exp2.c bn_gf2m.c bn_nist.c \
+         bn_depr.c bn_const.c bn_x931p.c bn_intern.c bn_dh.c bn_srp.c
+-INCLUDE[../../libcrypto]=../../crypto/include
++INCLUDE[../../libcrypto{- $config{suffix} -}]=../../crypto/include
+ 
+ INCLUDE[bn_exp.o]=..
+ 
+diff --git a/crypto/buffer/build.info b/crypto/buffer/build.info
+index 54da1f92a8..aea124b786 100644
+--- crypto/buffer/build.info
++++ crypto/buffer/build.info
+@@ -1,2 +1 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=buffer.c buf_err.c
++SOURCE[../../libcrypto{- $config{suffix} -}]=buffer.c buf_err.c
+--- crypto\build.info
++++ crypto\build.info
+@@ -1,5 +1,4 @@
+-LIBS=../libcrypto
+-SOURCE[../libcrypto]=\
++SOURCE[../libcrypto{- $config{suffix} -}]=\
+         cryptlib.c mem.c mem_dbg.c cversion.c ex_data.c cpt_err.c \
+         ebcdic.c uid.c o_time.c o_str.c o_dir.c o_fopen.c ctype.c \
+         threads_pthread.c threads_win.c threads_none.c getenv.c \
+@@ -35,5 +34,5 @@
+ INCLUDE[s390xcpuid.o]=.
+ 
+ IF[{- $config{target} =~ /^(?:Cygwin|mingw|VC-)/ -}]
+-  SHARED_SOURCE[../libcrypto]=dllmain.c
++  SHARED_SOURCE[../libcrypto{- $config{suffix} -}]=dllmain.c
+ ENDIF
+diff --git a/crypto/camellia/build.info b/crypto/camellia/build.info
+index e36a19bd4d..049fab284a 100644
+--- crypto/camellia/build.info
++++ crypto/camellia/build.info
+@@ -1,5 +1,4 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         cmll_ecb.c cmll_ofb.c cmll_cfb.c cmll_ctr.c \
+         {- $target{cmll_asm_src} -}
+ 
+diff --git a/crypto/cast/build.info b/crypto/cast/build.info
+index b0f59f3800..ee9f4b0283 100644
+--- crypto/cast/build.info
++++ crypto/cast/build.info
+@@ -1,5 +1,4 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         c_skey.c c_ecb.c {- $target{cast_asm_src} -} c_cfb64.c c_ofb64.c
+ 
+ GENERATE[cast-586.s]=asm/cast-586.pl \
+diff --git a/crypto/chacha/build.info b/crypto/chacha/build.info
+index e75ca72b67..f84ec2c551 100644
+--- crypto/chacha/build.info
++++ crypto/chacha/build.info
+@@ -1,5 +1,4 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]={- $target{chacha_asm_src} -}
++SOURCE[../../libcrypto{- $config{suffix} -}]={- $target{chacha_asm_src} -}
+ 
+ GENERATE[chacha-x86.s]=asm/chacha-x86.pl \
+         $(PERLASM_SCHEME) $(LIB_CFLAGS) $(LIB_CPPFLAGS) $(PROCESSOR)
+diff --git a/crypto/cmac/build.info b/crypto/cmac/build.info
+index c8a4949a07..28793ead69 100644
+--- crypto/cmac/build.info
++++ crypto/cmac/build.info
+@@ -1,2 +1 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=cmac.c cm_ameth.c cm_pmeth.c
++SOURCE[../../libcrypto{- $config{suffix} -}]=cmac.c cm_ameth.c cm_pmeth.c
+diff --git a/crypto/cms/build.info b/crypto/cms/build.info
+index cb675436ef..6dbe5bf619 100644
+--- crypto/cms/build.info
++++ crypto/cms/build.info
+@@ -1,5 +1,4 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]= \
++SOURCE[../../libcrypto{- $config{suffix} -}]= \
+         cms_lib.c cms_asn1.c cms_att.c cms_io.c cms_smime.c cms_err.c \
+         cms_sd.c cms_dd.c cms_cd.c cms_env.c cms_enc.c cms_ess.c \
+         cms_pwri.c cms_kari.c
+diff --git a/crypto/comp/build.info b/crypto/comp/build.info
+index 65df46a175..82b564f55e 100644
+--- crypto/comp/build.info
++++ crypto/comp/build.info
+@@ -1,4 +1,3 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]= \
++SOURCE[../../libcrypto{- $config{suffix} -}]= \
+         comp_lib.c comp_err.c \
+         c_zlib.c
+diff --git a/crypto/conf/build.info b/crypto/conf/build.info
+index ff367994ea..789c16bb46 100644
+--- crypto/conf/build.info
++++ crypto/conf/build.info
+@@ -1,4 +1,3 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]= \
++SOURCE[../../libcrypto{- $config{suffix} -}]= \
+         conf_err.c conf_lib.c conf_api.c conf_def.c conf_mod.c \
+         conf_mall.c conf_sap.c conf_ssl.c
+diff --git a/crypto/ct/build.info b/crypto/ct/build.info
+index 3ca0e31608..de3074f9ce 100644
+--- crypto/ct/build.info
++++ crypto/ct/build.info
+@@ -1,3 +1,2 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]= ct_b64.c ct_err.c ct_log.c ct_oct.c ct_policy.c \
++SOURCE[../../libcrypto{- $config{suffix} -}]= ct_b64.c ct_err.c ct_log.c ct_oct.c ct_policy.c \
+                          ct_prn.c ct_sct.c ct_sct_ctx.c ct_vfy.c ct_x509v3.c
+diff --git a/crypto/des/build.info b/crypto/des/build.info
+index 05cb154cd4..63f02462f8 100644
+--- crypto/des/build.info
++++ crypto/des/build.info
+@@ -1,5 +1,4 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         set_key.c  ecb_enc.c  cbc_enc.c \
+         ecb3_enc.c cfb64enc.c cfb64ede.c cfb_enc.c \
+         ofb64ede.c ofb64enc.c ofb_enc.c \
+diff --git a/crypto/dh/build.info b/crypto/dh/build.info
+index b19ff6dbac..0085c82f1a 100644
+--- crypto/dh/build.info
++++ crypto/dh/build.info
+@@ -1,5 +1,4 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         dh_asn1.c dh_gen.c dh_key.c dh_lib.c dh_check.c dh_err.c dh_depr.c \
+         dh_ameth.c dh_pmeth.c dh_prn.c dh_rfc5114.c dh_kdf.c dh_meth.c \
+         dh_rfc7919.c
+diff --git a/crypto/dsa/build.info b/crypto/dsa/build.info
+index 2e759853a2..0a64542a1f 100644
+--- crypto/dsa/build.info
++++ crypto/dsa/build.info
+@@ -1,5 +1,4 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         dsa_gen.c dsa_key.c dsa_lib.c dsa_asn1.c dsa_vrf.c dsa_sign.c \
+         dsa_err.c dsa_ossl.c dsa_depr.c dsa_ameth.c dsa_pmeth.c dsa_prn.c \
+         dsa_meth.c
+diff --git a/crypto/dso/build.info b/crypto/dso/build.info
+index 82b592d9a1..d5d2b8eb3d 100644
+--- crypto/dso/build.info
++++ crypto/dso/build.info
+@@ -1,4 +1,3 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         dso_dl.c dso_dlfcn.c dso_err.c dso_lib.c \
+         dso_openssl.c dso_win32.c dso_vms.c
+diff --git a/crypto/ec/build.info b/crypto/ec/build.info
+index a1e673e347..8cd4661f9d 100644
+--- crypto/ec/build.info
++++ crypto/ec/build.info
+@@ -1,5 +1,4 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         ec_lib.c ecp_smpl.c ecp_mont.c ecp_nist.c ec_cvt.c ec_mult.c \
+         ec_err.c ec_curve.c ec_check.c ec_print.c ec_asn1.c ec_key.c \
+         ec2_smpl.c ec_ameth.c ec_pmeth.c eck_prn.c \
+diff --git a/crypto/engine/build.info b/crypto/engine/build.info
+index e00802a3fd..de3602fcd0 100644
+--- crypto/engine/build.info
++++ crypto/engine/build.info
+@@ -1,5 +1,4 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         eng_err.c eng_lib.c eng_list.c eng_init.c eng_ctrl.c \
+         eng_table.c eng_pkey.c eng_fat.c eng_all.c \
+         tb_rsa.c tb_dsa.c tb_dh.c tb_rand.c \
+@@ -7,5 +7,5 @@ SOURCE[../../libcrypto]=\
+         eng_openssl.c eng_cnf.c eng_dyn.c \
+         eng_rdrand.c
+ IF[{- !$disabled{devcryptoeng} -}]
+-  SOURCE[../../libcrypto]=eng_devcrypto.c
++  SOURCE[../../libcrypto{- $config{suffix} -}]=eng_devcrypto.c
+ ENDIF
+diff --git a/crypto/err/build.info b/crypto/err/build.info
+index 6163d95b74..6d7112562f 100644
+--- crypto/err/build.info
++++ crypto/err/build.info
+@@ -1,3 +1,2 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         err.c err_all.c err_prn.c
+diff --git a/crypto/evp/build.info b/crypto/evp/build.info
+index cc33ac3c49..6a63d4f0ff 100644
+--- crypto/evp/build.info
++++ crypto/evp/build.info
+@@ -1,5 +1,4 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         encode.c digest.c evp_enc.c evp_key.c evp_cnf.c \
+         e_des.c e_bf.c e_idea.c e_des3.c e_camellia.c\
+         e_rc4.c e_aes.c names.c e_seed.c e_aria.c e_sm4.c \
+diff --git a/crypto/hmac/build.info b/crypto/hmac/build.info
+index 09f67c2a02..e1c732b115 100644
+--- crypto/hmac/build.info
++++ crypto/hmac/build.info
+@@ -1,3 +1,2 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         hmac.c hm_ameth.c hm_pmeth.c
+diff --git a/crypto/idea/build.info b/crypto/idea/build.info
+index 2326123797..559092c9cb 100644
+--- crypto/idea/build.info
++++ crypto/idea/build.info
+@@ -1,3 +1,2 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         i_cbc.c i_cfb64.c i_ofb64.c i_ecb.c i_skey.c
+diff --git a/crypto/kdf/build.info b/crypto/kdf/build.info
+index c166399d0c..50edb641e9 100644
+--- crypto/kdf/build.info
++++ crypto/kdf/build.info
+@@ -1,3 +1,2 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         tls1_prf.c kdf_err.c hkdf.c scrypt.c
+diff --git a/crypto/lhash/build.info b/crypto/lhash/build.info
+index 30797f2caf..78628a0bcf 100644
+--- crypto/lhash/build.info
++++ crypto/lhash/build.info
+@@ -1,3 +1,2 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         lhash.c lh_stats.c
+diff --git a/crypto/md2/build.info b/crypto/md2/build.info
+index e31948c23f..c98f550f16 100644
+--- crypto/md2/build.info
++++ crypto/md2/build.info
+@@ -1,3 +1,2 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         md2_dgst.c md2_one.c
+diff --git a/crypto/md4/build.info b/crypto/md4/build.info
+index 20846e0dce..4a384bba64 100644
+--- crypto/md4/build.info
++++ crypto/md4/build.info
+@@ -1,3 +1,2 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         md4_dgst.c md4_one.c
+diff --git a/crypto/md5/build.info b/crypto/md5/build.info
+index e641fecd0d..67f2f00280 100644
+--- crypto/md5/build.info
++++ crypto/md5/build.info
+@@ -1,5 +1,4 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         md5_dgst.c md5_one.c {- $target{md5_asm_src} -}
+ 
+ GENERATE[md5-586.s]=asm/md5-586.pl \
+diff --git a/crypto/mdc2/build.info b/crypto/mdc2/build.info
+index 8fe6878d60..0f74344622 100644
+--- crypto/mdc2/build.info
++++ crypto/mdc2/build.info
+@@ -1,3 +1,2 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         mdc2dgst.c mdc2_one.c
+diff --git a/crypto/modes/build.info b/crypto/modes/build.info
+index 821340eb90..57f5161a73 100644
+--- crypto/modes/build.info
++++ crypto/modes/build.info
+@@ -1,5 +1,4 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         cbc128.c ctr128.c cts128.c cfb128.c ofb128.c gcm128.c \
+         ccm128.c xts128.c wrap128.c ocb128.c \
+         {- $target{modes_asm_src} -}
+diff --git a/crypto/objects/build.info b/crypto/objects/build.info
+index 38e290756b..21378db0b9 100644
+--- crypto/objects/build.info
++++ crypto/objects/build.info
+@@ -1,3 +1,2 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         o_names.c obj_dat.c obj_lib.c obj_err.c obj_xref.c
+diff --git a/crypto/ocsp/build.info b/crypto/ocsp/build.info
+index 0902caae3d..e07a166462 100644
+--- crypto/ocsp/build.info
++++ crypto/ocsp/build.info
+@@ -1,4 +1,3 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         ocsp_asn.c ocsp_ext.c ocsp_ht.c ocsp_lib.c ocsp_cl.c \
+         ocsp_srv.c ocsp_prn.c ocsp_vfy.c ocsp_err.c v3_ocsp.c
+diff --git a/crypto/pem/build.info b/crypto/pem/build.info
+index 357b32833b..f094e4596f 100644
+--- crypto/pem/build.info
++++ crypto/pem/build.info
+@@ -1,4 +1,3 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         pem_sign.c pem_info.c pem_lib.c pem_all.c pem_err.c \
+         pem_x509.c pem_xaux.c pem_oth.c pem_pk8.c pem_pkey.c pvkfmt.c
+diff --git a/crypto/pkcs12/build.info b/crypto/pkcs12/build.info
+index b87299e6cb..aa3cc79f8d 100644
+--- crypto/pkcs12/build.info
++++ crypto/pkcs12/build.info
+@@ -1,5 +1,4 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         p12_add.c p12_asn.c p12_attr.c p12_crpt.c p12_crt.c p12_decr.c \
+         p12_init.c p12_key.c p12_kiss.c p12_mutl.c p12_sbag.c \
+         p12_utl.c p12_npas.c pk12err.c p12_p8d.c p12_p8e.c
+diff --git a/crypto/pkcs7/build.info b/crypto/pkcs7/build.info
+index 2029d538fc..c86379edbb 100644
+--- crypto/pkcs7/build.info
++++ crypto/pkcs7/build.info
+@@ -1,4 +1,3 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         pk7_asn1.c pk7_lib.c pkcs7err.c pk7_doit.c pk7_smime.c pk7_attr.c \
+         pk7_mime.c bio_pk7.c
+diff --git a/crypto/poly1305/build.info b/crypto/poly1305/build.info
+index 4e4dcca521..a315a3c8e7 100644
+--- crypto/poly1305/build.info
++++ crypto/poly1305/build.info
+@@ -1,5 +1,4 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         poly1305_pmeth.c \
+         poly1305_ameth.c \
+         poly1305.c {- $target{poly1305_asm_src} -}
+diff --git a/crypto/rand/build.info b/crypto/rand/build.info
+index df9bac67f0..dad4e5e93b 100644
+--- crypto/rand/build.info
++++ crypto/rand/build.info
+@@ -1,4 +1,3 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         randfile.c rand_lib.c rand_err.c rand_egd.c \
+         rand_win.c rand_unix.c rand_vms.c drbg_lib.c drbg_ctr.c
+diff --git a/crypto/rc2/build.info b/crypto/rc2/build.info
+index 47a3fd0d4e..cf0e19f762 100644
+--- crypto/rc2/build.info
++++ crypto/rc2/build.info
+@@ -1,3 +1,2 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         rc2_ecb.c rc2_skey.c rc2_cbc.c rc2cfb64.c rc2ofb64.c
+diff --git a/crypto/rc4/build.info b/crypto/rc4/build.info
+index 913942b5e9..34d1d3db59 100644
+--- crypto/rc4/build.info
++++ crypto/rc4/build.info
+@@ -1,5 +1,4 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         {- $target{rc4_asm_src} -}
+ 
+ GENERATE[rc4-586.s]=asm/rc4-586.pl \
+diff --git a/crypto/rc5/build.info b/crypto/rc5/build.info
+index 928a62cd85..d3485f13e3 100644
+--- crypto/rc5/build.info
++++ crypto/rc5/build.info
+@@ -1,5 +1,4 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         rc5_skey.c rc5_ecb.c {- $target{rc5_asm_src} -} rc5cfb64.c rc5ofb64.c
+ 
+ GENERATE[rc5-586.s]=asm/rc5-586.pl \
+diff --git a/crypto/ripemd/build.info b/crypto/ripemd/build.info
+index a4a894e2d1..480317c356 100644
+--- crypto/ripemd/build.info
++++ crypto/ripemd/build.info
+@@ -1,5 +1,4 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         rmd_dgst.c rmd_one.c {- $target{rmd160_asm_src} -}
+ 
+ GENERATE[rmd-586.s]=asm/rmd-586.pl \
+diff --git a/crypto/rsa/build.info b/crypto/rsa/build.info
+index 87f924922f..f6a3d43f47 100644
+--- crypto/rsa/build.info
++++ crypto/rsa/build.info
+@@ -1,5 +1,4 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         rsa_ossl.c rsa_gen.c rsa_lib.c rsa_sign.c rsa_saos.c rsa_err.c \
+         rsa_pk1.c rsa_ssl.c rsa_none.c rsa_oaep.c rsa_chk.c \
+         rsa_pss.c rsa_x931.c rsa_asn1.c rsa_depr.c rsa_ameth.c rsa_prn.c \
+diff --git a/crypto/seed/build.info b/crypto/seed/build.info
+index abdcbcaa94..df24b583bb 100644
+--- crypto/seed/build.info
++++ crypto/seed/build.info
+@@ -1,2 +1 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=seed.c seed_ecb.c seed_cbc.c seed_cfb.c seed_ofb.c
++SOURCE[../../libcrypto{- $config{suffix} -}]=seed.c seed_ecb.c seed_cbc.c seed_cfb.c seed_ofb.c
+diff --git a/crypto/sha/build.info b/crypto/sha/build.info
+index 5dd5a9941d..1b180ad578 100644
+--- crypto/sha/build.info
++++ crypto/sha/build.info
+@@ -1,5 +1,4 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         sha1dgst.c sha1_one.c sha256.c sha512.c {- $target{sha1_asm_src} -} \
+         {- $target{keccak1600_asm_src} -}
+ 
+diff --git a/crypto/siphash/build.info b/crypto/siphash/build.info
+index 4166344a5b..b6ca4351f9 100644
+--- crypto/siphash/build.info
++++ crypto/siphash/build.info
+@@ -1,5 +1,4 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+ 	siphash.c \
+ 	siphash_pmeth.c \
+ 	siphash_ameth.c
+diff --git a/crypto/sm2/build.info b/crypto/sm2/build.info
+index be76d96d31..e387a54810 100644
+--- crypto/sm2/build.info
++++ crypto/sm2/build.info
+@@ -1,5 +1,4 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         sm2_sign.c sm2_crypt.c sm2_err.c sm2_pmeth.c
+ 
+ 
+diff --git a/crypto/sm3/build.info b/crypto/sm3/build.info
+index 6009b1949e..7930b3677c 100644
+--- crypto/sm3/build.info
++++ crypto/sm3/build.info
+@@ -1,2 +1 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=sm3.c m_sm3.c
++SOURCE[../../libcrypto{- $config{suffix} -}]=sm3.c m_sm3.c
+diff --git a/crypto/sm4/build.info b/crypto/sm4/build.info
+index b65a7d149e..328a8ff654 100644
+--- crypto/sm4/build.info
++++ crypto/sm4/build.info
+@@ -1,4 +1,3 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         sm4.c
+ 
+diff --git a/crypto/srp/build.info b/crypto/srp/build.info
+index b6c7fe7adc..80a2ae520e 100644
+--- crypto/srp/build.info
++++ crypto/srp/build.info
+@@ -1,2 +1 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=srp_lib.c srp_vfy.c
++SOURCE[../../libcrypto{- $config{suffix} -}]=srp_lib.c srp_vfy.c
+diff --git a/crypto/stack/build.info b/crypto/stack/build.info
+index e5870210ac..8d7598dbd4 100644
+--- crypto/stack/build.info
++++ crypto/stack/build.info
+@@ -1,2 +1 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=stack.c
++SOURCE[../../libcrypto{- $config{suffix} -}]=stack.c
+diff --git a/crypto/store/build.info b/crypto/store/build.info
+index 7d882f313e..d9150d8546 100644
+--- crypto/store/build.info
++++ crypto/store/build.info
+@@ -1,4 +1,3 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         store_err.c store_init.c store_lib.c store_register.c store_strings.c \
+         loader_file.c
+diff --git a/crypto/ts/build.info b/crypto/ts/build.info
+index 98e633d57a..c038661327 100644
+--- crypto/ts/build.info
++++ crypto/ts/build.info
+@@ -1,5 +1,4 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         ts_err.c ts_req_utils.c ts_req_print.c ts_rsp_utils.c ts_rsp_print.c \
+         ts_rsp_sign.c ts_rsp_verify.c ts_verify_ctx.c ts_lib.c ts_conf.c \
+         ts_asn1.c
+diff --git a/crypto/txt_db/build.info b/crypto/txt_db/build.info
+index 4379d5f1b0..45527f6ec1 100644
+--- crypto/txt_db/build.info
++++ crypto/txt_db/build.info
+@@ -1,2 +1 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=txt_db.c
++SOURCE[../../libcrypto{- $config{suffix} -}]=txt_db.c
+diff --git a/crypto/ui/build.info b/crypto/ui/build.info
+index c5d17fb744..291840199d 100644
+--- crypto/ui/build.info
++++ crypto/ui/build.info
+@@ -1,3 +1,2 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         ui_err.c ui_lib.c ui_openssl.c ui_null.c ui_util.c
+diff --git a/crypto/whrlpool/build.info b/crypto/whrlpool/build.info
+index 4b167b504e..95ad3dee2a 100644
+--- crypto/whrlpool/build.info
++++ crypto/whrlpool/build.info
+@@ -1,5 +1,4 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=wp_dgst.c {- $target{wp_asm_src} -}
++SOURCE[../../libcrypto{- $config{suffix} -}]=wp_dgst.c {- $target{wp_asm_src} -}
+ 
+ GENERATE[wp-mmx.s]=asm/wp-mmx.pl \
+         $(PERLASM_SCHEME) $(LIB_CFLAGS) $(LIB_CPPFLAGS) $(PROCESSOR)
+diff --git a/crypto/x509/build.info b/crypto/x509/build.info
+index afd0b6134e..773817b688 100644
+--- crypto/x509/build.info
++++ crypto/x509/build.info
+@@ -1,5 +1,4 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+         x509_def.c x509_d2.c x509_r2x.c x509_cmp.c \
+         x509_obj.c x509_req.c x509spki.c x509_vfy.c \
+         x509_set.c x509cset.c x509rset.c x509_err.c \
+diff --git a/crypto/x509v3/build.info b/crypto/x509v3/build.info
+index 4ab6488493..5fced51289 100644
+--- crypto/x509v3/build.info
++++ crypto/x509v3/build.info
+@@ -1,5 +1,4 @@
+-LIBS=../../libcrypto
+-SOURCE[../../libcrypto]=\
++SOURCE[../../libcrypto{- $config{suffix} -}]=\
+   v3_bcons.c v3_bitst.c v3_conf.c v3_extku.c v3_ia5.c v3_lib.c \
+   v3_prn.c v3_utl.c v3err.c v3_genn.c v3_alt.c v3_skey.c v3_akey.c v3_pku.c \
+   v3_int.c v3_enum.c v3_sxnet.c v3_cpols.c v3_crld.c v3_purp.c v3_info.c \
+--- engines\build.info
++++ engines\build.info
+@@ -1,39 +1,38 @@
+ IF[{- !$disabled{"engine"} -}]
+
+   IF[{- $disabled{"dynamic-engine"} -}]
+-    LIBS=../libcrypto
+-    SOURCE[../libcrypto]=\
++    SOURCE[../libcrypto{- $config{suffix} -}]=\
+             e_padlock.c {- $target{padlock_asm_src} -}
+     IF[{- !$disabled{capieng} -}]
+-      SOURCE[../libcrypto]=e_capi.c
++      SOURCE[../libcrypto{- $config{suffix} -}]=e_capi.c
+     ENDIF
+     IF[{- !$disabled{afalgeng} -}]
+-      SOURCE[../libcrypto]=e_afalg.c
++      SOURCE[../libcrypto{- $config{suffix} -}]=e_afalg.c
+     ENDIF
+   ELSE
+     ENGINES=padlock
+     SOURCE[padlock]=e_padlock.c {- $target{padlock_asm_src} -}
+-    DEPEND[padlock]=../libcrypto
++    DEPEND[padlock]=../libcrypto{- $config{suffix} -}
+     INCLUDE[padlock]=../include
+     IF[{- !$disabled{capieng} -}]
+       ENGINES=capi
+       SOURCE[capi]=e_capi.c
+-      DEPEND[capi]=../libcrypto
++      DEPEND[capi]=../libcrypto{- $config{suffix} -}
+       INCLUDE[capi]=../include
+     ENDIF
+     IF[{- !$disabled{afalgeng} -}]
+       ENGINES=afalg
+       SOURCE[afalg]=e_afalg.c
+-      DEPEND[afalg]=../libcrypto
++      DEPEND[afalg]=../libcrypto{- $config{suffix} -}
+       INCLUDE[afalg]= ../include
+     ENDIF
+
+     ENGINES_NO_INST=ossltest dasync
+     SOURCE[dasync]=e_dasync.c
+-    DEPEND[dasync]=../libcrypto
++    DEPEND[dasync]=../libcrypto{- $config{suffix} -}
+     INCLUDE[dasync]=../include
+     SOURCE[ossltest]=e_ossltest.c
+-    DEPEND[ossltest]=../libcrypto
++    DEPEND[ossltest]=../libcrypto{- $config{suffix} -}
+     INCLUDE[ossltest]=../include
+   ENDIF
+ 
+diff --git a/fuzz/build.info b/fuzz/build.info
+index cde03d3447..ae57dded3e 100644
+--- fuzz/build.info
++++ fuzz/build.info
+@@ -21,47 +21,47 @@ IF[{- !$disabled{"fuzz-afl"} || !$disabled{"fuzz-libfuzzer"} -}]
+ 
+   SOURCE[asn1]=asn1.c driver.c
+   INCLUDE[asn1]=../include {- $ex_inc -}
+-  DEPEND[asn1]=../libcrypto ../libssl {- $ex_lib -}
++  DEPEND[asn1]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} {- $ex_lib -}
+ 
+   SOURCE[asn1parse]=asn1parse.c driver.c
+   INCLUDE[asn1parse]=../include {- $ex_inc -}
+-  DEPEND[asn1parse]=../libcrypto {- $ex_lib -}
++  DEPEND[asn1parse]=../libcrypto{- $config{suffix} -} {- $ex_lib -}
+ 
+   SOURCE[bignum]=bignum.c driver.c
+   INCLUDE[bignum]=../include {- $ex_inc -}
+-  DEPEND[bignum]=../libcrypto {- $ex_lib -}
++  DEPEND[bignum]=../libcrypto{- $config{suffix} -} {- $ex_lib -}
+ 
+   SOURCE[bndiv]=bndiv.c driver.c
+   INCLUDE[bndiv]=../include {- $ex_inc -}
+-  DEPEND[bndiv]=../libcrypto {- $ex_lib -}
++  DEPEND[bndiv]=../libcrypto{- $config{suffix} -} {- $ex_lib -}
+ 
+   SOURCE[client]=client.c driver.c
+   INCLUDE[client]=../include {- $ex_inc -}
+-  DEPEND[client]=../libcrypto ../libssl {- $ex_lib -}
++  DEPEND[client]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} {- $ex_lib -}
+ 
+   SOURCE[cms]=cms.c driver.c
+   INCLUDE[cms]=../include {- $ex_inc -}
+-  DEPEND[cms]=../libcrypto {- $ex_lib -}
++  DEPEND[cms]=../libcrypto{- $config{suffix} -} {- $ex_lib -}
+ 
+   SOURCE[conf]=conf.c driver.c
+   INCLUDE[conf]=../include {- $ex_inc -}
+-  DEPEND[conf]=../libcrypto {- $ex_lib -}
++  DEPEND[conf]=../libcrypto{- $config{suffix} -} {- $ex_lib -}
+ 
+   SOURCE[crl]=crl.c driver.c
+   INCLUDE[crl]=../include {- $ex_inc -}
+-  DEPEND[crl]=../libcrypto {- $ex_lib -}
++  DEPEND[crl]=../libcrypto{- $config{suffix} -} {- $ex_lib -}
+ 
+   SOURCE[ct]=ct.c driver.c
+   INCLUDE[ct]=../include {- $ex_inc -}
+-  DEPEND[ct]=../libcrypto {- $ex_lib -}
++  DEPEND[ct]=../libcrypto{- $config{suffix} -} {- $ex_lib -}
+ 
+   SOURCE[server]=server.c driver.c
+   INCLUDE[server]=../include {- $ex_inc -}
+-  DEPEND[server]=../libcrypto ../libssl {- $ex_lib -}
++  DEPEND[server]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} {- $ex_lib -}
+ 
+   SOURCE[x509]=x509.c driver.c
+   INCLUDE[x509]=../include {- $ex_inc -}
+-  DEPEND[x509]=../libcrypto {- $ex_lib -}
++  DEPEND[x509]=../libcrypto{- $config{suffix} -} {- $ex_lib -}
+ ENDIF
+ 
+ IF[{- !$disabled{tests} -}]
+@@ -77,45 +77,45 @@ IF[{- !$disabled{tests} -}]
+ 
+   SOURCE[asn1-test]=asn1.c test-corpus.c
+   INCLUDE[asn1-test]=../include
+-  DEPEND[asn1-test]=../libcrypto ../libssl
++  DEPEND[asn1-test]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -}
+ 
+   SOURCE[asn1parse-test]=asn1parse.c test-corpus.c
+   INCLUDE[asn1parse-test]=../include
+-  DEPEND[asn1parse-test]=../libcrypto
++  DEPEND[asn1parse-test]=../libcrypto{- $config{suffix} -}
+ 
+   SOURCE[bignum-test]=bignum.c test-corpus.c
+   INCLUDE[bignum-test]=../include
+-  DEPEND[bignum-test]=../libcrypto
++  DEPEND[bignum-test]=../libcrypto{- $config{suffix} -}
+ 
+   SOURCE[bndiv-test]=bndiv.c test-corpus.c
+   INCLUDE[bndiv-test]=../include
+-  DEPEND[bndiv-test]=../libcrypto
++  DEPEND[bndiv-test]=../libcrypto{- $config{suffix} -}
+ 
+   SOURCE[client-test]=client.c test-corpus.c
+   INCLUDE[client-test]=../include
+-  DEPEND[client-test]=../libcrypto ../libssl
++  DEPEND[client-test]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -}
+ 
+   SOURCE[cms-test]=cms.c test-corpus.c
+   INCLUDE[cms-test]=../include
+-  DEPEND[cms-test]=../libcrypto
++  DEPEND[cms-test]=../libcrypto{- $config{suffix} -}
+ 
+   SOURCE[conf-test]=conf.c test-corpus.c
+   INCLUDE[conf-test]=../include
+-  DEPEND[conf-test]=../libcrypto
++  DEPEND[conf-test]=../libcrypto{- $config{suffix} -}
+ 
+   SOURCE[crl-test]=crl.c test-corpus.c
+   INCLUDE[crl-test]=../include
+-  DEPEND[crl-test]=../libcrypto
++  DEPEND[crl-test]=../libcrypto{- $config{suffix} -}
+ 
+   SOURCE[ct-test]=ct.c test-corpus.c
+   INCLUDE[ct-test]=../include
+-  DEPEND[ct-test]=../libcrypto
++  DEPEND[ct-test]=../libcrypto{- $config{suffix} -}
+ 
+   SOURCE[server-test]=server.c test-corpus.c
+   INCLUDE[server-test]=../include
+-  DEPEND[server-test]=../libcrypto ../libssl
++  DEPEND[server-test]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -}
+ 
+   SOURCE[x509-test]=x509.c test-corpus.c
+   INCLUDE[x509-test]=../include
+-  DEPEND[x509-test]=../libcrypto
++  DEPEND[x509-test]=../libcrypto{- $config{suffix} -}
+ ENDIF
+--- ssl\build.info
++++ ssl\build.info
+@@ -1,5 +1,4 @@
+-LIBS=../libssl
+-SOURCE[../libssl]=\
++SOURCE[../libssl{- $config{suffix} -}]=\
+         pqueue.c packet.c \
+         statem/statem_srvr.c statem/statem_clnt.c  s3_lib.c  s3_enc.c record/rec_layer_s3.c \
+         statem/statem_lib.c statem/extensions.c statem/extensions_srvr.c \
+
+diff --git a/test/build.info b/test/build.info
+index a2fb0e2e1e..339bd42b5b 100644
+--- test/build.info
++++ test/build.info
+@@ -14,7 +14,7 @@ IF[{- !$disabled{tests} -}]
+           testutil/format_output.c testutil/tap_bio.c \
+           testutil/test_cleanup.c testutil/main.c testutil/init.c
+   INCLUDE[libtestutil.a]=../include
+-  DEPEND[libtestutil.a]=../libcrypto
++  DEPEND[libtestutil.a]=../libcrypto{- $config{suffix} -}
+ 
+   # Special hack for descrip.mms to include the MAIN object module
+   # explicitly.  This will only be done if there isn't a MAIN in the
+@@ -54,234 +54,234 @@ INCLUDE_MAIN___test_libtestutil_OLB = /INCLUDE=MAIN
+ 
+   SOURCE[versions]=versions.c
+   INCLUDE[versions]=../include
+-  DEPEND[versions]=../libcrypto
++  DEPEND[versions]=../libcrypto{- $config{suffix} -}
+ 
+   SOURCE[aborttest]=aborttest.c
+   INCLUDE[aborttest]=../include
+-  DEPEND[aborttest]=../libcrypto
++  DEPEND[aborttest]=../libcrypto{- $config{suffix} -}
+ 
+   SOURCE[sanitytest]=sanitytest.c
+   INCLUDE[sanitytest]=../include
+-  DEPEND[sanitytest]=../libcrypto libtestutil.a
++  DEPEND[sanitytest]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[rsa_complex]=rsa_complex.c
+   INCLUDE[rsa_complex]=../include
+ 
+   SOURCE[test_test]=test_test.c
+   INCLUDE[test_test]=../include
+-  DEPEND[test_test]=../libcrypto libtestutil.a
++  DEPEND[test_test]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[exdatatest]=exdatatest.c
+   INCLUDE[exdatatest]=../include
+-  DEPEND[exdatatest]=../libcrypto libtestutil.a
++  DEPEND[exdatatest]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[bntest]=bntest.c
+   INCLUDE[bntest]=../include
+-  DEPEND[bntest]=../libcrypto libtestutil.a
++  DEPEND[bntest]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[ectest]=ectest.c
+   INCLUDE[ectest]=../include
+-  DEPEND[ectest]=../libcrypto libtestutil.a
++  DEPEND[ectest]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[ecstresstest]=ecstresstest.c
+   INCLUDE[ecstresstest]=../include
+-  DEPEND[ecstresstest]=../libcrypto libtestutil.a
++  DEPEND[ecstresstest]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[ecdsatest]=ecdsatest.c
+   INCLUDE[ecdsatest]=../include
+-  DEPEND[ecdsatest]=../libcrypto libtestutil.a
++  DEPEND[ecdsatest]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[gmdifftest]=gmdifftest.c
+   INCLUDE[gmdifftest]=../include
+-  DEPEND[gmdifftest]=../libcrypto libtestutil.a
++  DEPEND[gmdifftest]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[pbelutest]=pbelutest.c
+   INCLUDE[pbelutest]=../include
+-  DEPEND[pbelutest]=../libcrypto libtestutil.a
++  DEPEND[pbelutest]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[ideatest]=ideatest.c
+   INCLUDE[ideatest]=../include
+-  DEPEND[ideatest]=../libcrypto libtestutil.a
++  DEPEND[ideatest]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[md2test]=md2test.c
+   INCLUDE[md2test]=../include
+-  DEPEND[md2test]=../libcrypto libtestutil.a
++  DEPEND[md2test]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[hmactest]=hmactest.c
+   INCLUDE[hmactest]=../include
+-  DEPEND[hmactest]=../libcrypto libtestutil.a
++  DEPEND[hmactest]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[rc2test]=rc2test.c
+   INCLUDE[rc2test]=../include
+-  DEPEND[rc2test]=../libcrypto libtestutil.a
++  DEPEND[rc2test]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[rc4test]=rc4test.c
+   INCLUDE[rc4test]=../include
+-  DEPEND[rc4test]=../libcrypto libtestutil.a
++  DEPEND[rc4test]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[rc5test]=rc5test.c
+   INCLUDE[rc5test]=../include
+-  DEPEND[rc5test]=../libcrypto libtestutil.a
++  DEPEND[rc5test]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[destest]=destest.c
+   INCLUDE[destest]=../include
+-  DEPEND[destest]=../libcrypto libtestutil.a
++  DEPEND[destest]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[mdc2test]=mdc2test.c
+   INCLUDE[mdc2test]=../include
+-  DEPEND[mdc2test]=../libcrypto libtestutil.a
++  DEPEND[mdc2test]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[dhtest]=dhtest.c
+   INCLUDE[dhtest]=../include
+-  DEPEND[dhtest]=../libcrypto libtestutil.a
++  DEPEND[dhtest]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[enginetest]=enginetest.c
+   INCLUDE[enginetest]=../include
+-  DEPEND[enginetest]=../libcrypto libtestutil.a
++  DEPEND[enginetest]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[casttest]=casttest.c
+   INCLUDE[casttest]=../include
+-  DEPEND[casttest]=../libcrypto libtestutil.a
++  DEPEND[casttest]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[bftest]=bftest.c
+   INCLUDE[bftest]=../include
+-  DEPEND[bftest]=../libcrypto libtestutil.a
++  DEPEND[bftest]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[ssltest_old]=ssltest_old.c
+   INCLUDE[ssltest_old]=.. ../include
+-  DEPEND[ssltest_old]=../libcrypto ../libssl
++  DEPEND[ssltest_old]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -}
+ 
+   SOURCE[dsatest]=dsatest.c
+   INCLUDE[dsatest]=../include
+-  DEPEND[dsatest]=../libcrypto libtestutil.a
++  DEPEND[dsatest]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[dsa_no_digest_size_test]=dsa_no_digest_size_test.c
+   INCLUDE[dsa_no_digest_size_test]=../include
+-  DEPEND[dsa_no_digest_size_test]=../libcrypto libtestutil.a
++  DEPEND[dsa_no_digest_size_test]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[exptest]=exptest.c
+   INCLUDE[exptest]=../include
+-  DEPEND[exptest]=../libcrypto libtestutil.a
++  DEPEND[exptest]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[rsa_test]=rsa_test.c
+   INCLUDE[rsa_test]=../include
+-  DEPEND[rsa_test]=../libcrypto libtestutil.a
++  DEPEND[rsa_test]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[rsa_mp_test]=rsa_mp_test.c
+   INCLUDE[rsa_mp_test]=../include
+-  DEPEND[rsa_mp_test]=../libcrypto libtestutil.a
++  DEPEND[rsa_mp_test]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[fatalerrtest]=fatalerrtest.c ssltestlib.c
+   INCLUDE[fatalerrtest]=../include
+-  DEPEND[fatalerrtest]=../libcrypto ../libssl libtestutil.a
++  DEPEND[fatalerrtest]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[tls13ccstest]=tls13ccstest.c ssltestlib.c
+   INCLUDE[tls13ccstest]=../include
+-  DEPEND[tls13ccstest]=../libcrypto ../libssl libtestutil.a
++  DEPEND[tls13ccstest]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[evp_test]=evp_test.c
+   INCLUDE[evp_test]=../include
+-  DEPEND[evp_test]=../libcrypto libtestutil.a
++  DEPEND[evp_test]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[evp_extra_test]=evp_extra_test.c
+   INCLUDE[evp_extra_test]=../include ../crypto/include
+-  DEPEND[evp_extra_test]=../libcrypto libtestutil.a
++  DEPEND[evp_extra_test]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[igetest]=igetest.c
+   INCLUDE[igetest]=../include
+-  DEPEND[igetest]=../libcrypto libtestutil.a
++  DEPEND[igetest]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[v3nametest]=v3nametest.c
+   INCLUDE[v3nametest]=../include
+-  DEPEND[v3nametest]=../libcrypto libtestutil.a
++  DEPEND[v3nametest]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[crltest]=crltest.c
+   INCLUDE[crltest]=../include
+-  DEPEND[crltest]=../libcrypto libtestutil.a
++  DEPEND[crltest]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[v3ext]=v3ext.c
+   INCLUDE[v3ext]=../include
+-  DEPEND[v3ext]=../libcrypto libtestutil.a
++  DEPEND[v3ext]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[danetest]=danetest.c
+   INCLUDE[danetest]=../include
+-  DEPEND[danetest]=../libcrypto ../libssl libtestutil.a
++  DEPEND[danetest]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[constant_time_test]=constant_time_test.c
+   INCLUDE[constant_time_test]=../include
+-  DEPEND[constant_time_test]=../libcrypto libtestutil.a
++  DEPEND[constant_time_test]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[verify_extra_test]=verify_extra_test.c
+   INCLUDE[verify_extra_test]=../include
+-  DEPEND[verify_extra_test]=../libcrypto libtestutil.a
++  DEPEND[verify_extra_test]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[clienthellotest]=clienthellotest.c
+   INCLUDE[clienthellotest]=../include
+-  DEPEND[clienthellotest]=../libcrypto ../libssl libtestutil.a
++  DEPEND[clienthellotest]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[bad_dtls_test]=bad_dtls_test.c
+   INCLUDE[bad_dtls_test]=../include
+-  DEPEND[bad_dtls_test]=../libcrypto ../libssl libtestutil.a
++  DEPEND[bad_dtls_test]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[packettest]=packettest.c
+   INCLUDE[packettest]=../include
+-  DEPEND[packettest]=../libcrypto libtestutil.a
++  DEPEND[packettest]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[asynctest]=asynctest.c
+   INCLUDE[asynctest]=../include
+-  DEPEND[asynctest]=../libcrypto
++  DEPEND[asynctest]=../libcrypto{- $config{suffix} -}
+ 
+   SOURCE[secmemtest]=secmemtest.c
+   INCLUDE[secmemtest]=../include
+-  DEPEND[secmemtest]=../libcrypto libtestutil.a
++  DEPEND[secmemtest]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[srptest]=srptest.c
+   INCLUDE[srptest]=../include
+-  DEPEND[srptest]=../libcrypto libtestutil.a
++  DEPEND[srptest]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[memleaktest]=memleaktest.c
+   INCLUDE[memleaktest]=../include
+-  DEPEND[memleaktest]=../libcrypto libtestutil.a
++  DEPEND[memleaktest]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[stack_test]=stack_test.c
+   INCLUDE[stack_test]=../include
+-  DEPEND[stack_test]=../libcrypto libtestutil.a
++  DEPEND[stack_test]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[lhash_test]=lhash_test.c
+   INCLUDE[lhash_test]=../include
+-  DEPEND[lhash_test]=../libcrypto libtestutil.a
++  DEPEND[lhash_test]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[dtlsv1listentest]=dtlsv1listentest.c
+   INCLUDE[dtlsv1listentest]=../include
+-  DEPEND[dtlsv1listentest]=../libssl libtestutil.a
++  DEPEND[dtlsv1listentest]=../libssl{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[ct_test]=ct_test.c
+   INCLUDE[ct_test]=../include
+-  DEPEND[ct_test]=../libcrypto libtestutil.a
++  DEPEND[ct_test]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[threadstest]=threadstest.c
+   INCLUDE[threadstest]=../include
+-  DEPEND[threadstest]=../libcrypto libtestutil.a
++  DEPEND[threadstest]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[afalgtest]=afalgtest.c
+   INCLUDE[afalgtest]=../include
+-  DEPEND[afalgtest]=../libcrypto libtestutil.a
++  DEPEND[afalgtest]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[d2i_test]=d2i_test.c
+   INCLUDE[d2i_test]=../include
+-  DEPEND[d2i_test]=../libcrypto libtestutil.a
++  DEPEND[d2i_test]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[ssl_test_ctx_test]=ssl_test_ctx_test.c ssl_test_ctx.c
+   INCLUDE[ssl_test_ctx_test]=../include
+-  DEPEND[ssl_test_ctx_test]=../libcrypto ../libssl libtestutil.a
++  DEPEND[ssl_test_ctx_test]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[ssl_test]=ssl_test.c ssl_test_ctx.c handshake_helper.c
+   INCLUDE[ssl_test]=../include
+-  DEPEND[ssl_test]=../libcrypto ../libssl libtestutil.a
++  DEPEND[ssl_test]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[cipherlist_test]=cipherlist_test.c
+   INCLUDE[cipherlist_test]=../include
+-  DEPEND[cipherlist_test]=../libcrypto ../libssl libtestutil.a
++  DEPEND[cipherlist_test]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
+ 
+   INCLUDE[ssl_test_ctx.o]=../include
+   INCLUDE[handshake_helper.o]=.. ../include
+@@ -289,104 +289,104 @@ INCLUDE_MAIN___test_libtestutil_OLB = /INCLUDE=MAIN
+ 
+   SOURCE[x509aux]=x509aux.c
+   INCLUDE[x509aux]=../include
+-  DEPEND[x509aux]=../libcrypto libtestutil.a
++  DEPEND[x509aux]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[asynciotest]=asynciotest.c ssltestlib.c
+   INCLUDE[asynciotest]=../include
+-  DEPEND[asynciotest]=../libcrypto ../libssl libtestutil.a
++  DEPEND[asynciotest]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[bio_callback_test]=bio_callback_test.c
+   INCLUDE[bio_callback_test]=../include
+-  DEPEND[bio_callback_test]=../libcrypto libtestutil.a
++  DEPEND[bio_callback_test]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[bio_memleak_test]=bio_memleak_test.c
+   INCLUDE[bio_memleak_test]=../include
+-  DEPEND[bio_memleak_test]=../libcrypto libtestutil.a
++  DEPEND[bio_memleak_test]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[bioprinttest]=bioprinttest.c
+   INCLUDE[bioprinttest]=../include
+-  DEPEND[bioprinttest]=../libcrypto libtestutil.a
++  DEPEND[bioprinttest]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[sslapitest]=sslapitest.c ssltestlib.c
+   INCLUDE[sslapitest]=../include ..
+-  DEPEND[sslapitest]=../libcrypto ../libssl libtestutil.a
++  DEPEND[sslapitest]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[ocspapitest]=ocspapitest.c
+   INCLUDE[ocspapitest]=../include
+-  DEPEND[ocspapitest]=../libcrypto libtestutil.a
++  DEPEND[ocspapitest]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[dtlstest]=dtlstest.c ssltestlib.c
+   INCLUDE[dtlstest]=../include
+-  DEPEND[dtlstest]=../libcrypto ../libssl libtestutil.a
++  DEPEND[dtlstest]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[sslcorrupttest]=sslcorrupttest.c ssltestlib.c
+   INCLUDE[sslcorrupttest]=../include
+-  DEPEND[sslcorrupttest]=../libcrypto ../libssl libtestutil.a
++  DEPEND[sslcorrupttest]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[bio_enc_test]=bio_enc_test.c
+   INCLUDE[bio_enc_test]=../include
+-  DEPEND[bio_enc_test]=../libcrypto libtestutil.a
++  DEPEND[bio_enc_test]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[pkey_meth_test]=pkey_meth_test.c
+   INCLUDE[pkey_meth_test]=../include
+-  DEPEND[pkey_meth_test]=../libcrypto libtestutil.a
++  DEPEND[pkey_meth_test]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[pkey_meth_kdf_test]=pkey_meth_kdf_test.c
+   INCLUDE[pkey_meth_kdf_test]=../include
+-  DEPEND[pkey_meth_kdf_test]=../libcrypto libtestutil.a
++  DEPEND[pkey_meth_kdf_test]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[x509_time_test]=x509_time_test.c
+   INCLUDE[x509_time_test]=../include
+-  DEPEND[x509_time_test]=../libcrypto libtestutil.a
++  DEPEND[x509_time_test]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[recordlentest]=recordlentest.c ssltestlib.c
+   INCLUDE[recordlentest]=../include
+-  DEPEND[recordlentest]=../libcrypto ../libssl libtestutil.a
++  DEPEND[recordlentest]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[drbgtest]=drbgtest.c
+   INCLUDE[drbgtest]=../include
+-  DEPEND[drbgtest]=../libcrypto.a libtestutil.a
++  DEPEND[drbgtest]=../libcrypto{- $config{suffix} -}.a libtestutil.a
+ 
+   SOURCE[drbg_cavs_test]=drbg_cavs_test.c drbg_cavs_data.c
+   INCLUDE[drbg_cavs_test]=../include . ..
+-  DEPEND[drbg_cavs_test]=../libcrypto libtestutil.a
++  DEPEND[drbg_cavs_test]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[x509_dup_cert_test]=x509_dup_cert_test.c
+   INCLUDE[x509_dup_cert_test]=../include
+-  DEPEND[x509_dup_cert_test]=../libcrypto libtestutil.a
++  DEPEND[x509_dup_cert_test]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[x509_check_cert_pkey_test]=x509_check_cert_pkey_test.c
+   INCLUDE[x509_check_cert_pkey_test]=../include
+-  DEPEND[x509_check_cert_pkey_test]=../libcrypto libtestutil.a
++  DEPEND[x509_check_cert_pkey_test]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[pemtest]=pemtest.c
+   INCLUDE[pemtest]=../include
+-  DEPEND[pemtest]=../libcrypto libtestutil.a
++  DEPEND[pemtest]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[ssl_cert_table_internal_test]=ssl_cert_table_internal_test.c
+   INCLUDE[ssl_cert_table_internal_test]=.. ../include
+-  DEPEND[ssl_cert_table_internal_test]=../libcrypto libtestutil.a
++  DEPEND[ssl_cert_table_internal_test]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[ciphername_test]=ciphername_test.c
+   INCLUDE[ciphername_test]=../include
+-  DEPEND[ciphername_test]=../libcrypto ../libssl libtestutil.a
++  DEPEND[ciphername_test]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[servername_test]=servername_test.c ssltestlib.c
+   INCLUDE[servername_test]=../include
+-  DEPEND[servername_test]=../libcrypto ../libssl libtestutil.a
++  DEPEND[servername_test]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
+ 
+   IF[{- !$disabled{cms} -}]
+     PROGRAMS_NO_INST=cmsapitest
+     SOURCE[cmsapitest]=cmsapitest.c
+     INCLUDE[cmsapitest]=../include
+-    DEPEND[cmsapitest]=../libcrypto libtestutil.a
++    DEPEND[cmsapitest]=../libcrypto{- $config{suffix} -} libtestutil.a
+   ENDIF
+ 
+   IF[{- !$disabled{psk} -}]
+     PROGRAMS_NO_INST=dtls_mtu_test
+     SOURCE[dtls_mtu_test]=dtls_mtu_test.c ssltestlib.c
+     INCLUDE[dtls_mtu_test]=.. ../include
+-    DEPEND[dtls_mtu_test]=../libcrypto ../libssl libtestutil.a
++    DEPEND[dtls_mtu_test]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
+   ENDIF
+ 
+   IF[{- !$disabled{shared} -}]
+@@ -399,38 +399,38 @@ INCLUDE_MAIN___test_libtestutil_OLB = /INCLUDE=MAIN
+     PROGRAMS_NO_INST=cipher_overhead_test
+     SOURCE[cipher_overhead_test]=cipher_overhead_test.c
+     INCLUDE[cipher_overhead_test]=.. ../include
+-    DEPEND[cipher_overhead_test]=../libcrypto ../libssl libtestutil.a
++    DEPEND[cipher_overhead_test]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
+   ENDIF
+ 
+   SOURCE[uitest]=uitest.c \
+                  {- rebase_files("../apps",
+                                  split(/\s+/, $target{apps_init_src})) -}
+   INCLUDE[uitest]=.. ../include ../apps
+-  DEPEND[uitest]=../apps/libapps.a ../libcrypto ../libssl libtestutil.a
++  DEPEND[uitest]=../apps/libapps.a ../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[cipherbytes_test]=cipherbytes_test.c
+   INCLUDE[cipherbytes_test]=../include
+-  DEPEND[cipherbytes_test]=../libcrypto ../libssl libtestutil.a
++  DEPEND[cipherbytes_test]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[asn1_encode_test]=asn1_encode_test.c
+   INCLUDE[asn1_encode_test]=../include
+-  DEPEND[asn1_encode_test]=../libcrypto libtestutil.a
++  DEPEND[asn1_encode_test]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[asn1_decode_test]=asn1_decode_test.c
+   INCLUDE[asn1_decode_test]=../include
+-  DEPEND[asn1_decode_test]=../libcrypto libtestutil.a
++  DEPEND[asn1_decode_test]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[asn1_string_table_test]=asn1_string_table_test.c
+   INCLUDE[asn1_string_table_test]=../include
+-  DEPEND[asn1_string_table_test]=../libcrypto libtestutil.a
++  DEPEND[asn1_string_table_test]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[time_offset_test]=time_offset_test.c
+   INCLUDE[time_offset_test]=../include
+-  DEPEND[time_offset_test]=../libcrypto libtestutil.a
++  DEPEND[time_offset_test]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[conf_include_test]=conf_include_test.c
+   INCLUDE[conf_include_test]=../include
+-  DEPEND[conf_include_test]=../libcrypto libtestutil.a
++  DEPEND[conf_include_test]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   # Internal test programs.  These are essentially a collection of internal
+   # test routines.  Some of them need to reach internal symbols that aren't
+@@ -463,59 +463,59 @@ INCLUDE_MAIN___test_libtestutil_OLB = /INCLUDE=MAIN
+ 
+     SOURCE[poly1305_internal_test]=poly1305_internal_test.c
+     INCLUDE[poly1305_internal_test]=.. ../include ../crypto/include
+-    DEPEND[poly1305_internal_test]=../libcrypto.a libtestutil.a
++    DEPEND[poly1305_internal_test]=../libcrypto{- $config{suffix} -}.a libtestutil.a
+ 
+     SOURCE[chacha_internal_test]=chacha_internal_test.c
+     INCLUDE[chacha_internal_test]=.. ../include ../crypto/include
+-    DEPEND[chacha_internal_test]=../libcrypto.a libtestutil.a
++    DEPEND[chacha_internal_test]=../libcrypto{- $config{suffix} -}.a libtestutil.a
+ 
+     SOURCE[asn1_internal_test]=asn1_internal_test.c
+     INCLUDE[asn1_internal_test]=.. ../include ../crypto/include
+-    DEPEND[asn1_internal_test]=../libcrypto.a libtestutil.a
++    DEPEND[asn1_internal_test]=../libcrypto{- $config{suffix} -}.a libtestutil.a
+ 
+     SOURCE[modes_internal_test]=modes_internal_test.c
+     INCLUDE[modes_internal_test]=.. ../include
+-    DEPEND[modes_internal_test]=../libcrypto.a libtestutil.a
++    DEPEND[modes_internal_test]=../libcrypto{- $config{suffix} -}.a libtestutil.a
+ 
+     SOURCE[x509_internal_test]=x509_internal_test.c
+     INCLUDE[x509_internal_test]=.. ../include
+-    DEPEND[x509_internal_test]=../libcrypto.a libtestutil.a
++    DEPEND[x509_internal_test]=../libcrypto{- $config{suffix} -}.a libtestutil.a
+ 
+     SOURCE[tls13encryptiontest]=tls13encryptiontest.c
+     INCLUDE[tls13encryptiontest]=.. ../include
+-    DEPEND[tls13encryptiontest]=../libcrypto ../libssl.a libtestutil.a
++    DEPEND[tls13encryptiontest]=../libcrypto{- $config{suffix} -} ../libssl.a libtestutil.a
+ 
+     SOURCE[wpackettest]=wpackettest.c
+     INCLUDE[wpackettest]=../include
+-    DEPEND[wpackettest]=../libcrypto ../libssl.a libtestutil.a
++    DEPEND[wpackettest]=../libcrypto{- $config{suffix} -} ../libssl.a libtestutil.a
+ 
+     SOURCE[ctype_internal_test]=ctype_internal_test.c
+     INCLUDE[ctype_internal_test]=.. ../crypto/include ../include
+-    DEPEND[ctype_internal_test]=../libcrypto.a libtestutil.a
++    DEPEND[ctype_internal_test]=../libcrypto{- $config{suffix} -}.a libtestutil.a
+ 
+     SOURCE[siphash_internal_test]=siphash_internal_test.c
+     INCLUDE[siphash_internal_test]=.. ../include ../crypto/include
+-    DEPEND[siphash_internal_test]=../libcrypto.a libtestutil.a
++    DEPEND[siphash_internal_test]=../libcrypto{- $config{suffix} -}.a libtestutil.a
+ 
+     SOURCE[sm2_internal_test]=sm2_internal_test.c
+     INCLUDE[sm2_internal_test]=../include ../crypto/include
+-    DEPEND[sm2_internal_test]=../libcrypto.a libtestutil.a
++    DEPEND[sm2_internal_test]=../libcrypto{- $config{suffix} -}.a libtestutil.a
+ 
+     SOURCE[sm4_internal_test]=sm4_internal_test.c
+     INCLUDE[sm4_internal_test]=.. ../include ../crypto/include
+-    DEPEND[sm4_internal_test]=../libcrypto.a libtestutil.a
++    DEPEND[sm4_internal_test]=../libcrypto{- $config{suffix} -}.a libtestutil.a
+ 
+     SOURCE[ec_internal_test]=ec_internal_test.c
+     INCLUDE[ec_internal_test]=../include ../crypto/ec ../crypto/include
+-    DEPEND[ec_internal_test]=../libcrypto.a libtestutil.a
++    DEPEND[ec_internal_test]=../libcrypto{- $config{suffix} -}.a libtestutil.a
+ 
+     SOURCE[curve448_internal_test]=curve448_internal_test.c
+     INCLUDE[curve448_internal_test]=.. ../include ../crypto/ec/curve448
+-    DEPEND[curve448_internal_test]=../libcrypto.a libtestutil.a
++    DEPEND[curve448_internal_test]=../libcrypto{- $config{suffix} -}.a libtestutil.a
+ 
+     SOURCE[rdrand_sanitytest]=rdrand_sanitytest.c
+     INCLUDE[rdrand_sanitytest]=../include
+-    DEPEND[rdrand_sanitytest]=../libcrypto.a libtestutil.a
++    DEPEND[rdrand_sanitytest]=../libcrypto{- $config{suffix} -}.a libtestutil.a
+   ENDIF
+ 
+   IF[{- !$disabled{mdc2} -}]
+@@ -524,12 +524,12 @@ INCLUDE_MAIN___test_libtestutil_OLB = /INCLUDE=MAIN
+ 
+   SOURCE[mdc2_internal_test]=mdc2_internal_test.c
+   INCLUDE[mdc2_internal_test]=.. ../include
+-  DEPEND[mdc2_internal_test]=../libcrypto libtestutil.a
++  DEPEND[mdc2_internal_test]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   PROGRAMS_NO_INST=asn1_time_test
+   SOURCE[asn1_time_test]=asn1_time_test.c
+   INCLUDE[asn1_time_test]=../include
+-  DEPEND[asn1_time_test]=../libcrypto libtestutil.a
++  DEPEND[asn1_time_test]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   # We disable this test completely in a shared build because it deliberately
+   # redefines some internal libssl symbols. This doesn't work in a non-shared
+@@ -539,24 +539,24 @@ INCLUDE_MAIN___test_libtestutil_OLB = /INCLUDE=MAIN
+     SOURCE[tls13secretstest]=tls13secretstest.c
+     SOURCE[tls13secretstest]= ../ssl/tls13_enc.c ../ssl/packet.c
+     INCLUDE[tls13secretstest]=.. ../include
+-    DEPEND[tls13secretstest]=../libcrypto ../libssl libtestutil.a
++    DEPEND[tls13secretstest]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
+   ENDIF
+ 
+   SOURCE[sslbuffertest]=sslbuffertest.c ssltestlib.c
+   INCLUDE[sslbuffertest]=../include
+-  DEPEND[sslbuffertest]=../libcrypto ../libssl libtestutil.a
++  DEPEND[sslbuffertest]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[sysdefaulttest]=sysdefaulttest.c
+   INCLUDE[sysdefaulttest]=../include
+-  DEPEND[sysdefaulttest]=../libcrypto ../libssl libtestutil.a
++  DEPEND[sysdefaulttest]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[errtest]=errtest.c
+   INCLUDE[errtest]=../include
+-  DEPEND[errtest]=../libcrypto libtestutil.a
++  DEPEND[errtest]=../libcrypto{- $config{suffix} -} libtestutil.a
+ 
+   SOURCE[gosttest]=gosttest.c ssltestlib.c
+   INCLUDE[gosttest]=../include ..
+-  DEPEND[gosttest]=../libcrypto ../libssl libtestutil.a
++  DEPEND[gosttest]=../libcrypto{- $config{suffix} -} ../libssl{- $config{suffix} -} libtestutil.a
+ ENDIF
+ 
+ {-
+@@ -583,7 +583,7 @@ ENDIF
+   SOURCE[buildtest_c_$name]=buildtest_$name.c
+   GENERATE[buildtest_$name.c]=generate_buildtest.pl $name
+   INCLUDE[buildtest_c_$name]=../include
+-  DEPEND[buildtest_c_$name]=../libssl ../libcrypto
++  DEPEND[buildtest_c_$name]=../libssl$config{suffix} ../libcrypto$config{suffix}
+ _____
+        $OUT .= <<"_____" if $config{CXX} && !$disabled{"buildtest-c++"};
+ 
+@@ -591,7 +591,7 @@ _____
+   SOURCE[buildtest_cc_$name]=buildtest_$name.cc
+   GENERATE[buildtest_$name.cc]=generate_buildtest.pl $name
+   INCLUDE[buildtest_cc_$name]=../include
+-  DEPEND[buildtest_cc_$name]=../libssl ../libcrypto
++  DEPEND[buildtest_cc_$name]=../libssl$config{suffix} ../libcrypto$config{suffix}
+ _____
+    }
+ -}
+
+--- util\mkdef.pl
++++ mkdef.pl
+@@ -186,8 +186,8 @@
+ 		$zlib = 1;
+ 	}
+ 
+-	$do_crypto=1 if $_ eq "libcrypto" || $_ eq "crypto";
+-	$do_ssl=1 if $_ eq "libssl" || $_ eq "ssl";
++	$do_crypto=1 if $_ =~ m/^libcrypto/ || $_ =~ m/^crypto/;
++	$do_ssl=1 if $_ =~ m/^libssl/ || $_ =~ m/^ssl/;
+ 
+ 	$do_update=1 if $_ eq "update";
+ 	$do_rewrite=1 if $_ eq "rewrite";
+diff --git a/test/ossl_shim/build.info b/test/ossl_shim/build.info
+index 12250600b9..b38b987212 100644
+--- test/ossl_shim/build.info
++++ test/ossl_shim/build.info
+@@ -2,5 +2,5 @@ IF[{- defined $target{CXX} && !$disabled{"external-tests"} -}]
+   PROGRAMS_NO_INST=ossl_shim
+   SOURCE[ossl_shim]=ossl_shim.cc async_bio.cc packeted_bio.cc test_config.cc
+   INCLUDE[ossl_shim]=. include ../../include
+-  DEPEND[ossl_shim]=../../libssl ../../libcrypto
++  DEPEND[ossl_shim]=../../libssl{- $config{suffix} -} ../../libcrypto{- $config{suffix} -}
+ ENDIF

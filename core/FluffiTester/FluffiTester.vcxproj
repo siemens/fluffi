@@ -1,15 +1,15 @@
 §§﻿<?xml version="1.0" encoding="utf-8"?>
-§§<!--
-§§Copyright 2017-2019 Siemens AG
-§§
-§§Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-§§
-§§The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-§§
-§§THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-§§
-§§Author(s): Abian Blome, Thomas Riedmaier, Michael Kraus, Fabian Russwurm
-§§-->
+<!--
+Copyright 2017-2019 Siemens AG
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Author(s): Abian Blome, Thomas Riedmaier, Michael Kraus, Fabian Russwurm
+-->
 §§<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 §§  <ItemGroup Label="ProjectConfigurations">
 §§    <ProjectConfiguration Include="Debug|Win32">
@@ -121,12 +121,12 @@
 §§  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
 §§    <LinkIncremental>true</LinkIncremental>
 §§    <IncludePath>$(SolutionDir)\dependencies\zeromq\include;$(SolutionDir)\SharedCode;$(SolutionDir)\dependencies\libprotoc\include\siemens\cpp;$(SolutionDir)\dependencies\libprotoc\include;$(SolutionDir)\TestcaseGenerator;$(IncludePath)</IncludePath>
-§§    <LibraryPath>$(SolutionDir)\dependencies\zeromq\lib\x64;$(OutDir);$(SolutionDir)\dependencies\libprotoc\lib\x64;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)\dependencies\zeromq\lib\x64;$(OutDir);$(SolutionDir)\dependencies\libprotoc\lib\x64;$(LibraryPath)</LibraryPath>
 §§  </PropertyGroup>
 §§  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'">
 §§    <LinkIncremental>true</LinkIncremental>
-§§    <IncludePath>$(SolutionDir)\dependencies\honggfuzz\include;$(SolutionDir)\dependencies\afl\include;$(SolutionDir)\dependencies\easylogging\include;$(SolutionDir)\dependencies\dynamorio\include;$(SolutionDir)\dependencies\zeromq\include;$(SolutionDir)\SharedCode;$(SolutionDir)\dependencies\libprotoc\include\siemens\cpp;$(SolutionDir)\dependencies\libprotoc\include;$(SolutionDir)\TestcaseGenerator;$(SolutionDir)\TestcaseRunner;$(SolutionDir)\SharedMemIPC;$(SolutionDir)\LocalManager;$(SolutionDir)\dependencies\mariadb\include;$(SolutionDir)\TestcaseEvaluator;$(SolutionDir)\GlobalManager;$(IncludePath)</IncludePath>
-§§    <LibraryPath>$(SolutionDir)\dependencies\honggfuzz\lib\x64;$(SolutionDir)\dependencies\afl\lib\x64;$(SolutionDir)\dependencies\easylogging\lib\x64;$(SolutionDir)\dependencies\zeromq\lib\x64;$(OutDir);$(SolutionDir)\dependencies\mariadb\lib\x64;$(SolutionDir)\dependencies\libprotoc\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\dependencies\honggfuzz\include;$(SolutionDir)\dependencies\afl\include;$(SolutionDir)\dependencies\easylogging\include;$(SolutionDir)\dependencies\dynamorio\include;$(SolutionDir)\dependencies\zeromq\include;$(SolutionDir)\SharedCode;$(SolutionDir)\dependencies\libprotoc\include\siemens\cpp;$(SolutionDir)\dependencies\libprotoc\include;$(SolutionDir)\TestcaseGenerator;$(SolutionDir)\TestcaseRunner;$(SolutionDir)\SharedMemIPC;$(SolutionDir)\LocalManager;$(SolutionDir)\dependencies\mariadb\include;$(SolutionDir)\TestcaseEvaluator;$(SolutionDir)\GlobalManager;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\dependencies\honggfuzz\lib\x64;$(SolutionDir)\dependencies\afl\lib\x64;$(SolutionDir)\dependencies\easylogging\lib\x64;$(SolutionDir)\dependencies\zeromq\lib\x64;$(OutDir);$(SolutionDir)\dependencies\mariadb\lib\x64;$(SolutionDir)\dependencies\libprotoc\lib\x64;$(LibraryPath)</LibraryPath>
 §§  </PropertyGroup>
 §§  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
 §§    <LinkIncremental>true</LinkIncremental>
@@ -142,13 +142,13 @@
 §§      <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
 §§      <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
 §§      <UseFullPaths>true</UseFullPaths>
-§§      <AdditionalOptions>/wd4146</AdditionalOptions>
+      <AdditionalOptions>/wd4146</AdditionalOptions>
 §§    </ClCompile>
 §§    <Link>
 §§      <SubSystem>Windows</SubSystem>
 §§      <GenerateDebugInformation>true</GenerateDebugInformation>
 §§      <AdditionalLibraryDirectories>$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-§§      <UACExecutionLevel>AsInvoker</UACExecutionLevel>
+      <UACExecutionLevel>AsInvoker</UACExecutionLevel>
 §§    </Link>
 §§  </ItemDefinitionGroup>
 §§  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">
@@ -157,16 +157,16 @@
 §§      <WarningLevel>Level3</WarningLevel>
 §§      <Optimization>Disabled</Optimization>
 §§      <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-§§      <PreprocessorDefinitions>WIN32;_VSTEST;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_VSTEST;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
 §§      <UseFullPaths>true</UseFullPaths>
-§§      <AdditionalOptions>/wd4146</AdditionalOptions>
+      <AdditionalOptions>/wd4146</AdditionalOptions>
 §§    </ClCompile>
 §§    <Link>
 §§      <SubSystem>Windows</SubSystem>
 §§      <GenerateDebugInformation>true</GenerateDebugInformation>
 §§      <AdditionalLibraryDirectories>$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-§§      <AdditionalDependencies>Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-§§      <UACExecutionLevel>AsInvoker</UACExecutionLevel>
+      <AdditionalDependencies>Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <UACExecutionLevel>AsInvoker</UACExecutionLevel>
 §§    </Link>
 §§  </ItemDefinitionGroup>
 §§  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -178,13 +178,13 @@
 §§      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
 §§      <UseFullPaths>true</UseFullPaths>
 §§      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-§§      <AdditionalOptions>/wd4146</AdditionalOptions>
+      <AdditionalOptions>/wd4146</AdditionalOptions>
 §§    </ClCompile>
 §§    <Link>
 §§      <SubSystem>Windows</SubSystem>
 §§      <GenerateDebugInformation>true</GenerateDebugInformation>
 §§      <AdditionalLibraryDirectories>$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-§§      <AdditionalDependencies>libprotobufd.lib;libzmq-v140-mt-gd-4_3_1.lib;SharedCoded.lib;Ws2_32.lib;Iphlpapi.lib;Pdh.lib;Rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libprotobufd.lib;libzmq-v140-mt-gd-4_3_1.lib;SharedCoded.lib;Ws2_32.lib;Iphlpapi.lib;Pdh.lib;Rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
 §§    </Link>
 §§  </ItemDefinitionGroup>
 §§  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'">
@@ -193,32 +193,32 @@
 §§      <WarningLevel>Level3</WarningLevel>
 §§      <Optimization>Disabled</Optimization>
 §§      <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-§§      <PreprocessorDefinitions>_DEBUG;_VSTEST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_VSTEST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
 §§      <UseFullPaths>true</UseFullPaths>
 §§      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-§§      <AdditionalOptions>/wd4146</AdditionalOptions>
+      <AdditionalOptions>/wd4146</AdditionalOptions>
 §§    </ClCompile>
 §§    <Link>
 §§      <SubSystem>Windows</SubSystem>
 §§      <GenerateDebugInformation>true</GenerateDebugInformation>
 §§      <AdditionalLibraryDirectories>$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-§§      <AdditionalDependencies>honggfuzzd.lib;afl-fuzzd.lib;easyloggingppd.lib;libprotobufd.lib;libzmq-v140-mt-gd-4_3_1.lib;libmariadbd.lib;SharedCoded.lib;SharedMemIPC.lib;GlobalManager.lib;LocalManager.lib;TestcaseGenerator.lib;TestcaseRunner.lib;TestcaseEvaluator.lib;Ws2_32.lib;Iphlpapi.lib;Pdh.lib;Rpcrt4.lib;Shlwapi.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
-§§      <UACExecutionLevel>AsInvoker</UACExecutionLevel>
+      <AdditionalDependencies>honggfuzzd.lib;afl-fuzzd.lib;easyloggingppd.lib;libprotobufd.lib;libzmq-v140-mt-gd-4_3_1.lib;libmariadbd.lib;SharedCoded.lib;SharedMemIPC.lib;GlobalManager.lib;LocalManager.lib;TestcaseGenerator.lib;TestcaseRunner.lib;TestcaseEvaluator.lib;Ws2_32.lib;Iphlpapi.lib;Pdh.lib;Rpcrt4.lib;Shlwapi.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <UACExecutionLevel>AsInvoker</UACExecutionLevel>
 §§    </Link>
-§§    <PostBuildEvent>
-§§      <Command>
-§§call testApplications\bin\get_gdb.bat
-§§robocopy "$(SolutionDir)FluffiTester\testApplications\bin" "$(TargetDir)." *.*
-§§if errorlevel 4 goto BuildEventFailed
+    <PostBuildEvent>
+      <Command>
+call testApplications\bin\get_gdb.bat
+robocopy "$(SolutionDir)FluffiTester\testApplications\bin" "$(TargetDir)." *.*
+if errorlevel 4 goto BuildEventFailed
 §§robocopy "$(SolutionDir)dependencies\dynamorio\dyndist64" "$(TargetDir)dyndist64" /E
-§§if errorlevel 4 goto BuildEventFailed
-§§if errorlevel 0 goto end
-§§:BuildEventFailed echo FIL
-§§:BuildEventFailed echo FILECOPY for $(ProjectName) FAILED
-§§exit 1
-§§:end echo FILECOPY for $(ProjectName) COMPLETED OK
-§§exit 0</Command>
-§§    </PostBuildEvent>
+if errorlevel 4 goto BuildEventFailed
+if errorlevel 0 goto end
+:BuildEventFailed echo FIL
+:BuildEventFailed echo FILECOPY for $(ProjectName) FAILED
+exit 1
+:end echo FILECOPY for $(ProjectName) COMPLETED OK
+exit 0</Command>
+    </PostBuildEvent>
 §§  </ItemDefinitionGroup>
 §§  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
 §§    <ClCompile>
@@ -230,13 +230,13 @@
 §§      <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
 §§      <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
 §§      <UseFullPaths>true</UseFullPaths>
-§§      <AdditionalOptions>/wd4146</AdditionalOptions>
+      <AdditionalOptions>/wd4146</AdditionalOptions>
 §§    </ClCompile>
 §§    <Link>
 §§      <SubSystem>Windows</SubSystem>
 §§      <EnableCOMDATFolding>true</EnableCOMDATFolding>
 §§      <OptimizeReferences>true</OptimizeReferences>
-§§      <GenerateDebugInformation>No</GenerateDebugInformation>
+      <GenerateDebugInformation>No</GenerateDebugInformation>
 §§      <AdditionalLibraryDirectories>$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
 §§    </Link>
 §§  </ItemDefinitionGroup>
@@ -250,13 +250,13 @@
 §§      <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
 §§      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
 §§      <UseFullPaths>true</UseFullPaths>
-§§      <AdditionalOptions>/wd4146</AdditionalOptions>
+      <AdditionalOptions>/wd4146</AdditionalOptions>
 §§    </ClCompile>
 §§    <Link>
 §§      <SubSystem>Windows</SubSystem>
 §§      <EnableCOMDATFolding>true</EnableCOMDATFolding>
 §§      <OptimizeReferences>true</OptimizeReferences>
-§§      <GenerateDebugInformation>No</GenerateDebugInformation>
+      <GenerateDebugInformation>No</GenerateDebugInformation>
 §§      <AdditionalLibraryDirectories>$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
 §§    </Link>
 §§  </ItemDefinitionGroup>
@@ -265,22 +265,22 @@
 §§    <ClInclude Include="targetver.h" />
 §§  </ItemGroup>
 §§  <ItemGroup>
-§§    <ClCompile Include="AbstractionLayerTester.cpp" />
-§§    <ClCompile Include="AFLMutatorTester.cpp" />
+    <ClCompile Include="AbstractionLayerTester.cpp" />
+    <ClCompile Include="AFLMutatorTester.cpp" />
 §§    <ClCompile Include="BlockCoverageCacheTester.cpp" />
-§§    <ClCompile Include="CommIntTester.cpp" />
+    <ClCompile Include="CommIntTester.cpp" />
 §§    <ClCompile Include="CommPartnerManagerTester.cpp" />
 §§    <ClCompile Include="ExternalMutatorTester.cpp" />
-§§    <ClCompile Include="ExternalProcessTester.cpp" />
-§§    <ClCompile Include="GarbageCollectorWorkerTester.cpp" />
-§§    <ClCompile Include="GetStatusRequestHandlerTester.cpp" />
+    <ClCompile Include="ExternalProcessTester.cpp" />
+    <ClCompile Include="GarbageCollectorWorkerTester.cpp" />
+    <ClCompile Include="GetStatusRequestHandlerTester.cpp" />
 §§    <ClCompile Include="HonggfuzzMutatorTester.cpp" />
-§§    <ClCompile Include="LMDatabaseManagerTester.cpp" />
+    <ClCompile Include="LMDatabaseManagerTester.cpp" />
 §§    <ClCompile Include="GMDatabaseManagerTester.cpp" />
-§§    <ClCompile Include="GMWorkerThreadStateBuilderTester.cpp" />
-§§    <ClCompile Include="LMWorkerThreadStateBuilderTester.cpp" />
-§§    <ClCompile Include="RegisterAtLMRequestHandlerTester.cpp" />
-§§    <ClCompile Include="SharedMemIPCTester.cpp" />
+    <ClCompile Include="GMWorkerThreadStateBuilderTester.cpp" />
+    <ClCompile Include="LMWorkerThreadStateBuilderTester.cpp" />
+    <ClCompile Include="RegisterAtLMRequestHandlerTester.cpp" />
+    <ClCompile Include="SharedMemIPCTester.cpp" />
 §§    <ClCompile Include="stdafx.cpp">
 §§      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
 §§      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">Create</PrecompiledHeader>
@@ -289,15 +289,15 @@
 §§      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
 §§      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
 §§    </ClCompile>
-§§    <ClCompile Include="RadamsaMutatorTester.cpp" />
-§§    <ClCompile Include="TestExecutorDynRioMultiTester.cpp" />
-§§    <ClCompile Include="TestExecutorDynRioSingleTester.cpp" />
-§§    <ClCompile Include="TestExecutorGDBTester.cpp" />
+    <ClCompile Include="RadamsaMutatorTester.cpp" />
+    <ClCompile Include="TestExecutorDynRioMultiTester.cpp" />
+    <ClCompile Include="TestExecutorDynRioSingleTester.cpp" />
+    <ClCompile Include="TestExecutorGDBTester.cpp" />
 §§    <ClCompile Include="TETestResultManagerTester.cpp" />
-§§    <ClCompile Include="TEWorkerThreadStateBuilderTester.cpp" />
+    <ClCompile Include="TEWorkerThreadStateBuilderTester.cpp" />
 §§    <ClCompile Include="TGTestcaseManagerTester.cpp" />
-§§    <ClCompile Include="TGWorkerThreadStateBuilderTester.cpp" />
-§§    <ClCompile Include="TRWorkerThreadStateBuilderTester.cpp" />
+    <ClCompile Include="TGWorkerThreadStateBuilderTester.cpp" />
+    <ClCompile Include="TRWorkerThreadStateBuilderTester.cpp" />
 §§    <ClCompile Include="utilTester.cpp" />
 §§    <ClCompile Include="WorkerWeightCalculatorTester.cpp" />
 §§  </ItemGroup>
@@ -321,4 +321,4 @@
 §§  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 §§  <ImportGroup Label="ExtensionTargets">
 §§  </ImportGroup>
-§§</Project>
+</Project>

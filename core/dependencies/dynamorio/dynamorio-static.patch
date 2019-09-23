@@ -1,46 +1,46 @@
-§§# ***************************************************************************
-§§# Copyright (c) 2017-2019 Siemens AG  All rights reserved.
-§§# ***************************************************************************/
-§§#
-§§#
-§§# Redistribution and use in source and binary forms, with or without
-§§# modification, are permitted provided that the following conditions are met:
-§§#
-§§# * Redistributions of source code must retain the above copyright notice,
-§§#   this list of conditions and the following disclaimer.
-§§#
-§§# * Redistributions in binary form must reproduce the above copyright notice,
-§§#   this list of conditions and the following disclaimer in the documentation
-§§#   and/or other materials provided with the distribution.
-§§#
-§§# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-§§# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-§§# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-§§# ARE DISCLAIMED. IN NO EVENT SHALL Siemens AG OR CONTRIBUTORS BE LIABLE
-§§# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-§§# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-§§# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-§§# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-§§# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
-§§# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
-§§# DAMAGE.
-§§# 
-§§# Author(s): Thomas Riedmaier, Roman Bendt
-§§--- tools/CMakeLists.txt	2018-11-09 04:59:47.000000000 +0100
-§§+++ tools/CMakeLists.txt	2018-12-18 16:57:23.589762608 +0100
+# ***************************************************************************
+# Copyright (c) 2017-2019 Siemens AG  All rights reserved.
+# ***************************************************************************/
+#
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# * Redistributions of source code must retain the above copyright notice,
+#   this list of conditions and the following disclaimer.
+#
+# * Redistributions in binary form must reproduce the above copyright notice,
+#   this list of conditions and the following disclaimer in the documentation
+#   and/or other materials provided with the distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL Siemens AG OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+# DAMAGE.
+# 
+# Author(s): Thomas Riedmaier, Roman Bendt
+--- tools/CMakeLists.txt	2018-11-09 04:59:47.000000000 +0100
++++ tools/CMakeLists.txt	2018-12-18 16:57:23.589762608 +0100
 §§@@ -163,12 +163,15 @@
-§§ add_executable(drconfig drdeploy.c ${RESOURCES})
-§§ set_target_properties(drconfig PROPERTIES
-§§   COMPILE_FLAGS "${tool_cflags} -DRC_IS_drconfig -DDRCONFIG")
-§§+target_link_libraries(drconfig "-static")
-§§ add_executable(drrun drdeploy.c ${RESOURCES})
-§§ set_target_properties(drrun PROPERTIES
-§§   COMPILE_FLAGS "${tool_cflags} -DRC_IS_drrun -DDRRUN")
-§§+target_link_libraries(drrun "-static")
-§§ add_executable(drinject drdeploy.c ${RESOURCES})
-§§ set_target_properties(drinject PROPERTIES
-§§   COMPILE_FLAGS "${tool_cflags} -DRC_IS_drinject -DDRINJECT")
-§§+target_link_libraries(drinject "-static")
-§§ set(tgts ${tgts} drconfig drrun drinject)
-§§ 
-§§ foreach (deploytgt drconfig drrun drinject)
+ add_executable(drconfig drdeploy.c ${RESOURCES})
+ set_target_properties(drconfig PROPERTIES
+   COMPILE_FLAGS "${tool_cflags} -DRC_IS_drconfig -DDRCONFIG")
++target_link_libraries(drconfig "-static")
+ add_executable(drrun drdeploy.c ${RESOURCES})
+ set_target_properties(drrun PROPERTIES
+   COMPILE_FLAGS "${tool_cflags} -DRC_IS_drrun -DDRRUN")
++target_link_libraries(drrun "-static")
+ add_executable(drinject drdeploy.c ${RESOURCES})
+ set_target_properties(drinject PROPERTIES
+   COMPILE_FLAGS "${tool_cflags} -DRC_IS_drinject -DDRINJECT")
++target_link_libraries(drinject "-static")
+ set(tgts ${tgts} drconfig drrun drinject)
+ 
+ foreach (deploytgt drconfig drrun drinject)

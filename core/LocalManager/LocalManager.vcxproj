@@ -1,15 +1,15 @@
 §§﻿<?xml version="1.0" encoding="utf-8"?>
-§§<!--
-§§Copyright 2017-2019 Siemens AG
-§§
-§§Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-§§
-§§The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-§§
-§§THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-§§
-§§Author(s): Roman Bendt, Thomas Riedmaier
-§§-->
+<!--
+Copyright 2017-2019 Siemens AG
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Author(s): Roman Bendt, Thomas Riedmaier
+-->
 §§<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 §§  <ItemGroup Label="ProjectConfigurations">
 §§    <ProjectConfiguration Include="Debug|Win32">
@@ -110,37 +110,37 @@
 §§    <LinkIncremental>true</LinkIncremental>
 §§    <IntDir>$(Platform)\$(Configuration)\</IntDir>
 §§    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-§§    <IncludePath>$(SolutionDir)\dependencies\easylogging\include;$(SolutionDir)\dependencies\mariadb\include;$(SolutionDir)\dependencies\zeromq\include;$(SolutionDir)\SharedCode;$(SolutionDir)\dependencies\libprotoc\include\siemens\cpp;$(SolutionDir)\dependencies\libprotoc\include;$(IncludePath)</IncludePath>
-§§    <LibraryPath>$(SolutionDir)\dependencies\zeromq\lib\x86;$(OutDir);$(SolutionDir)\dependencies\mariadb\lib\x86;$(SolutionDir)\dependencies\easylogging\lib\x86;$(SolutionDir)\dependencies\libprotoc\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\dependencies\easylogging\include;$(SolutionDir)\dependencies\mariadb\include;$(SolutionDir)\dependencies\zeromq\include;$(SolutionDir)\SharedCode;$(SolutionDir)\dependencies\libprotoc\include\siemens\cpp;$(SolutionDir)\dependencies\libprotoc\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\dependencies\zeromq\lib\x86;$(OutDir);$(SolutionDir)\dependencies\mariadb\lib\x86;$(SolutionDir)\dependencies\easylogging\lib\x86;$(SolutionDir)\dependencies\libprotoc\lib\x86;$(LibraryPath)</LibraryPath>
 §§  </PropertyGroup>
 §§  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">
 §§    <LinkIncremental>true</LinkIncremental>
 §§    <IntDir>$(Platform)\$(Configuration)\</IntDir>
 §§    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-§§    <IncludePath>$(SolutionDir)\dependencies\easylogging\include;$(SolutionDir)\dependencies\mariadb\include;$(SolutionDir)\dependencies\zeromq\include;$(SolutionDir)\SharedCode;$(SolutionDir)\dependencies\libprotoc\include\siemens\cpp;$(SolutionDir)\dependencies\libprotoc\include;$(IncludePath)</IncludePath>
-§§    <LibraryPath>$(SolutionDir)\dependencies\zeromq\lib\x86;$(OutDir);$(SolutionDir)\dependencies\mariadb\lib\x86;$(SolutionDir)\dependencies\easylogging\lib\x86;$(SolutionDir)\dependencies\libprotoc\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\dependencies\easylogging\include;$(SolutionDir)\dependencies\mariadb\include;$(SolutionDir)\dependencies\zeromq\include;$(SolutionDir)\SharedCode;$(SolutionDir)\dependencies\libprotoc\include\siemens\cpp;$(SolutionDir)\dependencies\libprotoc\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\dependencies\zeromq\lib\x86;$(OutDir);$(SolutionDir)\dependencies\mariadb\lib\x86;$(SolutionDir)\dependencies\easylogging\lib\x86;$(SolutionDir)\dependencies\libprotoc\lib\x86;$(LibraryPath)</LibraryPath>
 §§  </PropertyGroup>
 §§  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
 §§    <LinkIncremental>true</LinkIncremental>
-§§    <IncludePath>$(SolutionDir)\dependencies\easylogging\include;$(SolutionDir)\dependencies\mariadb\include;$(SolutionDir)\dependencies\zeromq\include;$(SolutionDir)\SharedCode;$(SolutionDir)\dependencies\libprotoc\include\siemens\cpp;$(SolutionDir)\dependencies\libprotoc\include;$(IncludePath)</IncludePath>
-§§    <LibraryPath>$(SolutionDir)\dependencies\zeromq\lib\x64;$(SolutionDir)\dependencies\mariadb\lib\x64;$(OutDir);$(SolutionDir)\dependencies\easylogging\lib\x64;$(SolutionDir)\dependencies\libprotoc\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\dependencies\easylogging\include;$(SolutionDir)\dependencies\mariadb\include;$(SolutionDir)\dependencies\zeromq\include;$(SolutionDir)\SharedCode;$(SolutionDir)\dependencies\libprotoc\include\siemens\cpp;$(SolutionDir)\dependencies\libprotoc\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\dependencies\zeromq\lib\x64;$(SolutionDir)\dependencies\mariadb\lib\x64;$(OutDir);$(SolutionDir)\dependencies\easylogging\lib\x64;$(SolutionDir)\dependencies\libprotoc\lib\x64;$(LibraryPath)</LibraryPath>
 §§  </PropertyGroup>
 §§  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'">
 §§    <LinkIncremental>true</LinkIncremental>
-§§    <IncludePath>$(SolutionDir)\dependencies\easylogging\include;$(SolutionDir)\dependencies\mariadb\include;$(SolutionDir)\dependencies\zeromq\include;$(SolutionDir)\SharedCode;$(SolutionDir)\dependencies\libprotoc\include\siemens\cpp;$(SolutionDir)\dependencies\libprotoc\include;$(IncludePath)</IncludePath>
-§§    <LibraryPath>$(SolutionDir)\dependencies\zeromq\lib\x64;$(SolutionDir)\dependencies\mariadb\lib\x64;$(OutDir);$(SolutionDir)\dependencies\easylogging\lib\x86;$(SolutionDir)\dependencies\libprotoc\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\dependencies\easylogging\include;$(SolutionDir)\dependencies\mariadb\include;$(SolutionDir)\dependencies\zeromq\include;$(SolutionDir)\SharedCode;$(SolutionDir)\dependencies\libprotoc\include\siemens\cpp;$(SolutionDir)\dependencies\libprotoc\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\dependencies\zeromq\lib\x64;$(SolutionDir)\dependencies\mariadb\lib\x64;$(OutDir);$(SolutionDir)\dependencies\easylogging\lib\x86;$(SolutionDir)\dependencies\libprotoc\lib\x64;$(LibraryPath)</LibraryPath>
 §§  </PropertyGroup>
 §§  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
 §§    <LinkIncremental>false</LinkIncremental>
-§§    <IncludePath>$(SolutionDir)\dependencies\easylogging\include;$(SolutionDir)\dependencies\mariadb\include;$(SolutionDir)\dependencies\zeromq\include;$(SolutionDir)\SharedCode;$(SolutionDir)\dependencies\libprotoc\include\siemens\cpp;$(SolutionDir)\dependencies\libprotoc\include;$(IncludePath)</IncludePath>
-§§    <LibraryPath>$(SolutionDir)\dependencies\zeromq\lib\x86;$(SolutionDir)$(Platform)\$(Configuration)\;$(SolutionDir)\dependencies\mariadb\lib\x86;$(SolutionDir)\dependencies\easylogging\lib\x86;$(SolutionDir)\dependencies\libprotoc\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\dependencies\easylogging\include;$(SolutionDir)\dependencies\mariadb\include;$(SolutionDir)\dependencies\zeromq\include;$(SolutionDir)\SharedCode;$(SolutionDir)\dependencies\libprotoc\include\siemens\cpp;$(SolutionDir)\dependencies\libprotoc\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\dependencies\zeromq\lib\x86;$(SolutionDir)$(Platform)\$(Configuration)\;$(SolutionDir)\dependencies\mariadb\lib\x86;$(SolutionDir)\dependencies\easylogging\lib\x86;$(SolutionDir)\dependencies\libprotoc\lib\x86;$(LibraryPath)</LibraryPath>
 §§    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
 §§    <IntDir>$(Platform)\$(Configuration)\</IntDir>
 §§  </PropertyGroup>
 §§  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
 §§    <LinkIncremental>false</LinkIncremental>
-§§    <IncludePath>$(SolutionDir)\dependencies\easylogging\include;$(SolutionDir)\dependencies\mariadb\include;$(SolutionDir)\dependencies\zeromq\include;$(SolutionDir)\SharedCode;$(SolutionDir)\dependencies\libprotoc\include\siemens\cpp;$(SolutionDir)\dependencies\libprotoc\include;$(IncludePath)</IncludePath>
-§§    <LibraryPath>$(SolutionDir)\dependencies\zeromq\lib\x64;$(SolutionDir)\dependencies\mariadb\lib\x64;$(OutDir);$(SolutionDir)\dependencies\easylogging\lib\x64;$(SolutionDir)\dependencies\libprotoc\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\dependencies\easylogging\include;$(SolutionDir)\dependencies\mariadb\include;$(SolutionDir)\dependencies\zeromq\include;$(SolutionDir)\SharedCode;$(SolutionDir)\dependencies\libprotoc\include\siemens\cpp;$(SolutionDir)\dependencies\libprotoc\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\dependencies\zeromq\lib\x64;$(SolutionDir)\dependencies\mariadb\lib\x64;$(OutDir);$(SolutionDir)\dependencies\easylogging\lib\x64;$(SolutionDir)\dependencies\libprotoc\lib\x64;$(LibraryPath)</LibraryPath>
 §§  </PropertyGroup>
 §§  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
 §§    <ClCompile>
@@ -155,7 +155,7 @@
 §§    <Link>
 §§      <SubSystem>Console</SubSystem>
 §§      <GenerateDebugInformation>true</GenerateDebugInformation>
-§§      <AdditionalDependencies>easyloggingppd.lib;libprotobufd.lib;libzmq-v140-mt-gd-4_3_1.lib;SharedCoded.lib;Ws2_32.lib;Iphlpapi.lib;libmariadbd.lib;Pdh.lib;Rpcrt4.lib;Shlwapi.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>easyloggingppd.lib;libprotobufd.lib;libzmq-v140-mt-gd-4_3_1.lib;SharedCoded.lib;Ws2_32.lib;Iphlpapi.lib;libmariadbd.lib;Pdh.lib;Rpcrt4.lib;Shlwapi.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
 §§    </Link>
 §§  </ItemDefinitionGroup>
 §§  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">
@@ -171,7 +171,7 @@
 §§    <Link>
 §§      <SubSystem>Console</SubSystem>
 §§      <GenerateDebugInformation>true</GenerateDebugInformation>
-§§      <AdditionalDependencies>easyloggingppd.lib;libprotobufd.lib;libzmq-v140-mt-gd-4_3_1.lib;SharedCoded.lib;Ws2_32.lib;Iphlpapi.lib;libmariadbd.lib;Pdh.lib;Rpcrt4.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>easyloggingppd.lib;libprotobufd.lib;libzmq-v140-mt-gd-4_3_1.lib;SharedCoded.lib;Ws2_32.lib;Iphlpapi.lib;libmariadbd.lib;Pdh.lib;Rpcrt4.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
 §§    </Link>
 §§  </ItemDefinitionGroup>
 §§  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -187,7 +187,7 @@
 §§    <Link>
 §§      <SubSystem>Console</SubSystem>
 §§      <GenerateDebugInformation>true</GenerateDebugInformation>
-§§      <AdditionalDependencies>easyloggingppd.lib;libprotobufd.lib;libzmq-v140-mt-gd-4_3_1.lib;SharedCoded.lib;Ws2_32.lib;Iphlpapi.lib;libmariadbd.lib;Pdh.lib;Rpcrt4.lib;Shlwapi.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>easyloggingppd.lib;libprotobufd.lib;libzmq-v140-mt-gd-4_3_1.lib;SharedCoded.lib;Ws2_32.lib;Iphlpapi.lib;libmariadbd.lib;Pdh.lib;Rpcrt4.lib;Shlwapi.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
 §§    </Link>
 §§  </ItemDefinitionGroup>
 §§  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'">
@@ -203,7 +203,7 @@
 §§    <Link>
 §§      <SubSystem>Console</SubSystem>
 §§      <GenerateDebugInformation>true</GenerateDebugInformation>
-§§      <AdditionalDependencies>easyloggingppd.lib;libprotobufd.lib;libzmq-v140-mt-gd-4_3_1.lib;SharedCoded.lib;Ws2_32.lib;Iphlpapi.lib;libmariadbd.lib;Pdh.lib;Rpcrt4.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>easyloggingppd.lib;libprotobufd.lib;libzmq-v140-mt-gd-4_3_1.lib;SharedCoded.lib;Ws2_32.lib;Iphlpapi.lib;libmariadbd.lib;Pdh.lib;Rpcrt4.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
 §§    </Link>
 §§  </ItemDefinitionGroup>
 §§  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -223,7 +223,7 @@
 §§      <EnableCOMDATFolding>true</EnableCOMDATFolding>
 §§      <OptimizeReferences>true</OptimizeReferences>
 §§      <GenerateDebugInformation>No</GenerateDebugInformation>
-§§      <AdditionalDependencies>easyloggingpp.lib;libprotobuf.lib;libzmq-v140-mt-4_3_1.lib;SharedCode.lib;Ws2_32.lib;Iphlpapi.lib;libmariadb.lib;Pdh.lib;Rpcrt4.lib;Shlwapi.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>easyloggingpp.lib;libprotobuf.lib;libzmq-v140-mt-4_3_1.lib;SharedCode.lib;Ws2_32.lib;Iphlpapi.lib;libmariadb.lib;Pdh.lib;Rpcrt4.lib;Shlwapi.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
 §§    </Link>
 §§  </ItemDefinitionGroup>
 §§  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -243,12 +243,12 @@
 §§      <EnableCOMDATFolding>true</EnableCOMDATFolding>
 §§      <OptimizeReferences>true</OptimizeReferences>
 §§      <GenerateDebugInformation>No</GenerateDebugInformation>
-§§      <AdditionalDependencies>easyloggingpp.lib;libprotobuf.lib;libzmq-v140-mt-4_3_1.lib;SharedCode.lib;Ws2_32.lib;Iphlpapi.lib;libmariadb.lib;Pdh.lib;Rpcrt4.lib;Shlwapi.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>easyloggingpp.lib;libprotobuf.lib;libzmq-v140-mt-4_3_1.lib;SharedCode.lib;Ws2_32.lib;Iphlpapi.lib;libmariadb.lib;Pdh.lib;Rpcrt4.lib;Shlwapi.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
 §§    </Link>
 §§  </ItemDefinitionGroup>
 §§  <ItemGroup>
 §§    <ClInclude Include="DBCleanupWorker.h" />
-§§    <ClInclude Include="GetLMConfigurationRequestHandler.h" />
+    <ClInclude Include="GetLMConfigurationRequestHandler.h" />
 §§    <ClInclude Include="IsAgentWelcomedRequestHandler.h" />
 §§    <ClInclude Include="LMDatabaseManager.h" />
 §§    <ClInclude Include="GetCurrentBlockCoverageRequestHandler.h" />
@@ -270,7 +270,7 @@
 §§  </ItemGroup>
 §§  <ItemGroup>
 §§    <ClCompile Include="DBCleanupWorker.cpp" />
-§§    <ClCompile Include="GetLMConfigurationRequestHandler.cpp" />
+    <ClCompile Include="GetLMConfigurationRequestHandler.cpp" />
 §§    <ClCompile Include="IsAgentWelcomedRequestHandler.cpp" />
 §§    <ClCompile Include="LMDatabaseManager.cpp" />
 §§    <ClCompile Include="GetCurrentBlockCoverageRequestHandler.cpp" />
@@ -298,4 +298,4 @@
 §§  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 §§  <ImportGroup Label="ExtensionTargets">
 §§  </ImportGroup>
-§§</Project>
+</Project>

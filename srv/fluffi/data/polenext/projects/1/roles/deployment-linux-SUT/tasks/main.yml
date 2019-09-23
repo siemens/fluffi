@@ -1,13 +1,13 @@
-§§# Copyright 2017-2019 Siemens AG
-§§# 
-§§# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-§§# 
-§§# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-§§# 
-§§# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-§§# 
-§§# Author(s): Fabian Russwurm, Thomas Riedmaier, Pascal Eckmann
-§§
+# Copyright 2017-2019 Siemens AG
+# 
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# 
+# Author(s): Fabian Russwurm, Thomas Riedmaier, Pascal Eckmann
+
 §§- name: Ensure directory exists
 §§  file:
 §§    path: "{{SUTPath}}"
@@ -19,48 +19,48 @@
 §§    SUTFileName: "{{filePathToFetchFromFTP | basename}}"
 §§    SUTDirName: "{{filePathToFetchFromFTP | basename | splitext | first }}"
 §§
-§§- name: Check if the {{SUTFileName}} already exists
-§§  stat:
-§§    path: "{{SUTPath}}/{{SUTDirName}}"
-§§  register: stat_result
-§§
-§§- debug:
+- name: Check if the {{SUTFileName}} already exists
+  stat:
+    path: "{{SUTPath}}/{{SUTDirName}}"
+  register: stat_result
+
+- debug:
 §§    msg: "{{SUTPath}}/{{SUTDirName}} exists"
-§§  when: stat_result.stat.exists
-§§
-§§- name: Ensure directories are 0777
-§§  command: find {{SUTPath}}/{{SUTDirName}} -type d -exec chmod 0777 {} \;
-§§  when: stat_result.stat.exists
-§§
-§§- name: Ensure files are 0777
-§§  command: find {{SUTPath}}/{{SUTDirName}} -type f -exec chmod 0777 {} \;
-§§  when: stat_result.stat.exists
-§§
-§§- name: Delete the file, if it exist already
-§§  file:
-§§    path: "{{SUTPath}}/{{SUTDirName}}"
-§§    state: absent
-§§  when: stat_result.stat.exists
-§§
+  when: stat_result.stat.exists
+
+- name: Ensure directories are 0777
+  command: find {{SUTPath}}/{{SUTDirName}} -type d -exec chmod 0777 {} \;
+  when: stat_result.stat.exists
+
+- name: Ensure files are 0777
+  command: find {{SUTPath}}/{{SUTDirName}} -type f -exec chmod 0777 {} \;
+  when: stat_result.stat.exists
+
+- name: Delete the file, if it exist already
+  file:
+    path: "{{SUTPath}}/{{SUTDirName}}"
+    state: absent
+  when: stat_result.stat.exists
+
 §§- name: Check if the file {{SUTFileName}}.zip already exists
-§§  stat:
-§§    path: "{{SUTPath}}/{{SUTDirName}}.zip"
-§§  register: stat2_result
-§§
-§§- debug:
+  stat:
+    path: "{{SUTPath}}/{{SUTDirName}}.zip"
+  register: stat2_result
+
+- debug:
 §§    msg: "{{SUTPath}}/{{SUTDirName}}.zip exists"
-§§  when: stat2_result.stat.exists
-§§
-§§- name: Ensure file are 0777
-§§  command: find {{SUTPath}}/{{SUTDirName}}.zip -type f -exec chmod 0777 {} \;
-§§  when: stat2_result.stat.exists
-§§
-§§- name: Delete the file, if it exist already
-§§  file:
-§§    path: "{{SUTPath}}/{{SUTDirName}}.zip"
-§§    state: absent
-§§  when: stat2_result.stat.exists
-§§
+  when: stat2_result.stat.exists
+
+- name: Ensure file are 0777
+  command: find {{SUTPath}}/{{SUTDirName}}.zip -type f -exec chmod 0777 {} \;
+  when: stat2_result.stat.exists
+
+- name: Delete the file, if it exist already
+  file:
+    path: "{{SUTPath}}/{{SUTDirName}}.zip"
+    state: absent
+  when: stat2_result.stat.exists
+
 §§- name: Fetch SUT from "{{filePathToFetchFromFTP}}"
 §§  get_url: 
 §§    url: "{{filePathToFetchFromFTP}}"
@@ -110,4 +110,4 @@
 §§  shell: "{{deploymentScriptPath}}"
 §§  args:
 §§    chdir: "{{SUTPath}}/{{SUTDirName}}"
-§§  become: yes
+  become: yes

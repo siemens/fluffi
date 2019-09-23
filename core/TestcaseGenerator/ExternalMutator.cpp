@@ -1,15 +1,15 @@
-§§/*
-§§Copyright 2017-2019 Siemens AG
-§§
-§§Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-§§
-§§The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-§§
-§§THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-§§
-§§Author(s): Abian Blome, Thomas Riedmaier
-§§*/
-§§
+/*
+Copyright 2017-2019 Siemens AG
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Author(s): Abian Blome, Thomas Riedmaier
+*/
+
 §§#include "stdafx.h"
 §§#include "ExternalMutator.h"
 §§#include "FluffiTestcaseID.h"
@@ -30,14 +30,14 @@
 §§
 §§bool ExternalMutator::isSetupFunctionable() {
 §§	//1) check if the testcase directory  exists
-§§	if (!std::experimental::filesystem::exists(m_testcaseDir)) {
-§§		return false;
-§§	}
+	if (!std::experimental::filesystem::exists(m_testcaseDir)) {
+		return false;
+	}
 §§
 §§	//2) check if the external testcase directory  exists
-§§	if (!std::experimental::filesystem::exists(m_extTestcaseDir)) {
-§§		return false;
-§§	}
+	if (!std::experimental::filesystem::exists(m_extTestcaseDir)) {
+		return false;
+	}
 §§
 §§	//3) Give out the name of our testcase in the testcase directory
 §§	// ask lm for creds
@@ -47,12 +47,12 @@
 §§		FLUFFIMessage resp = FLUFFIMessage();
 §§		GetLMConfigurationRequest* glmcr = new GetLMConfigurationRequest();
 §§		req.set_allocated_getlmconfigurationrequest(glmcr);
-§§		bool respReceived = m_commInt->sendReqAndRecvResp(&req, &resp, m_workerThreadState, m_commInt->getMyLMServiceDescriptor().m_serviceHostAndPort, CommInt::timeoutNormalMessage);
-§§		if (!respReceived) {
-§§			LOG(ERROR) << "External mutator failed to get fuzzjob details";
-§§			return false;
-§§		}
-§§
+		bool respReceived = m_commInt->sendReqAndRecvResp(&req, &resp, m_workerThreadState, m_commInt->getMyLMServiceDescriptor().m_serviceHostAndPort, CommInt::timeoutNormalMessage);
+		if (!respReceived) {
+			LOG(ERROR) << "External mutator failed to get fuzzjob details";
+			return false;
+		}
+
 §§		const FluffiLMConfiguration lmConfig = FluffiLMConfiguration(resp.getlmconfigurationresponse().lmconfiguration());
 §§
 §§		std::experimental::filesystem::path outFilePath = std::experimental::filesystem::path(m_extTestcaseDir);
@@ -69,14 +69,14 @@
 §§		nameFile.close();
 §§	}
 §§
-§§	return true;
+	return true;
 §§}
 §§
 §§std::deque<TestcaseDescriptor> ExternalMutator::batchMutate(unsigned int numToGenerate, const FluffiTestcaseID parentID, const std::string parentPathAndFilename)
 §§{
-§§	(void)(parentID); //avoid unused parameter warning
-§§	(void)(parentPathAndFilename); //avoid unused parameter warning
-§§
+	(void)(parentID); //avoid unused parameter warning
+	(void)(parentPathAndFilename); //avoid unused parameter warning
+
 §§	std::deque<TestcaseDescriptor> generatedMutations{};
 §§
 §§	for (auto& file : std::experimental::filesystem::recursive_directory_iterator(m_extTestcaseDir)) {
@@ -116,11 +116,11 @@
 §§			}
 §§			else
 §§			{
-§§				LOG(ERROR) << "Error renaming generated file: " << file.path().generic_string();
+				LOG(ERROR) << "Error renaming generated file: " << file.path().generic_string();
 §§				break;
 §§			}
 §§		}
 §§	}
 §§
 §§	return generatedMutations;
-§§}
+}

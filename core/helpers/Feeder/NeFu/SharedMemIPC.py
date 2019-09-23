@@ -1,18 +1,18 @@
-§§# Copyright 2017-2019 Siemens AG
-§§# 
-§§# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-§§# 
-§§# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-§§# 
-§§# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-§§# 
-§§# Author(s): Abian Blome, Thomas Riedmaier
-§§
+# Copyright 2017-2019 Siemens AG
+# 
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# 
+# Author(s): Abian Blome, Thomas Riedmaier
+
 §§import ctypes
-§§import os 
-§§dir_path = os.path.dirname(os.path.realpath(__file__))
-§§
-§§lib = ctypes.cdll.LoadLibrary(os.path.join(dir_path, 'SharedMemIPC.dll'))
+import os 
+dir_path = os.path.dirname(os.path.realpath(__file__))
+
+lib = ctypes.cdll.LoadLibrary(os.path.join(dir_path, 'SharedMemIPC.dll'))
 §§
 §§
 §§class MessageTypes():
@@ -65,7 +65,7 @@
 §§        if messageType is None or data is None:
 §§            self.obj = lib.SharedMemMessage_new2()
 §§        else:
-§§            cData = ctypes.create_string_buffer(data.encode('ascii'))
+            cData = ctypes.create_string_buffer(data.encode('ascii'))
 §§            self.obj = lib.SharedMemMessage_new1(messageType, cData, len(data)+1)
 §§
 §§    def __del__(self):
@@ -80,7 +80,7 @@
 §§        return ctypes.string_at(cData, size)
 §§
 §§    def setData(self, data):
-§§        cData = ctypes.create_string_buffer(data.encode('ascii'))
+        cData = ctypes.create_string_buffer(data.encode('ascii'))
 §§        lib.SharedMemMessage_replaceDataWith(self.obj, cData, len(data)+1)
 §§
 §§    def getType(self):
@@ -116,7 +116,7 @@
 §§        lib.SharedMemIPC_waitForNewMessageToServer.argtypes = [ctypes.c_void_p, ctypes.c_void_p, ctypes.c_uint32]
 §§        lib.SharedMemIPC_waitForNewMessageToServer.restype = ctypes.c_bool
 §§
-§§        cSharedMemName = ctypes.create_string_buffer(sharedMemName.encode('ascii'))
+        cSharedMemName = ctypes.create_string_buffer(sharedMemName.encode('ascii'))
 §§
 §§        self.obj = lib.SharedMemIPC_new(cSharedMemName, sharedMemorySize)
 §§

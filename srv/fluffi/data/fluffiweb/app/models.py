@@ -1,13 +1,13 @@
-§§# Copyright 2017-2019 Siemens AG
-§§# 
-§§# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-§§# 
-§§# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-§§# 
-§§# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-§§# 
-§§# Author(s): Michael Kraus, Junes Najah, Abian Blome, Thomas Riedmaier
-§§
+# Copyright 2017-2019 Siemens AG
+# 
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# 
+# Author(s): Michael Kraus, Junes Najah, Abian Blome, Thomas Riedmaier
+
 §§from app import db
 §§from sqlalchemy import ForeignKey
 §§
@@ -44,7 +44,7 @@
 §§
 §§
 §§class Localmanagers(db.Model):
-§§    __tablename__ = 'localmanagers'
+    __tablename__ = 'localmanagers'
 §§    Servicedescriptorguid = db.Column(db.String(50), primary_key = True)
 §§    Servicedescriptorhostandport = db.Column(db.String(256))
 §§    Location = db.Column(db.String(256))
@@ -55,7 +55,7 @@
 §§
 §§
 §§class LocalmanagersStatuses(db.Model):
-§§    __tablename__ = 'localmanagers_statuses'
+    __tablename__ = 'localmanagers_statuses'
 §§    Id = db.Column(db.Integer, primary_key = True)
 §§    Servicedescriptorguid = db.Column(db.String(50))
 §§    Timeofstatus = db.Column(db.DateTime)
@@ -63,14 +63,14 @@
 §§
 §§
 §§class Workers(db.Model):
-§§    __tablename__ = 'workers'
+    __tablename__ = 'workers'
 §§    Servicedescriptorguid = db.Column(db.String(50), primary_key = True)
-§§    ServiceDescriptorhostandport = db.Column(db.String(50))
+    ServiceDescriptorhostandport = db.Column(db.String(50))
 §§    Fuzzjob = db.Column(db.Integer)
-§§    Location = db.Column(db.Integer)
+    Location = db.Column(db.Integer)
 §§    Timeoflastrequest = db.Column(db.DateTime)
 §§    Agenttype = db.Column(db.Integer)
-§§    Agentsubtypes = db.Column(db.String(1000))
+    Agentsubtypes = db.Column(db.String(1000))
 §§
 §§
 §§class LocationFuzzjobs(db.Model):
@@ -83,7 +83,7 @@
 §§
 §§
 §§class CommandQueue(db.Model):
-§§    __tablename__ = 'command_queue'
+    __tablename__ = 'command_queue'
 §§    Id = db.Column(db.Integer, primary_key = True)
 §§    Command = db.Column(db.String(256))
 §§    Argument = db.Column(db.String(4096))
