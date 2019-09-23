@@ -9,6 +9,6 @@
 //
 // Author(s): Thomas Riedmaier, Roman Bendt
 
-§§module CaRRoT
-§§
-§§go 1.12
+module CaRRoT
+
+go 1.12

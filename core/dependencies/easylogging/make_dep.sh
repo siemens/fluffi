@@ -10,7 +10,7 @@
 # Author(s): Thomas Riedmaier, Pascal Eckmann, Roman Bendt
 
 THREADS=$(cat /proc/cpuinfo | grep processor | wc -l)
-§§ARCH=$(file /bin/bash | awk -F',' '{print $2}' | tr -d ' ')
+ARCH=$(file /bin/bash | awk -F',' '{print $2}' | tr -d ' ')
 
 §§rm -rf include
 §§rm -rf lib/$ARCH

@@ -30,7 +30,7 @@ public:
 	std::string m_lastCrash;
 	PROCESS_TERMINATION_TYPE m_terminationType;
 	std::string m_terminationDescription;
-§§	int m_PID;
+	int m_PID;
 	bool m_debuggerThreadDone;
 	bool m_hasFullCoverage;
 

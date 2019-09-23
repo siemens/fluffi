@@ -52,10 +52,10 @@ fi
 §§if [[ $hostname == *"lemming"* ]]; then
 §§	echo "Setting odroidxu4 to $hostname"
 §§	hostnamectl set-hostname $hostname
-§§	sed -i "s/odroidxu4/$hostname/g" /var/run/systemd/netif/leases/*
-§§	sed -i "s/odroidxu4/$hostname/g" /etc/ssh/ssh_host*
-§§	sed -i "s/ odroidxu4//g" /etc/hosts
-§§
+	sed -i "s/odroidxu4/$hostname/g" /var/run/systemd/netif/leases/*
+	sed -i "s/odroidxu4/$hostname/g" /etc/ssh/ssh_host*
+	sed -i "s/ odroidxu4//g" /etc/hosts
+
 	echo "Add fluffi user"
 	ROOTPASSWD=$(cat odroid_rootpasswd)
 	FLUFFIUSER=$(cat odroid_username)

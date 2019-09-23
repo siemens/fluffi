@@ -54,7 +54,7 @@ void GetFuzzJobConfigurationRequestHandler::handleFLUFFIMessage(WorkerThreadStat
 		Setting* nextSetting = getFuzzJobConfigurationResponse->add_settings();
 		nextSetting->CopyFrom(setting.getProtobuf());
 	}
-§§
+
 	//Add agent specific settings
 	FluffiServiceDescriptor fsd(req->getfuzzjobconfigurationrequest().servicedescriptor());
 	std::string selectedSubType = lmWorkerThreadState->dbManager->getRegisteredInstanceSubType(fsd.m_guid);

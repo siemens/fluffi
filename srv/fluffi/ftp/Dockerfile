@@ -16,7 +16,7 @@ FROM ubuntu:bionic
 §§    && rm -rf /var/lib/apt/lists/*
 §§
 RUN adduser --disabled-password --gecos "" fluffi
-§§
+
 §§RUN mkdir -p /var/run/vsftpd/empty \
 §§ && mkdir -p /etc/vsftpd \
 §§ && mkdir -p /var/ftp \

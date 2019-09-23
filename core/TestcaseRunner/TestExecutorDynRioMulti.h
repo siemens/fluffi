@@ -13,8 +13,8 @@ Author(s): Thomas Riedmaier, Roman Bendt, Abian Blome
 #pragma once
 #include "TestExecutorDynRio.h"
 #include "SharedMemIPC.h"
-§§
-§§#if defined(_WIN64) || defined(_WIN32)
+
+#if defined(_WIN64) || defined(_WIN32)
 
 #if defined(_WIN64)
 //64 bit Windows
@@ -23,7 +23,7 @@ Author(s): Thomas Riedmaier, Roman Bendt, Abian Blome
 #define DRCOVMULTI_PATH "dyndist64\\clients\\lib64\\release\\drcovMulti.dll"
 #define DYNRIO_DIR "\\dyndist64"
 #define DYNRIO_LIBDIR "lib64"
-§§#else
+#else
 //32 bit Windows
 #define DRCONFIGLIB_PATH "dyndist32\\lib32\\drconfiglib.dll"
 #define DRRUN_PATH "dyndist32\\bin32\\drrun.exe"
@@ -115,15 +115,15 @@ public:
 	HANDLE m_SharedMemIPCInterruptEvent;
 
 	static void debuggerThreadMain(std::shared_ptr<DebugExecutionOutput> exOutput_FROM_TARGET_DEBUGGING, std::shared_ptr<ExternalProcess> debuggeeProcess, HANDLE sharedMemIPCInterruptEvent, bool attachInsteadOfStart, bool treatAnyAccessViolationAsFatal);
-§§
-§§#else
+
+#else
 	int m_pipe_to_dynrio;
 	int m_SharedMemIPCInterruptFD[2];
 	bool m_target_forks;
 
 	static void debuggerThreadMain(std::shared_ptr<DebugExecutionOutput> exOutput_FROM_TARGET_DEBUGGING, std::shared_ptr<ExternalProcess> debuggeeProcess, int sharedMemIPCInterruptWriteFD, bool attachInsteadOfStart, bool treatAnyAccessViolationAsFatal);
 	dr_config_status_t m_dr_nudge_pid(process_id_t process_id, client_id_t client_id, uint64_t arg, uint timeout_ms);
-§§#endif
+#endif
 
 	bool setDynamoRioRegistration(bool active, const std::string dynrioPipeName, std::string* errormsg);
 	bool runSingleTestcase(const FluffiTestcaseID testcaseId, std::shared_ptr<DebugExecutionOutput> exResult, bool use_dyn_rio);
@@ -132,10 +132,10 @@ public:
 	void waitForDebuggerToTerminate();
 	std::string getDrCovOutputFile(int iterationNumMod2);
 
-§§public:
+public:
 	TestExecutorDynRioMulti(const std::string targetCMDline, int hangTimeoutMS, const std::set<Module> modulesToCover, const std::string testcaseDir, ExternalProcess::CHILD_OUTPUT_TYPE child_output_mode, const std::string additionalEnvParam, GarbageCollectorWorker* garbageCollectorWorker, bool treatAnyAccessViolationAsFatal, const std::string  feederCmdline, const std::string  starterCmdline, int initializationTimeoutMS, CommInt* commInt, bool target_forks, int forceRestartAfterXTCs);
-§§	virtual ~TestExecutorDynRioMulti();
-§§
+	virtual ~TestExecutorDynRioMulti();
+
 	std::shared_ptr<DebugExecutionOutput> execute(const FluffiTestcaseID testcaseId, bool forceFullCoverage);
-§§	bool isSetupFunctionable();
+	bool isSetupFunctionable();
 };

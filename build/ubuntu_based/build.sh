@@ -14,12 +14,12 @@ if ! [ -f /.dockerenv ]; then
     exit 1
 fi
 
-§§MAKE_THREADS=-j$(cat /proc/cpuinfo | awk '/^processor/{print $3}' | wc -l) 
-§§
+MAKE_THREADS=-j$(cat /proc/cpuinfo | awk '/^processor/{print $3}' | wc -l) 
+
 if [ "$FLUFFI_DEPS" = TRUE ] ; then
-§§	cd /fluffi/dependencies
-§§	./make_all_dep.sh
-§§fi
-§§
+	cd /fluffi/dependencies
+	./make_all_dep.sh
+fi
+
 cd /fluffi
-§§make $MAKE_THREADS
+make $MAKE_THREADS

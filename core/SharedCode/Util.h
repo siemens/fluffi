@@ -17,8 +17,8 @@ Author(s): Thomas Riedmaier, Abian Blome, Roman Bendt
 #include "conio.h"
 #else
 #include "uuid.h"
-§§#include "sys/times.h"
-§§//#include "sys/vtimes.h"
+#include "sys/times.h"
+//#include "sys/vtimes.h"
 #include <sys/ioctl.h>
 #include <termios.h>
 #endif

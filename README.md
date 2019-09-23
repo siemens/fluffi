@@ -10,8 +10,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Roman Bendt
 -->
 
-§§# FLUFFI
-§§
+# FLUFFI
+
 ![alt text](srv/fluffi/data/fluffiweb/app/static/images/friendly_fluffi_md.jpg "FLUFFI greets you")
 
 FLUFFI - A distributed evolutionary binary fuzzer for pentesters.
@@ -23,4 +23,4 @@ FLUFFI - A distributed evolutionary binary fuzzer for pentesters.
 - [Technical Details](technical_details.md)
 - [Contributing to FLUFFI](CONTRIBUTING.md)
 - [LICENSE](LICENSE.md)
-§§
+

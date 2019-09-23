@@ -10,7 +10,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Roman Bendt
 -->
 
-§§ln -s $(pwd) ~/go/src/CaRRoT
+ln -s $(pwd) ~/go/src/CaRRoT
 
 # Concepts
 

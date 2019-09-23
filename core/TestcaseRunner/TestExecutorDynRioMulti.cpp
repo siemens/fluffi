@@ -161,7 +161,7 @@ TestExecutorDynRioMulti::TestExecutorDynRioMulti(const std::string targetCMDline
 
 		//Try to remove registration for the target. It might be there due to a dirty exit
 		std::string errormsg = "";
-§§		bool dynRioReg = setDynamoRioRegistration(false, "", &errormsg);
+		bool dynRioReg = setDynamoRioRegistration(false, "", &errormsg);
 		LOG(DEBUG) << "initial setDynamoRioRegistration(false) returned " << (dynRioReg ? "true" : "false");
 	}
 }
@@ -365,8 +365,8 @@ bool TestExecutorDynRioMulti::attemptStartTargetAndFeeder(bool use_dyn_rio) {
 		}
 
 		//Start the target by starting the starter (starter is a class member, so the destructor is called when a new starter is created or on class destruct)
-§§		std::shared_ptr<ExternalProcess> starterProcess = std::make_shared<ExternalProcess>(m_starterCmdline, m_child_output_mode);
-§§
+		std::shared_ptr<ExternalProcess> starterProcess = std::make_shared<ExternalProcess>(m_starterCmdline, m_child_output_mode);
+
 #if defined(_WIN32) || defined(_WIN64)
 		starterProcess->setAllowBreakAway(); //children of the starter process should run outside of the starter job. So we can attach to them as a target
 #else

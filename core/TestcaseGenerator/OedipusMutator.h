@@ -10,28 +10,28 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Roman Bendt, Thomas Riedmaier, Abian Blome
 */
 
-§§#pragma once
-§§#include "FluffiMutator.h"
-§§
-§§class FluffiServiceDescriptor;
-§§class TestcaseDescriptor;
-§§class FluffiTestcaseID;
-§§class CommInt;
-§§class TGWorkerThreadState;
-§§class OedipusMutator : public FluffiMutator
-§§{
-§§public:
+#pragma once
+#include "FluffiMutator.h"
+
+class FluffiServiceDescriptor;
+class TestcaseDescriptor;
+class FluffiTestcaseID;
+class CommInt;
+class TGWorkerThreadState;
+class OedipusMutator : public FluffiMutator
+{
+public:
 	OedipusMutator(FluffiServiceDescriptor serviceDescriptor, std::string testcaseDirectory, CommInt* commInt, TGWorkerThreadState* workerThreadState);
-§§	virtual ~OedipusMutator();
+	virtual ~OedipusMutator();
 	const static int m_numberOfNeededParents{ 2 };
-§§
-§§	bool isSetupFunctionable();
-§§	std::deque<TestcaseDescriptor> batchMutate(unsigned int numToGenerate, const FluffiTestcaseID parentID, const std::string parentPathAndFilename);
-§§
-§§private:
+
+	bool isSetupFunctionable();
+	std::deque<TestcaseDescriptor> batchMutate(unsigned int numToGenerate, const FluffiTestcaseID parentID, const std::string parentPathAndFilename);
+
+private:
 	static std::string string2hex(const std::string& input);
 	std::string encodedDBcredentials{ "" };
-§§
+
 	CommInt* m_commInt;
 	TGWorkerThreadState* m_workerThreadState;
-§§};
+};

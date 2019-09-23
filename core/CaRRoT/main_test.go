@@ -10,25 +10,25 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Roman Bendt, Thomas Riedmaier
 */
 
-§§package main
-§§
-§§import (
-§§	"io/ioutil"
-§§	"log"
-§§	"testing"
-§§)
-§§
-§§func BenchmarkInt2String(b *testing.B) {
-§§	db = NewDB()
-§§	f := NewFile()
-§§	L = log.New(ioutil.Discard, "", log.Ldate|log.Ltime)
-§§	D = L
-§§	for i := uint64(0); i < uint64(b.N); i++ {
-§§		f.Stringz.Add(Text{Enc: "ascii", Len: 20, Pos: 2 * (i + 1)})
-§§		f.Intz.Add(Int{Enc: "uint32be", ByteW: 4, Pos: i, ValS: int64(i % 50), ValU: i % 100})
-§§	}
-§§	f.Size = uint64(2*(b.N+1) + 1)
-§§	db.Files["test"] = f
-§§	b.ResetTimer()
-§§	CorrelateIntStrings("test")
-§§}
+package main
+
+import (
+	"io/ioutil"
+	"log"
+	"testing"
+)
+
+func BenchmarkInt2String(b *testing.B) {
+	db = NewDB()
+	f := NewFile()
+	L = log.New(ioutil.Discard, "", log.Ldate|log.Ltime)
+	D = L
+	for i := uint64(0); i < uint64(b.N); i++ {
+		f.Stringz.Add(Text{Enc: "ascii", Len: 20, Pos: 2 * (i + 1)})
+		f.Intz.Add(Int{Enc: "uint32be", ByteW: 4, Pos: i, ValS: int64(i % 50), ValU: i % 100})
+	}
+	f.Size = uint64(2*(b.N+1) + 1)
+	db.Files["test"] = f
+	b.ResetTimer()
+	CorrelateIntStrings("test")
+}

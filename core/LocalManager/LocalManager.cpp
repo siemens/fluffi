@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
 #endif
 
 	// ################## Define / Build global objects  ##################
-§§	Util::setDefaultLogOptions("logs" + Util::pathSeperator + "LocalManager_" + std::to_string(GETPID()) + ".log");
+	Util::setDefaultLogOptions("logs" + Util::pathSeperator + "LocalManager_" + std::to_string(GETPID()) + ".log");
 
 	if (argc < 2) {
 		LOG(ERROR) << "Usage: LocalManager <LOCATION>";

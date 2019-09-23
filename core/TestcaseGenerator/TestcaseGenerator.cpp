@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
 #endif
 
 	// ################## Define / Build global objects  ##################
-§§	Util::setDefaultLogOptions("logs" + Util::pathSeperator + "TestcaseGenerator_" + std::to_string(GETPID()) + ".log");
+	Util::setDefaultLogOptions("logs" + Util::pathSeperator + "TestcaseGenerator_" + std::to_string(GETPID()) + ".log");
 
 	if (argc < 2) {
 		LOG(ERROR) << "Usage: TestcaseGenerator <LOCATION> [<CommaSeparatedListOfSubtypes>]";
@@ -58,9 +58,9 @@ int main(int argc, char* argv[])
 	std::set<std::string> myAgentSubTypes;
 	myAgentSubTypes.insert("RadamsaMutator");
 	myAgentSubTypes.insert("AFLMutator");
-§§	myAgentSubTypes.insert("CaRRoTMutator");
+	myAgentSubTypes.insert("CaRRoTMutator");
 	myAgentSubTypes.insert("HonggfuzzMutator");
-§§	myAgentSubTypes.insert("OedipusMutator");
+	myAgentSubTypes.insert("OedipusMutator");
 	myAgentSubTypes.insert("ExternalMutator");
 
 	if (argc >= 3) {

@@ -25,7 +25,7 @@ if errorlevel 1 goto errorDone
 :: Starter x86
 "C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" helpers\Starter\Starter.sln /m  /t:Build /p:Configuration=Release /p:Platform=x86 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
 if errorlevel 1 goto errorDone
-§§
+
 :: Feeder x64
 "C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" helpers\Feeder\Feeder.sln /m  /t:Build /p:Configuration=Release /p:Platform=x64 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
 if errorlevel 1 goto errorDone
@@ -36,23 +36,23 @@ if errorlevel 1 goto errorDone
 
 :: Requires at least go 1.12
 
-§§set CGO_ENABLED=0
+set CGO_ENABLED=0
 cd CaRRoT\
-§§set GOARCH=386
-§§go build -o CaRRoT-386.exe -v -a -ldflags "-s -w -extldflags ^"-static^"" .
+set GOARCH=386
+go build -o CaRRoT-386.exe -v -a -ldflags "-s -w -extldflags ^"-static^"" .
 if errorlevel 1 goto errorDone
 
-§§set GOARCH=amd64
-§§go build -o CaRRoT-amd64.exe -v -a -ldflags "-s -w -extldflags ^"-static^"" .
+set GOARCH=amd64
+go build -o CaRRoT-amd64.exe -v -a -ldflags "-s -w -extldflags ^"-static^"" .
 if errorlevel 1 goto errorDone
 
-§§set CGO_ENABLED=0
-§§cd ..\Oedipus\
-§§set GOARCH=386
+set CGO_ENABLED=0
+cd ..\Oedipus\
+set GOARCH=386
 go build -o Oedipus-386.exe -v -a -ldflags "-s -w -extldflags ^"-static^"" .\cmd\Oedipus
 if errorlevel 1 goto errorDone
 
-§§set GOARCH=amd64
+set GOARCH=amd64
 go build -o Oedipus-amd64.exe -v -a -ldflags "-s -w -extldflags ^"-static^"" .\cmd\Oedipus
 if errorlevel 1 goto errorDone
 

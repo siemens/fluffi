@@ -10,20 +10,20 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Roman Bendt, Thomas Riedmaier
 */
 
-§§#pragma once
-§§#include "FluffiMutator.h"
-§§
-§§class FluffiServiceDescriptor;
-§§class TestcaseDescriptor;
-§§class FluffiTestcaseID;
-§§class CaRRoTMutator : public FluffiMutator
-§§{
-§§public:
-§§	CaRRoTMutator(FluffiServiceDescriptor ptMySelfServiceDescriptor, std::string testcaseDirectory);
-§§	virtual ~CaRRoTMutator();
-§§
-§§	bool isSetupFunctionable();
-§§	std::deque<TestcaseDescriptor> batchMutate(unsigned int numToGenerate, const FluffiTestcaseID parentID, const std::string parentPathAndFilename);
-§§
-§§private:
-§§};
+#pragma once
+#include "FluffiMutator.h"
+
+class FluffiServiceDescriptor;
+class TestcaseDescriptor;
+class FluffiTestcaseID;
+class CaRRoTMutator : public FluffiMutator
+{
+public:
+	CaRRoTMutator(FluffiServiceDescriptor ptMySelfServiceDescriptor, std::string testcaseDirectory);
+	virtual ~CaRRoTMutator();
+
+	bool isSetupFunctionable();
+	std::deque<TestcaseDescriptor> batchMutate(unsigned int numToGenerate, const FluffiTestcaseID parentID, const std::string parentPathAndFilename);
+
+private:
+};

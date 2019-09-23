@@ -9,18 +9,18 @@
 # 
 # Author(s): Thomas Riedmaier, Roman Bendt
 
-§§(
-§§cd afl
-§§./make_dep.sh
+(
+cd afl
+./make_dep.sh
 rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
-§§)
-§§
-§§(
+)
+
+(
 cd zeromq
-§§./make_dep.sh
+./make_dep.sh
 rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
-§§)
-§§
+)
+
 (
 cd libprotoc
 ./make_dep.sh
@@ -52,7 +52,7 @@ rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
 )
 
 (
-§§cd qemu
+cd qemu
 ./make_dep.sh
 rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
 )

@@ -82,13 +82,13 @@
  
      if (go_native)
          return DR_EMIT_GO_NATIVE;
-§§@@ -373,6 +378,128 @@
+@@ -373,6 +378,128 @@
          return DR_EMIT_DEFAULT;
  }
  
 +//CSA created
 +//inspired by https://github.com/firodj/bbtrace/blob/master/clients/bbtrace.c, http://dynamorio.org/docs/samples/bbcount.c and winafl.c
-§§+//static byte buf[8192];
++//static byte buf[8192];
 +static dr_emit_flags_t event_bb_insert(void *drcontext, void *tag,
 +	instrlist_t *bb, instr_t *instr, bool for_trace, bool translating, void *user_data)
 +{
@@ -98,100 +98,100 @@
 +	//insert an increment operation
 +#if defined(AARCH64) || defined(ARM)
 +
-§§+	reg_id_t reg_1 = 0, reg_2 = 0;
-§§+	// for (int i = 0; i < 20; i++) {
-§§+	// 	buf[i] = 0;
-§§+	// }
-§§+	//NOTIFY(0, "nulltes FLUUUFIIII%s\n", "");
-§§+
++	reg_id_t reg_1 = 0, reg_2 = 0;
++	// for (int i = 0; i < 20; i++) {
++	// 	buf[i] = 0;
++	// }
++	//NOTIFY(0, "nulltes FLUUUFIIII%s\n", "");
++
 +	//Save registers
 +	drreg_reserve_aflags(drcontext, bb, instr);
-§§+	drreg_reserve_register(drcontext, bb, instr, NULL, &reg_1);
-§§+	drreg_reserve_register(drcontext, bb, instr, NULL, &reg_2);
-§§+	
-§§+	//load
-§§+	size_t naked_addr = (size_t)&(((bb_entry_t*)user_data)->hits_since_last_reset);
++	drreg_reserve_register(drcontext, bb, instr, NULL, &reg_1);
++	drreg_reserve_register(drcontext, bb, instr, NULL, &reg_2);
++	
++	//load
++	size_t naked_addr = (size_t)&(((bb_entry_t*)user_data)->hits_since_last_reset);
 +
-§§+#if defined(ARM)
-§§+	instr_t* instructions[] = {NULL, NULL, NULL, NULL, NULL};
-§§+	size_t instructions_len = sizeof(instructions)/sizeof(instructions[0]);
-§§+	// load high
-§§+	instructions[0] = INSTR_CREATE_movw(drcontext,
-§§+			opnd_create_reg(reg_1),
-§§+			OPND_CREATE_INT16(naked_addr & 0xFFFF)
-§§+			);
++#if defined(ARM)
++	instr_t* instructions[] = {NULL, NULL, NULL, NULL, NULL};
++	size_t instructions_len = sizeof(instructions)/sizeof(instructions[0]);
++	// load high
++	instructions[0] = INSTR_CREATE_movw(drcontext,
++			opnd_create_reg(reg_1),
++			OPND_CREATE_INT16(naked_addr & 0xFFFF)
++			);
 +
-§§+	// load low
-§§+	instructions[1] = INSTR_CREATE_movt(drcontext,
-§§+			opnd_create_reg(reg_1),
-§§+			OPND_CREATE_INT16((naked_addr>>16) & 0xFFFF)
-§§+			);
-§§+#else 
-§§+	instr_t* instructions[] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL};
-§§+	size_t instructions_len = sizeof(instructions)/sizeof(instructions[0]);
-§§+	// load 
-§§+	instructions[0] = INSTR_CREATE_movk(drcontext,
-§§+			opnd_create_reg(reg_1),
-§§+			OPND_CREATE_INT16((naked_addr>>0) & 0xFFFF),
-§§+			OPND_CREATE_INT8(0)
-§§+			);
-§§+	instructions[1] = INSTR_CREATE_movk(drcontext,
-§§+			opnd_create_reg(reg_1),
-§§+			OPND_CREATE_INT16((naked_addr>>16) & 0xFFFF),
-§§+			OPND_CREATE_INT8(16)
-§§+			);
-§§+	instructions[2] = INSTR_CREATE_movk(drcontext,
-§§+			opnd_create_reg(reg_1),
-§§+			OPND_CREATE_INT16((naked_addr>>32) & 0xFFFF),
-§§+			OPND_CREATE_INT8(32)
-§§+			);
-§§+	instructions[3] = INSTR_CREATE_movk(drcontext,
-§§+			opnd_create_reg(reg_1),
-§§+			OPND_CREATE_INT16((naked_addr>>48) & 0xFFFF),
-§§+			OPND_CREATE_INT8(48)
-§§+			);
-§§+#endif
-§§+
-§§+	// deref
-§§+	instructions[instructions_len-3] = INSTR_CREATE_ldr(drcontext,
-§§+			opnd_create_reg(reg_2),
-§§+			OPND_CREATE_MEM32(reg_1, 0)
-§§+			);
-§§+
-§§+	//Inc
-§§+	instructions[instructions_len-2] = INSTR_CREATE_add(drcontext,
-§§+			opnd_create_reg(reg_2),
-§§+			opnd_create_reg(reg_2),
-§§+			OPND_CREATE_INT(1));
-§§+
-§§+	// store
-§§+		instructions[instructions_len-1] = INSTR_CREATE_str(drcontext,
-§§+			OPND_CREATE_MEM32(reg_1, 0),
-§§+			opnd_create_reg(reg_2)
-§§+			);
-§§+
-§§+	for (int i = 0; i < 5; i++) {
-§§+		//instr_encode(drcontext, instructions[i], buf+4*i);
-§§+		instrlist_meta_preinsert(bb, instr, instructions[i]);
-§§+	}
-§§+	//NOTIFY(0, "FLUFFI instructions: %s\n", "");
-§§+	// for (int i = 0; i < 20; i++) {
-§§+	// 	NOTIFY(0, "%0x ", buf[i]);
-§§+	// 	buf[i] = 0;
-§§+	// }
-§§+	//NOTIFY(0, "%s", "\n");
-§§+
-§§+	// opnd_create_rel_addr((void *)&buf[128], OPSZ_PTR)
-§§+	//opnd_create_rel_addr((void*)&(((bb_entry_t*)user_data)->hits_since_last_reset), OPSZ_PTR)
-§§+	//OPND_CREATE_ABSMEM((void*)&(((bb_entry_t*)user_data)->hits_since_last_reset), OPSZ_4)
-§§+	// opnd_create_rel_addr((void *)&buf[128], OPSZ_PTR)
-§§+	//opnd_create_rel_addr((void*)&(((bb_entry_t*)user_data)->hits_since_last_reset), OPSZ_PTR)
-§§+	//OPND_CREATE_ABSMEM((void*)&(((bb_entry_t*)user_data)->hits_since_last_reset), OPSZ_4)
++	// load low
++	instructions[1] = INSTR_CREATE_movt(drcontext,
++			opnd_create_reg(reg_1),
++			OPND_CREATE_INT16((naked_addr>>16) & 0xFFFF)
++			);
++#else 
++	instr_t* instructions[] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL};
++	size_t instructions_len = sizeof(instructions)/sizeof(instructions[0]);
++	// load 
++	instructions[0] = INSTR_CREATE_movk(drcontext,
++			opnd_create_reg(reg_1),
++			OPND_CREATE_INT16((naked_addr>>0) & 0xFFFF),
++			OPND_CREATE_INT8(0)
++			);
++	instructions[1] = INSTR_CREATE_movk(drcontext,
++			opnd_create_reg(reg_1),
++			OPND_CREATE_INT16((naked_addr>>16) & 0xFFFF),
++			OPND_CREATE_INT8(16)
++			);
++	instructions[2] = INSTR_CREATE_movk(drcontext,
++			opnd_create_reg(reg_1),
++			OPND_CREATE_INT16((naked_addr>>32) & 0xFFFF),
++			OPND_CREATE_INT8(32)
++			);
++	instructions[3] = INSTR_CREATE_movk(drcontext,
++			opnd_create_reg(reg_1),
++			OPND_CREATE_INT16((naked_addr>>48) & 0xFFFF),
++			OPND_CREATE_INT8(48)
++			);
++#endif
 +
-§§+	drreg_unreserve_register(drcontext, bb, instr, reg_2);
-§§+	drreg_unreserve_register(drcontext, bb, instr, reg_1);
++	// deref
++	instructions[instructions_len-3] = INSTR_CREATE_ldr(drcontext,
++			opnd_create_reg(reg_2),
++			OPND_CREATE_MEM32(reg_1, 0)
++			);
++
++	//Inc
++	instructions[instructions_len-2] = INSTR_CREATE_add(drcontext,
++			opnd_create_reg(reg_2),
++			opnd_create_reg(reg_2),
++			OPND_CREATE_INT(1));
++
++	// store
++		instructions[instructions_len-1] = INSTR_CREATE_str(drcontext,
++			OPND_CREATE_MEM32(reg_1, 0),
++			opnd_create_reg(reg_2)
++			);
++
++	for (int i = 0; i < 5; i++) {
++		//instr_encode(drcontext, instructions[i], buf+4*i);
++		instrlist_meta_preinsert(bb, instr, instructions[i]);
++	}
++	//NOTIFY(0, "FLUFFI instructions: %s\n", "");
++	// for (int i = 0; i < 20; i++) {
++	// 	NOTIFY(0, "%0x ", buf[i]);
++	// 	buf[i] = 0;
++	// }
++	//NOTIFY(0, "%s", "\n");
++
++	// opnd_create_rel_addr((void *)&buf[128], OPSZ_PTR)
++	//opnd_create_rel_addr((void*)&(((bb_entry_t*)user_data)->hits_since_last_reset), OPSZ_PTR)
++	//OPND_CREATE_ABSMEM((void*)&(((bb_entry_t*)user_data)->hits_since_last_reset), OPSZ_4)
++	// opnd_create_rel_addr((void *)&buf[128], OPSZ_PTR)
++	//opnd_create_rel_addr((void*)&(((bb_entry_t*)user_data)->hits_since_last_reset), OPSZ_PTR)
++	//OPND_CREATE_ABSMEM((void*)&(((bb_entry_t*)user_data)->hits_since_last_reset), OPSZ_4)
++
++	drreg_unreserve_register(drcontext, bb, instr, reg_2);
++	drreg_unreserve_register(drcontext, bb, instr, reg_1);
 +	drreg_unreserve_aflags(drcontext, bb, instr);
-§§+	//NOTIFY(0, "drittes FLUUUFIIII%s\n", "");
++	//NOTIFY(0, "drittes FLUUUFIIII%s\n", "");
 +
 +#else
 +	drreg_reserve_aflags(drcontext, bb, instr);
@@ -211,7 +211,7 @@
  static void
  event_thread_exit(void *drcontext)
  {
-§§@@ -575,7 +702,7 @@
+@@ -575,7 +702,7 @@
  
      drmgr_register_thread_init_event(event_thread_init);
      drmgr_register_thread_exit_event(event_thread_exit);
@@ -220,7 +220,7 @@
      dr_register_filter_syscall_event(event_filter_syscall);
      drmgr_register_pre_syscall_event(event_pre_syscall);
  #ifdef UNIX
-§§@@ -588,3 +715,81 @@
+@@ -588,3 +715,81 @@
  
      return event_init();
  }

@@ -17,16 +17,16 @@
 #
 # Author(s): Thomas Riedmaier, Roman Bendt, Pascal Eckmann
 
-§§THREADS=$(cat /proc/cpuinfo | grep processor | wc -l)
-§§ARCH=$(file /bin/bash | awk -F',' '{print $2}' | tr -d ' ')
-§§
+THREADS=$(cat /proc/cpuinfo | grep processor | wc -l)
+ARCH=$(file /bin/bash | awk -F',' '{print $2}' | tr -d ' ')
+
 §§rm -rf include
 §§rm -rf bin/$ARCH
 §§rm -rf lib/$ARCH
 
 mkdir -p include
-§§mkdir -p bin/$ARCH
-§§mkdir -p lib/$ARCH
+mkdir -p bin/$ARCH
+mkdir -p lib/$ARCH
 
 # Getting the C binaries
 
@@ -40,13 +40,13 @@ git checkout 2cb1240db64ce1ea299e00474c646a2453a8435b
 patch -p0 < ../staticgcc.patch
 
 # Building the C libraries
-§§mkdir -p build$ARCH
-§§cd build$ARCH
+mkdir -p build$ARCH
+cd build$ARCH
 cmake -DBUILD_TESTS=OFF ..
-§§make -j$THREADS
-§§cd ../..
+make -j$THREADS
+cd ../..
 
-§§cp libzmq/build${ARCH}/lib/libzmq.so.5.2.1 lib/${ARCH}/libzmq.so.5
+cp libzmq/build${ARCH}/lib/libzmq.so.5.2.1 lib/${ARCH}/libzmq.so.5
 cp libzmq/include/zmq.h include
 
 

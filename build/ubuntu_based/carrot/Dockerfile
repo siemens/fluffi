@@ -8,21 +8,21 @@
 # 
 # Author(s): Thomas Riedmaier, Roman Bendt
 
-§§FROM ubuntu:bionic
-§§
-§§ENV DEBIAN_FRONTEND noninteractive
+FROM ubuntu:bionic
+
+ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update -y
 RUN apt-get upgrade -y
-§§RUN apt-get dist-upgrade -y
+RUN apt-get dist-upgrade -y
 
-§§RUN adduser --system --uid 1000 --shell /bin/bash --gecos 'fluffi builder' --group --disabled-password --home /home/builder builder
-§§
+RUN adduser --system --uid 1000 --shell /bin/bash --gecos 'fluffi builder' --group --disabled-password --home /home/builder builder
+
 RUN apt-get install -yq wget build-essential
-§§
-§§RUN wget -qO- https://dl.google.com/go/go1.12.5.linux-amd64.tar.gz | tar xvz -C /usr/local
-§§RUN ln -s /usr/local/go/bin/go /usr/bin/go
-§§RUN ln -s /usr/local/go/bin/gofmt /usr/bin/gofmt
-§§RUN ln -s /usr/local/go/bin/godoc /usr/bin/godoc
-§§
+
+RUN wget -qO- https://dl.google.com/go/go1.12.5.linux-amd64.tar.gz | tar xvz -C /usr/local
+RUN ln -s /usr/local/go/bin/go /usr/bin/go
+RUN ln -s /usr/local/go/bin/gofmt /usr/bin/gofmt
+RUN ln -s /usr/local/go/bin/godoc /usr/bin/godoc
+
 CMD ["/bin/bash"]

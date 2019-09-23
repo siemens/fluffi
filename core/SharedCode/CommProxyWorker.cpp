@@ -43,7 +43,7 @@ void CommProxyWorker::wrap(zmq::multipart_t* mmsg, const std::string* address, c
 std::string CommProxyWorker::unwrap(zmq::multipart_t* mmsg) {
 	if (mmsg->size() == 0) {
 		errno = 0x182;
-§§		throw zmq::error_t();
+		throw zmq::error_t();
 	}
 	std::string addr = mmsg->popstr();
 	if (mmsg->size() > 0 && mmsg->at(0).size() == 0) {

@@ -74,8 +74,8 @@ Author(s): Michael Kraus, Thomas Riedmaier, Abian Blome
 			Assert::AreEqual(ret.m_serviceHostAndPort, std::string("127.0.0.1:4444"), L"Error getting LM SD for specific Worker: (getLMServiceDescriptorForWorker)");
 
 			// Exists, there is no lm in the location
-§§			//'3333-4444', '127.0.0.1:5555' is in location auenland, and responsible for fuzzjob 22
-§§			//agent 8888-8888 has fuzzjob 22, but is located in location Mitteleerde
+			//'3333-4444', '127.0.0.1:5555' is in location auenland, and responsible for fuzzjob 22
+			//agent 8888-8888 has fuzzjob 22, but is located in location Mitteleerde
 			std::string testGUID3 = "8888-8888";
 			std::string testHAP3 = "testhap3";
 			FluffiServiceDescriptor sd3{ testHAP3 ,testGUID3 };

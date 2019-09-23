@@ -21,8 +21,8 @@ Author(s): Thomas Riedmaier, Abian Blome, Roman Bendt
 #include "TGWorkerThreadState.h"
 #include "GarbageCollectorWorker.h"
 #include "RadamsaMutator.h"
-§§#include "CaRRoTMutator.h"
-§§#include "OedipusMutator.h"
+#include "CaRRoTMutator.h"
+#include "OedipusMutator.h"
 #include "HonggfuzzMutator.h"
 #include "ExternalMutator.h"
 #include "FluffiSetting.h"
@@ -230,18 +230,18 @@ bool QueueFillerWorker::tryGetConfigFromLM() {
 	{
 		m_mutator = new AFLMutator{ m_mySelfServiceDescriptor, m_testcaseDirectory };
 	}
-§§	else if (settings["chosenSubtype"] == "CaRRoTMutator")
-§§	{
-§§		m_mutator = new CaRRoTMutator{ m_mySelfServiceDescriptor, m_testcaseDirectory };
-§§	}
+	else if (settings["chosenSubtype"] == "CaRRoTMutator")
+	{
+		m_mutator = new CaRRoTMutator{ m_mySelfServiceDescriptor, m_testcaseDirectory };
+	}
 	else if (settings["chosenSubtype"] == "HonggfuzzMutator")
 	{
 		m_mutator = new HonggfuzzMutator{ m_mySelfServiceDescriptor, m_testcaseDirectory };
 	}
-§§	else if (settings["chosenSubtype"] == "OedipusMutator")
-§§	{
+	else if (settings["chosenSubtype"] == "OedipusMutator")
+	{
 		m_mutator = new OedipusMutator{ m_mySelfServiceDescriptor, m_testcaseDirectory, m_commInt, m_workerThreadState };
-§§	}
+	}
 	else if (settings["chosenSubtype"] == "ExternalMutator")
 	{
 		m_mutator = new ExternalMutator{ m_mySelfServiceDescriptor, m_testcaseDirectory, settings["extGeneratorDirectory"], m_commInt, m_workerThreadState };

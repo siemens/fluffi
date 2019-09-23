@@ -8,11 +8,11 @@
 # 
 # Author(s): Thomas Riedmaier, Roman Bendt
 
-§§FROM ubuntu:bionic
-§§
-§§RUN apt update
-§§RUN DEBIAN_FRONTEND=noninteractive apt-get install -yq git
-§§
-§§RUN adduser --system --uid 1000 --shell /bin/bash --gecos 'git version control' --group --disabled-password --home /home/git git
-§§
-§§ENTRYPOINT ["/var/lib/gitea/gitea", "web"]
+FROM ubuntu:bionic
+
+RUN apt update
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -yq git
+
+RUN adduser --system --uid 1000 --shell /bin/bash --gecos 'git version control' --group --disabled-password --home /home/git git
+
+ENTRYPOINT ["/var/lib/gitea/gitea", "web"]

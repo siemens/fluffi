@@ -121,7 +121,7 @@ bool isPortOpen(std::string target, uint16_t port)
 #if defined(_WIN32) || defined(_WIN64)
 	if (inet_pton(AF_INET, target.c_str(), &saServer.sin_addr) == 0) {
 #else
-§§	if (inet_aton(target.c_str(), &saServer.sin_addr) == 0) {
+	if (inet_aton(target.c_str(), &saServer.sin_addr) == 0) {
 #endif
 		std::cout << "Error using inet_aton" << std::endl;
 		closesocket(connectSocket);
@@ -405,4 +405,4 @@ std::string getNewFuzzFileOrDie(SharedMemIPC& sharedMemIPC_ToRunner, int feederT
 #endif
 		exit(-1);
 	}
-§§}
+}

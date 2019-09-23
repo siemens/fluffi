@@ -10,34 +10,34 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Roman Bendt, Thomas Riedmaier, Abian Blome
 */
 
-§§#pragma once
-§§#include "FluffiTestExecutor.h"
-§§#if defined(_WIN32) || defined(_WIN64)
-§§#else
-§§#include <sys/ptrace.h>
-§§#include <sys/mount.h>
-§§#include <sys/wait.h>
-§§#include <fcntl.h>
-§§#endif
-§§
-§§class TestExecutorQemuUserSingle :
-§§	public FluffiTestExecutor
-§§{
-§§public:
+#pragma once
+#include "FluffiTestExecutor.h"
+#if defined(_WIN32) || defined(_WIN64)
+#else
+#include <sys/ptrace.h>
+#include <sys/mount.h>
+#include <sys/wait.h>
+#include <fcntl.h>
+#endif
+
+class TestExecutorQemuUserSingle :
+	public FluffiTestExecutor
+{
+public:
 	TestExecutorQemuUserSingle(const std::string targetCMDline, int hangTimeoutMS, const std::set<Module> modulesToCover, const std::string testcaseDir, ExternalProcess::CHILD_OUTPUT_TYPE child_output_mode, GarbageCollectorWorker* garbageCollectorWorker, bool treatAnyAccessViolationAsFatal, const std::string rootfs);
-§§	virtual ~TestExecutorQemuUserSingle();
+	virtual ~TestExecutorQemuUserSingle();
 	std::shared_ptr<DebugExecutionOutput> execute(const FluffiTestcaseID testcaseId, bool forceFullCoverage);
-§§	bool isSetupFunctionable();
-§§
-§§private:
-§§	bool doInit();
+	bool isSetupFunctionable();
+
+private:
+	bool doInit();
 
 	bool m_treatAnyAccessViolationAsFatal;
-§§	std::experimental::filesystem::path m_rootfs;
-§§	bool m_was_initialized;
-§§
-§§#if defined(_WIN32) || defined(_WIN64)
-§§#else
+	std::experimental::filesystem::path m_rootfs;
+	bool m_was_initialized;
+
+#if defined(_WIN32) || defined(_WIN64)
+#else
 	static void DebugCommandLineInChrootEnv(std::string commandline, std::string rootfs, ExternalProcess::CHILD_OUTPUT_TYPE child_output_mode, int timeoutMS, std::shared_ptr<DebugExecutionOutput> exResult, bool treatAnyAccessViolationAsFatal);
-§§#endif
-§§};
+#endif
+};

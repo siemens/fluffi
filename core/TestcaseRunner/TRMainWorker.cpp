@@ -26,11 +26,11 @@ Author(s): Thomas Riedmaier, Abian Blome, Roman Bendt
 #include "Util.h"
 #include "TRWorkerThreadState.h"
 #include "GarbageCollectorWorker.h"
-§§
+
 TRMainWorker::TRMainWorker(CommInt* commInt,
 	TRWorkerThreadStateBuilder*  workerThreadStateBuilder,
 	int delayToWaitUntilConfigIsCompleteInMS,
-§§	CommPartnerManager* tGManager,
+	CommPartnerManager* tGManager,
 	CommPartnerManager* tEManager,
 	std::string testcaseDir,
 	int* numberOfProcessedTestcases,
@@ -40,11 +40,11 @@ TRMainWorker::TRMainWorker(CommInt* commInt,
 	:
 	m_gotConfigFromLM(false),
 	m_commInt(commInt),
-§§	m_workerThreadStateBuilder(workerThreadStateBuilder),
+	m_workerThreadStateBuilder(workerThreadStateBuilder),
 	m_delayToWaitUntilConfigIsCompleteInMS(delayToWaitUntilConfigIsCompleteInMS),
-§§	m_tGManager(tGManager),
-§§	m_tEManager(tEManager),
-§§	m_testcaseDir(testcaseDir),
+	m_tGManager(tGManager),
+	m_tEManager(tEManager),
+	m_testcaseDir(testcaseDir),
 	m_numberOfProcessedTestcases(numberOfProcessedTestcases),
 	m_myAgentSubTypes(myAgentSubTypes),
 	m_garbageCollectorWorker(garbageCollectorWorker),
@@ -178,7 +178,7 @@ bool TRMainWorker::getTestcaseFromGenerator(FLUFFIMessage* resp, std::string gen
 		LOG(DEBUG) << "GetTestcaseResponse successfully received (first part of Testcase)!";
 	}
 	else {
-§§		LOG(ERROR) << "No GetTestcaseResponse received, check timeout and the accessibility of the TestcaseGenerator!";
+		LOG(ERROR) << "No GetTestcaseResponse received, check timeout and the accessibility of the TestcaseGenerator!";
 		return false;
 	}
 
@@ -303,7 +303,7 @@ bool TRMainWorker::tryGetConfigFromLM() {
 
 		if (settings.count("targetCMDLine") == 0) {
 			LOG(ERROR) << "No targetCMDLine received!";
-§§			return false;
+			return false;
 		}
 		std::string targetcmdline = settings["targetCMDLine"];
 
@@ -375,7 +375,7 @@ bool TRMainWorker::tryGetConfigFromLM() {
 			google::protobuf::ShutdownProtobufLibrary();
 			_exit(EXIT_FAILURE); //make compiler happy
 		}
-§§
+
 		ExternalProcess::CHILD_OUTPUT_TYPE suppressChildOutput = ExternalProcess::CHILD_OUTPUT_TYPE::SUPPRESS;
 		if (settings.count("suppressChildOutput") == 0) {
 			LOG(INFO) << "No suppressChildOutput value received - using default (true)";
@@ -387,13 +387,13 @@ bool TRMainWorker::tryGetConfigFromLM() {
 		if (settings.count("feederCMDLine") == 0) {
 			LOG(ERROR) << "No feederCMDLine received!";
 			return false;
-§§		}
+		}
 		std::string feederCmdline = settings["feederCMDLine"];
 
 		if (settings.count("initializationTimeout") == 0) {
 			LOG(ERROR) << "No initializationTimeout value received!";
 			return false;
-§§		}
+		}
 
 		int initializationTimeoutMS;
 		try {
@@ -404,7 +404,7 @@ bool TRMainWorker::tryGetConfigFromLM() {
 			google::protobuf::ShutdownProtobufLibrary();
 			_exit(EXIT_FAILURE); //make compiler happy
 		}
-§§
+
 		std::string starterCMDLine = "";
 		if (settings.count("starterCMDLine") == 0) {
 			LOG(INFO) << "No starterCMDLine value received - using default (\"\")";
@@ -641,7 +641,7 @@ bool TRMainWorker::tryGetConfigFromLM() {
 
 FluffiTestResult TRMainWorker::fuzzTestCase(const FluffiTestcaseID testcaseId, bool forceFullCoverage) {
 	LOG(DEBUG) << "Fuzzing testcase " << testcaseId;
-§§
+
 	LOG(DEBUG) << "starting execution";
 	std::shared_ptr<DebugExecutionOutput> output = m_executor->execute(testcaseId, forceFullCoverage);
 	LOG(DEBUG) << "finished execution";
@@ -669,6 +669,6 @@ FluffiTestResult TRMainWorker::fuzzTestCase(const FluffiTestcaseID testcaseId, b
 			LOG(ERROR) << "Observed non-implemented termination type!";
 			google::protobuf::ShutdownProtobufLibrary();
 			_exit(EXIT_FAILURE); //make compiler happy
-§§		}
-§§	}
+		}
+	}
 }

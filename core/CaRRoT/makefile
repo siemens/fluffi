@@ -8,20 +8,20 @@
 # 
 # Author(s): Roman Bendt, Thomas Riedmaier
 
-§§all:
-§§	#@go test -bench=. ./...
-§§	@find -type f -name '*.go' -exec goimports -w "{}" \;
-§§	@go build
-§§	#@GOOS=windows GOARCH=amd64 go build -o ~/VMShare/CaRRoT.exe .
-§§
-§§release:
-§§	@CGO_ENABLED=0 GOARCH=386 GOOS=linux go build -o CaRRoT-386 -v -a -ldflags '-s -w -extldflags "-static"' .
-§§	@CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -o CaRRoT-amd64 -v -a -ldflags '-s -w -extldflags "-static"' .
-§§	@CGO_ENABLED=0 GOARCH=arm GOOS=linux go build -o CaRRoT-arm -v -a -ldflags '-s -w -extldflags "-static"' .
-§§	@CGO_ENABLED=0 GOARCH=arm64 GOOS=linux go build -o CaRRoT-arm64 -v -a -ldflags '-s -w -extldflags "-static"' .
-§§
-§§native:
-§§	@CGO_ENABLED=0 go build -v -a -ldflags '-s -w -extldflags "-static"' .
-§§
-§§clean:
-§§	@rm -f carrot.db carrot.gob carrot_* ~/VMShare/CaRRoT.exe CaRRoT CaRRoT-386 CaRRoT-amd64 CaRRoT-arm CaRRoT-arm64
+all:
+	#@go test -bench=. ./...
+	@find -type f -name '*.go' -exec goimports -w "{}" \;
+	@go build
+	#@GOOS=windows GOARCH=amd64 go build -o ~/VMShare/CaRRoT.exe .
+
+release:
+	@CGO_ENABLED=0 GOARCH=386 GOOS=linux go build -o CaRRoT-386 -v -a -ldflags '-s -w -extldflags "-static"' .
+	@CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -o CaRRoT-amd64 -v -a -ldflags '-s -w -extldflags "-static"' .
+	@CGO_ENABLED=0 GOARCH=arm GOOS=linux go build -o CaRRoT-arm -v -a -ldflags '-s -w -extldflags "-static"' .
+	@CGO_ENABLED=0 GOARCH=arm64 GOOS=linux go build -o CaRRoT-arm64 -v -a -ldflags '-s -w -extldflags "-static"' .
+
+native:
+	@CGO_ENABLED=0 go build -v -a -ldflags '-s -w -extldflags "-static"' .
+
+clean:
+	@rm -f carrot.db carrot.gob carrot_* ~/VMShare/CaRRoT.exe CaRRoT CaRRoT-386 CaRRoT-amd64 CaRRoT-arm CaRRoT-arm64

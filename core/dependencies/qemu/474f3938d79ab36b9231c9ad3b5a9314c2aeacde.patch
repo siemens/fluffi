@@ -16,1037 +16,1037 @@
 #    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #    
 # Author(s): Roman Bendt, Thomas Riedmaier
-§§diff --git a/README b/README
-§§index 441c33eb2f..e142149784 100644
-§§--- a/README
-§§+++ b/README
-§§@@ -1,3 +1,57 @@
-§§+        FLUFFI README
-§§+        =============
-§§+
-§§+This is a patched QEMU version for use with FLUFFI the fuzzer.
-§§+
-§§+Changelog
-§§+=========
-§§+
-§§++ patch qemu-user-{arm,mips,ppc} to track module mapping
-§§++ fix undocumented upstream bug where trace files will not flush on target execution exit
-§§++ rebase from QEMU stable-2.9 to master
-§§+
-§§+Building
-§§+========
-§§+
-§§+  ./fluffi_build.sh
-§§+
-§§+Usage
-§§+=====
-§§+
-§§+create the target arch rootfs inside the output folder:
-§§+
-§§+  mv ~/rootfs ~/qemu-fluffi/build/arm-linux-user/.
-§§+  cp qemu-arm rootfs/bin/qemu-arm
-§§+
-§§+put the following into rootfs/tmp/events:
-§§+
-§§+  exec_tb
-§§+
-§§+execute the target using qemu-arm:
-§§+
-§§+  sudo chroot rootfs /bin/qemu-arm -d nochain -trace events=/tmp/events -E LD_PRELOAD="/home/csa/mylib.so" /home/csa/sigma -h
-§§+
-§§+find the output inside the rootfs:
-§§+
-§§+	rootfs/trace-PID
-§§+	rootfs/modules.txt
-§§+
-§§+analyze the trace file with simpletrace:
-§§+
-§§+  ~/qemu-fluffi/scripts/simpletrace.py ~/qemu-fluffi/trace-events rootfs/trace-PID > rootfs/decode-trace-PID.txt
-§§+
-§§+Porting
-§§+=======
-§§+
-§§+Due to the qemu compile time typedefs and defines, it might be necessary
-§§+to change the data types used in linux-user/fluffi.[h|c]
-§§+Currently we use default types and rely on their size to (mostly) be 32 bit,
-§§+since the target (arm) is a 32 bit system.
-§§+
-§§+Other than this, there should not be any problems, as long as the target is
-§§+a Linux system.
-§§+
-§§+
-§§          QEMU README
-§§          ===========
-§§
-§§diff --git a/accel/tcg/trace-events b/accel/tcg/trace-events
-§§index 01852217a6..a2c0edf5d4 100644
-§§--- a/accel/tcg/trace-events
-§§+++ b/accel/tcg/trace-events
-§§@@ -2,9 +2,9 @@
-§§
-§§ # TCG related tracing (mostly disabled by default)
-§§ # cpu-exec.c
-§§-disable exec_tb(void *tb, uintptr_t pc) "tb:%p pc=0x%"PRIxPTR
-§§-disable exec_tb_nocache(void *tb, uintptr_t pc) "tb:%p pc=0x%"PRIxPTR
-§§-disable exec_tb_exit(void *last_tb, unsigned int flags) "tb:%p flags=0x%x"
-§§+exec_tb(void *tb, uintptr_t pc) "tb:%p pc=0x%"PRIxPTR
-§§+exec_tb_nocache(void *tb, uintptr_t pc) "tb:%p pc=0x%"PRIxPTR
-§§+exec_tb_exit(void *last_tb, unsigned int flags) "tb:%p flags=0x%x"
-§§
-§§ # translate-all.c
-§§ translate_block(void *tb, uintptr_t pc, uint8_t *tb_code) "tb:%p, pc:0x%"PRIxPTR", tb_code:%p"
-§§diff --git a/fluffi-build.sh b/fluffi-build.sh
-§§new file mode 100755
-§§index 0000000000..a383d4839d
-§§--- /dev/null
-§§+++ b/fluffi-build.sh
-§§@@ -0,0 +1,13 @@
-§§+#!/bin/bash
-§§+
-§§+for ARCH in "arm" "mips" "ppc" ; do
-§§+	if [[ ! -d "build-${ARCH}" ]] ; then
-§§+		echo "FLUFFI: configuring ${ARCH} build"
-§§+		mkdir build-${ARCH}
-§§+		(cd build-${ARCH} && ../configure --enable-trace-backends=simple --disable-gtk --disable-system --disable-tools --static --target-list=${ARCH}-linux-user)
-§§+	fi
-§§+
-§§+	echo "FLUFFI: compiling for ${ARCH}"
-§§+	(cd build-${ARCH} && make -j)
-§§+	build-${ARCH}/${ARCH}-linux-user/qemu-${ARCH} --version
-§§+done
-§§diff --git a/linux-user/Makefile.objs b/linux-user/Makefile.objs
-§§index 285c5dfa17..81a6c6e73a 100644
-§§--- a/linux-user/Makefile.objs
-§§+++ b/linux-user/Makefile.objs
-§§@@ -1,4 +1,4 @@
-§§-obj-y = main.o syscall.o strace.o mmap.o signal.o \
-§§+obj-y = main.o fluffi.o syscall.o strace.o mmap.o signal.o \
-§§ 	elfload.o linuxload.o uaccess.o uname.o \
-§§ 	safe-syscall.o $(TARGET_ABI_DIR)/signal.o \
-§§         $(TARGET_ABI_DIR)/cpu_loop.o exit.o fd-trans.o
-§§diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-§§index 9fd65708c4..69f9f45cd7 100644
-§§--- a/linux-user/elfload.c
-§§+++ b/linux-user/elfload.c
-§§@@ -10,6 +10,8 @@
-§§ #include "qemu/path.h"
-§§ #include "qemu/guest-random.h"
-§§
-§§+#include "fluffi.h"
-§§+
-§§ #ifdef _ARCH_PPC64
-§§ #undef ARCH_DLINFO
-§§ #undef ELF_PLATFORM
-§§@@ -2274,6 +2276,7 @@ exit_errmsg:
-§§
-§§    On return: INFO values will be filled in, as necessary or available.  */
-§§
-§§+//static int fluffi_i = 0;
-§§ static void load_elf_image(const char *image_name, int image_fd,
-§§                            struct image_info *info, char **pinterp_name,
-§§                            char bprm_buf[BPRM_BUF_SIZE])
-§§@@ -2318,10 +2321,12 @@ static void load_elf_image(const char *image_name, int image_fd,
-§§     for (i = 0; i < ehdr->e_phnum; ++i) {
-§§         if (phdr[i].p_type == PT_LOAD) {
-§§             abi_ulong a = phdr[i].p_vaddr - phdr[i].p_offset;
-§§+			//fprintf(stderr, "FLUFFI%d: %x\n", fluffi_i++, a);
-§§             if (a < loaddr) {
-§§                 loaddr = a;
-§§             }
-§§             a = phdr[i].p_vaddr + phdr[i].p_memsz;
-§§+			//fprintf(stderr, "FLUFFI%d: %x\n", fluffi_i++, a);
-§§             if (a > hiaddr) {
-§§                 hiaddr = a;
-§§             }
-§§@@ -2349,6 +2354,7 @@ static void load_elf_image(const char *image_name, int image_fd,
-§§            QEMU application itself.  */
-§§         probe_guest_base(image_name, loaddr, hiaddr);
-§§     }
-§§+	fluffi_register_elf_img(image_name, load_addr, hiaddr-loaddr);
-§§     load_bias = load_addr - loaddr;
-§§
-§§     if (elf_is_fdpic(ehdr)) {
-§§diff --git a/linux-user/fluffi.c b/linux-user/fluffi.c
-§§new file mode 100644
-§§index 0000000000..14441b7ca1
-§§--- /dev/null
-§§+++ b/linux-user/fluffi.c
-§§@@ -0,0 +1,517 @@
-§§+#include "fluffi.h"
-§§+#include <stdio.h>
-§§+#include <signal.h>
-§§+#include <stdlib.h>
-§§+#include <pthread.h>
-§§+#include <string.h>
-§§+#include <assert.h>
-§§+#include <sys/stat.h>
-§§+#include <elf.h>
-§§+#include <unistd.h>
-§§+#include <sys/mman.h>
-§§+
-§§+#ifdef FLUFFIDBG
-§§+//#define STNL "\n"
-§§+#define STNL
-§§+#else
-§§+#define STNL
-§§+#endif
-§§+
-§§+int fluffi_die_on_sig = 42;
-§§+int m_intermediate = 0;
-§§+
-§§+unsigned int m_first_sig = 0;
-§§+unsigned int m_first_pc = 0;
-§§+
-§§+// cookie that enables code reentry with spending as little time as possible in critical sections
-§§+unsigned long long cookie_ctr = 1;
-§§+pthread_mutex_t ctr_mutex;
-§§+
-§§+// map of fd<--->objectnames so we always know the fd of every open thing, and the name behind every open fd
-§§+typedef struct m_item {
-§§+	unsigned long long cookie;
-§§+	int fd;
-§§+	int interesting;
-§§+	char* name;
-§§+	struct m_item* p;
-§§+	struct m_item* n;
-§§+} m_item;
-§§+
-§§+// the linked list has the following conventions:
-§§+// - starts at map_start
-§§+// - elements after which there is no more elements have a NEXT ptr of NULL
-§§+// - the first element in the map has a PREV that points to the last element in the list, this makes "append" O(1)
-§§+// therefore: forward iteration can break on null ptr, backward iteration must check for pointer equality to map_start or will never terminate
-§§+
-§§+m_item* map_start = NULL;
-§§+pthread_mutex_t map_mutex;
-§§+
-§§+
-§§+// map that holds all loaded shared objects as a doubly linked ring list
-§§+typedef struct m_module {
-§§+	unsigned long long cookie;
-§§+	size_t length;
-§§+	int currently_remapping;
-§§+	char* name;
-§§+	int start;
-§§+	struct m_module* p;
-§§+	struct m_module* n;
-§§+} m_module;
-§§+
-§§+m_module* modules_start = NULL;
-§§+pthread_mutex_t modules_mutex;
-§§+
-§§+// small abstraction to move the malloc shit out of the higher level stuff below
-§§+m_item* map_make_node(char* name);
-§§+m_item* map_make_node(char* name) {
-§§+	m_item* node = (m_item*)malloc(sizeof(m_item));
-§§+	memset(node, 0, sizeof(m_item));
-§§+	size_t nlen = strlen(name);
-§§+	node->name = (char*)malloc(nlen+1);
-§§+	memset(node->name, 0, nlen+1);
-§§+	strncpy(node->name, name, nlen);
-§§+	node->fd = -1;
-§§+	return node;
-§§+}
-§§+m_module* module_make_node(char* name);
-§§+m_module* module_make_node(char* name){
-§§+	m_module* node = (m_module*)malloc(sizeof(m_module));
-§§+	memset(node, 0, sizeof(m_module));
-§§+	size_t nlen = strlen(name);
-§§+	node->name = (char*)malloc(nlen+1);
-§§+	memset(node->name, 0, nlen+1);
-§§+	strncpy(node->name, name, nlen);
-§§+	return node;
-§§+}
-§§+
-§§+// deletes a node from the list and frees all resources.
-§§+// locking the map needs to be done high level though!
-§§+int map_delete_node(m_item* node);
-§§+int map_delete_node(m_item* node) {
-§§+	// redirect pointers for map consistency
-§§+	if (node->p == node) { // node is the only item in the list
-§§+		//fprintf(stderr, "only\n");
-§§+		map_start = NULL;
-§§+	}
-§§+	else if (map_start == node) { // node is the first item in the list
-§§+		//fprintf(stderr, "first\n");
-§§+		node->n->p = node->p;
-§§+		map_start = node->n;
-§§+	}
-§§+	else if(node->n == NULL) { // node is the last item in the list
-§§+		//fprintf(stderr, "last\n");
-§§+		node->p->n = NULL; // BUG BUG BUG SEGV
-§§+		map_start->p = node->p;
-§§+	}
-§§+	else {
-§§+		//fprintf(stderr, "norm\n");
-§§+		node->n->p = node->p;
-§§+		node->p->n = node->n;
-§§+	}
-§§+
-§§+	free(node->name);
-§§+	node->name = NULL;
-§§+	free(node);
-§§+	node = NULL;
-§§+
-§§+	return 0;
-§§+}
-§§+
-§§+// only frees resources, locking and list pointer stuff must be done somewhere else
-§§+int module_free_node(m_module* node);
-§§+int module_free_node(m_module* node) {
-§§+	free(node->name);
-§§+	node->name = NULL;
-§§+	free(node);
-§§+	node = NULL;
-§§+	return 0;
-§§+}
-§§+
-§§+int fluffi_init(void) {
-§§+#ifdef FLUFFIDBG
-§§+	fprintf(stderr, STNL "FLUFFI: qemu fluffi patch initializing\n");
-§§+#endif
-§§+	pthread_mutex_init(&ctr_mutex, NULL);
-§§+	pthread_mutex_init(&map_mutex, NULL);
-§§+	pthread_mutex_init(&modules_mutex, NULL);
-§§+	return 0;
-§§+}
-§§+void fluffi_set_sig_forward(void) {
-§§+#ifdef FLUFFIDBG
-§§+	fprintf(stderr, STNL "FLUFFI: CALL: set forward\n");
-§§+#endif
-§§+	fluffi_die_on_sig = 0;
-§§+}
-§§+
-§§+int fluffi_register_elf_img(const char* path, int addr, unsigned int length) {
-§§+#ifdef FLUFFIDBG
-§§+	fprintf(stderr, STNL "FLUFFI: CALL: register elf\n");
-§§+#endif
-§§+	m_module* mod = module_make_node((char*)path);
-§§+	pthread_mutex_lock(&ctr_mutex);
-§§+	mod->cookie = cookie_ctr++;
-§§+	pthread_mutex_unlock(&ctr_mutex);
-§§+	pthread_mutex_lock(&modules_mutex);
-§§+	mod->start = addr;
-§§+	mod->length = length;
-§§+#ifdef FLUFFIDBG
-§§+	fprintf(stderr, STNL "FLUFFI: adding mapping to list: %s at %x\n", mod->name, mod->start);
-§§+#endif
-§§+	if (!modules_start) { // map is empty
-§§+		modules_start = mod;
-§§+		mod->n = mod;
-§§+		mod->p = mod;
-§§+	} else {
-§§+		mod->n = modules_start;
-§§+		mod->p = modules_start->p;
-§§+		modules_start->p = mod;
-§§+		mod->p->n = mod;
-§§+	}
-§§+	pthread_mutex_unlock(&modules_mutex);
-§§+
-§§+	return 0;
-§§+}
-§§+
-§§+void fluffi_internal_exit(unsigned int crashaddr, unsigned int sig);
-§§+void fluffi_internal_exit(unsigned int crashaddr, unsigned int sig) {
-§§+#ifdef FLUFFIDBG
-§§+	fprintf(stderr, STNL "FLUFFI: CALL: internal exit\n");
-§§+#endif
-§§+	if (modules_start) {
-§§+#ifdef FLUFFIDBG
-§§+		FILE* res = stderr;
-§§+#else
-§§+		FILE* res = fopen("/modules.txt", "w+");
-§§+		if (!res){
-§§+			return;
-§§+		}
-§§+#endif
-§§+		fprintf(res, "FLUFFI: first signal %d pc %x\n", m_first_sig, m_first_pc);
-§§+		fprintf(res, "FLUFFI: last signal %d pc %x\n", sig, crashaddr);
-§§+
-§§+		m_module* i = modules_start;
-§§+		fprintf(res, "FLUFFI: modules on exit:\n");
-§§+		do {
-§§+			// this IS LEGAL in GNU C :) - fuck std C, sizeof(void) obviously is 1
-§§+			fprintf(res, "FLUFFI: %x - %x %s\n", i->start, (unsigned int)(i->start + i->length), i->name);
-§§+			i = i->n;
-§§+		} while (i != modules_start);
-§§+
-§§+#ifndef FLUFFIDBG
-§§+		fclose(res);
-§§+#endif
-§§+	}
-§§+
-§§+#ifdef FLUFFIDBG
-§§+	fprintf(stderr, STNL "FLUFFI: pid %d\n", getpid());
-§§+	char* fn = (char*)malloc(512);
-§§+	memset(fn, 0, 512);
-§§+	snprintf(fn, 512, "/proc/%d/maps", getpid());
-§§+	// lol, aparently there is this thing called /proc/self/maps... fuck it :)
-§§+
-§§+	int c;
-§§+	FILE* f = fopen(fn, "r");
-§§+	if (f) {
-§§+		while ((c = getc(f)) != EOF)
-§§+			putchar(c);
-§§+		fclose(f);
-§§+	}
-§§+	free(fn);
-§§+	fn = NULL;
-§§+#endif
-§§+}
-§§+
-§§+void fluffi_signal_exit_call(unsigned int pc, unsigned int sig) {
-§§+#ifdef FLUFFIDBG
-§§+	fprintf(stderr, STNL "FLUFFI: CALL: signal exit\n");
-§§+#endif
-§§+	fluffi_internal_exit(pc, sig);
-§§+}
-§§+
-§§+void fluffi_first_signal(unsigned int pc, unsigned int sig) {
-§§+#ifdef FLUFFIDBG
-§§+	fprintf(stderr, STNL "FLUFFI: CALL: first signal\n");
-§§+#endif
-§§+	if(!m_intermediate) {
-§§+		m_intermediate = 42;
-§§+#ifdef FLUFFIDBG
-§§+		fprintf(stderr, STNL "FLUFFI: intermediate signal : %d at %x\n", sig, pc);
-§§+#endif
-§§+		m_first_pc = pc;
-§§+		m_first_sig = sig;
-§§+	}
-§§+}
-§§+
-§§+void fluffi_syscall_exit_call(void) {
-§§+#ifdef FLUFFIDBG
-§§+	fprintf(stderr, STNL "FLUFFI: CALL: syscal exit\n");
-§§+#endif
-§§+	fluffi_internal_exit(0, 0);
-§§+}
-§§+
-§§+unsigned long long fluffi_syscall_open_call(char* path, int flags , int mode) {
-§§+#ifdef FLUFFIDBG
-§§+	fprintf(stderr, STNL "FLUFFI: CALL: open\n");
-§§+#endif
-§§+	(void)flags;
-§§+	(void)mode;
-§§+
-§§+	m_item* node = map_make_node(path);
-§§+	pthread_mutex_lock(&ctr_mutex);
-§§+	node->cookie = cookie_ctr++;
-§§+	pthread_mutex_unlock(&ctr_mutex);
-§§+
-§§+	pthread_mutex_lock(&map_mutex);
-§§+	if (!map_start) { // map is empty
-§§+		map_start = node;
-§§+		node->p = node;
-§§+		node->n = NULL;
-§§+	}
-§§+	else { // append to existing map
-§§+		node->p = map_start->p;
-§§+		map_start->p->n = node;
-§§+		map_start->p = node;
-§§+		node->n = NULL;
-§§+	}
-§§+	pthread_mutex_unlock(&map_mutex);
-§§+
-§§+	// return cookie and wait for ret to complete the datum with the fd
-§§+	return node->cookie;
-§§+}
-§§+
-§§+int fluffi_syscall_open_ret(unsigned long long fluffi_cookie, int ret) {
-§§+#ifdef FLUFFIDBG
-§§+	fprintf(stderr, STNL "FLUFFI: CALL: open ret\n");
-§§+#endif
-§§+	pthread_mutex_lock(&map_mutex);
-§§+	m_item* node = map_start;
-§§+	for(;;) {
-§§+		if (node->cookie == fluffi_cookie)
-§§+			break;
-§§+		node = node->n;
-§§+		if (!node)
-§§+			break;
-§§+	}
-§§+	assert(node != NULL);
-§§+
-§§+	// if open succeeded, ret is >0. update with fd. else, delete the node from the list, since open failed.
-§§+	if (ret >= 0) {
-§§+		node->fd = ret;
-§§+	}
-§§+	else {
-§§+		map_delete_node(node);
-§§+		node = NULL;
-§§+	}
-§§+	pthread_mutex_unlock(&map_mutex);
-§§+
-§§+	if (node != NULL) {
-§§+		// now lets check if this is something we might want to remember.
-§§+		// stat to check if regular file
-§§+		struct stat sb;
-§§+		ret = fstat(node->fd, &sb);
-§§+		if (!ret && S_ISREG(sb.st_mode)) {
-§§+			// seek to check if seekable stream (aka we do not disrupt the actual app awaiting data)
-§§+			off_t oret = lseek(node->fd, 0, SEEK_SET);
-§§+			if (oret >= 0) {
-§§+				// check if elf header
-§§+				char* buf = (char*)malloc(64);
-§§+				memset(buf, 0, 64);
-§§+				ssize_t sret = read(node->fd, buf, 64);
-§§+				sret = lseek(node->fd, 0, SEEK_SET);
-§§+				(void)sret;
-§§+
-§§+				if (buf[0] == 0x7F && buf[1] == 'E' && buf[2] == 'L' && buf[3] == 'F') {
-§§+					// check bitness
-§§+					if (buf[4] == 1) {
-§§+						Elf32_Ehdr* hd = (Elf32_Ehdr*)buf;
-§§+						// check if shared object
-§§+						if (hd->e_type == ET_DYN) {
-§§+							node->interesting = 42;
-§§+						}
-§§+						//fprintf(stderr, STNL "FLUFFI: got elf32 of type %x\n", hd->e_type);
-§§+					}
-§§+					else if (buf[4] == 2) {
-§§+						Elf64_Ehdr* hd = (Elf64_Ehdr*)buf;
-§§+						// check if shared object
-§§+						if (hd->e_type == ET_DYN) {
-§§+							node->interesting = 42;
-§§+						}
-§§+						//fprintf(stderr, STNL "FLUFFI: got elf64 of type %x\n", hd->e_type);
-§§+					}
-§§+					else {
-§§+						//fprintf(stderr, STNL "FLUFFI: got elf, but bitness is weird\n");
-§§+					}
-§§+				}
-§§+				free(buf);
-§§+			}
-§§+		}
-§§+
-§§+		//fprintf(stderr, "FLUFFI: Node: fd %d with mode %x is given to %s\n", node->fd, sb.st_mode, node->name);
-§§+		//fprintf(stderr, "FLUFFI: Node: fd %d is given to %s, but could not stat\n", node->fd, node->name);
-§§+	}
-§§+
-§§+	return 0;
-§§+}
-§§+
-§§+unsigned long long fluffi_syscall_close_call(int fd) {
-§§+	//fprintf(stderr, STNL "FLUFFI: Node: fd %d will be closed\n", fd);
-§§+#ifdef FLUFFIDBG
-§§+	fprintf(stderr, STNL "FLUFFI: CALL: close\n");
-§§+#endif
-§§+	pthread_mutex_lock(&map_mutex);
-§§+
-§§+	if (!map_start) {
-§§+		pthread_mutex_unlock(&map_mutex);
-§§+		return 0;
-§§+	}
-§§+
-§§+	m_item* node = map_start;
-§§+	for(;;) {
-§§+		if (node->fd == fd)
-§§+			break;
-§§+		node = node->n;
-§§+		if (!node)
-§§+			break;
-§§+	}
-§§+	if (!node) {
-§§+		pthread_mutex_unlock(&map_mutex);
-§§+		return 0;
-§§+	}
-§§+
-§§+	unsigned long long ret = node->cookie;
-§§+	map_delete_node(node);
-§§+	node = NULL;
-§§+	pthread_mutex_unlock(&map_mutex);
-§§+
-§§+	return ret;
-§§+}
-§§+
-§§+int fluffi_syscall_close_ret(unsigned long long fluffi_cookie, int ret) {
-§§+#ifdef FLUFFIDBG
-§§+	fprintf(stderr, STNL "FLUFFI: CALL: close ret\n");
-§§+#endif
-§§+	(void)fluffi_cookie;
-§§+	if (ret != 0)
-§§+		fprintf(stderr, STNL "FLUFFI: close failed\n");
-§§+	return 0;
-§§+}
-§§+
-§§+unsigned long long fluffi_syscall_mmap_call(int addr, size_t length, int prot, int flags, int fd, off_t offset) {
-§§+#ifdef FLUFFIDBG
-§§+	fprintf(stderr, STNL "FLUFFI: CALL: mmap\n");
-§§+#endif
-§§+	(void)offset;
-§§+	(void)prot;
-§§+	m_module* mod = NULL;
-§§+	unsigned long long ret;
-§§+
-§§+	if (flags & MAP_ANONYMOUS) {
-§§+		return 0;
-§§+	}
-§§+
-§§+	pthread_mutex_lock(&map_mutex);
-§§+	m_item* node = map_start;
-§§+	for(;;) {
-§§+		if (!node)
-§§+			break;
-§§+		if (node->fd == fd)
-§§+			break;
-§§+		node = node->n;
-§§+	}
-§§+	if (!node) {
-§§+		pthread_mutex_unlock(&map_mutex);
-§§+		fprintf(stderr, STNL "FLUFFI: WTF, mmap called with a fd that we do not know: %d\n", fd);
-§§+		return 0;
-§§+	}
-§§+	if (node && node->interesting) {
-§§+		//fprintf(stderr, STNL "FLUFFI: found interesting file mmaped: %s\n", node->name);
-§§+
-§§+		// stupid create node, if we find that this is a remap, we clean it up later.
-§§+		// reason: as a lazy deadlock prevention, we do not want to lock both mutexes
-§§+		// at the same time.
-§§+		mod = module_make_node(node->name);
-§§+		mod->cookie = node->cookie;
-§§+	}
-§§+	if (node) {
-§§+		ret = node->cookie;
-§§+	}
-§§+	pthread_mutex_unlock(&map_mutex);
-§§+
-§§+	if (mod != NULL) {
-§§+		mod->length = length;
-§§+		mod->start = addr;
-§§+
-§§+		pthread_mutex_lock(&modules_mutex);
-§§+		// now lets check if this was a remap
-§§+		if (mod->start && modules_start) {
-§§+			m_module* i = modules_start;
-§§+			do
-§§+			{
-§§+				if (mod->start >= i->start) {
-§§+					if (mod->start < (i->start + i->length)) { // this IS LEGAL in GNU C :) - fuck std C, sizeof(void) obviously is 1
-§§+						// well, we really should check here if the names match, otherwise we are mapping something different
-§§+						// into the address space of some shared object (is this a thing? code injection?)
-§§+						int neq = strcmp(mod->name, i->name);
-§§+						if (!neq) {
-§§+							// FOUND REMAP
-§§+#ifdef FLUFFIDBG
-§§+							fprintf(stderr, STNL "FLUFFI: found remap: %s at %x\n", i->name, mod->start);
-§§+#endif
-§§+							i->currently_remapping = 42;
-§§+							module_free_node(mod);
-§§+							mod = NULL;
-§§+							break;
-§§+						}
-§§+					}
-§§+				}
-§§+				i = i->n;
-§§+			} while (i != modules_start);
-§§+		}
-§§+		// not a remap, lets add this to the list
-§§+		if (mod) {
-§§+#ifdef FLUFFIDBG
-§§+			fprintf(stderr, STNL "FLUFFI: adding mapping to list: %s at %x\n", mod->name, mod->start);
-§§+#endif
-§§+			if (!modules_start) { // map is empty
-§§+				modules_start = mod;
-§§+				mod->n = mod;
-§§+				mod->p = mod;
-§§+			} else {
-§§+				mod->n = modules_start;
-§§+				mod->p = modules_start->p;
-§§+				modules_start->p = mod;
-§§+				mod->p->n = mod;
-§§+			}
-§§+		}
-§§+		pthread_mutex_unlock(&modules_mutex);
-§§+	}
-§§+	return ret;
-§§+}
-§§+
-§§+int fluffi_syscall_mmap_ret(unsigned long long fluffi_cookie, int ret) {
-§§+#ifdef FLUFFIDBG
-§§+	fprintf(stderr, STNL "FLUFFI: CALL: mmap ret\n");
-§§+#endif
-§§+
-§§+	pthread_mutex_lock(&modules_mutex);
-§§+	// look for cookie, if found, update address.
-§§+	if (modules_start) {
-§§+		m_module* i = modules_start;
-§§+		do {
-§§+			if (i->cookie == fluffi_cookie && i->currently_remapping != 42) {
-§§+#ifdef FLUFFIDBG
-§§+				fprintf(stderr, STNL "FLUFFI: updating mapping: %s from %x to %x\n", i->name, i->start, ret);
-§§+#endif
-§§+				i->start = ret;
-§§+				break;
-§§+			}
-§§+			i->currently_remapping = 0;
-§§+			i = i->n;
-§§+		} while (i != modules_start);
-§§+	}
-§§+	pthread_mutex_unlock(&modules_mutex);
-§§+	//fprintf(stderr, STNL "FLUFFI: mmap ret end\n");
-§§+
-§§+
-§§+	return 0;
-§§+}
-§§diff --git a/linux-user/fluffi.h b/linux-user/fluffi.h
-§§new file mode 100644
-§§index 0000000000..2809faf7aa
-§§--- /dev/null
-§§+++ b/linux-user/fluffi.h
-§§@@ -0,0 +1,50 @@
-§§+#ifndef FLUFFI_H
-§§+#define FLUFFI_H
-§§+#include <stdint.h>
-§§+#include <sys/types.h>
-§§+
-§§+//#define FLUFFIDBG
-§§+
-§§+// if this is "true", we kill the app on potentially deadly signals
-§§+// and do not give the target a chance to handle it
-§§+extern int fluffi_die_on_sig;
-§§+
-§§+// call from main to init stuff
-§§+int fluffi_init(void);
-§§+
-§§+// cmd arg to forward potentially deadly signals was given
-§§+void fluffi_set_sig_forward(void);
-§§+
-§§+// call from elfloader for actual test executable and ld.so
-§§+int fluffi_register_elf_img(const char* path, int addr, unsigned int length);
-§§+
-§§+// called after exit_group syscall to end application
-§§+void fluffi_syscall_exit_call(void);
-§§+
-§§+// called on exit by signal
-§§+void fluffi_signal_exit_call(unsigned int pc, unsigned int sig);
-§§+
-§§+// called when a signal is passed to a targets handler
-§§+void fluffi_first_signal(unsigned int pc, unsigned int sig);
-§§+
-§§+// called before open, registers the name to be opened and returns a thread cookie for the return call
-§§+unsigned long long fluffi_syscall_open_call(char* path, int flags , int mode);
-§§+
-§§+// called after open, maps the fd returned to the name using the thread cookie that was returned on the open call
-§§+int fluffi_syscall_open_ret(unsigned long long fluffi_cookie, int ret);
-§§+
-§§+// called before close, removes the node map
-§§+unsigned long long fluffi_syscall_close_call(int fd);
-§§+
-§§+// called after close, currently does nothing.
-§§+int fluffi_syscall_close_ret(unsigned long long fluffi_cookie, int ret);
-§§+
-§§+// called before mmap, checks if the file is of interest and gets the corresponding cookie for the return call
-§§+unsigned long long fluffi_syscall_mmap_call(int addr, size_t length, int prot, int flags, int fd, off_t offset);
-§§+
-§§+// called after mmap, writes the mapping address to the tracking object
-§§+int fluffi_syscall_mmap_ret(unsigned long long fluffi_cookie, int ret);
-§§+
-§§+// called after munmap, deletes the mapping info
-§§+
-§§+#endif
-§§diff --git a/linux-user/main.c b/linux-user/main.c
-§§index a59ae9439d..fc5971ca29 100644
-§§--- a/linux-user/main.c
-§§+++ b/linux-user/main.c
-§§@@ -42,6 +42,7 @@
-§§ #include "elf.h"
-§§ #include "trace/control.h"
-§§ #include "target_elf.h"
-§§+#include "fluffi.h"
-§§ #include "cpu_loop-common.h"
-§§ #include "crypto/init.h"
-§§
-§§@@ -262,6 +263,12 @@ static void handle_arg_unset_env(const char *arg)
-§§     free(r);
-§§ }
-§§
-§§+// THIS IS FLUFFI CODE!
-§§+static void handle_arg_forward_sigs(const char* arg)
-§§+{
-§§+	fluffi_set_sig_forward();
-§§+}
-§§+
-§§ static void handle_arg_argv0(const char *arg)
-§§ {
-§§     argv0 = strdup(arg);
-§§@@ -375,7 +382,7 @@ static void handle_arg_strace(const char *arg)
-§§
-§§ static void handle_arg_version(const char *arg)
-§§ {
-§§-    printf("qemu-" TARGET_NAME " version " QEMU_FULL_VERSION
-§§+    printf("qemu-fluffi-" TARGET_NAME " version fluffi-" QEMU_FULL_VERSION
-§§            "\n" QEMU_COPYRIGHT "\n");
-§§     exit(EXIT_SUCCESS);
-§§ }
-§§@@ -411,6 +418,8 @@ static const struct qemu_argument arg_table[] = {
-§§      "model",      "select CPU (-cpu help for list)"},
-§§     {"E",          "QEMU_SET_ENV",     true,  handle_arg_set_env,
-§§      "var=value",  "sets targets environment variable (see below)"},
-§§+	{"f",          "QEMU_FRWRD_SIGS",  false, handle_arg_forward_sigs,
-§§+     "",           "disables fastcrash on possibly fatal signals such as SIGSEGV"},
-§§     {"U",          "QEMU_UNSET_ENV",   true,  handle_arg_unset_env,
-§§      "var",        "unsets targets environment variable (see below)"},
-§§     {"0",          "QEMU_ARGV0",       true,  handle_arg_argv0,
-§§@@ -588,6 +597,28 @@ static int parse_args(int argc, char **argv)
-§§
-§§ int main(int argc, char **argv, char **envp)
-§§ {
-§§+#if defined(TARGET_ARM)
-§§+	printf("qemu-fluffi-arm, compiled %s, %s\n", __DATE__, __TIME__);
-§§+#elif defined(TARGET_MIPS)
-§§+	printf("qemu-fluffi-mips, compiled %s, %s\n", __DATE__, __TIME__);
-§§+#elif defined(TARGET_PPC)
-§§+	printf("qemu-fluffi-ppc, compiled %s, %s\n", __DATE__, __TIME__);
-§§+#else
-§§+	printf("qemu-fluffi-UNKNOWN, compiled %s, %s\n", __DATE__, __TIME__);
-§§+#endif
-§§+
-§§+#if defined(__amd64__)
-§§+	printf("running on amd64\n");
-§§+#elif defined(__i386__)
-§§+	printf("running on x86\n");
-§§+#elif defined(__aarch64__)
-§§+	printf("running on aarch64\n");
-§§+#elif defined(__arm__)
-§§+	printf("running on arm\n");
-§§+#else
-§§+	printf("running on UNKNOWN HOST ARCH\n");
-§§+#endif
-§§+
-§§     struct target_pt_regs regs1, *regs = &regs1;
-§§     struct image_info info1, *info = &info1;
-§§     struct linux_binprm bprm;
-§§@@ -596,8 +627,8 @@ int main(int argc, char **argv, char **envp)
-§§     CPUState *cpu;
-§§     int optind;
-§§     char **target_environ, **wrk;
-§§-    char **target_argv;
-§§-    int target_argc;
-§§+    char **target_argv, **new_argv;
-§§+    int target_argc, new_argc;
-§§     int i;
-§§     int ret;
-§§     int execfd;
-§§@@ -606,6 +637,7 @@ int main(int argc, char **argv, char **envp)
-§§     module_call_init(MODULE_INIT_TRACE);
-§§     qemu_init_cpu_list();
-§§     module_call_init(MODULE_INIT_QOM);
-§§+	fluffi_init();
-§§
-§§     envlist = envlist_create();
-§§
-§§@@ -629,6 +661,55 @@ int main(int argc, char **argv, char **envp)
-§§
-§§     qemu_add_opts(&qemu_trace_opts);
-§§
-§§+
-§§+	// FLUFFI: first, check if all the options we need are already present.
-§§+	// if not, we need to insert them into argv
-§§+
-§§+	int argv_found = 0;
-§§+	for (i = 0; i < argc; i++) {
-§§+		int cmp = strcmp("-d", argv[i]);
-§§+		if (cmp == 0) {
-§§+			argv_found++;
-§§+			continue;
-§§+		}
-§§+		cmp = strcmp("nochain", argv[i]);
-§§+		if (cmp == 0) {
-§§+			argv_found++;
-§§+			continue;
-§§+		}
-§§+		cmp = strcmp("-trace", argv[i]);
-§§+		if (cmp == 0) {
-§§+			argv_found++;
-§§+			continue;
-§§+		}
-§§+		cmp = strcmp("events=/etc/qemu-events", argv[i]);
-§§+		if (cmp == 0) {
-§§+			argv_found++;
-§§+			continue;
-§§+		}
-§§+	}
-§§+
-§§+	if (argv_found != 4) { // we need to insert stuff into argv, because aparently we were not called with stuff. (fuck you, binfmt)
-§§+		fprintf(stderr, "FLUFFI %d: injecting parameters\n", getpid());
-§§+		new_argc = argc + 4;
-§§+		new_argv = malloc((new_argc + 1)* sizeof (char *));
-§§+		if (new_argv == NULL) {
-§§+			(void) fprintf(stderr, "FLUFFI: Unable to allocate memory for new_argv\n");
-§§+			exit(EXIT_FAILURE);
-§§+		}
-§§+		new_argv[0] = strdup(argv[0]);
-§§+		new_argv[1] = strdup("-d");
-§§+		new_argv[2] = strdup("nochain");
-§§+		new_argv[3] = strdup("-trace");
-§§+		new_argv[4] = strdup("events=/etc/qemu-events");
-§§+		for (i = 5; (i < new_argc) && ((i-4) < argc); i++) {
-§§+			new_argv[i] = strdup(argv[i-4]);
-§§+		}
-§§+		new_argv[new_argc] = NULL;
-§§+		argc = new_argc;
-§§+		argv = new_argv;
-§§+	}
-§§+
-§§     optind = parse_args(argc, argv);
-§§
-§§     if (!trace_init_backends()) {
-§§@@ -829,6 +910,10 @@ int main(int argc, char **argv, char **envp)
-§§         }
-§§         gdb_handlesig(cpu, 0);
-§§     }
-§§+	//fprintf(stderr, "qemu: forking twice %d\n", getpid());
-§§+	//fork();
-§§+	//fork();
-§§+
-§§     cpu_loop(env);
-§§     /* never exits */
-§§     return 0;
-§§diff --git a/linux-user/signal.c b/linux-user/signal.c
-§§index 5cd237834d..4e775af0c1 100644
-§§--- a/linux-user/signal.c
-§§+++ b/linux-user/signal.c
-§§@@ -23,6 +23,8 @@
-§§
-§§ #include "qemu.h"
-§§ #include "trace.h"
-§§+#include "fluffi.h"
-§§+#include "trace/simple.h"
-§§ #include "signal-common.h"
-§§
-§§ struct target_sigaltstack target_sigaltstack_used = {
-§§@@ -595,6 +597,15 @@ static void QEMU_NORETURN dump_core_and_abort(int target_sig)
-§§         (void) fprintf(stderr, "qemu: uncaught target signal %d (%s) - %s\n",
-§§             target_sig, strsignal(host_sig), "core dumped" );
-§§     }
-§§+#if defined(TARGET_ARM)
-§§+	fluffi_signal_exit_call(((CPUARMState*)(cpu->env_ptr))->regs[15], host_sig);
-§§+#elif defined(TARGET_MIPS)
-§§+	fluffi_signal_exit_call(((CPUMIPSState*)(cpu->env_ptr))->active_tc.PC, host_sig);
-§§+#elif defined(TARGET_PPC)
-§§+	fluffi_signal_exit_call(((CPUPPCState*)(cpu->env_ptr))->nip, host_sig);
-§§+#endif
-§§+
-§§+	st_flush_trace_buffer();
-§§
-§§     /* The proper exit code for dying from an uncaught signal is
-§§      * -<signal>.  The kernel doesn't allow exit() or _exit() to pass
-§§diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-§§index b187c1281d..f22f3d39a6 100644
-§§--- a/linux-user/syscall.c
-§§+++ b/linux-user/syscall.c
-§§@@ -108,6 +108,8 @@
-§§ #include "qemu.h"
-§§ #include "qemu/guest-random.h"
-§§ #include "qapi/error.h"
-§§+#include "fluffi.h"
-§§+#include "trace/simple.h"
-§§ #include "fd-trans.h"
-§§
-§§ #ifndef CLONE_IO
-§§@@ -7043,6 +7045,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-§§ {
-§§     CPUState *cpu = env_cpu(cpu_env);
-§§     abi_long ret;
-§§+	unsigned long long fluffi_cookie;
-§§ #if defined(TARGET_NR_stat) || defined(TARGET_NR_stat64) \
-§§     || defined(TARGET_NR_lstat) || defined(TARGET_NR_lstat64) \
-§§     || defined(TARGET_NR_fstat) || defined(TARGET_NR_fstat64)
-§§@@ -7056,6 +7059,9 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-§§
-§§     switch(num) {
-§§     case TARGET_NR_exit:
-§§+
-§§+		//fprintf(stderr, "EXIT CALL\n");
-§§+		fluffi_syscall_exit_call();
-§§         /* In old applications this may be used to implement _exit(2).
-§§            However in threaded applictions it is used for thread termination,
-§§            and _exit_group is used for application termination.
-§§@@ -7130,9 +7136,11 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-§§     case TARGET_NR_open:
-§§         if (!(p = lock_user_string(arg1)))
-§§             return -TARGET_EFAULT;
-§§+		fluffi_cookie = fluffi_syscall_open_call((char*)p, target_to_host_bitmask(arg2, fcntl_flags_tbl), arg3);
-§§         ret = get_errno(do_openat(cpu_env, AT_FDCWD, p,
-§§                                   target_to_host_bitmask(arg2, fcntl_flags_tbl),
-§§                                   arg3));
-§§+		fluffi_syscall_open_ret(fluffi_cookie, ret);
-§§         fd_trans_unregister(ret);
-§§         unlock_user(p, arg1, 0);
-§§         return ret;
-§§@@ -7140,9 +7148,11 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-§§     case TARGET_NR_openat:
-§§         if (!(p = lock_user_string(arg2)))
-§§             return -TARGET_EFAULT;
-§§+		fluffi_cookie = fluffi_syscall_open_call((char*)p, target_to_host_bitmask(arg3, fcntl_flags_tbl), arg4);
-§§         ret = get_errno(do_openat(cpu_env, arg1, p,
-§§                                   target_to_host_bitmask(arg3, fcntl_flags_tbl),
-§§                                   arg4));
-§§+		fluffi_syscall_open_ret(fluffi_cookie, ret);
-§§         fd_trans_unregister(ret);
-§§         unlock_user(p, arg2, 0);
-§§         return ret;
-§§@@ -7159,7 +7169,10 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-§§ #endif
-§§     case TARGET_NR_close:
-§§         fd_trans_unregister(arg1);
-§§-        return get_errno(close(arg1));
-§§+		fluffi_cookie = fluffi_syscall_close_call(arg1);
-§§+        ret = get_errno(close(arg1));
-§§+		fluffi_syscall_close_ret(fluffi_cookie, ret);
-§§+        return ret;
-§§
-§§     case TARGET_NR_brk:
-§§         return do_brk(arg1);
-§§@@ -8528,15 +8541,20 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-§§             v5 = tswapal(v[4]);
-§§             v6 = tswapal(v[5]);
-§§             unlock_user(v, arg1, 0);
-§§+			fluffi_cookie = fluffi_syscall_mmap_call(v1, v2, v3, target_to_host_bitmask(v4, mmap_flags_tbl), v5, v6);
-§§             ret = get_errno(target_mmap(v1, v2, v3,
-§§                                         target_to_host_bitmask(v4, mmap_flags_tbl),
-§§                                         v5, v6));
-§§+			fluffi_syscall_mmap_ret(fluffi_cookie, ret);
-§§+
-§§         }
-§§ #else
-§§+		fluffi_cookie = fluffi_syscall_mmap_call(arg1, arg2, arg3, target_to_host_bitmask(arg4, mmap_flags_tbl), arg5, arg6);
-§§         ret = get_errno(target_mmap(arg1, arg2, arg3,
-§§                                     target_to_host_bitmask(arg4, mmap_flags_tbl),
-§§                                     arg5,
-§§                                     arg6));
-§§+			fluffi_syscall_mmap_ret(fluffi_cookie, ret);
-§§ #endif
-§§         return ret;
-§§ #endif
-§§@@ -8545,10 +8563,15 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-§§ #ifndef MMAP_SHIFT
-§§ #define MMAP_SHIFT 12
-§§ #endif
-§§-        ret = target_mmap(arg1, arg2, arg3,
-§§-                          target_to_host_bitmask(arg4, mmap_flags_tbl),
-§§-                          arg5, arg6 << MMAP_SHIFT);
-§§-        return get_errno(ret);
-§§+		//fprintf(stderr, "abi_ulong*: %ld ", sizeof(abi_ulong*));
-§§+		//fprintf(stderr, "void*     : %ld\n", sizeof(void*));
-§§+		fluffi_cookie = fluffi_syscall_mmap_call(arg1, arg2, arg3, target_to_host_bitmask(arg4, mmap_flags_tbl), arg5, arg6<<MMAP_SHIFT);
-§§+        ret = get_errno(target_mmap(arg1, arg2, arg3,
-§§+                                    target_to_host_bitmask(arg4, mmap_flags_tbl),
-§§+                                    arg5,
-§§+                                    arg6 << MMAP_SHIFT));
-§§+		fluffi_syscall_mmap_ret(fluffi_cookie, ret);
-§§+		return ret;
-§§ #endif
-§§     case TARGET_NR_munmap:
-§§         return get_errno(target_munmap(arg1, arg2));
-§§@@ -9067,6 +9090,9 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-§§         /* new thread calls */
-§§     case TARGET_NR_exit_group:
-§§         preexit_cleanup(cpu_env, arg1);
-§§+		// FLUFFI ROMAN FLUSH HERE
-§§+		st_flush_trace_buffer();
-§§+		fluffi_syscall_exit_call();
-§§         return get_errno(exit_group(arg1));
-§§ #endif
-§§     case TARGET_NR_setdomainname:
+diff --git a/README b/README
+index 441c33eb2f..e142149784 100644
+--- a/README
++++ b/README
+@@ -1,3 +1,57 @@
++        FLUFFI README
++        =============
++
++This is a patched QEMU version for use with FLUFFI the fuzzer.
++
++Changelog
++=========
++
+++ patch qemu-user-{arm,mips,ppc} to track module mapping
+++ fix undocumented upstream bug where trace files will not flush on target execution exit
+++ rebase from QEMU stable-2.9 to master
++
++Building
++========
++
++  ./fluffi_build.sh
++
++Usage
++=====
++
++create the target arch rootfs inside the output folder:
++
++  mv ~/rootfs ~/qemu-fluffi/build/arm-linux-user/.
++  cp qemu-arm rootfs/bin/qemu-arm
++
++put the following into rootfs/tmp/events:
++
++  exec_tb
++
++execute the target using qemu-arm:
++
++  sudo chroot rootfs /bin/qemu-arm -d nochain -trace events=/tmp/events -E LD_PRELOAD="/home/csa/mylib.so" /home/csa/sigma -h
++
++find the output inside the rootfs:
++
++	rootfs/trace-PID
++	rootfs/modules.txt
++
++analyze the trace file with simpletrace:
++
++  ~/qemu-fluffi/scripts/simpletrace.py ~/qemu-fluffi/trace-events rootfs/trace-PID > rootfs/decode-trace-PID.txt
++
++Porting
++=======
++
++Due to the qemu compile time typedefs and defines, it might be necessary
++to change the data types used in linux-user/fluffi.[h|c]
++Currently we use default types and rely on their size to (mostly) be 32 bit,
++since the target (arm) is a 32 bit system.
++
++Other than this, there should not be any problems, as long as the target is
++a Linux system.
++
++
+          QEMU README
+          ===========
+
+diff --git a/accel/tcg/trace-events b/accel/tcg/trace-events
+index 01852217a6..a2c0edf5d4 100644
+--- a/accel/tcg/trace-events
++++ b/accel/tcg/trace-events
+@@ -2,9 +2,9 @@
+
+ # TCG related tracing (mostly disabled by default)
+ # cpu-exec.c
+-disable exec_tb(void *tb, uintptr_t pc) "tb:%p pc=0x%"PRIxPTR
+-disable exec_tb_nocache(void *tb, uintptr_t pc) "tb:%p pc=0x%"PRIxPTR
+-disable exec_tb_exit(void *last_tb, unsigned int flags) "tb:%p flags=0x%x"
++exec_tb(void *tb, uintptr_t pc) "tb:%p pc=0x%"PRIxPTR
++exec_tb_nocache(void *tb, uintptr_t pc) "tb:%p pc=0x%"PRIxPTR
++exec_tb_exit(void *last_tb, unsigned int flags) "tb:%p flags=0x%x"
+
+ # translate-all.c
+ translate_block(void *tb, uintptr_t pc, uint8_t *tb_code) "tb:%p, pc:0x%"PRIxPTR", tb_code:%p"
+diff --git a/fluffi-build.sh b/fluffi-build.sh
+new file mode 100755
+index 0000000000..a383d4839d
+--- /dev/null
++++ b/fluffi-build.sh
+@@ -0,0 +1,13 @@
++#!/bin/bash
++
++for ARCH in "arm" "mips" "ppc" ; do
++	if [[ ! -d "build-${ARCH}" ]] ; then
++		echo "FLUFFI: configuring ${ARCH} build"
++		mkdir build-${ARCH}
++		(cd build-${ARCH} && ../configure --enable-trace-backends=simple --disable-gtk --disable-system --disable-tools --static --target-list=${ARCH}-linux-user)
++	fi
++
++	echo "FLUFFI: compiling for ${ARCH}"
++	(cd build-${ARCH} && make -j)
++	build-${ARCH}/${ARCH}-linux-user/qemu-${ARCH} --version
++done
+diff --git a/linux-user/Makefile.objs b/linux-user/Makefile.objs
+index 285c5dfa17..81a6c6e73a 100644
+--- a/linux-user/Makefile.objs
++++ b/linux-user/Makefile.objs
+@@ -1,4 +1,4 @@
+-obj-y = main.o syscall.o strace.o mmap.o signal.o \
++obj-y = main.o fluffi.o syscall.o strace.o mmap.o signal.o \
+ 	elfload.o linuxload.o uaccess.o uname.o \
+ 	safe-syscall.o $(TARGET_ABI_DIR)/signal.o \
+         $(TARGET_ABI_DIR)/cpu_loop.o exit.o fd-trans.o
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index 9fd65708c4..69f9f45cd7 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -10,6 +10,8 @@
+ #include "qemu/path.h"
+ #include "qemu/guest-random.h"
+
++#include "fluffi.h"
++
+ #ifdef _ARCH_PPC64
+ #undef ARCH_DLINFO
+ #undef ELF_PLATFORM
+@@ -2274,6 +2276,7 @@ exit_errmsg:
+
+    On return: INFO values will be filled in, as necessary or available.  */
+
++//static int fluffi_i = 0;
+ static void load_elf_image(const char *image_name, int image_fd,
+                            struct image_info *info, char **pinterp_name,
+                            char bprm_buf[BPRM_BUF_SIZE])
+@@ -2318,10 +2321,12 @@ static void load_elf_image(const char *image_name, int image_fd,
+     for (i = 0; i < ehdr->e_phnum; ++i) {
+         if (phdr[i].p_type == PT_LOAD) {
+             abi_ulong a = phdr[i].p_vaddr - phdr[i].p_offset;
++			//fprintf(stderr, "FLUFFI%d: %x\n", fluffi_i++, a);
+             if (a < loaddr) {
+                 loaddr = a;
+             }
+             a = phdr[i].p_vaddr + phdr[i].p_memsz;
++			//fprintf(stderr, "FLUFFI%d: %x\n", fluffi_i++, a);
+             if (a > hiaddr) {
+                 hiaddr = a;
+             }
+@@ -2349,6 +2354,7 @@ static void load_elf_image(const char *image_name, int image_fd,
+            QEMU application itself.  */
+         probe_guest_base(image_name, loaddr, hiaddr);
+     }
++	fluffi_register_elf_img(image_name, load_addr, hiaddr-loaddr);
+     load_bias = load_addr - loaddr;
+
+     if (elf_is_fdpic(ehdr)) {
+diff --git a/linux-user/fluffi.c b/linux-user/fluffi.c
+new file mode 100644
+index 0000000000..14441b7ca1
+--- /dev/null
++++ b/linux-user/fluffi.c
+@@ -0,0 +1,517 @@
++#include "fluffi.h"
++#include <stdio.h>
++#include <signal.h>
++#include <stdlib.h>
++#include <pthread.h>
++#include <string.h>
++#include <assert.h>
++#include <sys/stat.h>
++#include <elf.h>
++#include <unistd.h>
++#include <sys/mman.h>
++
++#ifdef FLUFFIDBG
++//#define STNL "\n"
++#define STNL
++#else
++#define STNL
++#endif
++
++int fluffi_die_on_sig = 42;
++int m_intermediate = 0;
++
++unsigned int m_first_sig = 0;
++unsigned int m_first_pc = 0;
++
++// cookie that enables code reentry with spending as little time as possible in critical sections
++unsigned long long cookie_ctr = 1;
++pthread_mutex_t ctr_mutex;
++
++// map of fd<--->objectnames so we always know the fd of every open thing, and the name behind every open fd
++typedef struct m_item {
++	unsigned long long cookie;
++	int fd;
++	int interesting;
++	char* name;
++	struct m_item* p;
++	struct m_item* n;
++} m_item;
++
++// the linked list has the following conventions:
++// - starts at map_start
++// - elements after which there is no more elements have a NEXT ptr of NULL
++// - the first element in the map has a PREV that points to the last element in the list, this makes "append" O(1)
++// therefore: forward iteration can break on null ptr, backward iteration must check for pointer equality to map_start or will never terminate
++
++m_item* map_start = NULL;
++pthread_mutex_t map_mutex;
++
++
++// map that holds all loaded shared objects as a doubly linked ring list
++typedef struct m_module {
++	unsigned long long cookie;
++	size_t length;
++	int currently_remapping;
++	char* name;
++	int start;
++	struct m_module* p;
++	struct m_module* n;
++} m_module;
++
++m_module* modules_start = NULL;
++pthread_mutex_t modules_mutex;
++
++// small abstraction to move the malloc shit out of the higher level stuff below
++m_item* map_make_node(char* name);
++m_item* map_make_node(char* name) {
++	m_item* node = (m_item*)malloc(sizeof(m_item));
++	memset(node, 0, sizeof(m_item));
++	size_t nlen = strlen(name);
++	node->name = (char*)malloc(nlen+1);
++	memset(node->name, 0, nlen+1);
++	strncpy(node->name, name, nlen);
++	node->fd = -1;
++	return node;
++}
++m_module* module_make_node(char* name);
++m_module* module_make_node(char* name){
++	m_module* node = (m_module*)malloc(sizeof(m_module));
++	memset(node, 0, sizeof(m_module));
++	size_t nlen = strlen(name);
++	node->name = (char*)malloc(nlen+1);
++	memset(node->name, 0, nlen+1);
++	strncpy(node->name, name, nlen);
++	return node;
++}
++
++// deletes a node from the list and frees all resources.
++// locking the map needs to be done high level though!
++int map_delete_node(m_item* node);
++int map_delete_node(m_item* node) {
++	// redirect pointers for map consistency
++	if (node->p == node) { // node is the only item in the list
++		//fprintf(stderr, "only\n");
++		map_start = NULL;
++	}
++	else if (map_start == node) { // node is the first item in the list
++		//fprintf(stderr, "first\n");
++		node->n->p = node->p;
++		map_start = node->n;
++	}
++	else if(node->n == NULL) { // node is the last item in the list
++		//fprintf(stderr, "last\n");
++		node->p->n = NULL; // BUG BUG BUG SEGV
++		map_start->p = node->p;
++	}
++	else {
++		//fprintf(stderr, "norm\n");
++		node->n->p = node->p;
++		node->p->n = node->n;
++	}
++
++	free(node->name);
++	node->name = NULL;
++	free(node);
++	node = NULL;
++
++	return 0;
++}
++
++// only frees resources, locking and list pointer stuff must be done somewhere else
++int module_free_node(m_module* node);
++int module_free_node(m_module* node) {
++	free(node->name);
++	node->name = NULL;
++	free(node);
++	node = NULL;
++	return 0;
++}
++
++int fluffi_init(void) {
++#ifdef FLUFFIDBG
++	fprintf(stderr, STNL "FLUFFI: qemu fluffi patch initializing\n");
++#endif
++	pthread_mutex_init(&ctr_mutex, NULL);
++	pthread_mutex_init(&map_mutex, NULL);
++	pthread_mutex_init(&modules_mutex, NULL);
++	return 0;
++}
++void fluffi_set_sig_forward(void) {
++#ifdef FLUFFIDBG
++	fprintf(stderr, STNL "FLUFFI: CALL: set forward\n");
++#endif
++	fluffi_die_on_sig = 0;
++}
++
++int fluffi_register_elf_img(const char* path, int addr, unsigned int length) {
++#ifdef FLUFFIDBG
++	fprintf(stderr, STNL "FLUFFI: CALL: register elf\n");
++#endif
++	m_module* mod = module_make_node((char*)path);
++	pthread_mutex_lock(&ctr_mutex);
++	mod->cookie = cookie_ctr++;
++	pthread_mutex_unlock(&ctr_mutex);
++	pthread_mutex_lock(&modules_mutex);
++	mod->start = addr;
++	mod->length = length;
++#ifdef FLUFFIDBG
++	fprintf(stderr, STNL "FLUFFI: adding mapping to list: %s at %x\n", mod->name, mod->start);
++#endif
++	if (!modules_start) { // map is empty
++		modules_start = mod;
++		mod->n = mod;
++		mod->p = mod;
++	} else {
++		mod->n = modules_start;
++		mod->p = modules_start->p;
++		modules_start->p = mod;
++		mod->p->n = mod;
++	}
++	pthread_mutex_unlock(&modules_mutex);
++
++	return 0;
++}
++
++void fluffi_internal_exit(unsigned int crashaddr, unsigned int sig);
++void fluffi_internal_exit(unsigned int crashaddr, unsigned int sig) {
++#ifdef FLUFFIDBG
++	fprintf(stderr, STNL "FLUFFI: CALL: internal exit\n");
++#endif
++	if (modules_start) {
++#ifdef FLUFFIDBG
++		FILE* res = stderr;
++#else
++		FILE* res = fopen("/modules.txt", "w+");
++		if (!res){
++			return;
++		}
++#endif
++		fprintf(res, "FLUFFI: first signal %d pc %x\n", m_first_sig, m_first_pc);
++		fprintf(res, "FLUFFI: last signal %d pc %x\n", sig, crashaddr);
++
++		m_module* i = modules_start;
++		fprintf(res, "FLUFFI: modules on exit:\n");
++		do {
++			// this IS LEGAL in GNU C :) - fuck std C, sizeof(void) obviously is 1
++			fprintf(res, "FLUFFI: %x - %x %s\n", i->start, (unsigned int)(i->start + i->length), i->name);
++			i = i->n;
++		} while (i != modules_start);
++
++#ifndef FLUFFIDBG
++		fclose(res);
++#endif
++	}
++
++#ifdef FLUFFIDBG
++	fprintf(stderr, STNL "FLUFFI: pid %d\n", getpid());
++	char* fn = (char*)malloc(512);
++	memset(fn, 0, 512);
++	snprintf(fn, 512, "/proc/%d/maps", getpid());
++	// lol, aparently there is this thing called /proc/self/maps... fuck it :)
++
++	int c;
++	FILE* f = fopen(fn, "r");
++	if (f) {
++		while ((c = getc(f)) != EOF)
++			putchar(c);
++		fclose(f);
++	}
++	free(fn);
++	fn = NULL;
++#endif
++}
++
++void fluffi_signal_exit_call(unsigned int pc, unsigned int sig) {
++#ifdef FLUFFIDBG
++	fprintf(stderr, STNL "FLUFFI: CALL: signal exit\n");
++#endif
++	fluffi_internal_exit(pc, sig);
++}
++
++void fluffi_first_signal(unsigned int pc, unsigned int sig) {
++#ifdef FLUFFIDBG
++	fprintf(stderr, STNL "FLUFFI: CALL: first signal\n");
++#endif
++	if(!m_intermediate) {
++		m_intermediate = 42;
++#ifdef FLUFFIDBG
++		fprintf(stderr, STNL "FLUFFI: intermediate signal : %d at %x\n", sig, pc);
++#endif
++		m_first_pc = pc;
++		m_first_sig = sig;
++	}
++}
++
++void fluffi_syscall_exit_call(void) {
++#ifdef FLUFFIDBG
++	fprintf(stderr, STNL "FLUFFI: CALL: syscal exit\n");
++#endif
++	fluffi_internal_exit(0, 0);
++}
++
++unsigned long long fluffi_syscall_open_call(char* path, int flags , int mode) {
++#ifdef FLUFFIDBG
++	fprintf(stderr, STNL "FLUFFI: CALL: open\n");
++#endif
++	(void)flags;
++	(void)mode;
++
++	m_item* node = map_make_node(path);
++	pthread_mutex_lock(&ctr_mutex);
++	node->cookie = cookie_ctr++;
++	pthread_mutex_unlock(&ctr_mutex);
++
++	pthread_mutex_lock(&map_mutex);
++	if (!map_start) { // map is empty
++		map_start = node;
++		node->p = node;
++		node->n = NULL;
++	}
++	else { // append to existing map
++		node->p = map_start->p;
++		map_start->p->n = node;
++		map_start->p = node;
++		node->n = NULL;
++	}
++	pthread_mutex_unlock(&map_mutex);
++
++	// return cookie and wait for ret to complete the datum with the fd
++	return node->cookie;
++}
++
++int fluffi_syscall_open_ret(unsigned long long fluffi_cookie, int ret) {
++#ifdef FLUFFIDBG
++	fprintf(stderr, STNL "FLUFFI: CALL: open ret\n");
++#endif
++	pthread_mutex_lock(&map_mutex);
++	m_item* node = map_start;
++	for(;;) {
++		if (node->cookie == fluffi_cookie)
++			break;
++		node = node->n;
++		if (!node)
++			break;
++	}
++	assert(node != NULL);
++
++	// if open succeeded, ret is >0. update with fd. else, delete the node from the list, since open failed.
++	if (ret >= 0) {
++		node->fd = ret;
++	}
++	else {
++		map_delete_node(node);
++		node = NULL;
++	}
++	pthread_mutex_unlock(&map_mutex);
++
++	if (node != NULL) {
++		// now lets check if this is something we might want to remember.
++		// stat to check if regular file
++		struct stat sb;
++		ret = fstat(node->fd, &sb);
++		if (!ret && S_ISREG(sb.st_mode)) {
++			// seek to check if seekable stream (aka we do not disrupt the actual app awaiting data)
++			off_t oret = lseek(node->fd, 0, SEEK_SET);
++			if (oret >= 0) {
++				// check if elf header
++				char* buf = (char*)malloc(64);
++				memset(buf, 0, 64);
++				ssize_t sret = read(node->fd, buf, 64);
++				sret = lseek(node->fd, 0, SEEK_SET);
++				(void)sret;
++
++				if (buf[0] == 0x7F && buf[1] == 'E' && buf[2] == 'L' && buf[3] == 'F') {
++					// check bitness
++					if (buf[4] == 1) {
++						Elf32_Ehdr* hd = (Elf32_Ehdr*)buf;
++						// check if shared object
++						if (hd->e_type == ET_DYN) {
++							node->interesting = 42;
++						}
++						//fprintf(stderr, STNL "FLUFFI: got elf32 of type %x\n", hd->e_type);
++					}
++					else if (buf[4] == 2) {
++						Elf64_Ehdr* hd = (Elf64_Ehdr*)buf;
++						// check if shared object
++						if (hd->e_type == ET_DYN) {
++							node->interesting = 42;
++						}
++						//fprintf(stderr, STNL "FLUFFI: got elf64 of type %x\n", hd->e_type);
++					}
++					else {
++						//fprintf(stderr, STNL "FLUFFI: got elf, but bitness is weird\n");
++					}
++				}
++				free(buf);
++			}
++		}
++
++		//fprintf(stderr, "FLUFFI: Node: fd %d with mode %x is given to %s\n", node->fd, sb.st_mode, node->name);
++		//fprintf(stderr, "FLUFFI: Node: fd %d is given to %s, but could not stat\n", node->fd, node->name);
++	}
++
++	return 0;
++}
++
++unsigned long long fluffi_syscall_close_call(int fd) {
++	//fprintf(stderr, STNL "FLUFFI: Node: fd %d will be closed\n", fd);
++#ifdef FLUFFIDBG
++	fprintf(stderr, STNL "FLUFFI: CALL: close\n");
++#endif
++	pthread_mutex_lock(&map_mutex);
++
++	if (!map_start) {
++		pthread_mutex_unlock(&map_mutex);
++		return 0;
++	}
++
++	m_item* node = map_start;
++	for(;;) {
++		if (node->fd == fd)
++			break;
++		node = node->n;
++		if (!node)
++			break;
++	}
++	if (!node) {
++		pthread_mutex_unlock(&map_mutex);
++		return 0;
++	}
++
++	unsigned long long ret = node->cookie;
++	map_delete_node(node);
++	node = NULL;
++	pthread_mutex_unlock(&map_mutex);
++
++	return ret;
++}
++
++int fluffi_syscall_close_ret(unsigned long long fluffi_cookie, int ret) {
++#ifdef FLUFFIDBG
++	fprintf(stderr, STNL "FLUFFI: CALL: close ret\n");
++#endif
++	(void)fluffi_cookie;
++	if (ret != 0)
++		fprintf(stderr, STNL "FLUFFI: close failed\n");
++	return 0;
++}
++
++unsigned long long fluffi_syscall_mmap_call(int addr, size_t length, int prot, int flags, int fd, off_t offset) {
++#ifdef FLUFFIDBG
++	fprintf(stderr, STNL "FLUFFI: CALL: mmap\n");
++#endif
++	(void)offset;
++	(void)prot;
++	m_module* mod = NULL;
++	unsigned long long ret;
++
++	if (flags & MAP_ANONYMOUS) {
++		return 0;
++	}
++
++	pthread_mutex_lock(&map_mutex);
++	m_item* node = map_start;
++	for(;;) {
++		if (!node)
++			break;
++		if (node->fd == fd)
++			break;
++		node = node->n;
++	}
++	if (!node) {
++		pthread_mutex_unlock(&map_mutex);
++		fprintf(stderr, STNL "FLUFFI: WTF, mmap called with a fd that we do not know: %d\n", fd);
++		return 0;
++	}
++	if (node && node->interesting) {
++		//fprintf(stderr, STNL "FLUFFI: found interesting file mmaped: %s\n", node->name);
++
++		// stupid create node, if we find that this is a remap, we clean it up later.
++		// reason: as a lazy deadlock prevention, we do not want to lock both mutexes
++		// at the same time.
++		mod = module_make_node(node->name);
++		mod->cookie = node->cookie;
++	}
++	if (node) {
++		ret = node->cookie;
++	}
++	pthread_mutex_unlock(&map_mutex);
++
++	if (mod != NULL) {
++		mod->length = length;
++		mod->start = addr;
++
++		pthread_mutex_lock(&modules_mutex);
++		// now lets check if this was a remap
++		if (mod->start && modules_start) {
++			m_module* i = modules_start;
++			do
++			{
++				if (mod->start >= i->start) {
++					if (mod->start < (i->start + i->length)) { // this IS LEGAL in GNU C :) - fuck std C, sizeof(void) obviously is 1
++						// well, we really should check here if the names match, otherwise we are mapping something different
++						// into the address space of some shared object (is this a thing? code injection?)
++						int neq = strcmp(mod->name, i->name);
++						if (!neq) {
++							// FOUND REMAP
++#ifdef FLUFFIDBG
++							fprintf(stderr, STNL "FLUFFI: found remap: %s at %x\n", i->name, mod->start);
++#endif
++							i->currently_remapping = 42;
++							module_free_node(mod);
++							mod = NULL;
++							break;
++						}
++					}
++				}
++				i = i->n;
++			} while (i != modules_start);
++		}
++		// not a remap, lets add this to the list
++		if (mod) {
++#ifdef FLUFFIDBG
++			fprintf(stderr, STNL "FLUFFI: adding mapping to list: %s at %x\n", mod->name, mod->start);
++#endif
++			if (!modules_start) { // map is empty
++				modules_start = mod;
++				mod->n = mod;
++				mod->p = mod;
++			} else {
++				mod->n = modules_start;
++				mod->p = modules_start->p;
++				modules_start->p = mod;
++				mod->p->n = mod;
++			}
++		}
++		pthread_mutex_unlock(&modules_mutex);
++	}
++	return ret;
++}
++
++int fluffi_syscall_mmap_ret(unsigned long long fluffi_cookie, int ret) {
++#ifdef FLUFFIDBG
++	fprintf(stderr, STNL "FLUFFI: CALL: mmap ret\n");
++#endif
++
++	pthread_mutex_lock(&modules_mutex);
++	// look for cookie, if found, update address.
++	if (modules_start) {
++		m_module* i = modules_start;
++		do {
++			if (i->cookie == fluffi_cookie && i->currently_remapping != 42) {
++#ifdef FLUFFIDBG
++				fprintf(stderr, STNL "FLUFFI: updating mapping: %s from %x to %x\n", i->name, i->start, ret);
++#endif
++				i->start = ret;
++				break;
++			}
++			i->currently_remapping = 0;
++			i = i->n;
++		} while (i != modules_start);
++	}
++	pthread_mutex_unlock(&modules_mutex);
++	//fprintf(stderr, STNL "FLUFFI: mmap ret end\n");
++
++
++	return 0;
++}
+diff --git a/linux-user/fluffi.h b/linux-user/fluffi.h
+new file mode 100644
+index 0000000000..2809faf7aa
+--- /dev/null
++++ b/linux-user/fluffi.h
+@@ -0,0 +1,50 @@
++#ifndef FLUFFI_H
++#define FLUFFI_H
++#include <stdint.h>
++#include <sys/types.h>
++
++//#define FLUFFIDBG
++
++// if this is "true", we kill the app on potentially deadly signals
++// and do not give the target a chance to handle it
++extern int fluffi_die_on_sig;
++
++// call from main to init stuff
++int fluffi_init(void);
++
++// cmd arg to forward potentially deadly signals was given
++void fluffi_set_sig_forward(void);
++
++// call from elfloader for actual test executable and ld.so
++int fluffi_register_elf_img(const char* path, int addr, unsigned int length);
++
++// called after exit_group syscall to end application
++void fluffi_syscall_exit_call(void);
++
++// called on exit by signal
++void fluffi_signal_exit_call(unsigned int pc, unsigned int sig);
++
++// called when a signal is passed to a targets handler
++void fluffi_first_signal(unsigned int pc, unsigned int sig);
++
++// called before open, registers the name to be opened and returns a thread cookie for the return call
++unsigned long long fluffi_syscall_open_call(char* path, int flags , int mode);
++
++// called after open, maps the fd returned to the name using the thread cookie that was returned on the open call
++int fluffi_syscall_open_ret(unsigned long long fluffi_cookie, int ret);
++
++// called before close, removes the node map
++unsigned long long fluffi_syscall_close_call(int fd);
++
++// called after close, currently does nothing.
++int fluffi_syscall_close_ret(unsigned long long fluffi_cookie, int ret);
++
++// called before mmap, checks if the file is of interest and gets the corresponding cookie for the return call
++unsigned long long fluffi_syscall_mmap_call(int addr, size_t length, int prot, int flags, int fd, off_t offset);
++
++// called after mmap, writes the mapping address to the tracking object
++int fluffi_syscall_mmap_ret(unsigned long long fluffi_cookie, int ret);
++
++// called after munmap, deletes the mapping info
++
++#endif
+diff --git a/linux-user/main.c b/linux-user/main.c
+index a59ae9439d..fc5971ca29 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -42,6 +42,7 @@
+ #include "elf.h"
+ #include "trace/control.h"
+ #include "target_elf.h"
++#include "fluffi.h"
+ #include "cpu_loop-common.h"
+ #include "crypto/init.h"
+
+@@ -262,6 +263,12 @@ static void handle_arg_unset_env(const char *arg)
+     free(r);
+ }
+
++// THIS IS FLUFFI CODE!
++static void handle_arg_forward_sigs(const char* arg)
++{
++	fluffi_set_sig_forward();
++}
++
+ static void handle_arg_argv0(const char *arg)
+ {
+     argv0 = strdup(arg);
+@@ -375,7 +382,7 @@ static void handle_arg_strace(const char *arg)
+
+ static void handle_arg_version(const char *arg)
+ {
+-    printf("qemu-" TARGET_NAME " version " QEMU_FULL_VERSION
++    printf("qemu-fluffi-" TARGET_NAME " version fluffi-" QEMU_FULL_VERSION
+            "\n" QEMU_COPYRIGHT "\n");
+     exit(EXIT_SUCCESS);
+ }
+@@ -411,6 +418,8 @@ static const struct qemu_argument arg_table[] = {
+      "model",      "select CPU (-cpu help for list)"},
+     {"E",          "QEMU_SET_ENV",     true,  handle_arg_set_env,
+      "var=value",  "sets targets environment variable (see below)"},
++	{"f",          "QEMU_FRWRD_SIGS",  false, handle_arg_forward_sigs,
++     "",           "disables fastcrash on possibly fatal signals such as SIGSEGV"},
+     {"U",          "QEMU_UNSET_ENV",   true,  handle_arg_unset_env,
+      "var",        "unsets targets environment variable (see below)"},
+     {"0",          "QEMU_ARGV0",       true,  handle_arg_argv0,
+@@ -588,6 +597,28 @@ static int parse_args(int argc, char **argv)
+
+ int main(int argc, char **argv, char **envp)
+ {
++#if defined(TARGET_ARM)
++	printf("qemu-fluffi-arm, compiled %s, %s\n", __DATE__, __TIME__);
++#elif defined(TARGET_MIPS)
++	printf("qemu-fluffi-mips, compiled %s, %s\n", __DATE__, __TIME__);
++#elif defined(TARGET_PPC)
++	printf("qemu-fluffi-ppc, compiled %s, %s\n", __DATE__, __TIME__);
++#else
++	printf("qemu-fluffi-UNKNOWN, compiled %s, %s\n", __DATE__, __TIME__);
++#endif
++
++#if defined(__amd64__)
++	printf("running on amd64\n");
++#elif defined(__i386__)
++	printf("running on x86\n");
++#elif defined(__aarch64__)
++	printf("running on aarch64\n");
++#elif defined(__arm__)
++	printf("running on arm\n");
++#else
++	printf("running on UNKNOWN HOST ARCH\n");
++#endif
++
+     struct target_pt_regs regs1, *regs = &regs1;
+     struct image_info info1, *info = &info1;
+     struct linux_binprm bprm;
+@@ -596,8 +627,8 @@ int main(int argc, char **argv, char **envp)
+     CPUState *cpu;
+     int optind;
+     char **target_environ, **wrk;
+-    char **target_argv;
+-    int target_argc;
++    char **target_argv, **new_argv;
++    int target_argc, new_argc;
+     int i;
+     int ret;
+     int execfd;
+@@ -606,6 +637,7 @@ int main(int argc, char **argv, char **envp)
+     module_call_init(MODULE_INIT_TRACE);
+     qemu_init_cpu_list();
+     module_call_init(MODULE_INIT_QOM);
++	fluffi_init();
+
+     envlist = envlist_create();
+
+@@ -629,6 +661,55 @@ int main(int argc, char **argv, char **envp)
+
+     qemu_add_opts(&qemu_trace_opts);
+
++
++	// FLUFFI: first, check if all the options we need are already present.
++	// if not, we need to insert them into argv
++
++	int argv_found = 0;
++	for (i = 0; i < argc; i++) {
++		int cmp = strcmp("-d", argv[i]);
++		if (cmp == 0) {
++			argv_found++;
++			continue;
++		}
++		cmp = strcmp("nochain", argv[i]);
++		if (cmp == 0) {
++			argv_found++;
++			continue;
++		}
++		cmp = strcmp("-trace", argv[i]);
++		if (cmp == 0) {
++			argv_found++;
++			continue;
++		}
++		cmp = strcmp("events=/etc/qemu-events", argv[i]);
++		if (cmp == 0) {
++			argv_found++;
++			continue;
++		}
++	}
++
++	if (argv_found != 4) { // we need to insert stuff into argv, because aparently we were not called with stuff. (fuck you, binfmt)
++		fprintf(stderr, "FLUFFI %d: injecting parameters\n", getpid());
++		new_argc = argc + 4;
++		new_argv = malloc((new_argc + 1)* sizeof (char *));
++		if (new_argv == NULL) {
++			(void) fprintf(stderr, "FLUFFI: Unable to allocate memory for new_argv\n");
++			exit(EXIT_FAILURE);
++		}
++		new_argv[0] = strdup(argv[0]);
++		new_argv[1] = strdup("-d");
++		new_argv[2] = strdup("nochain");
++		new_argv[3] = strdup("-trace");
++		new_argv[4] = strdup("events=/etc/qemu-events");
++		for (i = 5; (i < new_argc) && ((i-4) < argc); i++) {
++			new_argv[i] = strdup(argv[i-4]);
++		}
++		new_argv[new_argc] = NULL;
++		argc = new_argc;
++		argv = new_argv;
++	}
++
+     optind = parse_args(argc, argv);
+
+     if (!trace_init_backends()) {
+@@ -829,6 +910,10 @@ int main(int argc, char **argv, char **envp)
+         }
+         gdb_handlesig(cpu, 0);
+     }
++	//fprintf(stderr, "qemu: forking twice %d\n", getpid());
++	//fork();
++	//fork();
++
+     cpu_loop(env);
+     /* never exits */
+     return 0;
+diff --git a/linux-user/signal.c b/linux-user/signal.c
+index 5cd237834d..4e775af0c1 100644
+--- a/linux-user/signal.c
++++ b/linux-user/signal.c
+@@ -23,6 +23,8 @@
+
+ #include "qemu.h"
+ #include "trace.h"
++#include "fluffi.h"
++#include "trace/simple.h"
+ #include "signal-common.h"
+
+ struct target_sigaltstack target_sigaltstack_used = {
+@@ -595,6 +597,15 @@ static void QEMU_NORETURN dump_core_and_abort(int target_sig)
+         (void) fprintf(stderr, "qemu: uncaught target signal %d (%s) - %s\n",
+             target_sig, strsignal(host_sig), "core dumped" );
+     }
++#if defined(TARGET_ARM)
++	fluffi_signal_exit_call(((CPUARMState*)(cpu->env_ptr))->regs[15], host_sig);
++#elif defined(TARGET_MIPS)
++	fluffi_signal_exit_call(((CPUMIPSState*)(cpu->env_ptr))->active_tc.PC, host_sig);
++#elif defined(TARGET_PPC)
++	fluffi_signal_exit_call(((CPUPPCState*)(cpu->env_ptr))->nip, host_sig);
++#endif
++
++	st_flush_trace_buffer();
+
+     /* The proper exit code for dying from an uncaught signal is
+      * -<signal>.  The kernel doesn't allow exit() or _exit() to pass
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index b187c1281d..f22f3d39a6 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -108,6 +108,8 @@
+ #include "qemu.h"
+ #include "qemu/guest-random.h"
+ #include "qapi/error.h"
++#include "fluffi.h"
++#include "trace/simple.h"
+ #include "fd-trans.h"
+
+ #ifndef CLONE_IO
+@@ -7043,6 +7045,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+ {
+     CPUState *cpu = env_cpu(cpu_env);
+     abi_long ret;
++	unsigned long long fluffi_cookie;
+ #if defined(TARGET_NR_stat) || defined(TARGET_NR_stat64) \
+     || defined(TARGET_NR_lstat) || defined(TARGET_NR_lstat64) \
+     || defined(TARGET_NR_fstat) || defined(TARGET_NR_fstat64)
+@@ -7056,6 +7059,9 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+
+     switch(num) {
+     case TARGET_NR_exit:
++
++		//fprintf(stderr, "EXIT CALL\n");
++		fluffi_syscall_exit_call();
+         /* In old applications this may be used to implement _exit(2).
+            However in threaded applictions it is used for thread termination,
+            and _exit_group is used for application termination.
+@@ -7130,9 +7136,11 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+     case TARGET_NR_open:
+         if (!(p = lock_user_string(arg1)))
+             return -TARGET_EFAULT;
++		fluffi_cookie = fluffi_syscall_open_call((char*)p, target_to_host_bitmask(arg2, fcntl_flags_tbl), arg3);
+         ret = get_errno(do_openat(cpu_env, AT_FDCWD, p,
+                                   target_to_host_bitmask(arg2, fcntl_flags_tbl),
+                                   arg3));
++		fluffi_syscall_open_ret(fluffi_cookie, ret);
+         fd_trans_unregister(ret);
+         unlock_user(p, arg1, 0);
+         return ret;
+@@ -7140,9 +7148,11 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+     case TARGET_NR_openat:
+         if (!(p = lock_user_string(arg2)))
+             return -TARGET_EFAULT;
++		fluffi_cookie = fluffi_syscall_open_call((char*)p, target_to_host_bitmask(arg3, fcntl_flags_tbl), arg4);
+         ret = get_errno(do_openat(cpu_env, arg1, p,
+                                   target_to_host_bitmask(arg3, fcntl_flags_tbl),
+                                   arg4));
++		fluffi_syscall_open_ret(fluffi_cookie, ret);
+         fd_trans_unregister(ret);
+         unlock_user(p, arg2, 0);
+         return ret;
+@@ -7159,7 +7169,10 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+ #endif
+     case TARGET_NR_close:
+         fd_trans_unregister(arg1);
+-        return get_errno(close(arg1));
++		fluffi_cookie = fluffi_syscall_close_call(arg1);
++        ret = get_errno(close(arg1));
++		fluffi_syscall_close_ret(fluffi_cookie, ret);
++        return ret;
+
+     case TARGET_NR_brk:
+         return do_brk(arg1);
+@@ -8528,15 +8541,20 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+             v5 = tswapal(v[4]);
+             v6 = tswapal(v[5]);
+             unlock_user(v, arg1, 0);
++			fluffi_cookie = fluffi_syscall_mmap_call(v1, v2, v3, target_to_host_bitmask(v4, mmap_flags_tbl), v5, v6);
+             ret = get_errno(target_mmap(v1, v2, v3,
+                                         target_to_host_bitmask(v4, mmap_flags_tbl),
+                                         v5, v6));
++			fluffi_syscall_mmap_ret(fluffi_cookie, ret);
++
+         }
+ #else
++		fluffi_cookie = fluffi_syscall_mmap_call(arg1, arg2, arg3, target_to_host_bitmask(arg4, mmap_flags_tbl), arg5, arg6);
+         ret = get_errno(target_mmap(arg1, arg2, arg3,
+                                     target_to_host_bitmask(arg4, mmap_flags_tbl),
+                                     arg5,
+                                     arg6));
++			fluffi_syscall_mmap_ret(fluffi_cookie, ret);
+ #endif
+         return ret;
+ #endif
+@@ -8545,10 +8563,15 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+ #ifndef MMAP_SHIFT
+ #define MMAP_SHIFT 12
+ #endif
+-        ret = target_mmap(arg1, arg2, arg3,
+-                          target_to_host_bitmask(arg4, mmap_flags_tbl),
+-                          arg5, arg6 << MMAP_SHIFT);
+-        return get_errno(ret);
++		//fprintf(stderr, "abi_ulong*: %ld ", sizeof(abi_ulong*));
++		//fprintf(stderr, "void*     : %ld\n", sizeof(void*));
++		fluffi_cookie = fluffi_syscall_mmap_call(arg1, arg2, arg3, target_to_host_bitmask(arg4, mmap_flags_tbl), arg5, arg6<<MMAP_SHIFT);
++        ret = get_errno(target_mmap(arg1, arg2, arg3,
++                                    target_to_host_bitmask(arg4, mmap_flags_tbl),
++                                    arg5,
++                                    arg6 << MMAP_SHIFT));
++		fluffi_syscall_mmap_ret(fluffi_cookie, ret);
++		return ret;
+ #endif
+     case TARGET_NR_munmap:
+         return get_errno(target_munmap(arg1, arg2));
+@@ -9067,6 +9090,9 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+         /* new thread calls */
+     case TARGET_NR_exit_group:
+         preexit_cleanup(cpu_env, arg1);
++		// FLUFFI ROMAN FLUSH HERE
++		st_flush_trace_buffer();
++		fluffi_syscall_exit_call();
+         return get_errno(exit_group(arg1));
+ #endif
+     case TARGET_NR_setdomainname:

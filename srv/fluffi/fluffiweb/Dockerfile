@@ -8,7 +8,7 @@
 # 
 # Author(s): Thomas Riedmaier, Fabian Russwurm, Junes Najah, Roman Bendt
 
-§§FROM tiangolo/uwsgi-nginx-flask:python3.6-alpine3.7
+FROM tiangolo/uwsgi-nginx-flask:python3.6-alpine3.7
 §§
 # Install mariadb-client
 RUN apk --no-cache --no-progress upgrade && \
@@ -18,10 +18,10 @@ RUN apk --no-cache --no-progress upgrade && \
 §§ENV FLASK_APP main.py
 §§ENV UWSGI_INI /app/uwsgi.ini
 §§ENV FLASK_DEBUG 1
-§§ENV STATIC_PATH /app/app/static
+ENV STATIC_PATH /app/app/static
 §§
 §§COPY requirements.txt /tmp/
 §§
 §§#RUN pip3 install -U pip
 §§RUN pip3 install -r /tmp/requirements.txt
-§§
+

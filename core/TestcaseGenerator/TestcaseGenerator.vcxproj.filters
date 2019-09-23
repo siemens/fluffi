@@ -71,9 +71,9 @@ Author(s): Thomas Riedmaier, Abian Blome, Michael Kraus, Roman Bendt
     <ClInclude Include="HonggfuzzMutator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-§§    <ClInclude Include="OedipusMutator.h">
-§§      <Filter>Header Files</Filter>
-§§    </ClInclude>
+    <ClInclude Include="OedipusMutator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="ExternalMutator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -121,9 +121,9 @@ Author(s): Thomas Riedmaier, Abian Blome, Michael Kraus, Roman Bendt
     <ClCompile Include="HonggfuzzMutator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-§§    <ClCompile Include="OedipusMutator.cpp">
-§§      <Filter>Source Files</Filter>
-§§    </ClCompile>
+    <ClCompile Include="OedipusMutator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="ExternalMutator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

@@ -422,7 +422,7 @@ import mysql.connector
 §§        print("\n\nCURRENT\n=============================\n\n" + json.dumps(CURRENT, indent=4)
 §§              + "\n\nSHOULD\n=============================\n\n" + json.dumps(SHOULD, indent=4)
 §§              + "\n\nWORKERS\n=============================\n\n" + json.dumps(workers_dic, indent=4) + "\n\n")
-§§
+
 §§    print("\n#   mode      : " + MODE
 §§          + "\n#   current   : " + str(count_c)
 §§          + "\n#   should    : " + str(count_s)

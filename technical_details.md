@@ -13,56 +13,56 @@ Author(s): Thomas Riedmaier, Roman Bendt
 ## Technical Details
 
 ### 1) CODING GUIDELINES
-§§
+
 Readable code is the most important thing when working in a team. A simple example. This:
-§§```CPP
-§§bool TestExecutorGDB::getBaseAddressesAndSizes(std::vector<std::tuple<std::string, long long, long long>> * baseAddressesAndSizes, std::string parseInfoOutput) {
-§§    std::vector<std::tuple<long long, long long, std::string, std::string, std::string>>  loadedFiles;
-§§
-§§    if (!parseInfoFiles(&loadedFiles, parseInfoOutput)) {
-§§        return false;
-§§    }
-§§
-§§    for (std::vector<std::tuple<long long, long long, std::string, std::string, std::string>>::iterator loadedFilesIT = loadedFiles.begin(); loadedFilesIT != loadedFiles.end(); ++loadedFilesIT) {
-§§        baseAddressesAndSizes->push_back(std::make_tuple(std::get<2>((*loadedFilesIT)) + "/" + std::get<3>((*loadedFilesIT)), std::get<0>((*loadedFilesIT)), std::get<1>((*loadedFilesIT)) - std::get<0>((*loadedFilesIT))));
-§§    }
-§§
-§§    return true;
-§§}
-§§```
-§§
-§§can easily be refactored to this:
-§§```CPP
-§§using std::string;
-§§using std::vector;
-§§using std::tuple;
-§§typedef long long i64;
-§§typedef vector<tuple<string, i64, i64>> tModule;
-§§
-§§bool TestExecutorGDB::getBaseAddressesAndSizes(tModule* outBaseAddressesAndSizes, string parseInfoOutput) {
-§§    // start, end, name, segmentname, path
-§§    vector<tuple<i64, i64, string, string, string>>  loadedFiles;
-§§
-§§    if (!parseInfoFiles(&loadedFiles, parseInfoOutput)) {
-§§        return false;
-§§    }
-§§
-§§    using std::get;
-§§    for (auto& loadedFilesIT : loadedFiles) {
-§§        outBaseAddressesAndSizes->push_back(
-§§            std::make_tuple(
-§§                    get<2>(loadedFilesIT) + "/" + get<3>(loadedFilesIT),
-§§                    get<0>(loadedFilesIT),
-§§                    get<1>(loadedFilesIT) - get<0>(loadedFilesIT)
-§§                )
-§§        );
-§§    }
-§§
-§§    return true;
-§§}
-§§```
+```CPP
+bool TestExecutorGDB::getBaseAddressesAndSizes(std::vector<std::tuple<std::string, long long, long long>> * baseAddressesAndSizes, std::string parseInfoOutput) {
+    std::vector<std::tuple<long long, long long, std::string, std::string, std::string>>  loadedFiles;
+
+    if (!parseInfoFiles(&loadedFiles, parseInfoOutput)) {
+        return false;
+    }
+
+    for (std::vector<std::tuple<long long, long long, std::string, std::string, std::string>>::iterator loadedFilesIT = loadedFiles.begin(); loadedFilesIT != loadedFiles.end(); ++loadedFilesIT) {
+        baseAddressesAndSizes->push_back(std::make_tuple(std::get<2>((*loadedFilesIT)) + "/" + std::get<3>((*loadedFilesIT)), std::get<0>((*loadedFilesIT)), std::get<1>((*loadedFilesIT)) - std::get<0>((*loadedFilesIT))));
+    }
+
+    return true;
+}
+```
+
+can easily be refactored to this:
+```CPP
+using std::string;
+using std::vector;
+using std::tuple;
+typedef long long i64;
+typedef vector<tuple<string, i64, i64>> tModule;
+
+bool TestExecutorGDB::getBaseAddressesAndSizes(tModule* outBaseAddressesAndSizes, string parseInfoOutput) {
+    // start, end, name, segmentname, path
+    vector<tuple<i64, i64, string, string, string>>  loadedFiles;
+
+    if (!parseInfoFiles(&loadedFiles, parseInfoOutput)) {
+        return false;
+    }
+
+    using std::get;
+    for (auto& loadedFilesIT : loadedFiles) {
+        outBaseAddressesAndSizes->push_back(
+            std::make_tuple(
+                    get<2>(loadedFilesIT) + "/" + get<3>(loadedFilesIT),
+                    get<0>(loadedFilesIT),
+                    get<1>(loadedFilesIT) - get<0>(loadedFilesIT)
+                )
+        );
+    }
+
+    return true;
+}
+```
 Now. Decide yourself, which one is more readable. In general, try to stick to the [cpp core guidelines](http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines) as close as possible.
-§§
+
 ### 2) Known WTFs
 
 GDB testcases won't succeed on Windows 10 if CFG is active for gdb. Disable CFG by navigating to: `Windows Defender Security Center` | `App & browser control` | `Exploit protection settings` | `Program settings` | `Add program to customize` | `Add by program name` . Then add gdb.exe and disable CFG.
@@ -159,30 +159,30 @@ There are specific patches to qemu-user that were implemented for FLUFFI, which 
 Currently the patch supports ARM, MIPS and PPC, but can be adopted for virtually any architecture supported by upstream qemu-linux-user.
 
 ### 9) Extending FLUFFI
-§§
-§§If you want to add new agent types to FLUFFI, here is what you must do
-§§How to add a new 
-§§
-§§**Runner**
-§§- Extend `FluffiTestExecutor`
-§§- Add the name of your runner to `TestcaseRunner.myAgentSubTypes`
-§§- Change `TRMainWorker.tryGetConfigFromLM` so that if your `runnerType` is chosen, `m_executor` is initialized with your runner
-§§- For an example see `TestExecutorDynRioSingle`
-§§
-§§**Generator**
-§§- Extend `FluffiMutator`
-§§- Add the name of your generator to `TestcaseGenerator.myAgentSubTypes`
-§§- Change `QueueFillerWorker.tryGetConfigFromLM` so that if your `generatorType` is chosen, `m_mutator` is initialized with your generator
-§§- For an example see `RadamsaMutator`
-§§
-§§**Evaluator**
-§§- Extend `FluffiEvaluator`
-§§- Add the name of your evaluator to `TestcaseEvaluator.myAgentSubTypes`
-§§- Change `TEMainWorker.tryGetConfigFromLM` so that if your `evaluatorType` is chosen, `m_evaluator` is initialized with your evaluator
-§§- For an example see `CoverageEvaluator`
-§§
+
+If you want to add new agent types to FLUFFI, here is what you must do
+How to add a new 
+
+**Runner**
+- Extend `FluffiTestExecutor`
+- Add the name of your runner to `TestcaseRunner.myAgentSubTypes`
+- Change `TRMainWorker.tryGetConfigFromLM` so that if your `runnerType` is chosen, `m_executor` is initialized with your runner
+- For an example see `TestExecutorDynRioSingle`
+
+**Generator**
+- Extend `FluffiMutator`
+- Add the name of your generator to `TestcaseGenerator.myAgentSubTypes`
+- Change `QueueFillerWorker.tryGetConfigFromLM` so that if your `generatorType` is chosen, `m_mutator` is initialized with your generator
+- For an example see `RadamsaMutator`
+
+**Evaluator**
+- Extend `FluffiEvaluator`
+- Add the name of your evaluator to `TestcaseEvaluator.myAgentSubTypes`
+- Change `TEMainWorker.tryGetConfigFromLM` so that if your `evaluatorType` is chosen, `m_evaluator` is initialized with your evaluator
+- For an example see `CoverageEvaluator`
+
 Of course, you can also ignore the existing code base and create your own FLUFFI agent by implementing the FLUFFI protocol. Feel free to do so! All you need is ZeroMQ, Protobuf, and the [FLUFFI protobuf definition](core/dependencies/libprotoc/FLUFFI.proto).
-§§
+
 ## Servers and Infrastructure
 
 FLUFFI expects the following services:

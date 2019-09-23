@@ -21,9 +21,9 @@ Author(s): Thomas Riedmaier, Roman Bendt
 #include <SDKDDKVer.h>
 #include <winsock2.h>
 #include <windows.h>
-§§#include <process.h>
-§§#define GETPID _getpid
+#include <process.h>
+#define GETPID _getpid
 #else
 #include <sys/unistd.h>
-§§#define GETPID getpid
+#define GETPID getpid
 #endif

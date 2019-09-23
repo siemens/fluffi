@@ -33,7 +33,7 @@
 §§        response = requests.post(url, json = json_data, auth=login)
 §§        time.sleep(1)
 §§        print(response)
-§§        if(response.status_code < 300):
+        if(response.status_code < 300):
 §§            jsonResult = json.loads(response.text)
 §§            if 'id' in jsonResult:
 §§                ID = jsonResult['id']
@@ -79,7 +79,7 @@
 §§        break
 §§    except:
 §§        print("Polemarch not available retrying...")
-§§        time.sleep(0.5)
+        time.sleep(0.5)
 §§        continue
 §§    if(response.status_code==200):
 §§        print("Polemarch is now available")
@@ -110,23 +110,23 @@ sendRequestFromFile("http://127.0.0.1:8080/api/v2/project/1/periodic_task/", "re
 §§
 §§# send sync project command
 §§print("Send Sync")
-§§checkurl = "http://127.0.0.1:8080/api/v2/project/1/"
-§§posturl = "http://127.0.0.1:8080/api/v2/project/1/sync/"
+checkurl = "http://127.0.0.1:8080/api/v2/project/1/"
+posturl = "http://127.0.0.1:8080/api/v2/project/1/sync/"
 §§while True:
 §§    try:	
-§§        response = requests.post(posturl, auth=login)
+        response = requests.post(posturl, auth=login)
 §§    except:
 §§        print("Polemarch not available retrying...")
-§§        time.sleep(0.5)
+        time.sleep(0.5)
 §§        continue
 §§    if(response.status_code==200):
-§§        response = requests.get(checkurl, auth=login)
-§§        if "OK" == json.loads(response.content)["status"]:
-§§            break
-§§        else:
-§§            print("Polemarch not available retrying (2)...")
-§§            time.sleep(0.5)
+        response = requests.get(checkurl, auth=login)
+        if "OK" == json.loads(response.content)["status"]:
+            break
+        else:
+            print("Polemarch not available retrying (2)...")
+            time.sleep(0.5)
 §§
-§§print("Initialization Finished!")
-§§    #print("Polemarch returns " + str(response.text) + "retrying...")
+print("Initialization Finished!")
+    #print("Polemarch returns " + str(response.text) + "retrying...")
 §§

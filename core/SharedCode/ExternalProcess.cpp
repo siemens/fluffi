@@ -863,7 +863,7 @@ std::string ExternalProcess::addrToRVAString(PROCESS_INFORMATION pi, std::uintpt
 
 		//apparently, the address is not part of any loaded module
 		std::stringstream oss;
-§§		oss << "unknown+0x" << std::hex << std::setw(8) << std::setfill('0') << addr;
+		oss << "unknown+0x" << std::hex << std::setw(8) << std::setfill('0') << addr;
 		return oss.str();
 	}
 	else {
@@ -1193,7 +1193,7 @@ bool ExternalProcess::initProcessInChrootEnv(const std::string  chrootPath) {
 		}
 
 		//This code is only executed if execve failed, e.g. if the file does not exist
-§§		printf("execve failed: %s; %s\n", strerror(errno), m_argv[0]);
+		printf("execve failed: %s; %s\n", strerror(errno), m_argv[0]);
 		google::protobuf::ShutdownProtobufLibrary();
 		_exit(EXIT_FAILURE); //Make compiler happy
 	}
@@ -1228,14 +1228,14 @@ bool ExternalProcess::runAndWaitForCompletion(unsigned long timeoutMilliseconds)
 	}
 	m_hasBeenRun = true;
 
-§§	struct timespec timeout;
+	struct timespec timeout;
 
-§§	timeout.tv_sec = timeoutMilliseconds / 1000;
-§§	timeout.tv_nsec = (timeoutMilliseconds % 1000) * 1000000;
-§§
+	timeout.tv_sec = timeoutMilliseconds / 1000;
+	timeout.tv_nsec = (timeoutMilliseconds % 1000) * 1000000;
+
 	int status = 0;
 	bool isfirstStop = true;
-§§
+
 	//tell the debuggee to continue
 	{
 		char buf[] = "X";
@@ -1247,28 +1247,28 @@ bool ExternalProcess::runAndWaitForCompletion(unsigned long timeoutMilliseconds)
 		m_fd_pipe[1] = -1;
 	}
 
-§§	do {
+	do {
 		//Wait for a SIGCHLD event
 		errno = 0;
 		int sig = sigtimedwait(&m_debugSignalMask, NULL, &timeout);
 		if (sig < 0) {
-§§			if (errno == EINTR) {
-§§				/* Interrupted by a signal other than SIGCHLD. */
+			if (errno == EINTR) {
+				/* Interrupted by a signal other than SIGCHLD. */
 				LOG(DEBUG) << "The wait on process " << m_childPID << " for SIGCHLD was interrupted by a signal other than SIGCHLD: " << sig;
 				ptrace(PTRACE_CONT, m_childPID, NULL, NULL);
 				continue;
-§§			}
-§§			else if (errno == EAGAIN) {
+			}
+			else if (errno == EAGAIN) {
 				LOG(WARNING) << "Process hang detected";
 				die();
-§§				return false;
-§§			}
-§§			else {
-§§				LOG(ERROR) << "sigtimedwait failed: " << strerror(errno);
+				return false;
+			}
+			else {
+				LOG(ERROR) << "sigtimedwait failed: " << strerror(errno);
 				die();
-§§				return false;
-§§			}
-§§		}
+				return false;
+			}
+		}
 
 		updateTimeSpent();//This might be a significant performance overhead! Remove if that turns out to be true (or change to "once every 100 times...")
 
@@ -1334,9 +1334,9 @@ bool ExternalProcess::runAndWaitForCompletion(unsigned long timeoutMilliseconds)
 		}
 	} while (true);
 
-§§	return true;
+	return true;
 }
-§§
+
 bool ExternalProcess::run() {
 	if (m_hasBeenRun || !m_hasBeenInitialized) {
 		LOG(ERROR) << "The process cannot run, as it is not in a runnable state";
@@ -1344,7 +1344,7 @@ bool ExternalProcess::run() {
 	}
 
 	m_hasBeenRun = true;
-§§
+
 	struct timespec timeout; //timeout for the initial "stop" signal. Once we received that-> detach
 	timeout.tv_sec = 100;
 	timeout.tv_nsec = 0;

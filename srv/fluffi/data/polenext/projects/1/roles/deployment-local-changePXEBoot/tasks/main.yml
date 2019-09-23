@@ -17,7 +17,7 @@
 §§  ignore_errors: yes
 §§
 §§- name: Copy root directory to TFTP server
-§§  local_action: "shell cp -pr {{TFTPAllRootsPath}}/{{OSRootDirName}}/* {{TFTPRootPath}}/"
+  local_action: "shell cp -pr {{TFTPAllRootsPath}}/{{OSRootDirName}}/* {{TFTPRootPath}}/"
 §§
 §§#- name: Change DHCP Boot-file
-§§#  local_action: "shell echo dhcp-boot={{bootFileOdroid}} >  {{DHCPConfigPath}}"
+#  local_action: "shell echo dhcp-boot={{bootFileOdroid}} >  {{DHCPConfigPath}}"

@@ -9,11 +9,11 @@
 //
 // Author(s): Thomas Riedmaier, Roman Bendt
 
-§§module Oedipus
-§§
-§§go 1.12
-§§
-§§require (
-§§	github.com/go-sql-driver/mysql v1.4.1
-§§	github.com/sergi/go-diff v1.0.0
-§§)
+module Oedipus
+
+go 1.12
+
+require (
+	github.com/go-sql-driver/mysql v1.4.1
+	github.com/sergi/go-diff v1.0.0
+)

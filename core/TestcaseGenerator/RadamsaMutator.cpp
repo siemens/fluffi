@@ -50,13 +50,13 @@ std::deque<TestcaseDescriptor> RadamsaMutator::batchMutate(unsigned int numToGen
 	}
 
 	LOG(DEBUG) << "Executing radamsa.exe";
-§§	std::string cmdline =
-§§#if defined(_WIN32) || defined(_WIN64)
-§§		"radamsa.exe --count "
-§§#else
-§§		"./radamsa.exe --count "
-§§#endif
-§§		+ std::to_string(numToGenerate) + " --output " + m_testcaseDir + Util::pathSeperator + "radamsa_%n " + parentPathAndFilename;
+	std::string cmdline =
+#if defined(_WIN32) || defined(_WIN64)
+		"radamsa.exe --count "
+#else
+		"./radamsa.exe --count "
+#endif
+		+ std::to_string(numToGenerate) + " --output " + m_testcaseDir + Util::pathSeperator + "radamsa_%n " + parentPathAndFilename;
 	if (!executeProcessAndWaitForCompletion(cmdline, 60 * 1000))
 	{
 		if (!std::experimental::filesystem::exists(parentPathAndFilename))

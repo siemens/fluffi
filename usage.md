@@ -41,7 +41,7 @@ If your binary parses files and you know how to emulate it with QEMU user-mode e
 
 **PLEASE NOTE**, that many targets can be converted to this type. Either by changing the source code, or by patching the binary.
 
-§§
+
 #### c) Server binaries that run natively
 
 You need to write a so-called Feeder that allows FLUFFI to feed testcases to your target. This feeder can be written in any language you like. The interface towards FLUFFI that you need to call is implemented by the `SharedMemIPC.dll`/`libsharedmemipc.so`.

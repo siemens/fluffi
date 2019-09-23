@@ -27,7 +27,7 @@ if [ -d "../../core/ARMaarch64/bin" ]; then cd ../../core/ARMaarch64/bin; zip -x
 
 ftp -inv ftp.fluffi << EOF
 user anonymous anonymous
-§§passive
+passive
 cd /fluffi/linux/x64
 delete fluffi.zip
 put x64.zip fluffi.zip
@@ -49,4 +49,4 @@ rm arm32.zip
 rm arm64.zip
 rm x64.zip
 rm x86.zip
-§§
+

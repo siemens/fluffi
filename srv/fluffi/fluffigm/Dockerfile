@@ -8,11 +8,11 @@
 # 
 # Author(s): Thomas Riedmaier, Roman Bendt, Pascal Eckmann
 
-§§FROM ubuntu:bionic
-§§
-§§RUN apt update
-§§RUN DEBIAN_FRONTEND=noninteractive apt-get install -yq software-properties-common
-§§
+FROM ubuntu:bionic
+
+RUN apt update
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -yq software-properties-common
+
 §§WORKDIR /fluffi/
 §§
 CMD ["./GlobalManager"]

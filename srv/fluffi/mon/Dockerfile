@@ -8,33 +8,33 @@
 # 
 # Author(s): Roman Bendt, Thomas Riedmaier
 
-§§FROM ubuntu:bionic
-§§
-§§ENV DEBIAN_FRONTEND noninteractive
-§§RUN apt-get update
-§§RUN apt-get install -y git wget curl screen htop net-tools netcat vim python3 python3-paho-mqtt python3-influxdb mosquitto
-§§
-§§#RUN wget -qO- https://dl.google.com/go/go1.12.7.linux-amd64.tar.gz | tar xvz -C /usr/local
-§§
-§§#RUN ln -s /usr/local/go/bin/go /usr/bin/go
-§§#RUN ln -s /usr/local/go/bin/gofmt /usr/bin/gofmt
-§§#RUN ln -s /usr/local/go/bin/godoc /usr/bin/godoc
-§§
-§§#ENV GOPATH "/root/go"
-§§#ENV PATH="/root/go/bin:${PATH}"
-§§#ENV GO111MODULE="on"
-§§#ENV GO111MODULE="auto"
-§§#WORKDIR /root/go/pkg/mod/github.com/influxdata/influxdb@v1.7.7
-§§
-§§WORKDIR /root
-§§RUN wget -q https://dl.grafana.com/oss/release/grafana_6.2.5_amd64.deb
-§§RUN wget -q https://dl.influxdata.com/influxdb/releases/influxdb_1.7.7_amd64.deb
-§§
-§§RUN dpkg -i grafana_6.2.5_amd64.deb || true
-§§RUN dpkg -i influxdb_1.7.7_amd64.deb || true
-§§
-§§RUN apt -y -f install
-§§RUN mkdir -p /etc/grafana/provisioning/jsons
-§§
-§§ENTRYPOINT ["/run.sh", ""]
-§§
+FROM ubuntu:bionic
+
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update
+RUN apt-get install -y git wget curl screen htop net-tools netcat vim python3 python3-paho-mqtt python3-influxdb mosquitto
+
+#RUN wget -qO- https://dl.google.com/go/go1.12.7.linux-amd64.tar.gz | tar xvz -C /usr/local
+
+#RUN ln -s /usr/local/go/bin/go /usr/bin/go
+#RUN ln -s /usr/local/go/bin/gofmt /usr/bin/gofmt
+#RUN ln -s /usr/local/go/bin/godoc /usr/bin/godoc
+
+#ENV GOPATH "/root/go"
+#ENV PATH="/root/go/bin:${PATH}"
+#ENV GO111MODULE="on"
+#ENV GO111MODULE="auto"
+#WORKDIR /root/go/pkg/mod/github.com/influxdata/influxdb@v1.7.7
+
+WORKDIR /root
+RUN wget -q https://dl.grafana.com/oss/release/grafana_6.2.5_amd64.deb
+RUN wget -q https://dl.influxdata.com/influxdb/releases/influxdb_1.7.7_amd64.deb
+
+RUN dpkg -i grafana_6.2.5_amd64.deb || true
+RUN dpkg -i influxdb_1.7.7_amd64.deb || true
+
+RUN apt -y -f install
+RUN mkdir -p /etc/grafana/provisioning/jsons
+
+ENTRYPOINT ["/run.sh", ""]
+

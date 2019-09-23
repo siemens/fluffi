@@ -47,4 +47,4 @@ Author(s): Thomas Riedmaier, Michael Kraus, Abian Blome, Roman Bendt
 #define new DBG_NEW
 #endif
 
-§§#endif
+#endif

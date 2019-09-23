@@ -35,4 +35,4 @@ dbclient = InfluxDBClient('mon.fluffi', 8086, 'root', 'root', 'FLUFFI')
 §§
 §§def print_result(name):
 §§    result = dbclient.query('select value from {};'.format(name))
-§§    print("Result: {0}".format(result))
+    print("Result: {0}".format(result))

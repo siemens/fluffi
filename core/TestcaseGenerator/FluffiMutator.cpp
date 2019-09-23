@@ -11,7 +11,7 @@ Author(s): Thomas Riedmaier, Roman Bendt
 */
 
 #include "stdafx.h"
-§§#include "FluffiMutator.h"
+#include "FluffiMutator.h"
 #include "FluffiTestcaseID.h"
 #include "ExternalProcess.h"
 

@@ -98,7 +98,7 @@ std::string GDBThreadCommunication::gdbOutputQueue_pop_front() {
 	std::string line = m_gdbOutputQueue.front();
 	m_gdbOutputQueue.pop_front();
 	return line;
-§§}
+}
 
 int GDBThreadCommunication::get_exitStatus() {
 	return m_exitStatus;

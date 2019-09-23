@@ -51,4 +51,4 @@ Author(s): Thomas Riedmaier, Abian Blome, Roman Bendt
 #define new DBG_NEW
 #endif
 
-§§#endif
+#endif

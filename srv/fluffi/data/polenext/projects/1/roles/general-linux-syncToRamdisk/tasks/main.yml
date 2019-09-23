@@ -19,10 +19,10 @@
   when: not ramdiskDetails.stat.exists
 
 - name: Execute rsync to move files to ramdisk
-§§  command: "rsync -av --delete --exclude='*/logs/*' --exclude='*/testcaseFiles/*' {{deploymentPath}} {{ramdiskPath}}"
+  command: "rsync -av --delete --exclude='*/logs/*' --exclude='*/testcaseFiles/*' {{deploymentPath}} {{ramdiskPath}}"
   become: yes
 §§
 #- name: Execute rsync to move files to ramdisk
-§§#  command: "rsync -av  --delete --exclude='*/logs/*' --exclude='*/testcaseFiles/*' {{SUTPath}}/ {{SUTRamdiskPath}}/"
+#  command: "rsync -av  --delete --exclude='*/logs/*' --exclude='*/testcaseFiles/*' {{SUTPath}}/ {{SUTRamdiskPath}}/"
 #  become: yes
 #  when: scope == "all"

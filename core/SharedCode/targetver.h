@@ -17,19 +17,19 @@ Author(s): Thomas Riedmaier, Roman Bendt
 // If you wish to build your application for a previous Windows platform, include WinSDKVer.h and
 // set the _WIN32_WINNT macro to the platform you wish to support before including SDKDDKVer.h.
 
-§§#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 #include <SDKDDKVer.h>
-§§#else
-§§#include <unistd.h>
-§§#include <sys/wait.h>
-§§#include <sys/times.h>
-§§#include <condition_variable>
-§§
-§§//#include <cstdio>
-§§//#include <cstring>
-§§//#include <errno.h>
-§§#include <libgen.h>
-§§typedef int errno_t;
-§§errno_t fopen_s(FILE** streamptr, const char* filename, const char* mode);
-§§
-§§#endif
+#else
+#include <unistd.h>
+#include <sys/wait.h>
+#include <sys/times.h>
+#include <condition_variable>
+
+//#include <cstdio>
+//#include <cstring>
+//#include <errno.h>
+#include <libgen.h>
+typedef int errno_t;
+errno_t fopen_s(FILE** streamptr, const char* filename, const char* mode);
+
+#endif

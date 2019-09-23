@@ -1053,8 +1053,8 @@ void TestExecutorGDB::gdbDebug(std::shared_ptr<GDBThreadCommunication> gDBThread
 		{
 			if (gDBThreadCommunication->m_exOutput.getCoveredBasicBlocks().size() > 0) {
 				LOG(WARNING) << "gDBThreadCommunication->m_exOutput.getCoveredBasicBlocks was not empty. This should not happen!";
-§§				DebugExecutionOutput t = DebugExecutionOutput{};
-§§				gDBThreadCommunication->m_exOutput.swapBlockVectorWith(t);
+				DebugExecutionOutput t = DebugExecutionOutput{};
+				gDBThreadCommunication->m_exOutput.swapBlockVectorWith(t);
 			}
 
 			for (const FluffiBasicBlock& blockIt : blocksCoveredSinceLastReset) {
@@ -1407,10 +1407,10 @@ void TestExecutorGDB::gdbLinereaderThread(std::shared_ptr<GDBThreadCommunication
 		if (totalBytesAvail != bytesRead) {
 #else
 	int nbytes = 0;
-§§	while (!gDBThreadCommunication->get_gdbThreadShouldTerminate() && 0 != ioctl(inputHandleFromGdb, FIONREAD, &nbytes)) {
+	while (!gDBThreadCommunication->get_gdbThreadShouldTerminate() && 0 != ioctl(inputHandleFromGdb, FIONREAD, &nbytes)) {
 		char* buff = new char[nbytes];
-§§		ssize_t bytesRead = read(inputHandleFromGdb, buff, nbytes);
-§§		if (bytesRead != nbytes) {
+		ssize_t bytesRead = read(inputHandleFromGdb, buff, nbytes);
+		if (bytesRead != nbytes) {
 #endif
 			gDBThreadCommunication->m_exOutput.m_terminationType = DebugExecutionOutput::PROCESS_TERMINATION_TYPE::ERR;
 			gDBThreadCommunication->m_exOutput.m_terminationDescription = "gdbLinereaderThread: Failed reading from gdb output pipe";
@@ -1483,7 +1483,7 @@ bool TestExecutorGDB::runSingleTestcase(const FluffiTestcaseID testcaseId, std::
 		exResult->m_terminationType = DebugExecutionOutput::PROCESS_TERMINATION_TYPE::ERR;
 		exResult->m_terminationDescription = "Problem while sending a fuzzing filename to the feeder!";
 		return false;
-§§	}
+	}
 
 	//wait for "done" from feeder
 	SharedMemMessage responseFromFeeder;

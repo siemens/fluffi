@@ -26,7 +26,7 @@ Author(s): Thomas Riedmaier, Abian Blome, Roman Bendt, Pascal Eckmann
 #endif
 
 //cp ../../../bin/libsharedmemipc.so .
-§§//g++ --std=c++11 -I../../../SharedMemIPC/ -o TCPFeeder stdafx.cpp TCPFeeder.cpp utils.cpp libsharedmemipc.so -Wl,-rpath='${ORIGIN}'
+//g++ --std=c++11 -I../../../SharedMemIPC/ -o TCPFeeder stdafx.cpp TCPFeeder.cpp utils.cpp libsharedmemipc.so -Wl,-rpath='${ORIGIN}'
 
 void preprocess(std::vector<char> bytes) {
 	// Add preprocession steps here as needed, e.g. for HTTP:
@@ -154,4 +154,4 @@ int main(int argc, char* argv[])
 	WSACleanup();
 #endif
 	return 0;
-§§}
+}

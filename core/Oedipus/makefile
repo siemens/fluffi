@@ -8,18 +8,18 @@
 # 
 # Author(s): Thomas Riedmaier, Roman Bendt
 
-§§native:
-§§	@CGO_ENABLED=0 go build -v -a -ldflags '-s -w -extldflags "-static"' ./cmd/Oedipus
-§§
-§§release:
+native:
+	@CGO_ENABLED=0 go build -v -a -ldflags '-s -w -extldflags "-static"' ./cmd/Oedipus
+
+release:
 	@CGO_ENABLED=0 GOARCH=386 GOOS=linux go build -o Oedipus-386 -v -a -ldflags '-s -w -extldflags "-static"' ./cmd/Oedipus
 	@CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -o Oedipus-amd64 -v -a -ldflags '-s -w -extldflags "-static"' ./cmd/Oedipus
 	@CGO_ENABLED=0 GOARCH=arm GOOS=linux go build -o Oedipus-arm -v -a -ldflags '-s -w -extldflags "-static"' ./cmd/Oedipus
 	@CGO_ENABLED=0 GOARCH=arm64 GOOS=linux go build -o Oedipus-arm64 -v -a -ldflags '-s -w -extldflags "-static"' ./cmd/Oedipus
-§§
-§§windows:
+
+windows:
 	@CGO_ENABLED=0 GOARCH=386 GOOS=windows go build -o Oedipus-win86 -v -a -ldflags '-s -w -extldflags "-static"' ./cmd/Oedipus
 	@CGO_ENABLED=0 GOARCH=amd64 GOOS=windows go build -o Oedipus-win64 -v -a -ldflags '-s -w -extldflags "-static"' ./cmd/Oedipus
-§§
-§§clean:
-§§	@rm -f Oedipus Oedipus-386 Oedipus-amd64 Oedipus-arm Oedipus-arm64
+
+clean:
+	@rm -f Oedipus Oedipus-386 Oedipus-amd64 Oedipus-arm Oedipus-arm64

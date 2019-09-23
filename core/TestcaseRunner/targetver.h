@@ -17,14 +17,14 @@ Author(s): Thomas Riedmaier, Roman Bendt
 // If you wish to build your application for a previous Windows platform, include WinSDKVer.h and
 // set the _WIN32_WINNT macro to the platform you wish to support before including SDKDDKVer.h.
 
-§§#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 #include <SDKDDKVer.h>
 #include <winsock2.h>
 #include <windows.h>
-§§#include <process.h>
-§§#define GETPID _getpid
-§§#else
-§§#include <unistd.h>
-§§#define GETPID getpid
-§§#include <libgen.h>
-§§#endif
+#include <process.h>
+#define GETPID _getpid
+#else
+#include <unistd.h>
+#define GETPID getpid
+#include <libgen.h>
+#endif

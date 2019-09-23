@@ -28,7 +28,7 @@
 # Author(s): Thomas Riedmaier, Roman Bendt
 --- tools/CMakeLists.txt	2018-11-09 04:59:47.000000000 +0100
 +++ tools/CMakeLists.txt	2018-12-18 16:57:23.589762608 +0100
-§§@@ -163,12 +163,15 @@
+@@ -163,12 +163,15 @@
  add_executable(drconfig drdeploy.c ${RESOURCES})
  set_target_properties(drconfig PROPERTIES
    COMPILE_FLAGS "${tool_cflags} -DRC_IS_drconfig -DDRCONFIG")

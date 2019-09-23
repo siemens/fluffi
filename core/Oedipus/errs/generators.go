@@ -10,41 +10,41 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Roman Bendt, Thomas Riedmaier
 */
 
-§§package errs
-§§
-§§import (
-§§	"log"
-§§	"os"
-§§	"strconv"
-§§)
-§§
-§§var tf *os.File
-§§
-§§func FlogOpen()  {
-§§	pid := os.Getpid()
-§§	err := os.MkdirAll("oedilogs", 0755)
-§§	if err != nil {
-§§		log.Fatalln("error creating log dir:", err.Error())
-§§	}
-§§	tf, err := os.OpenFile("oedilogs/oedipus-"+strconv.Itoa(pid)+".log", os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)
-§§	if err != nil {
-§§		log.Fatalln("error opening logfile:", err.Error())
-§§	}
-§§	log.SetOutput(tf)
-§§}
-§§
-§§func FlogClose() {
-§§	log.SetOutput(os.Stderr)
-§§	tf.Close()
-§§}
-§§
-§§func Foe(prefix string) (func(e error, msg string), func(msg string)) {
-§§
-§§	return func(e error, msg string) {
-§§			if e != nil {
-§§				log.Fatalln(prefix, msg, e.Error())
-§§			}
-§§		}, func(msg string) {
-§§			log.Fatalln(prefix, msg)
-§§		}
-§§}
+package errs
+
+import (
+	"log"
+	"os"
+	"strconv"
+)
+
+var tf *os.File
+
+func FlogOpen()  {
+	pid := os.Getpid()
+	err := os.MkdirAll("oedilogs", 0755)
+	if err != nil {
+		log.Fatalln("error creating log dir:", err.Error())
+	}
+	tf, err := os.OpenFile("oedilogs/oedipus-"+strconv.Itoa(pid)+".log", os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatalln("error opening logfile:", err.Error())
+	}
+	log.SetOutput(tf)
+}
+
+func FlogClose() {
+	log.SetOutput(os.Stderr)
+	tf.Close()
+}
+
+func Foe(prefix string) (func(e error, msg string), func(msg string)) {
+
+	return func(e error, msg string) {
+			if e != nil {
+				log.Fatalln(prefix, msg, e.Error())
+			}
+		}, func(msg string) {
+			log.Fatalln(prefix, msg)
+		}
+}

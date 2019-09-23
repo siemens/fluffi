@@ -17,7 +17,7 @@ Author(s): Thomas Riedmaier, Roman Bendt, Abian Blome, Michael Kraus
 #include <thread>
 #include <sstream>
 §§#include <mutex>
-§§#include <condition_variable>
+#include <condition_variable>
 #include <deque>
 #include <experimental/filesystem>
 #include <random>
@@ -36,16 +36,16 @@ Author(s): Thomas Riedmaier, Roman Bendt, Abian Blome, Michael Kraus
 
 //Memory leak hunting
 #ifdef _DEBUG
-§§#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 #define HUNTMEMLEAKS
 #endif
-§§#endif
+#endif
 
 #ifdef HUNTMEMLEAKS
 
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
-§§
+
 #include <crtdbg.h>
 
 #ifndef DBG_NEW
@@ -54,4 +54,4 @@ Author(s): Thomas Riedmaier, Roman Bendt, Abian Blome, Michael Kraus
 #define new DBG_NEW
 #endif
 
-§§#endif
+#endif

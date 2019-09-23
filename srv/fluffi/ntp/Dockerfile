@@ -9,8 +9,8 @@
 # Author(s): Thomas Riedmaier, Roman Bendt
 
 FROM ubuntu:bionic
-§§
+
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -yq ntp
-§§
+
 CMD ["/usr/sbin/ntpd", "-d"]

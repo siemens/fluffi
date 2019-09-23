@@ -11,7 +11,7 @@ Author(s): Thomas Riedmaier, Michael Kraus, Roman Bendt, Abian Blome
 */
 
 #pragma once
-§§#include "IFLUFFIMessageHandler.h"
+#include "IFLUFFIMessageHandler.h"
 §§
 class CommPartnerManager;
 class SetTGsAndTEsRequestHandler :

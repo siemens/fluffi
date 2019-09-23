@@ -10,41 +10,41 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Roman Bendt, Thomas Riedmaier
 */
 
-§§package ring
-§§
-§§type Bytes struct {
-§§	windowSize     uint64
-§§	bufferSize     uint64
-§§	windowPosition uint64
-§§	buffer         []byte
-§§}
-§§
-§§func New(windowsize uint64) *Bytes {
-§§	var b Bytes
-§§	b.windowSize = windowsize
-§§	b.bufferSize = windowsize * 100
-§§	b.windowPosition = (b.bufferSize - b.windowSize)
-§§	b.buffer = make([]byte, b.bufferSize)
-§§	return &b
-§§}
-§§
-§§func (b *Bytes) WindowSize() (r uint64) {
-§§	return b.windowSize
-§§}
-§§
-§§func (b *Bytes) Window() (r []byte) {
-§§	if b.windowPosition+b.windowSize < b.bufferSize {
-§§		return b.buffer[b.windowPosition : b.windowPosition+b.windowSize]
-§§	} else {
-§§		nb := make([]byte, b.windowSize)
-§§		for i := uint64(0); i < b.windowSize; i++ {
-§§			nb[i] = b.buffer[(b.windowPosition+i)%b.bufferSize]
-§§		}
-§§		return nb
-§§	}
-§§}
-§§
-§§func (b *Bytes) Push(n byte) {
-§§	b.buffer[(b.windowPosition+b.windowSize)%b.bufferSize] = n
-§§	b.windowPosition = (b.windowPosition + 1) % b.bufferSize
-§§}
+package ring
+
+type Bytes struct {
+	windowSize     uint64
+	bufferSize     uint64
+	windowPosition uint64
+	buffer         []byte
+}
+
+func New(windowsize uint64) *Bytes {
+	var b Bytes
+	b.windowSize = windowsize
+	b.bufferSize = windowsize * 100
+	b.windowPosition = (b.bufferSize - b.windowSize)
+	b.buffer = make([]byte, b.bufferSize)
+	return &b
+}
+
+func (b *Bytes) WindowSize() (r uint64) {
+	return b.windowSize
+}
+
+func (b *Bytes) Window() (r []byte) {
+	if b.windowPosition+b.windowSize < b.bufferSize {
+		return b.buffer[b.windowPosition : b.windowPosition+b.windowSize]
+	} else {
+		nb := make([]byte, b.windowSize)
+		for i := uint64(0); i < b.windowSize; i++ {
+			nb[i] = b.buffer[(b.windowPosition+i)%b.bufferSize]
+		}
+		return nb
+	}
+}
+
+func (b *Bytes) Push(n byte) {
+	b.buffer[(b.windowPosition+b.windowSize)%b.bufferSize] = n
+	b.windowPosition = (b.windowPosition + 1) % b.bufferSize
+}

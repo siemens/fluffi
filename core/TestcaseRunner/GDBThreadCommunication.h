@@ -43,12 +43,12 @@ public:
 	int get_exitStatus();
 	void set_exitStatus(int exitStatus);
 
-§§	template<typename Rep, typename Period>
-§§	std::cv_status waitForTerminateMessageOrCovStateChangeTimeout(const std::chrono::duration<Rep, Period>& rel_time, GDBThreadCommunication::COVERAGE_STATE statesToWaitFor[], int numOfStatesToWaitFor);
+	template<typename Rep, typename Period>
+	std::cv_status waitForTerminateMessageOrCovStateChangeTimeout(const std::chrono::duration<Rep, Period>& rel_time, GDBThreadCommunication::COVERAGE_STATE statesToWaitFor[], int numOfStatesToWaitFor);
 	void waitForTerminateMessageOrCovStateChange(GDBThreadCommunication::COVERAGE_STATE statesToWaitFor[], int numOfStatesToWaitFor);
 
-§§	template<typename Rep, typename Period>
-§§	std::cv_status waitForDebuggingReadyTimeout(const std::chrono::duration<Rep, Period>& rel_time);
+	template<typename Rep, typename Period>
+	std::cv_status waitForDebuggingReadyTimeout(const std::chrono::duration<Rep, Period>& rel_time);
 	void waitForDebuggingReady();
 
 private:
@@ -62,30 +62,30 @@ private:
 	std::deque<std::string> m_gdbOutputQueue;
 	int m_exitStatus;
 };
-§§
-§§template<typename Rep, typename Period>
-§§std::cv_status GDBThreadCommunication::waitForTerminateMessageOrCovStateChangeTimeout(const std::chrono::duration<Rep, Period>& rel_time, GDBThreadCommunication::COVERAGE_STATE statesToWaitFor[], int numOfStatesToWaitFor) {
-§§	std::unique_lock<std::mutex> lk(m_gdb_mutex);
-§§	//Dont wait, if the state we want to wait for is already reached
-§§	if (m_gdbThreadShouldTerminate || m_gdbOutputQueue.size() > 0) {
-§§		return std::cv_status::no_timeout;
-§§	}
-§§	for (int i = 0; i < numOfStatesToWaitFor; i++) {
-§§		if (statesToWaitFor[i] == m_coverageState) {
-§§			return std::cv_status::no_timeout;
-§§		}
-§§	}
-§§
-§§	return m_gdb_mutex_cv.wait_for(lk, rel_time);
-§§}
-§§
-§§template<typename Rep, typename Period>
-§§std::cv_status GDBThreadCommunication::waitForDebuggingReadyTimeout(const std::chrono::duration<Rep, Period>& rel_time) {
-§§	std::unique_lock<std::mutex> lk(m_readyDebug_mutex);
-§§	//Dont wait, if the state we want to wait for is already reached
-§§	if (m_debuggingReady) {
-§§		return std::cv_status::no_timeout;
-§§	}
-§§
-§§	return m_readyDebug_cv.wait_for(lk, rel_time);
-§§}
+
+template<typename Rep, typename Period>
+std::cv_status GDBThreadCommunication::waitForTerminateMessageOrCovStateChangeTimeout(const std::chrono::duration<Rep, Period>& rel_time, GDBThreadCommunication::COVERAGE_STATE statesToWaitFor[], int numOfStatesToWaitFor) {
+	std::unique_lock<std::mutex> lk(m_gdb_mutex);
+	//Dont wait, if the state we want to wait for is already reached
+	if (m_gdbThreadShouldTerminate || m_gdbOutputQueue.size() > 0) {
+		return std::cv_status::no_timeout;
+	}
+	for (int i = 0; i < numOfStatesToWaitFor; i++) {
+		if (statesToWaitFor[i] == m_coverageState) {
+			return std::cv_status::no_timeout;
+		}
+	}
+
+	return m_gdb_mutex_cv.wait_for(lk, rel_time);
+}
+
+template<typename Rep, typename Period>
+std::cv_status GDBThreadCommunication::waitForDebuggingReadyTimeout(const std::chrono::duration<Rep, Period>& rel_time) {
+	std::unique_lock<std::mutex> lk(m_readyDebug_mutex);
+	//Dont wait, if the state we want to wait for is already reached
+	if (m_debuggingReady) {
+		return std::cv_status::no_timeout;
+	}
+
+	return m_readyDebug_cv.wait_for(lk, rel_time);
+}

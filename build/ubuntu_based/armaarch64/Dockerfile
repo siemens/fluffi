@@ -10,13 +10,13 @@
 
 FROM arm64v8/ubuntu:bionic
 
-§§ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND noninteractive
 COPY qemu-aarch64-static /usr/bin/qemu-aarch64-static
 
 RUN apt-get update -y
 RUN apt-get upgrade -y
 RUN apt-get dist-upgrade -y
-§§
+
 RUN apt-get install -yq build-essential git cmake python pkg-config libglib2.0-dev rsync libbsd-dev
 
 CMD ["/bin/bash"]

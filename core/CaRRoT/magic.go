@@ -10,17 +10,17 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Roman Bendt, Thomas Riedmaier
 */
 
-§§package main
-§§
-§§import (
-§§	"bytes"
-§§)
-§§
-§§func ContainsMagic(buf []byte, magic ...byte) bool {
-§§	if len(buf) >= len(magic) {
-§§		if 0 == bytes.Compare(buf[:len(magic)], magic) {
-§§			return true
-§§		}
-§§	}
-§§	return false
-§§}
+package main
+
+import (
+	"bytes"
+)
+
+func ContainsMagic(buf []byte, magic ...byte) bool {
+	if len(buf) >= len(magic) {
+		if 0 == bytes.Compare(buf[:len(magic)], magic) {
+			return true
+		}
+	}
+	return false
+}

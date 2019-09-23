@@ -12,24 +12,24 @@ Author(s): Roman Bendt, Thomas Riedmaier
 
 #include "stdafx.h"
 
-§§#if defined(_WIN32) || defined(_WIN64)
-§§#else
-§§
-§§errno_t fopen_s(FILE** streamptr, const char* filename, const char* mode) {
-§§	FILE* fp = nullptr;
-§§	fp = fopen(filename, mode);
-§§	if (fp == nullptr) {
-§§		if (streamptr != nullptr) *streamptr = nullptr;
-§§		return errno;
-§§	}
-§§	else {
-§§		if (streamptr != nullptr) *streamptr = fp;
-§§		else fclose(fp);
-§§		return 0;
-§§	}
-§§}
-§§
-§§#endif
-§§
+#if defined(_WIN32) || defined(_WIN64)
+#else
+
+errno_t fopen_s(FILE** streamptr, const char* filename, const char* mode) {
+	FILE* fp = nullptr;
+	fp = fopen(filename, mode);
+	if (fp == nullptr) {
+		if (streamptr != nullptr) *streamptr = nullptr;
+		return errno;
+	}
+	else {
+		if (streamptr != nullptr) *streamptr = fp;
+		else fclose(fp);
+		return 0;
+	}
+}
+
+#endif
+
 //  reference any additional headers you need in STDAFX.H
 // and not in this file

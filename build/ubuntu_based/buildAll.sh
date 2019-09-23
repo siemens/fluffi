@@ -10,8 +10,8 @@
 # Author(s): Thomas Riedmaier, Roman Bendt
 
 # example call: sudo ./buildAll.sh PREPARE_ENV=TRUE WITH_DEPS=TRUE DEPLOY_TO_FTP=FALSE
-§§
-§§[ "$JENKINS_DEBUG" == 'true' ] && set -x
+
+[ "$JENKINS_DEBUG" == 'true' ] && set -x
 
 # Make sure only root can run our script
 if [ "$(id -u)" != "0" ]; then
@@ -42,57 +42,57 @@ done
 if [ "$PREPARE_ENV" = TRUE ] ; then
 	echo "Preparing Docker Build environment"
 	./prepare.sh
-§§	STAT=$?
-§§	if [ $STAT != 0 ]
+	STAT=$?
+	if [ $STAT != 0 ]
 	then
 		echo "Preparing docker environment failed"
-§§		exit $STAT
+		exit $STAT
 	fi
 fi
 
-§§USER=$(logname)
-§§GROUP=$(groups $USER | awk '{print $3}')
-§§USERID=$(id $USER -u)
-§§GROUPID=$(id $GROUP -g)
-§§
+USER=$(logname)
+GROUP=$(groups $USER | awk '{print $3}')
+USERID=$(id $USER -u)
+GROUPID=$(id $GROUP -g)
+
 # Building FLUFFI C
 for ARCH in "Intel80386" "x86-64" "ARM" "ARMaarch64"; do
-§§	docker run --rm -e FLUFFI_DEPS="$WITH_DEPS" --user $USERID:$GROUPID -v $(pwd)/../../core:/fluffi -v $(pwd)/build.sh:/build.sh fluffi${ARCH,,} /build.sh
-§§	STAT=$?
-§§	if [ $STAT != 0 ]
+	docker run --rm -e FLUFFI_DEPS="$WITH_DEPS" --user $USERID:$GROUPID -v $(pwd)/../../core:/fluffi -v $(pwd)/build.sh:/build.sh fluffi${ARCH,,} /build.sh
+	STAT=$?
+	if [ $STAT != 0 ]
 	then
 		echo "Sdocker run failed"
-§§		exit $STAT
+		exit $STAT
 	fi
-§§done
-§§
+done
+
 # Building FLUFFI GO: Carrot
-§§docker run --rm --user $USERID:$GROUPID -v $(pwd)/../../core:/fluffi -v $(pwd)/buildCaRRoT.sh:/build.sh flufficarrot /build.sh
-§§STAT=$?
-§§if [ $STAT != 0 ]
+docker run --rm --user $USERID:$GROUPID -v $(pwd)/../../core:/fluffi -v $(pwd)/buildCaRRoT.sh:/build.sh flufficarrot /build.sh
+STAT=$?
+if [ $STAT != 0 ]
 then
 	echo "Sdocker run failed"
-§§	exit $STAT
+	exit $STAT
 fi
 
 # Building FLUFFI GO: Oedipus
-§§docker run --rm --user $USERID:$GROUPID -v $(pwd)/../../core:/fluffi -v $(pwd)/buildOedipus.sh:/build.sh fluffioedipus /build.sh
-§§STAT=$?
-§§if [ $STAT != 0 ]
+docker run --rm --user $USERID:$GROUPID -v $(pwd)/../../core:/fluffi -v $(pwd)/buildOedipus.sh:/build.sh fluffioedipus /build.sh
+STAT=$?
+if [ $STAT != 0 ]
 then
 	echo "Sdocker run failed"
-§§	exit $STAT
+	exit $STAT
 fi
-§§
+
 
 if [[ -d "../../core/Intel80386/bin" ]] ; then
 	cp ../../core/CaRRoT/CaRRoT-386 ../../core/Intel80386/bin/CaRRoT
 	cp ../../core/Oedipus/Oedipus-386 ../../core/Intel80386/bin/Oedipus
-§§fi
+fi
 if [[ -d "../../core/x86-64/bin" ]] ; then
 	cp ../../core/CaRRoT/CaRRoT-amd64 ../../core/x86-64/bin/CaRRoT
 	cp ../../core/Oedipus/Oedipus-amd64 ../../core/x86-64/bin/Oedipus
-§§fi
+fi
 if [[ -d "../../core/ARM/bin" ]] ; then
 	cp ../../core/CaRRoT/CaRRoT-arm ../../core/ARM/bin/CaRRoT
 	cp ../../core/Oedipus/Oedipus-arm ../../core/ARM/bin/Oedipus
@@ -100,16 +100,16 @@ fi
 if [[ -d "../../core/ARMaarch64/bin" ]] ; then
 	cp ../../core/CaRRoT/CaRRoT-arm64 ../../core/ARMaarch64/bin/Oedipus
 	cp ../../core/Oedipus/Oedipus-arm64 ../../core/ARMaarch64/bin/CaRRoT
-§§fi
+fi
 
 if [ "$DEPLOY_TO_FTP" = TRUE ] ; then
 	echo "Deploying FLUFFI to ftp.fluffi"
 	./deploy2FTP.sh
-§§	STAT=$?
-§§	if [ $STAT != 0 ]
+	STAT=$?
+	if [ $STAT != 0 ]
 	then
 		echo "deploying to ftp failed"
-§§		exit $STAT
+		exit $STAT
 	fi
-§§fi
-§§
+fi
+
