@@ -56,7 +56,7 @@ namespace FluffiTester
 
 		static void writeManagedInstance_multithread(int i) {
 			GarbageCollectorWorker gc(200);
-§§			LMDatabaseManager local_lmdb(&gc);
+			LMDatabaseManager local_lmdb(&gc);
 
 			FluffiServiceDescriptor sd("HAP-" + std::to_string(i), Util::newGUID());
 			Assert::IsTrue(local_lmdb.writeManagedInstance(sd, 1, "subtest", "testloc"), L"Multithreaded insert failed");
@@ -160,7 +160,7 @@ namespace FluffiTester
 			dbman->writeManagedInstance(sd3, AgentType::TestcaseEvaluator, testsubtype, loc1);
 			dbman->writeManagedInstance(sd4, AgentType::TestcaseEvaluator, testsubtype, loc2);
 
-§§			std::vector<FluffiServiceDescriptor> resp = dbman->getRegisteredInstancesOfAgentType(AgentType::TestcaseEvaluator, loc1);
+			std::vector<FluffiServiceDescriptor> resp = dbman->getRegisteredInstancesOfAgentType(AgentType::TestcaseEvaluator, loc1);
 			Assert::IsTrue(resp.size() == 2);
 
 			resp = dbman->getRegisteredInstancesOfAgentType(AgentType::TestcaseGenerator, loc1);
@@ -202,7 +202,7 @@ namespace FluffiTester
 			dbman->writeManagedInstance(sd3, AgentType::LocalManager, testsubtype, loc1);
 			dbman->writeManagedInstance(sd4, AgentType::TestcaseEvaluator, testsubtype, loc2);
 
-§§			std::vector<std::pair<FluffiServiceDescriptor, AgentType>> resp = dbman->getAllRegisteredInstances(loc1);
+			std::vector<std::pair<FluffiServiceDescriptor, AgentType>> resp = dbman->getAllRegisteredInstances(loc1);
 			Assert::IsTrue(resp.size() == 3);
 
 			resp = dbman->getAllRegisteredInstances(loc2);
@@ -451,7 +451,7 @@ namespace FluffiTester
 
 		static void addEntryToCrashDescriptionsTable_multithread(int i) {
 			GarbageCollectorWorker gc(200);
-§§			LMDatabaseManager local_lmdb(&gc);
+			LMDatabaseManager local_lmdb(&gc);
 
 			std::string guid1 = "guid1";
 			std::string hap1 = "hap1";
@@ -524,7 +524,7 @@ namespace FluffiTester
 			std::ofstream fout;
 			fout.open(testfile, std::ios::binary | std::ios::out);
 			for (int i = 0; i < 256; i++) {
-§§				fout.write((char*)&i, 1);
+				fout.write((char*)&i, 1);
 			}
 			fout.close();
 
@@ -684,7 +684,7 @@ namespace FluffiTester
 
 		static void generateGetTestcaseToMutateResponse_multithread(int i) {
 			GarbageCollectorWorker gc(200);
-§§			LMDatabaseManager local_lmdb(&gc);
+			LMDatabaseManager local_lmdb(&gc);
 
 			GetTestcaseToMutateResponse* resp = local_lmdb.generateGetTestcaseToMutateResponse(".", 10);
 			Assert::IsTrue(!FluffiTestcaseID(resp->id()).m_serviceDescriptor.isNullObject() && FluffiTestcaseID(resp->id()).m_serviceDescriptor.m_guid != "", L"Multithreaded gettestcase failed");
@@ -711,7 +711,7 @@ namespace FluffiTester
 			std::ofstream fout;
 			fout.open(testfile, std::ios::binary | std::ios::out);
 			for (int i = 0; i < 256; i++) {
-§§				fout.write((char*)&i, 1);
+				fout.write((char*)&i, 1);
 			}
 			fout.close();
 
@@ -749,7 +749,7 @@ namespace FluffiTester
 			Assert::IsTrue(resp->alsorunwithoutmutation());
 			delete resp;
 
-§§			//check if alsoRunWithoutMutation is false if there are already some blocks for the testcase
+			//check if alsoRunWithoutMutation is false if there are already some blocks for the testcase
 			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO  target_modules (ID,ModuleName) VALUES (11,'adsf')");
 			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO  covered_blocks (CreatorTestcaseID, ModuleID, Offset) VALUES ((SELECT ID FROM interesting_testcases WHERE CreatorServiceDescriptorGUID = '" + guid2 + "' AND CreatorLocalID = " + std::to_string(localid2) + "), 11,22)");
 			resp = dbman->generateGetTestcaseToMutateResponse(".", 20);

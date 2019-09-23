@@ -449,7 +449,7 @@ std::vector<std::pair<FluffiServiceDescriptor, AgentType>> LMDatabaseManager::ge
 		return re;
 }
 
-§§std::vector<FluffiServiceDescriptor> LMDatabaseManager::getRegisteredInstancesOfAgentType(AgentType type, std::string location)
+std::vector<FluffiServiceDescriptor> LMDatabaseManager::getRegisteredInstancesOfAgentType(AgentType type, std::string location)
 {
 	PERFORMANCE_WATCH_FUNCTION_ENTRY
 		std::vector<FluffiServiceDescriptor> re;
@@ -694,7 +694,7 @@ GetTestcaseToMutateResponse* LMDatabaseManager::generateGetTestcaseToMutateRespo
 			return response;
 		}
 
-§§		MYSQL_RES* result = mysql_store_result(getDBConnection());
+		MYSQL_RES* result = mysql_store_result(getDBConnection());
 		if (result == NULL) {
 			return response;
 		}
@@ -705,7 +705,7 @@ GetTestcaseToMutateResponse* LMDatabaseManager::generateGetTestcaseToMutateRespo
 			return response;
 		}
 
-§§		unsigned long* lengths = mysql_fetch_lengths(result);
+		unsigned long* lengths = mysql_fetch_lengths(result);
 		if (lengths == NULL) {
 			mysql_free_result(result);
 			return response;
@@ -1074,7 +1074,7 @@ GetCurrentBlockCoverageResponse* LMDatabaseManager::generateGetCurrentBlockCover
 		return resp;
 	}
 
-§§	MYSQL_RES* result = mysql_store_result(getDBConnection());
+	MYSQL_RES* result = mysql_store_result(getDBConnection());
 	if (result == NULL) {
 		return resp;
 	}
@@ -1415,7 +1415,7 @@ std::deque<FluffiSetting> LMDatabaseManager::getAllSettings() {
 		return re;
 	}
 
-§§	MYSQL_RES* result = mysql_store_result(getDBConnection());
+	MYSQL_RES* result = mysql_store_result(getDBConnection());
 	if (result == NULL) {
 		return re;
 	}
@@ -1466,7 +1466,7 @@ std::deque<FluffiModuleNameToID> LMDatabaseManager::getTargetModules() {
 		return re;
 	}
 
-§§	MYSQL_RES* result = mysql_store_result(getDBConnection());
+	MYSQL_RES* result = mysql_store_result(getDBConnection());
 	if (result == NULL) {
 		return re;
 	}
@@ -1744,7 +1744,7 @@ std::deque<std::string> LMDatabaseManager::getAllCrashFootprints() {
 		return re;
 	}
 
-§§	MYSQL_RES* result = mysql_store_result(getDBConnection());
+	MYSQL_RES* result = mysql_store_result(getDBConnection());
 	if (result == NULL) {
 		return re;
 	}
@@ -1769,7 +1769,7 @@ std::vector<std::pair<std::string, int>> LMDatabaseManager::getRegisteredInstanc
 		return re;
 	}
 
-§§	MYSQL_RES* result = mysql_store_result(getDBConnection());
+	MYSQL_RES* result = mysql_store_result(getDBConnection());
 	if (result == NULL) {
 		return re;
 	}

@@ -8,68 +8,68 @@
 # 
 # Author(s): Pascal Eckmann, Thomas Riedmaier
 
-§§from distutils.dir_util import copy_tree
-§§import subprocess
-§§import code 
-§§import copy
-§§import requests
-§§import json
-§§import time
-§§import sys
-§§import os
-§§import configparser
-§§
-§§url = "http://127.0.0.1:8080/api/v2/history/"
-§§login = ('admin','admin')
-§§lastCheck = False
-§§lastHistory = False
-§§lastDBCheck = False
-§§
-§§def deleteRequest(url, auth):
-§§    try:
-§§        response = requests.delete(url, auth = auth)
-§§        time.sleep(0.3)
-§§        return response
-§§    except requests.exceptions.ConnectionError as err:
-§§        print(err)
-§§        time.sleep(1)
-§§        sendRequest(url, auth)
-§§
-§§def getRequest(url, auth):
-§§    try:
-§§        response = requests.get(url, auth = auth)
-§§        time.sleep(0.3)
-§§        return response
-§§    except requests.exceptions.ConnectionError as err:
-§§        print(err)
-§§        time.sleep(1)
-§§        getRequest(url, auth)
-§§
-§§
-§§print("Get History")
-§§history = getRequest(url, login)
-§§jsonResults = json.loads(history.text)
-§§for result in jsonResults['results']:
+from distutils.dir_util import copy_tree
+import subprocess
+import code 
+import copy
+import requests
+import json
+import time
+import sys
+import os
+import configparser
+
+url = "http://127.0.0.1:8080/api/v2/history/"
+login = ('admin','admin')
+lastCheck = False
+lastHistory = False
+lastDBCheck = False
+
+def deleteRequest(url, auth):
+    try:
+        response = requests.delete(url, auth = auth)
+        time.sleep(0.3)
+        return response
+    except requests.exceptions.ConnectionError as err:
+        print(err)
+        time.sleep(1)
+        sendRequest(url, auth)
+
+def getRequest(url, auth):
+    try:
+        response = requests.get(url, auth = auth)
+        time.sleep(0.3)
+        return response
+    except requests.exceptions.ConnectionError as err:
+        print(err)
+        time.sleep(1)
+        getRequest(url, auth)
+
+
+print("Get History")
+history = getRequest(url, login)
+jsonResults = json.loads(history.text)
+for result in jsonResults['results']:
     if result['mode'] == "cleanHistory.yml":
-§§        if lastHistory:
-§§            deleteRequest((url + str(result['id']) + "/"), login)
-§§            print("delete cleanHistory " + str(result['id']))
-§§        else:
-§§            lastHistory = True
+        if lastHistory:
+            deleteRequest((url + str(result['id']) + "/"), login)
+            print("delete cleanHistory " + str(result['id']))
+        else:
+            lastHistory = True
     if result['mode'] == "checkHostAlive.yml":
-§§        if lastCheck:
-§§            deleteRequest((url + str(result['id']) + "/"), login)
-§§            print("delete checkHostAlive " + str(result['id']))
-§§        else:
-§§            lastCheck = True
+        if lastCheck:
+            deleteRequest((url + str(result['id']) + "/"), login)
+            print("delete checkHostAlive " + str(result['id']))
+        else:
+            lastCheck = True
     if result['mode'] == "manageAgents.yml":
-§§        if lastDBCheck:
-§§            deleteRequest((url + str(result['id']) + "/"), login)
+        if lastDBCheck:
+            deleteRequest((url + str(result['id']) + "/"), login)
             print("delete manageAgents " + str(result['id']))
-§§        else:
-§§            lastDBCheck = True
-§§
-§§
-§§
-§§
-§§
+        else:
+            lastDBCheck = True
+
+
+
+
+

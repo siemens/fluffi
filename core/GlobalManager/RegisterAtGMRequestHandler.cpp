@@ -119,7 +119,7 @@ void RegisterAtGMRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerTh
 			{
 				//A race condition could happen here, if multiple LocalManagers request at the same time. Currently the last one wins due to constraints in the database
 				FluffiLMConfiguration lmConfiguration = dbManager->getLMConfigurationForFuzzJob(fuzzjob);
-§§				LMConfiguration* ptrToLMConfiguration = new LMConfiguration();
+				LMConfiguration* ptrToLMConfiguration = new LMConfiguration();
 				ptrToLMConfiguration->CopyFrom(lmConfiguration.getProtobuf());
 				registerResponse->set_allocated_lmconfiguration(ptrToLMConfiguration);
 				LOG(DEBUG) << "Sending message with LMConfiguration";

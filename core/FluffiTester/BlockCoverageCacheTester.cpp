@@ -24,7 +24,7 @@ namespace FluffiTester
 	{
 	public:
 
-§§		BlockCoverageCache* localBlockCoverageCache = nullptr;
+		BlockCoverageCache* localBlockCoverageCache = nullptr;
 
 		TEST_METHOD_INITIALIZE(ModuleInitialize)
 		{
@@ -79,7 +79,7 @@ namespace FluffiTester
 			std::set<FluffiBasicBlock> basicBlockList;
 
 			for (int i = 1; i < 100; i++) {
-§§				FluffiBasicBlock theblock = FluffiBasicBlock(100 * i, i);
+				FluffiBasicBlock theblock = FluffiBasicBlock(100 * i, i);
 				basicBlockList.insert(theblock);
 
 				Assert::IsFalse(localBlockCoverageCache->isBlockInCache(theblock), L"Error checking if specific BasicBlock was correctly added (addBlocksToCache)");
@@ -89,7 +89,7 @@ namespace FluffiTester
 			localBlockCoverageCache->addBlocksToCache(&basicBlockList);
 
 			for (int i = 1; i < 100; i++) {
-§§				FluffiBasicBlock theblock = FluffiBasicBlock(100 * i, i);
+				FluffiBasicBlock theblock = FluffiBasicBlock(100 * i, i);
 				Assert::IsTrue(localBlockCoverageCache->isBlockInCache(theblock), L"Error checking if specific BasicBlock was correctly added (addBlocksToCache)");
 			}
 

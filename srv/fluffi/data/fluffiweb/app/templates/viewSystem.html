@@ -101,129 +101,129 @@ Author(s): Pascal Eckmann, Fabian Russwurm, Junes Najah, Michael Kraus, Thomas R
             </form>
         </div>
         <div class="tab-pane fade" id="menu4">
-§§            <br>
-§§                <form action="/systems/configureSystemInstances/{{system.Name}}" enctype="multipart/form-data"
-§§                      method="POST" name="configureSystemInstances">
-§§                    <div class="system-view-lm-box">
-§§                        <h3>System LocalManagers:</h3>
-§§                        <table class="table">
-§§                            <thead>
-§§                            <tr>
-§§                                <th scope="col">Type</th>
-§§                                <th scope="col">Count</th>
-§§                                <th scope="col">NewCount</th>
-§§                                <th scope="col">Architecture</th>
-§§                                <th scope="col">Delete All</th>
-§§                            </tr>
-§§                            </thead>
-§§                            <tbody>
-§§                            <tr>
-§§                                <th scope="row">LocalManager</th>
-§§                                <td><p id="localManager_lm_count">{{lmCount}}</p></td>
-§§                                <td><input class="form-control" id="localManager_lm" name="localManager_lm"
-§§                                           placeholder="0" type="text"></td>
-§§                                <td>
-§§                                    <select class="form-control select-width" id="localManager_lm_arch"
-§§                                            name="localManager_lm_arch">
-§§                                        <option name="choice1" value="x64">x64</option>
-§§                                        <option name="choice2" value="x86">x86</option>
-§§                                        <option name="choice2" value="arm32">arm32</option>
-§§                                        <option name="choice2" value="arm64">arm64</option>
-§§                                    </select>
-§§                                </td>
-§§                                <td class="remove"><a class="btn btn-secondary"
-§§                                                                             onclick="removeInstances('/systems/removeConfiguredInstances/{{ system.Name }}/lm/lm', 'localManager_lm_count');"
-§§                                                                             role="button"><span
-§§                                        class="glyphicon glyphicon-remove"></span></a></td>
-§§                            </tr>
-§§                            </tbody>
-§§                        </table>
-§§                    </div>
-§§                    <hr>
-§§                    {% for fuzzjob in configFuzzjobs %}
-§§                    <div>
-§§                        <h3>{{fuzzjob.name}}</h3>
-§§                        <table class="table">
-§§                            <thead>
-§§                            <tr>
-§§                                <th scope="col">Type</th>
-§§                                <th scope="col">Count</th>
-§§                                <th scope="col">NewCount</th>
-§§                                <th scope="col">Architecture</th>
-§§                                <th scope="col">Delete All</th>
-§§                            </tr>
-§§                            </thead>
-§§                            <tbody>
-§§                            <tr>
-§§                                <th scope="row">TestcaseGenerator</th>
-§§                                <td><p id="{{fuzzjob.name}}_tg_count">{{fuzzjob.tg}}<font size="1">&ensp;{{fuzzjob.tgarch}}</font>
-§§                                </p></td>
-§§                                <td><input class="form-control" id="{{fuzzjob.name}}_tg"
-§§                                           name="{{fuzzjob.name}}_tg"
-§§                                           placeholder="0" type="text"></td>
-§§                                <td>
-§§                                    <select class="form-control select-width" id="{{fuzzjob.name}}_tg_arch"
-§§                                            name="{{fuzzjob.name}}_tg_arch">
-§§                                        <option name="choice1" value="x64">x64</option>
-§§                                        <option name="choice2" value="x86">x86</option>
-§§                                        <option name="choice2" value="arm32">arm32</option>
-§§                                        <option name="choice2" value="arm64">arm64</option>
-§§                                    </select>
-§§                                </td>
-§§                                <td class="remove"><a class="btn btn-secondary"
-§§                                                                             onclick="removeInstances('/systems/removeConfiguredInstances/{{ system.Name }}/{{ fuzzjob.name }}/tg', '{{fuzzjob.name}}_tg_count');"
-§§                                                                             role="button"><span
-§§                                        class="glyphicon glyphicon-remove"></span></a></td>
-§§                            </tr>
-§§                            <tr>
-§§                                <th scope="row">TestcaseRunner</th>
-§§                                <td><p id="{{fuzzjob.name}}_tr_count">{{fuzzjob.tr}}<font size="1">&ensp;{{fuzzjob.trarch}}</font>
-§§                                </p></td>
-§§                                <td><input class="form-control" id="{{fuzzjob.name}}_tr"
-§§                                           name="{{fuzzjob.name}}_tr"
-§§                                           placeholder="0" type="text"></td>
-§§                                <td>
-§§                                    <select class="form-control select-width" id="{{fuzzjob.name}}_tr_arch"
-§§                                            name="{{fuzzjob.name}}_tr_arch">
-§§                                        <option name="choice1" value="x64">x64</option>
-§§                                        <option name="choice2" value="x86">x86</option>
-§§                                        <option name="choice2" value="arm32">arm32</option>
-§§                                        <option name="choice2" value="arm64">arm64</option>
-§§                                    </select>
-§§                                </td>
-§§                                <td class="remove"><a class="btn btn-secondary"
-§§                                                                             onclick="removeInstances('/systems/removeConfiguredInstances/{{ system.Name }}/{{ fuzzjob.name }}/tr', '{{fuzzjob.name}}_tr_count');"
-§§                                                                             role="button"><span
-§§                                        class="glyphicon glyphicon-remove"></span></a></td>
-§§                            </tr>
-§§                            <tr>
-§§                                <th scope="row">TestcaseEvaluator</th>
-§§                                <td><p id="{{fuzzjob.name}}_te_count">{{fuzzjob.te}}<font size="1">&ensp;{{fuzzjob.tearch}}</font>
-§§                                </p></td>
-§§                                <td><input class="form-control" id="{{fuzzjob.name}}_te"
-§§                                           name="{{fuzzjob.name}}_te"
-§§                                           placeholder="0" type="text"></td>
-§§                                <td>
-§§                                    <select class="form-control select-width" id="{{fuzzjob.name}}_te_arch"
-§§                                            name="{{fuzzjob.name}}_te_arch">
-§§                                        <option name="choice1" value="x64">x64</option>
-§§                                        <option name="choice2" value="x86">x86</option>
-§§                                        <option name="choice2" value="arm32">arm32</option>
-§§                                        <option name="choice2" value="arm64">arm64</option>
-§§                                    </select>
-§§                                </td>
-§§                                <td class="remove"><a class="btn btn-secondary"
-§§                                                                             onclick="removeInstances('/systems/removeConfiguredInstances/{{ system.Name }}/{{ fuzzjob.name }}/te', '{{fuzzjob.name}}_te_count');"
-§§                                                                             role="button"><span
-§§                                        class="glyphicon glyphicon-remove"></span></a></td>
-§§                            </tr>
-§§                            </tbody>
-§§                        </table>
+            <br>
+                <form action="/systems/configureSystemInstances/{{system.Name}}" enctype="multipart/form-data"
+                      method="POST" name="configureSystemInstances">
+                    <div class="system-view-lm-box">
+                        <h3>System LocalManagers:</h3>
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th scope="col">Type</th>
+                                <th scope="col">Count</th>
+                                <th scope="col">NewCount</th>
+                                <th scope="col">Architecture</th>
+                                <th scope="col">Delete All</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <th scope="row">LocalManager</th>
+                                <td><p id="localManager_lm_count">{{lmCount}}</p></td>
+                                <td><input class="form-control" id="localManager_lm" name="localManager_lm"
+                                           placeholder="0" type="text"></td>
+                                <td>
+                                    <select class="form-control select-width" id="localManager_lm_arch"
+                                            name="localManager_lm_arch">
+                                        <option name="choice1" value="x64">x64</option>
+                                        <option name="choice2" value="x86">x86</option>
+                                        <option name="choice2" value="arm32">arm32</option>
+                                        <option name="choice2" value="arm64">arm64</option>
+                                    </select>
+                                </td>
+                                <td class="remove"><a class="btn btn-secondary"
+                                                                             onclick="removeInstances('/systems/removeConfiguredInstances/{{ system.Name }}/lm/lm', 'localManager_lm_count');"
+                                                                             role="button"><span
+                                        class="glyphicon glyphicon-remove"></span></a></td>
+                            </tr>
+                            </tbody>
+                        </table>
                     </div>
-§§                    {% endfor %}
-§§                    <button class="btn btn-success" id="configSystemsButton" type="submit">Save Config</button>
-§§                    <br>
-§§                    <br>
+                    <hr>
+                    {% for fuzzjob in configFuzzjobs %}
+                    <div>
+                        <h3>{{fuzzjob.name}}</h3>
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th scope="col">Type</th>
+                                <th scope="col">Count</th>
+                                <th scope="col">NewCount</th>
+                                <th scope="col">Architecture</th>
+                                <th scope="col">Delete All</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <th scope="row">TestcaseGenerator</th>
+                                <td><p id="{{fuzzjob.name}}_tg_count">{{fuzzjob.tg}}<font size="1">&ensp;{{fuzzjob.tgarch}}</font>
+                                </p></td>
+                                <td><input class="form-control" id="{{fuzzjob.name}}_tg"
+                                           name="{{fuzzjob.name}}_tg"
+                                           placeholder="0" type="text"></td>
+                                <td>
+                                    <select class="form-control select-width" id="{{fuzzjob.name}}_tg_arch"
+                                            name="{{fuzzjob.name}}_tg_arch">
+                                        <option name="choice1" value="x64">x64</option>
+                                        <option name="choice2" value="x86">x86</option>
+                                        <option name="choice2" value="arm32">arm32</option>
+                                        <option name="choice2" value="arm64">arm64</option>
+                                    </select>
+                                </td>
+                                <td class="remove"><a class="btn btn-secondary"
+                                                                             onclick="removeInstances('/systems/removeConfiguredInstances/{{ system.Name }}/{{ fuzzjob.name }}/tg', '{{fuzzjob.name}}_tg_count');"
+                                                                             role="button"><span
+                                        class="glyphicon glyphicon-remove"></span></a></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">TestcaseRunner</th>
+                                <td><p id="{{fuzzjob.name}}_tr_count">{{fuzzjob.tr}}<font size="1">&ensp;{{fuzzjob.trarch}}</font>
+                                </p></td>
+                                <td><input class="form-control" id="{{fuzzjob.name}}_tr"
+                                           name="{{fuzzjob.name}}_tr"
+                                           placeholder="0" type="text"></td>
+                                <td>
+                                    <select class="form-control select-width" id="{{fuzzjob.name}}_tr_arch"
+                                            name="{{fuzzjob.name}}_tr_arch">
+                                        <option name="choice1" value="x64">x64</option>
+                                        <option name="choice2" value="x86">x86</option>
+                                        <option name="choice2" value="arm32">arm32</option>
+                                        <option name="choice2" value="arm64">arm64</option>
+                                    </select>
+                                </td>
+                                <td class="remove"><a class="btn btn-secondary"
+                                                                             onclick="removeInstances('/systems/removeConfiguredInstances/{{ system.Name }}/{{ fuzzjob.name }}/tr', '{{fuzzjob.name}}_tr_count');"
+                                                                             role="button"><span
+                                        class="glyphicon glyphicon-remove"></span></a></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">TestcaseEvaluator</th>
+                                <td><p id="{{fuzzjob.name}}_te_count">{{fuzzjob.te}}<font size="1">&ensp;{{fuzzjob.tearch}}</font>
+                                </p></td>
+                                <td><input class="form-control" id="{{fuzzjob.name}}_te"
+                                           name="{{fuzzjob.name}}_te"
+                                           placeholder="0" type="text"></td>
+                                <td>
+                                    <select class="form-control select-width" id="{{fuzzjob.name}}_te_arch"
+                                            name="{{fuzzjob.name}}_te_arch">
+                                        <option name="choice1" value="x64">x64</option>
+                                        <option name="choice2" value="x86">x86</option>
+                                        <option name="choice2" value="arm32">arm32</option>
+                                        <option name="choice2" value="arm64">arm64</option>
+                                    </select>
+                                </td>
+                                <td class="remove"><a class="btn btn-secondary"
+                                                                             onclick="removeInstances('/systems/removeConfiguredInstances/{{ system.Name }}/{{ fuzzjob.name }}/te', '{{fuzzjob.name}}_te_count');"
+                                                                             role="button"><span
+                                        class="glyphicon glyphicon-remove"></span></a></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    {% endfor %}
+                    <button class="btn btn-success" id="configSystemsButton" type="submit">Save Config</button>
+                    <br>
+                    <br>
         </div>
     </div>
 </div>

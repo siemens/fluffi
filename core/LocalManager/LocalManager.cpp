@@ -111,7 +111,7 @@ int main(int argc, char* argv[])
 	PutTestEvaluationRequestHandler* m_PutTestEvaluationHandler = new PutTestEvaluationRequestHandler(testcaseTempDir, comm, garbageCollectorWorker, forceCompletedTestcasesCacheFlushAfterMS);
 	comm->registerFLUFFIMessageHandler(m_PutTestEvaluationHandler, FLUFFIMessage::FluffCase::kPutTestEvaluationRequest);
 
-§§	GetTestcaseChunkRequestHandler* m_getTestcaseChunkRequestHandler = new GetTestcaseChunkRequestHandler(testcaseTempDir, true, garbageCollectorWorker);
+	GetTestcaseChunkRequestHandler* m_getTestcaseChunkRequestHandler = new GetTestcaseChunkRequestHandler(testcaseTempDir, true, garbageCollectorWorker);
 	comm->registerFLUFFIMessageHandler(m_getTestcaseChunkRequestHandler, FLUFFIMessage::FluffCase::kGetTestCaseChunkRequest);
 
 	GetFuzzJobConfigurationRequestHandler* m_getFuzzJobConfigurationRequestHandler = new GetFuzzJobConfigurationRequestHandler();

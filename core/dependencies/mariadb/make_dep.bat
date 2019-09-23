@@ -17,9 +17,9 @@
 ::    
 :: Author(s): Thomas Riedmaier, Pascal Eckmann
 
-§§RMDIR /Q/S include
-§§RMDIR /Q/S bin
-§§RMDIR /Q/S lib
+RMDIR /Q/S include
+RMDIR /Q/S bin
+RMDIR /Q/S lib
 
 MKDIR include
 MKDIR bin
@@ -31,7 +31,7 @@ MKDIR lib\x86
 
 REM Compiling the libmaria library
 
-§§RMDIR /Q/S mariadb-connector-c
+RMDIR /Q/S mariadb-connector-c
 
 git clone https://github.com/MariaDB/mariadb-connector-c.git
 cd mariadb-connector-c
@@ -81,13 +81,13 @@ copy mariadb-connector-c\build86\libmariadb\Debug\libmariadbd.exp lib\x86
 
 
 xcopy mariadb-connector-c\include\*.h include /sy
-§§copy mariadb-connector-c\build64\include\mariadb_version.h include
+copy mariadb-connector-c\build64\include\mariadb_version.h include
 
 waitfor SomethingThatIsNeverHappening /t 10 2>NUL
 ::reset errorlevel
 ver > nul
 
-§§RMDIR /Q/S mariadb-connector-c
+RMDIR /Q/S mariadb-connector-c
 
 goto :eof
 

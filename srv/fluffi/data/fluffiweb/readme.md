@@ -20,10 +20,10 @@ FLUFFI - A distributed evolutionary binary fuzzer for pentesters.
 
 - Install Python Version >= 3.5 
 
-§§If you a old python 2.7 version, so use pip3 and python3 to start the app and on unix `sudo` before the pip command
-§§
+If you a old python 2.7 version, so use pip3 and python3 to start the app and on unix `sudo` before the pip command
+
 ```
-§§$ pip install -r requirements.txt
+$ pip install -r requirements.txt
 ```
 
 - Setup local mysql database with username `root` and password `toor` 

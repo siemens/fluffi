@@ -20,8 +20,8 @@
 ::
 :: Author(s): Thomas Riedmaier, Pascal Eckmann
 
-§§RMDIR /Q/S include
-§§RMDIR /Q/S lib
+RMDIR /Q/S include
+RMDIR /Q/S lib
 
 MKDIR include
 MKDIR lib
@@ -30,7 +30,7 @@ MKDIR lib\x86
 
 REM Getting base64
 
-§§RMDIR /Q/S cpp-base64
+RMDIR /Q/S cpp-base64
 
 git clone https://github.com/ReneNyffenegger/cpp-base64.git
 cd cpp-base64
@@ -80,7 +80,7 @@ waitfor SomethingThatIsNeverHappening /t 10 2>NUL
 ::reset errorlevel
 ver > nul
 
-§§RMDIR /Q/S cpp-base64
+RMDIR /Q/S cpp-base64
 
 goto :eof
 

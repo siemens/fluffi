@@ -20,9 +20,9 @@
 THREADS=$(cat /proc/cpuinfo | grep processor | wc -l)
 ARCH=$(file /bin/bash | awk -F',' '{print $2}' | tr -d ' ')
 
-§§rm -rf include
-§§rm -rf bin/$ARCH
-§§rm -rf lib/$ARCH
+rm -rf include
+rm -rf bin/$ARCH
+rm -rf lib/$ARCH
 
 mkdir -p include
 mkdir -p bin/$ARCH
@@ -30,7 +30,7 @@ mkdir -p lib/$ARCH
 
 # Getting the C binaries
 
-§§rm -rf libzmq
+rm -rf libzmq
 
 git clone https://github.com/zeromq/libzmq.git
 cd libzmq
@@ -50,11 +50,11 @@ cp libzmq/build${ARCH}/lib/libzmq.so.5.2.1 lib/${ARCH}/libzmq.so.5
 cp libzmq/include/zmq.h include
 
 
-§§rm -rf libzmq
+rm -rf libzmq
 
 # Getting the C++ bindings
 
-§§rm -rf cppzmq
+rm -rf cppzmq
 
 git clone https://github.com/zeromq/cppzmq.git
 cd cppzmq
@@ -64,5 +64,5 @@ cd ..
 cp cppzmq/zmq.hpp include
 cp cppzmq/zmq_addon.hpp include
 
-§§rm -rf cppzmq
+rm -rf cppzmq
 

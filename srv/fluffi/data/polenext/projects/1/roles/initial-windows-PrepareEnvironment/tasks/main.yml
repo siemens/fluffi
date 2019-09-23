@@ -8,7 +8,7 @@
 # 
 # Author(s): Thomas Riedmaier, Fabian Russwurm, Pascal Eckmann
 
-§§- name: Create a FLUFFI directory
+- name: Create a FLUFFI directory
   win_file:
     path: "{{deploymentPath}}"
     state: directory

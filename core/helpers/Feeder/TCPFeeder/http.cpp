@@ -19,7 +19,7 @@ void performHTTPAuthAndManageSession() {
 }
 
 
-§§void fixHTTPContentLength(std::vector<char>* bytes) {
+void fixHTTPContentLength(std::vector<char>* bytes) {
 	std::cout << "TCPFeeder: called fixHTTPContentLength" << std::endl;
 
 	std::string contentLength = "Content-Length: ";
@@ -74,7 +74,7 @@ void performHTTPAuthAndManageSession() {
 	return;
 }
 
-§§void dropNoDoubleLinebreak(std::vector<char>* bytes) {
+void dropNoDoubleLinebreak(std::vector<char>* bytes) {
 	std::string doubleLinebreak = "\r\n\r\n";
 	std::string fullrequest(bytes->begin(), bytes->begin() + bytes->size());
 

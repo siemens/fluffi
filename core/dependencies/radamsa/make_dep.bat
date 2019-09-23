@@ -7,7 +7,7 @@
 :: THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 :: 
 :: Author(s): Thomas Riedmaier, Pascal Eckmann
-§§RMDIR /Q/S bin
+RMDIR /Q/S bin
 
 MKDIR bin
 MKDIR bin\x64
@@ -24,7 +24,7 @@ set "mypath=%mypath:G:=/cygdrive/G%"
 
 REM Getting OWL
 
-§§RMDIR /Q/S owl
+RMDIR /Q/S owl
 
 git clone https://gitlab.com/owl-lisp/owl.git
 cd owl
@@ -34,7 +34,7 @@ cd ..
 
 REM Getting radamsa
 
-§§RMDIR /Q/S radamsa
+RMDIR /Q/S radamsa
 
 git clone https://gitlab.com/akihe/radamsa
 cd radamsa
@@ -43,25 +43,25 @@ cd ..
 
 REM Building OWL 64
 
-§§C:\cygwin64\bin\bash --login -c "cd %mypath%/owl && sed -i -e 's/\r\+$//' ./tests/* && make owl "
+C:\cygwin64\bin\bash --login -c "cd %mypath%/owl && sed -i -e 's/\r\+$//' ./tests/* && make owl "
 
 REM Building radamsa 64
 
 copy owl\bin\ol.exe radamsa\bin\ol.exe
-§§C:\cygwin64\bin\bash --login -c "cd %mypath%/radamsa && LDFLAGS=-static make everything "
+C:\cygwin64\bin\bash --login -c "cd %mypath%/radamsa && LDFLAGS=-static make everything "
 
 copy radamsa\bin\radamsa.exe bin\x64
 copy C:\cygwin64\bin\cygwin1.dll bin\x64
 
-§§REM Resetting for x86
+REM Resetting for x86
 
-§§C:\cygwin64\bin\bash --login -c "cd %mypath%/radamsa && git reset --hard && git clean -dXf && git clean -f"
+C:\cygwin64\bin\bash --login -c "cd %mypath%/radamsa && git reset --hard && git clean -dXf && git clean -f"
 
 
 REM Building radamsa 86
 
 copy owl\bin\ol.exe radamsa\bin\ol.exe
-§§C:\cygwin64\bin\bash --login -c "cd %mypath%/radamsa && CC=i686-pc-cygwin-gcc.exe LDFLAGS=-static make everything "
+C:\cygwin64\bin\bash --login -c "cd %mypath%/radamsa && CC=i686-pc-cygwin-gcc.exe LDFLAGS=-static make everything "
 
 copy radamsa\bin\radamsa.exe bin\x86
 copy C:\cygwin64\usr\i686-pc-cygwin\sys-root\usr\bin\cygwin1.dll bin\x86
@@ -71,8 +71,8 @@ waitfor SomethingThatIsNeverHappening /t 10 2>NUL
 ::reset errorlevel
 ver > nul
 
-§§RMDIR /Q/S radamsa
-§§RMDIR /Q/S owl
+RMDIR /Q/S radamsa
+RMDIR /Q/S owl
 
 goto :eof
 

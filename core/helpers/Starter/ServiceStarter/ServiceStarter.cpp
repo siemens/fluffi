@@ -37,11 +37,11 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
-§§	char* serviceBuf = new char[bytesNeeded];
+	char* serviceBuf = new char[bytesNeeded];
 	DWORD bytesNeeded2 = 0;
 	numOfServices = 0;
 	resumeHandle = 0;
-§§	success = EnumServicesStatus(hSCManager, SERVICE_WIN32_OWN_PROCESS, SERVICE_STATE_ALL, (ENUM_SERVICE_STATUS*)serviceBuf, bytesNeeded, &bytesNeeded2, &numOfServices, &resumeHandle);
+	success = EnumServicesStatus(hSCManager, SERVICE_WIN32_OWN_PROCESS, SERVICE_STATE_ALL, (ENUM_SERVICE_STATUS*)serviceBuf, bytesNeeded, &bytesNeeded2, &numOfServices, &resumeHandle);
 	if (success == FALSE) {
 		printf("EnumServicesStatus failed: %d.\n", GetLastError());
 		return -1;
@@ -49,8 +49,8 @@ int main(int argc, char* argv[])
 
 	//Search for the target service
 	for (DWORD i = 0; i < numOfServices; i++) {
-§§		printf("\nService %s \n", ((ENUM_SERVICE_STATUS*)serviceBuf)[i].lpServiceName);
-§§		SC_HANDLE hService = OpenService(hSCManager, ((ENUM_SERVICE_STATUS*)serviceBuf)[i].lpServiceName, SERVICE_START | SERVICE_STOP | SERVICE_QUERY_CONFIG | SERVICE_QUERY_STATUS);
+		printf("\nService %s \n", ((ENUM_SERVICE_STATUS*)serviceBuf)[i].lpServiceName);
+		SC_HANDLE hService = OpenService(hSCManager, ((ENUM_SERVICE_STATUS*)serviceBuf)[i].lpServiceName, SERVICE_START | SERVICE_STOP | SERVICE_QUERY_CONFIG | SERVICE_QUERY_STATUS);
 		if (hService == NULL) {
 			continue;
 		}
@@ -58,14 +58,14 @@ int main(int argc, char* argv[])
 		DWORD bytesNeededForQuery = 0;
 		success = QueryServiceConfig(hService, NULL, 0, &bytesNeededForQuery);
 
-§§		char* serviceConfig = new char[bytesNeededForQuery];
+		char* serviceConfig = new char[bytesNeededForQuery];
 		DWORD bytesNeededForQuery2 = 0;
 		success = QueryServiceConfig(hService, (LPQUERY_SERVICE_CONFIG)serviceConfig, bytesNeededForQuery, &bytesNeededForQuery2);
 
 		std::string scmdline = ((LPQUERY_SERVICE_CONFIG)serviceConfig)->lpBinaryPathName;
 		std::wstring wcmdline = std::wstring(scmdline.begin(), scmdline.end());
 		int numOfBlocks;
-§§		LPWSTR* szArglist = CommandLineToArgvW(wcmdline.c_str(), &numOfBlocks); //for some reasons this does not exist for Ascii :(
+		LPWSTR* szArglist = CommandLineToArgvW(wcmdline.c_str(), &numOfBlocks); //for some reasons this does not exist for Ascii :(
 		if (NULL != szArglist && numOfBlocks >= 1) {
 			wprintf(L"Found service binary %s\n", szArglist[0]);
 			if (std::wstring(szArglist[0]) == wserviceBinary) {
@@ -111,8 +111,8 @@ int main(int argc, char* argv[])
 				}
 
 				//Actualy start the service
-§§				LPCSTR* args4Start = new LPCSTR[argc - 1];
-§§				args4Start[0] = ((ENUM_SERVICE_STATUS*)serviceBuf)[i].lpServiceName;
+				LPCSTR* args4Start = new LPCSTR[argc - 1];
+				args4Start[0] = ((ENUM_SERVICE_STATUS*)serviceBuf)[i].lpServiceName;
 				for (int j = 2; j < argc; j++) {
 					args4Start[j - 1] = argv[j];
 				}

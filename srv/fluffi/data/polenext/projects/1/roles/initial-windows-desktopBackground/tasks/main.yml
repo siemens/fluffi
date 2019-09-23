@@ -7,7 +7,7 @@
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # 
 # Author(s): Fabian Russwurm, Thomas Riedmaier, Pascal Eckmann
-§§
+
 - name: Ensure source directory exists
   win_file:
     path: "{{remoteUtilitiesFilePath}}"
@@ -17,11 +17,11 @@
   win_get_url: 
     url: "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{backgroundImageFolderName}}/{{inventory_hostname}}.png"
     dest: "{{remoteUtilitiesFilePath}}{{inventory_hostname}}.png"
-§§  when: "inventory_hostname in inventory_hostname"
+  when: "inventory_hostname in inventory_hostname"
   ignore_errors: True
 
 # reg add “HKEY_CURRENT_USER\Control Panel\Desktop” /v Wallpaper /t REG_SZ /d C:\wallpaper.png /f
-§§- name: Modify registry to set wallpapaer
+- name: Modify registry to set wallpapaer
   win_regedit:
      path: HKCU:\Control Panel\Desktop
      name: "WallPaper"

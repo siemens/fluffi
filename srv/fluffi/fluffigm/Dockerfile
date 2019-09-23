@@ -13,6 +13,6 @@ FROM ubuntu:bionic
 RUN apt update
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -yq software-properties-common
 
-§§WORKDIR /fluffi/
-§§
+WORKDIR /fluffi/
+
 CMD ["./GlobalManager"]

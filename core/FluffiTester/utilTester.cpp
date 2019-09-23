@@ -320,7 +320,7 @@ namespace FluffiTester
 		TEST_METHOD(Util_storeTestcaseFileOnDisk)
 		{
 			GarbageCollectorWorker garbageCollector(0);
-§§			TRWorkerThreadStateBuilder workerStateBuilder;
+			TRWorkerThreadStateBuilder workerStateBuilder;
 			WorkerThreadState* state = workerStateBuilder.constructState();
 
 			// file not exists, only 1 chunk

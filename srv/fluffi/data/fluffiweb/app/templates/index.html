@@ -53,7 +53,7 @@ Author(s): Junes Najah, Thomas Riedmaier, Michael Kraus, Abian Blome, Pascal Eck
                         {% for project in fuzzjobs %}
                             <tr>
                                 <th scope="row">
-§§                                    <a class="{{'alert-bg-table' if project.checkRating }}" href="javascript:showProjectGraph('{{ project.name }}')">{{ project.name }}</a>
+                                    <a class="{{'alert-bg-table' if project.checkRating }}" href="javascript:showProjectGraph('{{ project.name }}')">{{ project.name }}</a>
                                 </th>
                                 <td style="text-align: center;">{{ project.numPopulation }}</td>
                                 <td style="text-align: center;">{{ project.testcases }}</td>

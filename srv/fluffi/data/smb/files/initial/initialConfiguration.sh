@@ -48,10 +48,10 @@ else
 	sudo sed -i "s/unassigned-hostname/$hostname/g" /etc/hostname
 fi
 
-§§# Lemmings needing a "Extrawurst"
-§§if [[ $hostname == *"lemming"* ]]; then
-§§	echo "Setting odroidxu4 to $hostname"
-§§	hostnamectl set-hostname $hostname
+# Lemmings needing a "Extrawurst"
+if [[ $hostname == *"lemming"* ]]; then
+	echo "Setting odroidxu4 to $hostname"
+	hostnamectl set-hostname $hostname
 	sed -i "s/odroidxu4/$hostname/g" /var/run/systemd/netif/leases/*
 	sed -i "s/odroidxu4/$hostname/g" /etc/ssh/ssh_host*
 	sed -i "s/ odroidxu4//g" /etc/hosts
@@ -63,68 +63,68 @@ fi
 	(echo -e "$ROOTPASSWD\n$ROOTPASSWD") | passwd root
 	(echo -e "$FLUFFIPASSWD\n$FLUFFIPASSWD\ny") | adduser $FLUFFIUSER
 	adduser $FLUFFIUSER sudo
-§§	echo "Disabling user account creation procedure"
-§§	rm -f /root/.not_logged_in_yet
-§§	trap - INT
-§§	
-§§	#systemctl stop systemd-networkd.service
-§§	#systemctl stop systemd-resolved.service
-§§	#systemctl disable systemd-networkd.service
-§§	#systemctl disable systemd-resolved.service
-§§	#systemctl mask systemd-networkd.service
-§§	#systemctl mask systemd-resolved.service
-§§	
-§§	rm -f /etc/resolv.conf
-§§	echo "search fluffi" > /etc/resolv.conf
-§§	echo "nameserver 10.66.0.1" >> /etc/resolv.conf
-§§	# /etc/network/interfaces /etc/network/interfaces.unused
-§§	#DEBIAN_FRONTEND=noninteractive apt-get install -yq network-manager
-§§	#sed -i ':a;N;$!ba;s/\[main\]\n/[main]\ndns=default\n/g' /etc/NetworkManager/NetworkManager.conf
-§§	#sed -i 's/renderer: networkd/renderer: NetworkManager/g' /etc/netplan/01-netcfg.yaml
-§§	#netplan apply
-§§	#systemctl restart network-manager
-§§	
-§§	#maclow="enx${MAC,,}"
-§§	#echo "${maclow//:}"
-§§	#ip link set dev "${maclow//:}" down
-§§	#ip link set dev "${maclow//:}" up
-§§	
-§§	#systemctl restart systemd-networkd.service
-§§	#systemctl restart systemd-resolved.service
-§§	
-§§	
-§§	#dhclient -r
-§§	#echo "run dhclient"
-§§	#dhclient -r
-§§	#systemctl restart ntp.service
-§§	#service ntp start
-§§	#echo "Wait 9s, because ntp needs 8s for fetching the new time"
-§§	
-§§	#dhclient
-§§	#sleep 10
-§§	apt-get update
-§§	(echo -e "y") | apt-get install python
-§§	dhclient
-§§else
-§§	# UBUNTU
-§§	# Fix apt-get mirror
-§§	# sudo sed -i "s/http/ftp/g" /etc/apt/sources.list
-§§	# fix systemd stuff (aka kill it with fire)
-§§	
-§§	systemctl stop systemd-networkd.service
-§§	systemctl stop systemd-resolved.service
-§§	systemctl disable systemd-networkd.service
-§§	systemctl disable systemd-resolved.service
-§§	systemctl mask systemd-networkd.service
-§§	systemctl mask systemd-resolved.service
-§§	
-§§	rm -f /etc/resolv.conf
-§§	echo "search fluffi" > /etc/resolv.conf
-§§	echo "nameserver 10.66.0.1" >> /etc/resolv.conf
-§§	mv /etc/network/interfaces /etc/network/interfaces.unused
-§§	DEBIAN_FRONTEND=noninteractive apt-get install -yq network-manager
-§§	sed -i ':a;N;$!ba;s/\[main\]\n/[main]\ndns=default\n/g' /etc/NetworkManager/NetworkManager.conf
-§§	sed -i 's/renderer: networkd/renderer: NetworkManager/g' /etc/netplan/01-netcfg.yaml
-§§	netplan apply
-§§	systemctl restart network-manager
-§§fi
+	echo "Disabling user account creation procedure"
+	rm -f /root/.not_logged_in_yet
+	trap - INT
+	
+	#systemctl stop systemd-networkd.service
+	#systemctl stop systemd-resolved.service
+	#systemctl disable systemd-networkd.service
+	#systemctl disable systemd-resolved.service
+	#systemctl mask systemd-networkd.service
+	#systemctl mask systemd-resolved.service
+	
+	rm -f /etc/resolv.conf
+	echo "search fluffi" > /etc/resolv.conf
+	echo "nameserver 10.66.0.1" >> /etc/resolv.conf
+	# /etc/network/interfaces /etc/network/interfaces.unused
+	#DEBIAN_FRONTEND=noninteractive apt-get install -yq network-manager
+	#sed -i ':a;N;$!ba;s/\[main\]\n/[main]\ndns=default\n/g' /etc/NetworkManager/NetworkManager.conf
+	#sed -i 's/renderer: networkd/renderer: NetworkManager/g' /etc/netplan/01-netcfg.yaml
+	#netplan apply
+	#systemctl restart network-manager
+	
+	#maclow="enx${MAC,,}"
+	#echo "${maclow//:}"
+	#ip link set dev "${maclow//:}" down
+	#ip link set dev "${maclow//:}" up
+	
+	#systemctl restart systemd-networkd.service
+	#systemctl restart systemd-resolved.service
+	
+	
+	#dhclient -r
+	#echo "run dhclient"
+	#dhclient -r
+	#systemctl restart ntp.service
+	#service ntp start
+	#echo "Wait 9s, because ntp needs 8s for fetching the new time"
+	
+	#dhclient
+	#sleep 10
+	apt-get update
+	(echo -e "y") | apt-get install python
+	dhclient
+else
+	# UBUNTU
+	# Fix apt-get mirror
+	# sudo sed -i "s/http/ftp/g" /etc/apt/sources.list
+	# fix systemd stuff (aka kill it with fire)
+	
+	systemctl stop systemd-networkd.service
+	systemctl stop systemd-resolved.service
+	systemctl disable systemd-networkd.service
+	systemctl disable systemd-resolved.service
+	systemctl mask systemd-networkd.service
+	systemctl mask systemd-resolved.service
+	
+	rm -f /etc/resolv.conf
+	echo "search fluffi" > /etc/resolv.conf
+	echo "nameserver 10.66.0.1" >> /etc/resolv.conf
+	mv /etc/network/interfaces /etc/network/interfaces.unused
+	DEBIAN_FRONTEND=noninteractive apt-get install -yq network-manager
+	sed -i ':a;N;$!ba;s/\[main\]\n/[main]\ndns=default\n/g' /etc/NetworkManager/NetworkManager.conf
+	sed -i 's/renderer: networkd/renderer: NetworkManager/g' /etc/netplan/01-netcfg.yaml
+	netplan apply
+	systemctl restart network-manager
+fi

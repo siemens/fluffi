@@ -66,7 +66,7 @@ bool sendBytesToHostAndPort(std::vector<char> fuzzBytes, std::string targethost,
 		}
 
 		// Connect to server.
-§§		volatile int iResult = connect(connectSocket, (struct sockaddr*)&saServer, sizeof(saServer));
+		volatile int iResult = connect(connectSocket, (struct sockaddr*)&saServer, sizeof(saServer));
 		if (iResult == SOCKET_ERROR) {
 			closesocket(connectSocket);
 			connectSocket = INVALID_SOCKET;

@@ -20,7 +20,7 @@ Author(s): Thomas Riedmaier, Abian Blome, Pascal Eckmann
 #include "LMWorkerThreadState.h"
 #include "LMDatabaseManager.h"
 
-§§InstanceControlWorker::InstanceControlWorker(CommInt* commInt, LMWorkerThreadStateBuilder* workerThreadStateBuilder, int loopIntervalMS, std::string location)
+InstanceControlWorker::InstanceControlWorker(CommInt* commInt, LMWorkerThreadStateBuilder* workerThreadStateBuilder, int loopIntervalMS, std::string location)
 {
 	m_commInt = commInt;
 	m_workerThreadStateBuilder = workerThreadStateBuilder;

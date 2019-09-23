@@ -18,7 +18,7 @@ class AnsibleRESTConnector:
         self.auth = (username, password)
 
     def getFluffiInventoryID(self):
-§§        url = self.ansibleURL + "inventory/"
+        url = self.ansibleURL + "inventory/"
         response = requests.get(url, auth=self.auth)
         jsonResults = json.loads(response.text)
         inventoryId=-1
@@ -28,19 +28,19 @@ class AnsibleRESTConnector:
         return inventoryId
 
     def getFluffiProjectURL(self):
-§§        url = self.ansibleURL + "project/"
+        url = self.ansibleURL + "project/"
         response = requests.get(url, auth = self.auth)
         jsonResults = json.loads(response.text)
         for result in jsonResults['results']:
             if result['name'].lower() == "fluffi":
-§§                return url + str(result['id']) + "/"
+                return url + str(result['id']) + "/"
 
     def executePlaybook(self, playbookName, limit, arguments = None):
         inventoryID = self.getFluffiInventoryID()
         fluffiProjectURL = self.getFluffiProjectURL()
-§§        fluffiProjectURL+="execute_playbook/"
+        fluffiProjectURL+="execute_playbook/"
         data = {}
-§§        data['inventory'] = str(inventoryID)
+        data['inventory'] = str(inventoryID)
         data['playbook'] = playbookName
         data['limit'] = limit
         if arguments is not None:
@@ -48,10 +48,10 @@ class AnsibleRESTConnector:
             for key, value in arguments.items():
                 extraVarsString += key + "=" + value + " "
             extraVarsString.strip()
-§§            data['extra_vars'] = extraVarsString
+            data['extra_vars'] = extraVarsString
         # Sending post request to execute a playbook
         response = requests.post(fluffiProjectURL, json = data, auth = self.auth)
-§§        print(str(data))
+        print(str(data))
         jsonResult = json.loads(response.text)
         if 'history_id' in jsonResult:
             historyID = jsonResult['history_id']
@@ -105,7 +105,7 @@ class AnsibleRESTConnector:
 
     # calls Polemarch REST API to remove a self created dev system to fluffi network
     def removeDevSystem(self, hostId):
-§§        url = self.ansibleURL + "host/" + hostId + "/"
+        url = self.ansibleURL + "host/" + hostId + "/"
         data = {}
 
         try:                                              
@@ -125,7 +125,7 @@ class AnsibleRESTConnector:
         lastHostCheckResultURL = ""
         for result in jsonResults['results']:
             if result['status'].lower() not in {"run", "running", "delay"}: # --> filter out some states, because no result available
-§§                lastHostCheckResultURL = self.ansibleURL + "history/" + str(result['id'])
+                lastHostCheckResultURL = self.ansibleURL + "history/" + str(result['id'])
                 break
 
         response = requests.get(lastHostCheckResultURL, auth=self.auth)
@@ -161,7 +161,7 @@ class AnsibleRESTConnector:
                     host.Failed = False 
                 hosts.append(host)
             
-§§        url = self.ansibleURL + 'group/'
+        url = self.ansibleURL + 'group/'
         res = requests.get(url, auth = self.auth, headers = {'Connection':'close'})
         groups = []
         if res.ok:
@@ -170,7 +170,7 @@ class AnsibleRESTConnector:
                 group = type('', (), {})()
                 group.Id = s['id']
                 group.Name = s['name']
-§§                group.URL = self.ansibleURL + 'group/' + str(group.Id) + "/host/"
+                group.URL = self.ansibleURL + 'group/' + str(group.Id) + "/host/"
                 group.hosts=[]
                 if group.Name.lower() not in self.SHOWN_GROUPS:
                     continue
@@ -179,12 +179,12 @@ class AnsibleRESTConnector:
                 resHosts = requests.get(url, auth = self.auth, headers = {'Connection':'close'})
                 if resHosts.ok:
                     dataHosts = resHosts.json()
-§§                    for h in dataHosts['results']:
+                    for h in dataHosts['results']:
                         host = type('', (), {})()
                         host.Id = h['id']
                         host.Name = h['name']
                         host.Type = h['type']
-§§                        host.URL = self.ansibleURL + 'host/' + str(host.Id)
+                        host.URL = self.ansibleURL + 'host/' + str(host.Id)
                         host.Location = ""
                         for singleHost in hosts:
                             if singleHost.Name == host.Name:

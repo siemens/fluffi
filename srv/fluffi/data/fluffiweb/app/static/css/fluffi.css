@@ -84,23 +84,23 @@ Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
     margin-right: 20px;
 }
 
-§§.instance-run-success {
-§§    text-align: left;
-§§    width: 15%;
-§§}
-§§
-§§.instance-run-error {
+.instance-run-success {
+    text-align: left;
+    width: 15%;
+}
+
+.instance-run-error {
     text-align: left; 
     width: 15%; 
-§§    color: red;
-§§    font-weight: bold;
-§§}
-§§
-§§.systems-lm-text {
-§§    display: inline;
-§§    font-size: 12px;
-§§    font-weight: bold;
-§§    color: #3795b1;
+    color: red;
+    font-weight: bold;
+}
+
+.systems-lm-text {
+    display: inline;
+    font-size: 12px;
+    font-weight: bold;
+    color: #3795b1;
 }
 
 .update-system-loc {
@@ -215,76 +215,76 @@ Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
 
 .footprint-color {
     background-color: orange
-§§}
-§§
-§§.alert-bg {
-§§    border-radius: 6px;
-§§    background-color: #ff5f52 !important;
-§§}
-§§
-§§.alert-bg-table {
-§§    border-radius: 6px;
-§§    padding: 5px;
-§§    background-color: #ff5f52 !important;
-§§}
-§§
-§§.alert-bg-table-dashboard {
-§§    border-radius: 6px;
-§§    padding: 5px;
-§§    background-color: #b0180b !important;
-§§}
-§§
-§§.modal-button {
-§§    margin: 10px 0px 0px auto;
-§§    display: block;
-§§}
-§§
-§§.modal-form {
-§§    width: 80%;
-§§    margin-bottom: 15px;
-§§}
-§§
-§§.modal-badge {
-§§    background-color: #31b0d5;
-§§    font-size: 1.3em;
-§§}
-§§
-§§.system-view-lm-box {
-§§    background-color: #a1cccc;
-§§    padding: 1px 10px;
-§§    border-radius: 5px;
-§§}
-§§
-§§.system-view-lm-box>.table>thead>tr>th {
-§§    border-bottom: 2px solid #fff;
-§§}
-§§
-§§.create-project-code {
-§§    background-color: #333;
-§§    padding: 6px;
-§§    border: solid 1px #222;
-§§    border-radius: 5px;
-§§    color: #fff;
-§§    font-family: monospace;
-§§}
-§§
-§§.create-project-monospace {
-§§    font-family: monospace;
-§§}
-§§
-§§.create-project-option {
-§§    padding: 8px;
-§§    border-radius: 5px;
-§§}
-§§
-§§.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
-§§    vertical-align: middle !important;
 }
-§§
-§§.basic-bock-box-visible {
-§§    visibility: hidden;
-§§    height: 0px;
-§§    width: 0px;
-§§    margin: 0;
-§§    padding: 0;
-§§}
+
+.alert-bg {
+    border-radius: 6px;
+    background-color: #ff5f52 !important;
+}
+
+.alert-bg-table {
+    border-radius: 6px;
+    padding: 5px;
+    background-color: #ff5f52 !important;
+}
+
+.alert-bg-table-dashboard {
+    border-radius: 6px;
+    padding: 5px;
+    background-color: #b0180b !important;
+}
+
+.modal-button {
+    margin: 10px 0px 0px auto;
+    display: block;
+}
+
+.modal-form {
+    width: 80%;
+    margin-bottom: 15px;
+}
+
+.modal-badge {
+    background-color: #31b0d5;
+    font-size: 1.3em;
+}
+
+.system-view-lm-box {
+    background-color: #a1cccc;
+    padding: 1px 10px;
+    border-radius: 5px;
+}
+
+.system-view-lm-box>.table>thead>tr>th {
+    border-bottom: 2px solid #fff;
+}
+
+.create-project-code {
+    background-color: #333;
+    padding: 6px;
+    border: solid 1px #222;
+    border-radius: 5px;
+    color: #fff;
+    font-family: monospace;
+}
+
+.create-project-monospace {
+    font-family: monospace;
+}
+
+.create-project-option {
+    padding: 8px;
+    border-radius: 5px;
+}
+
+.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+    vertical-align: middle !important;
+}
+
+.basic-bock-box-visible {
+    visibility: hidden;
+    height: 0px;
+    width: 0px;
+    margin: 0;
+    padding: 0;
+}

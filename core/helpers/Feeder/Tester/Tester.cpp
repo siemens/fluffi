@@ -29,7 +29,7 @@ typedef pid_t process_id_t; //globals_shared.h
 #endif
 
 //copied from FluffiTestExecutor::initializeFeeder. As this is not part of shared code but of TestcaseRunner, we cannot include this
-§§bool initializeFeeder(std::shared_ptr<ExternalProcess> feederProcess, SharedMemIPC* sharedMemIPC_toFeeder, process_id_t targetProcessID, int timeoutMS) {
+bool initializeFeeder(std::shared_ptr<ExternalProcess> feederProcess, SharedMemIPC* sharedMemIPC_toFeeder, process_id_t targetProcessID, int timeoutMS) {
 	std::chrono::time_point<std::chrono::system_clock> routineEntryTimeStamp = std::chrono::system_clock::now();
 	std::chrono::time_point<std::chrono::system_clock> latestRoutineExitTimeStamp = routineEntryTimeStamp + std::chrono::milliseconds(timeoutMS);
 

@@ -13,7 +13,7 @@
     path: "{{ ramdiskPath }}"
   register: ramdiskDetails
 
-§§- name: Check if ramdisk exists
+- name: Check if ramdisk exists
   fail: 
     msg: "Ramdisk not mounted!"
   when: not ramdiskDetails.stat.exists

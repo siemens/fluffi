@@ -9,32 +9,32 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 Author(s): Pascal Eckmann, Thomas Riedmaier
 #>
-§§
-§§# note the difference between jobs and tasks: https://stackoverflow.com/questions/23467026/are-scheduled-job-and-scheduled-task-the-same-thing-in-powershell-context
-§§
-§§# [System.IO.Path]::GetTempFileName()
-§§$monpath = "$env:APPDATA\FluffMon"
-§§
-§§Get-ScheduledTask -TaskName FLUFFIMonitoring -ErrorAction SilentlyContinue | Stop-ScheduledTask -ErrorAction SilentlyContinue
-§§# Get-ScheduledTask -TaskName FLUFFIMonitoring -ErrorAction SilentlyContinue | Unregister-ScheduledTask -confirm:$false -ErrorAction SilentlyContinue
-§§Unregister-ScheduledJob -Name FLUFFImonitoring -ErrorAction SilentlyContinue
-§§
-§§if([System.IO.Directory]::Exists($monpath)){
+
+# note the difference between jobs and tasks: https://stackoverflow.com/questions/23467026/are-scheduled-job-and-scheduled-task-the-same-thing-in-powershell-context
+
+# [System.IO.Path]::GetTempFileName()
+$monpath = "$env:APPDATA\FluffMon"
+
+Get-ScheduledTask -TaskName FLUFFIMonitoring -ErrorAction SilentlyContinue | Stop-ScheduledTask -ErrorAction SilentlyContinue
+# Get-ScheduledTask -TaskName FLUFFIMonitoring -ErrorAction SilentlyContinue | Unregister-ScheduledTask -confirm:$false -ErrorAction SilentlyContinue
+Unregister-ScheduledJob -Name FLUFFImonitoring -ErrorAction SilentlyContinue
+
+if([System.IO.Directory]::Exists($monpath)){
     Remove-Item -recurse -path $monpath
-§§}
-§§
-§§# create folder in appdata
-§§New-Item -ItemType directory -Path $monpath
-§§# copy stuff there
-§§Copy-Item -Path "$PSScriptRoot\sysmon.ps1" -Destination "$monpath\sysmon.ps1"
-§§Copy-Item -Path "$PSScriptRoot\mqttcli.exe" -Destination "$monpath\mqttcli.exe"
-§§
-§§# create job in task scheduler 
-§§$trigger = New-JobTrigger -AtStartup -RandomDelay 00:00:30
-§§Register-ScheduledJob -Trigger $trigger -FilePath "$monpath\sysmon.ps1" -Name FLUFFIMonitoring
-§§
-§§$task = Get-ScheduledTask -TaskName FLUFFIMonitoring
-§§$task.settings.executiontimelimit = 'PT0S'
-§§$task | Set-ScheduledTask
-§§
-§§Get-ScheduledTask -TaskName FLUFFIMonitoring | Start-ScheduledTask
+}
+
+# create folder in appdata
+New-Item -ItemType directory -Path $monpath
+# copy stuff there
+Copy-Item -Path "$PSScriptRoot\sysmon.ps1" -Destination "$monpath\sysmon.ps1"
+Copy-Item -Path "$PSScriptRoot\mqttcli.exe" -Destination "$monpath\mqttcli.exe"
+
+# create job in task scheduler 
+$trigger = New-JobTrigger -AtStartup -RandomDelay 00:00:30
+Register-ScheduledJob -Trigger $trigger -FilePath "$monpath\sysmon.ps1" -Name FLUFFIMonitoring
+
+$task = Get-ScheduledTask -TaskName FLUFFIMonitoring
+$task.settings.executiontimelimit = 'PT0S'
+$task | Set-ScheduledTask
+
+Get-ScheduledTask -TaskName FLUFFIMonitoring | Start-ScheduledTask

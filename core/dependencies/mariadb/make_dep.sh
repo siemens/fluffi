@@ -21,15 +21,15 @@
 THREADS=$(cat /proc/cpuinfo | grep processor | wc -l)
 ARCH=$(file /bin/bash | awk -F',' '{print $2}' | tr -d ' ')
 
-§§rm -rf include
-§§rm -rf lib/$ARCH
+rm -rf include
+rm -rf lib/$ARCH
 
 mkdir -p include
 mkdir -p lib/$ARCH
 
 # Compiling the libmaria library
 
-§§rm -rf mariadb-connector-c
+rm -rf mariadb-connector-c
 
 git clone https://github.com/MariaDB/mariadb-connector-c.git
 cd mariadb-connector-c
@@ -48,6 +48,6 @@ find . -name '*.h' -exec cp --parents \{\} ../../include/ \;
 cd ../..
 
 
-§§rm -rf mariadb-connector-c
+rm -rf mariadb-connector-c
 
 

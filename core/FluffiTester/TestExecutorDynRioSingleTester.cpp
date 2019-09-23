@@ -92,7 +92,7 @@ namespace FluffiTester
 			Assert::IsTrue(sizeof(allowedBasicBlocks) / sizeof(uint32_t) == texOut->getCoveredBasicBlocks().size(), L"The amount of covered blocks does not match");
 
 			for (int i = 0; i < texOut->getCoveredBasicBlocks().size(); i++) {
-§§				uint32_t* el = std::find(std::begin(allowedBasicBlocks), std::end(allowedBasicBlocks), texOut->getCoveredBasicBlocks().at(i).m_rva);
+				uint32_t* el = std::find(std::begin(allowedBasicBlocks), std::end(allowedBasicBlocks), texOut->getCoveredBasicBlocks().at(i).m_rva);
 				Assert::IsTrue(el != std::end(allowedBasicBlocks), L" Not all blocks are expected");
 			}
 		}
@@ -103,7 +103,7 @@ namespace FluffiTester
 			std::ofstream fout;
 			fout.open(filename, std::ios::binary | std::ios::out);
 			for (int i = 0; i < 256; i++) {
-§§				fout.write((char*)&i, 1);
+				fout.write((char*)&i, 1);
 			}
 			fout.close();
 
@@ -125,7 +125,7 @@ namespace FluffiTester
 			std::ofstream fout;
 			fout.open(filename, std::ios::binary | std::ios::out);
 			for (int i = 0; i < 256; i++) {
-§§				fout.write((char*)&i, 1);
+				fout.write((char*)&i, 1);
 			}
 			fout.close();
 

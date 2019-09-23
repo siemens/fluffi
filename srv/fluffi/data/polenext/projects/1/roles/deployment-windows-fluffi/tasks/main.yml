@@ -11,18 +11,18 @@
 # 1. Fetch Fluffi from FTP
 # 2. Unzip fluffi to C
 # 3. Create shortcuts
-§§
+
 - name: Ensure directory exists
   win_file:
     path: "{{deploymentPath}}\\{{architecture}}\\"
     state: directory
 
-§§- name: Fetch FLUFFI from "{{ftpserverURL}}/{{fluffiFTPDirname}}/windows/{{architecture}}/{{fluffiFTPFilename}}"
+- name: Fetch FLUFFI from "{{ftpserverURL}}/{{fluffiFTPDirname}}/windows/{{architecture}}/{{fluffiFTPFilename}}"
   win_get_url: 
     url: "{{ftpserverURL}}/{{fluffiFTPDirname}}/windows/{{architecture}}/{{fluffiFTPFilename}}"
     dest: "{{deploymentPath}}\\{{architecture}}\\"
 
-§§- name: Unzip FLUFFI to persistent C
+- name: Unzip FLUFFI to persistent C
   win_unzip:
     src: "{{deploymentPath}}\\{{architecture}}\\{{fluffiFTPFilename}}"
     dest: "{{deploymentPath}}\\{{architecture}}\\"

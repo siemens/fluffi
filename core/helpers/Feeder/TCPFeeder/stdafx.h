@@ -29,6 +29,6 @@ Author(s): Thomas Riedmaier, Abian Blome, Pascal Eckmann
 
 #pragma comment(lib, "sslwrap.lib")
 
-§§extern "C" __declspec(dllimport) int sendByteBufOnce(char* dstIP, int port, char* msg, int msgSize);
-§§extern "C" __declspec(dllimport) int sendByteBufWithResponse(char* dstIP, int port, char* msg, int msgSize, char* response, int responseSize);
+extern "C" __declspec(dllimport) int sendByteBufOnce(char* dstIP, int port, char* msg, int msgSize);
+extern "C" __declspec(dllimport) int sendByteBufWithResponse(char* dstIP, int port, char* msg, int msgSize, char* response, int responseSize);
 #endif

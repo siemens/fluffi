@@ -10,16 +10,16 @@
 
 # The version of the VSRedistributable
 VC_RedistributableVersion: 2017
-§§
-§§# CPU architecture to install
+
+# CPU architecture to install
 architecture: x64
-§§
-§§# Folder name on the ftp server
+
+# Folder name on the ftp server
 FTPRedistributableDirname: VCRedistributables
-§§
-§§# Prefix of all installer files
+
+# Prefix of all installer files
 installerFilename: vcredist_{{architecture}}.exe
-§§
+
 # Installer flags per redistributable installer
 installerFlags: /install /passive /norestart
   #2010: /install /passive /norestart

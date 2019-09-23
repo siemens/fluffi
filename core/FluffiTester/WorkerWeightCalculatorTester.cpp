@@ -27,7 +27,7 @@ namespace FluffiTester
 	{
 	public:
 
-§§		WorkerWeightCalculator* weightCalculator = nullptr;
+		WorkerWeightCalculator* weightCalculator = nullptr;
 		LMDatabaseManager* dbman = nullptr;
 		GarbageCollectorWorker* garbageCollector = nullptr;
 

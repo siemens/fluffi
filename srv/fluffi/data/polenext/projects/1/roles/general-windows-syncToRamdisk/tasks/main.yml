@@ -8,7 +8,7 @@
 # 
 # Author(s): Thomas Riedmaier, Pascal Eckmann
 
-§§- name: Obtain information about ramdisk
+- name: Obtain information about ramdisk
   win_stat:
     path: "{{ramDiskMountpointLetter}}:\\"
   register: ramDiskInfo
@@ -17,7 +17,7 @@
   fail: 'RamDisk {{ramDiskMountpointLetter}}:\\ not exists!'
   when: not ramDiskInfo.stat.exists
 
-§§- name: Delete existing files on ramdisk (x64)
+- name: Delete existing files on ramdisk (x64)
   win_file:
     path: "{{ramDiskMountpointLetter}}:\\{{deploymentDirName}}"
     state: absent

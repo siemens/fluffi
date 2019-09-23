@@ -7,10 +7,10 @@
 ::
 :: Author(s): Thomas Riedmaier, Pascal Eckmann
 
-§§RMDIR /Q/S include
-§§RMDIR /Q/S include64
-§§RMDIR /Q/S include86
-§§RMDIR /Q/S lib
+RMDIR /Q/S include
+RMDIR /Q/S include64
+RMDIR /Q/S include86
+RMDIR /Q/S lib
 
 MKDIR include
 MKDIR include64
@@ -23,7 +23,7 @@ MKDIR lib\x86
 
 REM Getting Openssl
 
-§§RMDIR /Q/S openssl
+RMDIR /Q/S openssl
 
 git clone https://github.com/openssl/openssl.git
 cd openssl
@@ -93,7 +93,7 @@ waitfor SomethingThatIsNeverHappening /t 10 2>NUL
 ::reset errorlevel
 ver > nul
 
-§§RMDIR /Q/S openssl
+RMDIR /Q/S openssl
 
 goto :eof
 

@@ -15,9 +15,9 @@
 ::    along with this script.  If not, see <https://www.gnu.org/licenses/>.
 ::
 :: Author(s): Thomas Riedmaier, Pascal Eckmann
-§§RMDIR /Q/S include
-§§RMDIR /Q/S bin
-§§RMDIR /Q/S lib
+RMDIR /Q/S include
+RMDIR /Q/S bin
+RMDIR /Q/S lib
 
 MKDIR include
 MKDIR bin
@@ -29,7 +29,7 @@ MKDIR lib\x86
 
 REM Getting the C binaries
 
-§§RMDIR /Q/S libzmq
+RMDIR /Q/S libzmq
 
 git clone https://github.com/zeromq/libzmq.git
 cd libzmq
@@ -37,14 +37,14 @@ git checkout 2cb1240db64ce1ea299e00474c646a2453a8435b
 mkdir build64
 mkdir build86
 cd build64
-§§cmake -G "Visual Studio 14 2015 Win64" -DBUILD_TESTS=OFF ..
+cmake -G "Visual Studio 14 2015 Win64" -DBUILD_TESTS=OFF ..
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDebugDll', 'MultiThreadedDebug' } | sc $f.PSPath }"
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDll', 'MultiThreaded' } | sc $f.PSPath }"
 "C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" ZeroMQ.sln /m /t:Build /p:Configuration=Release /p:Platform=x64 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
 "C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" ZeroMQ.sln /m /t:Build /p:Configuration=Debug /p:Platform=x64 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
 cd ..
 cd build86
-§§cmake -G "Visual Studio 14 2015" -DBUILD_TESTS=OFF ..
+cmake -G "Visual Studio 14 2015" -DBUILD_TESTS=OFF ..
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDebugDll', 'MultiThreadedDebug' } | sc $f.PSPath }"
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDll', 'MultiThreaded' } | sc $f.PSPath }"
 "C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" ZeroMQ.sln /m /t:Build /p:Configuration=Release /p:Platform=Win32 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
@@ -76,11 +76,11 @@ waitfor SomethingThatIsNeverHappening /t 10 2>NUL
 ::reset errorlevel
 ver > nul
 
-§§RMDIR /Q/S libzmq
+RMDIR /Q/S libzmq
 
 REM Getting the C++ bindings
 
-§§RMDIR /Q/S cppzmq
+RMDIR /Q/S cppzmq
 
 git clone https://github.com/zeromq/cppzmq.git
 cd cppzmq
@@ -94,7 +94,7 @@ waitfor SomethingThatIsNeverHappening /t 10 2>NUL
 ::reset errorlevel
 ver > nul
 
-§§RMDIR /Q/S cppzmq
+RMDIR /Q/S cppzmq
 
 goto :eof
 

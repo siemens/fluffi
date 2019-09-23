@@ -9,7 +9,7 @@
 # Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Abian Blome, Thomas Riedmaier
 
 import io
-§§import csv
+import csv
 import os
 import shutil
 import subprocess
@@ -18,8 +18,8 @@ from os import system, unlink
 
 from flask import abort
 from sqlalchemy import *
-§§from sqlalchemy.orm import scoped_session
-§§from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import scoped_session
+from sqlalchemy.orm import sessionmaker
 
 import config
 from app import db, models
@@ -65,9 +65,9 @@ def listFuzzJobs():
     projects = models.Fuzzjob.query.all()
 
     for project in projects:
-§§        engine = create_engine(
-§§            'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
-§§        connection = engine.connect()
+        engine = create_engine(
+            'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
+        connection = engine.connect()
         try:
             result = connection.execute(COMPLETED_TESTCASES_COUNT)
             project.testcases = result.fetchone()[0]
@@ -103,12 +103,12 @@ def listFuzzJobs():
             result = connection.execute(getMICountOfTypeQuery(0))
             project.numTG = result.fetchone()[0]
 
-§§            result = connection.execute(GET_CHECKED_RATING)
-§§            if len(result.fetchall()) == 0:
-§§                project.checkRating = True
-§§            else:
-§§                project.checkRating = False
-§§
+            result = connection.execute(GET_CHECKED_RATING)
+            if len(result.fetchall()) == 0:
+                project.checkRating = True
+            else:
+                project.checkRating = False
+
             project.numLM = int(models.Localmanagers.query.filter_by(Fuzzjob = project.id).count())
         except Exception as e:
             print(e)
@@ -121,9 +121,9 @@ def listFuzzJobs():
             project.numException = "-"
             project.numNoResponse = "-"
             project.numLM = 0
-§§        finally:
-§§            connection.close()
-§§            engine.dispose()
+        finally:
+            connection.close()
+            engine.dispose()
 
     return projects
 
@@ -150,9 +150,9 @@ def createArchive(projId, name, statement, data = None):
     os.makedirs(path)
     project = models.Fuzzjob.query.filter_by(id = projId).first()
 
-§§    engine = create_engine(
-§§        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
-§§    connection = engine.connect()
+    engine = create_engine(
+        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
+    connection = engine.connect()
     try:
         result = connection.execute(statement) if data is None else connection.execute(statement, data)
 
@@ -168,13 +168,13 @@ def createArchive(projId, name, statement, data = None):
             f.close()
 
         shutil.make_archive(name, "zip", path)
-§§        print(name, path)
+        print(name, path)
     except Exception as e:
-§§        print(e, name, statement)
+        print(e, name, statement)
         return False
-§§    finally:
-§§        connection.close()
-§§        engine.dispose()
+    finally:
+        connection.close()
+        engine.dispose()
     return True
 
 
@@ -195,9 +195,9 @@ def getLocationFormWithChoices(projId, locationForm):
 def getProject(projId):
     project = models.Fuzzjob.query.filter_by(id = projId).first()
 
-§§    engine = create_engine(
-§§        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
-§§    connection = engine.connect()
+    engine = create_engine(
+        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
+    connection = engine.connect()
     try:
         result = connection.execute(COMPLETED_TESTCASES_COUNT)
         project.testcases = result.fetchone()[0]
@@ -249,12 +249,12 @@ def getProject(projId):
         totalCPUSeconds = result.fetchone()[0]
         project.totalCPUHours = round(totalCPUSeconds / 3600)
 
-§§        result = connection.execute(GET_CHECKED_RATING)
-§§        if len(result.fetchall()) == 0:
-§§            project.checkRating = True
-§§        else:
-§§            project.checkRating = False
-§§
+        result = connection.execute(GET_CHECKED_RATING)
+        if len(result.fetchall()) == 0:
+            project.checkRating = True
+        else:
+            project.checkRating = False
+
         result = connection.execute(GET_SETTINGS)
         project.settings = []
         config = getConfigJson()
@@ -301,13 +301,13 @@ def getProject(projId):
         project.numTR = "-"
         project.settings = []
         project.modules = []
-§§    finally:
-§§        connection.close()
-§§        engine.dispose()
+    finally:
+        connection.close()
+        engine.dispose()
 
     project.locations = db.session.query(models.LocationFuzzjobs, models.Locations.Name, models.Locations.id).filter_by(
         Fuzzjob = projId).outerjoin(models.Locations)
-§§    project.numLM = models.Localmanagers.query.filter_by(Fuzzjob = projId).count()
+    project.numLM = models.Localmanagers.query.filter_by(Fuzzjob = projId).count()
 
     return project
 
@@ -316,23 +316,23 @@ def getProjects():
     projects = models.Fuzzjob.query.all()
 
     for project in projects:
-§§        engine = create_engine(
-§§            'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
-§§        connection = engine.connect()
+        engine = create_engine(
+            'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
+        connection = engine.connect()
         try:
-§§            result_dirty = connection.execute(GET_PROJECTS)
-§§            result = result_dirty.fetchall()[0]
-§§            project.testcases = result[0] + result[1]
-§§            project.numPopulation = result[2]
-§§            project.numHang = result[3]
-§§            project.numAccessViolation = result[4]
-§§            project.numException = result[5]
-§§            project.numNoResponse = result[6]
-§§            if result[7] is None:
-§§                project.checkRating = True
-§§            else:
-§§                project.checkRating = False
-§§
+            result_dirty = connection.execute(GET_PROJECTS)
+            result = result_dirty.fetchall()[0]
+            project.testcases = result[0] + result[1]
+            project.numPopulation = result[2]
+            project.numHang = result[3]
+            project.numAccessViolation = result[4]
+            project.numException = result[5]
+            project.numNoResponse = result[6]
+            if result[7] is None:
+                project.checkRating = True
+            else:
+                project.checkRating = False
+
             project.status = "Reachable"
         except Exception as e:
             print(e)
@@ -344,10 +344,10 @@ def getProjects():
             project.numAccessViolation = "-"
             project.numException = "-"
             project.numNoResponse = "-"
-§§            project.checkRating = False
-§§        finally:
-§§            connection.close()
-§§            engine.dispose()
+            project.checkRating = False
+        finally:
+            connection.close()
+            engine.dispose()
 
     return projects
 
@@ -358,9 +358,9 @@ def getGeneralInformationData(projId, stmt):
     data.testcases = []
     data.project = project
 
-§§    engine = create_engine(
-§§        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
-§§    connection = engine.connect()
+    engine = create_engine(
+        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
+    connection = engine.connect()
     try:
         result = connection.execute(stmt)
         for row in result:
@@ -374,9 +374,9 @@ def getGeneralInformationData(projId, stmt):
     except Exception as e:
         print(e)
         pass
-§§    finally:
-§§        connection.close()
-§§        engine.dispose()
+    finally:
+        connection.close()
+        engine.dispose()
 
     return data
 
@@ -384,9 +384,9 @@ def getGeneralInformationData(projId, stmt):
 def insertOrUpdateNiceName(projId, myId, newName, command, elemType):
     project = models.Fuzzjob.query.filter_by(id = projId).first()
 
-§§    engine = create_engine(
-§§        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
-§§    connection = engine.connect()
+    engine = create_engine(
+        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
+    connection = engine.connect()
     try:
         if elemType == "testcase":
             data = {"testcaseID": myId, "newName": newName}
@@ -405,9 +405,9 @@ def insertOrUpdateNiceName(projId, myId, newName, command, elemType):
     except Exception as e:
         print(e)
         msg, status = "Error: Could not {} testcase".format(command), "error"
-§§    finally:
-§§        connection.close()
-§§        engine.dispose()
+    finally:
+        connection.close()
+        engine.dispose()
 
     return msg, status
 
@@ -436,15 +436,15 @@ def getManagedInstancesAndSummary(projId):
     numOfRTT = 0
     sumOfAverageRTT = 0
 
-§§    engineOne = create_engine(
-§§        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
-§§    connectionOne = engineOne.connect()
-§§    engineTwo = create_engine(
-§§        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), "fluffi_gm"))
-§§    connectionTwo = engineTwo.connect()
+    engineOne = create_engine(
+        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
+    connectionOne = engineOne.connect()
+    engineTwo = create_engine(
+        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), "fluffi_gm"))
+    connectionTwo = engineTwo.connect()
     try:
-§§        resultMI = connectionOne.execute(GET_MANAGED_INSTANCES)
-§§        resultLM = connectionTwo.execute(text(GET_LOCAL_MANAGERS), {"fuzzjobID": projId})
+        resultMI = connectionOne.execute(GET_MANAGED_INSTANCES)
+        resultLM = connectionTwo.execute(text(GET_LOCAL_MANAGERS), {"fuzzjobID": projId})
 
         for row in resultLM:
             kill = 1 if models.CommandQueue.query.filter_by(Argument = row["ServiceDescriptorHostAndPort"],
@@ -484,11 +484,11 @@ def getManagedInstancesAndSummary(projId):
     except Exception as e:
         print(e)
         pass
-§§    finally:
-§§        connectionOne.close()
-§§        engineOne.dispose()
-§§        connectionTwo.close()
-§§        engineTwo.dispose()
+    finally:
+        connectionOne.close()
+        engineOne.dispose()
+        connectionTwo.close()
+        engineTwo.dispose()
 
     # sort list of instances by AgentType 
     managedInstances["instances"] = sorted(managedInstances["instances"], key = lambda k: k["AgentType"])
@@ -504,9 +504,9 @@ def getViolationsAndCrashes(projId):
     violationsAndCrashes.testcases = []
     violationsAndCrashes.project = project
 
-§§    engine = create_engine(
-§§        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
-§§    connection = engine.connect()
+    engine = create_engine(
+        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
+    connection = engine.connect()
     try:
         result = connection.execute(GET_VIOLATIONS_AND_CRASHES)
 
@@ -519,9 +519,9 @@ def getViolationsAndCrashes(projId):
     except Exception as e:
         print(e)
         pass
-§§    finally:
-§§        connection.close()
-§§        engine.dispose()
+    finally:
+        connection.close()
+        engine.dispose()
 
     return violationsAndCrashes
 
@@ -530,9 +530,9 @@ def insertSettings(projId, request, settingForm):
     project = models.Fuzzjob.query.filter_by(id = projId).first()
 
     if project is not None:
-§§        engine = create_engine(
-§§            'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
-§§        connection = engine.connect()
+        engine = create_engine(
+            'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
+        connection = engine.connect()
         try:
             if len(settingForm.option_module.data) > 0 and len(settingForm.option_module_value.data) > 0:
                 data = {"SettingName": settingForm.option_module.data,
@@ -556,9 +556,9 @@ def insertSettings(projId, request, settingForm):
         except Exception as e:
             print(e)
             return "Error: Could not add setting", "error"
-§§        finally:
-§§            connection.close()
-§§            engine.dispose()
+        finally:
+            connection.close()
+            engine.dispose()
     else:
         return "Error: Could not find project", "error"
 
@@ -576,50 +576,50 @@ def uploadNewTarget(targetFile):
         return "Error: Failed saving Target on FTP Server", "error"
 
 
-§§def setNewBasicBlocks(targetFile, projId):
-§§    basicBlocks = []
-§§    targetFile.seek(0)
-§§    data = targetFile.read()
-§§    reader = csv.reader(data.decode('utf-8').splitlines())
-§§    for row in reader:
-§§        basicBlocks.append(row)
-§§
-§§    project = models.Fuzzjob.query.filter_by(id=projId).first()
-§§
-§§    engine = create_engine(
-§§        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
-§§    connection = engine.connect()
-§§    try:
-§§        targetModulesData = connection.execute(GET_TARGET_MODULES)
-§§        targetModules = []
-§§        for row in targetModulesData:
-§§            targetModules.append([row[1], row[0]])
-§§
-§§        for row in basicBlocks:
-§§            for targetModule in targetModules:
-§§                if row[0] == targetModule[0]:
-§§                    row[0] = targetModule[1]
-§§                    data = {"ModuleID": row[0], "Offset": row[1]}
-§§                    statement = text(INSERT_BLOCK_TO_COVER)
-§§                    connection.execute(statement, data)
-§§
-§§    except Exception as e:
-§§        print(e)
-§§        return "Error: Failed to add new BasicBlocks to database", "error"
-§§    finally:
-§§        connection.close()
-§§        engine.dispose()
-§§
-§§    print(targetFile.filename)
-§§    return "Added new BasicBlocks to database", "success"
+def setNewBasicBlocks(targetFile, projId):
+    basicBlocks = []
+    targetFile.seek(0)
+    data = targetFile.read()
+    reader = csv.reader(data.decode('utf-8').splitlines())
+    for row in reader:
+        basicBlocks.append(row)
+
+    project = models.Fuzzjob.query.filter_by(id=projId).first()
+
+    engine = create_engine(
+        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
+    connection = engine.connect()
+    try:
+        targetModulesData = connection.execute(GET_TARGET_MODULES)
+        targetModules = []
+        for row in targetModulesData:
+            targetModules.append([row[1], row[0]])
+
+        for row in basicBlocks:
+            for targetModule in targetModules:
+                if row[0] == targetModule[0]:
+                    row[0] = targetModule[1]
+                    data = {"ModuleID": row[0], "Offset": row[1]}
+                    statement = text(INSERT_BLOCK_TO_COVER)
+                    connection.execute(statement, data)
+
+    except Exception as e:
+        print(e)
+        return "Error: Failed to add new BasicBlocks to database", "error"
+    finally:
+        connection.close()
+        engine.dispose()
+
+    print(targetFile.filename)
+    return "Added new BasicBlocks to database", "success"
 
 
 def executeResetFuzzjobStmts(projId, deletePopulation):
     project = getProject(projId)
 
-§§    engine = create_engine(
-§§        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
-§§    connection = engine.connect()
+    engine = create_engine(
+        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
+    connection = engine.connect()
     try:
         for stmt in ResetFuzzjobStmts:
             connection.execute(stmt)
@@ -631,22 +631,22 @@ def executeResetFuzzjobStmts(projId, deletePopulation):
             connection.execute(DELETE_TESTCASES_WITHOUT_POPULATION)
             connection.execute(RESET_INITIAL_RATING)
 
-§§        return "Reset Fuzzjob was successful", "success"
+        return "Reset Fuzzjob was successful", "success"
     except Exception as e:
         print(e)
         return "Error: Failed to reset fuzzjob", "error"
-§§    finally:
-§§        connection.close()
-§§        engine.dispose()
+    finally:
+        connection.close()
+        engine.dispose()
 
 
 def insertModules(projId, f):
     project = models.Fuzzjob.query.filter_by(id = projId).first()
 
     if project is not None:
-§§        engine = create_engine(
-§§            'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
-§§        connection = engine.connect()
+        engine = create_engine(
+            'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
+        connection = engine.connect()
         try:
             isEmpty = False
             for key in f.keys():
@@ -674,9 +674,9 @@ def insertModules(projId, f):
         except Exception as e:
             print(e)
             return "Error: Failed to add module", "error"
-§§        finally:
-§§            connection.close()
-§§            engine.dispose()
+        finally:
+            connection.close()
+            engine.dispose()
         return "Added Module(s)", "success"
     else:
         return "Error: Project not found", "error"
@@ -688,9 +688,9 @@ def createByteIOTestcase(projId, testcaseId):
     project = models.Fuzzjob.query.filter_by(id = projId).first()
     byteIO = io.BytesIO()
 
-§§    engine = create_engine(
-§§        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
-§§    connection = engine.connect()
+    engine = create_engine(
+        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
+    connection = engine.connect()
     try:
         data = {"guid": guid, "localId": localId}
         statement = text(GET_NN_TESTCASE_RAWBYTES)
@@ -707,9 +707,9 @@ def createByteIOTestcase(projId, testcaseId):
     except Exception as e:
         print(e)
         abort(400)
-§§    finally:
-§§        connection.close()
-§§        engine.dispose()
+    finally:
+        connection.close()
+        engine.dispose()
 
     return byteIO, filename
 
@@ -718,9 +718,9 @@ def createByteIOForSmallestVioOrCrash(projId, footprint):
     project = models.Fuzzjob.query.filter_by(id = projId).first()
     byteIO = io.BytesIO()
 
-§§    engine = create_engine(
-§§        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
-§§    connection = engine.connect()
+    engine = create_engine(
+        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
+    connection = engine.connect()
     try:
         data = {"footprint": footprint}
         statement = text(GET_SMALLEST_VIO_OR_CRASH_TC)
@@ -732,9 +732,9 @@ def createByteIOForSmallestVioOrCrash(projId, footprint):
     except Exception as e:
         print(e)
         abort(400)
-§§    finally:
-§§        connection.close()
-§§        engine.dispose()
+    finally:
+        connection.close()
+        engine.dispose()
 
     return byteIO
 
@@ -742,9 +742,9 @@ def createByteIOForSmallestVioOrCrash(projId, footprint):
 def addCommand(projId, guid, hostAndPort = None):
     project = models.Fuzzjob.query.filter_by(id = projId).first()
 
-§§    engine = create_engine(
-§§        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
-§§    connection = engine.connect()
+    engine = create_engine(
+        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
+    connection = engine.connect()
     try:
         if not hostAndPort:
             data = {"guid": guid}
@@ -757,17 +757,17 @@ def addCommand(projId, guid, hostAndPort = None):
         db.session.commit()
     except Exception as e:
         print(e)
-§§    finally:
-§§        connection.close()
-§§        engine.dispose()
+    finally:
+        connection.close()
+        engine.dispose()
 
 
 def addCommandToKillInstanceType(projId, myType):
     project = models.Fuzzjob.query.filter_by(id = projId).first()
 
-§§    engine = create_engine(
-§§        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
-§§    connection = engine.connect()
+    engine = create_engine(
+        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
+    connection = engine.connect()
     try:
         data = {"myType": myType}
         statement = text(MANAGED_INSTANCES_HOST_AND_PORT_AGENT_TYPE)
@@ -785,17 +785,17 @@ def addCommandToKillInstanceType(projId, myType):
     except Exception as e:
         print(e)
         pass
-§§    finally:
-§§        connection.close()
-§§        engine.dispose()
+    finally:
+        connection.close()
+        engine.dispose()
 
 
 def insertTestcases(projId, files):
     project = models.Fuzzjob.query.filter_by(id = projId).first()
 
-§§    engine = create_engine(
-§§        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
-§§    connection = engine.connect()
+    engine = create_engine(
+        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
+    connection = engine.connect()
     try:
         localId = connection.execute(GET_MAX_LOCALID).fetchone()[0]
 
@@ -815,19 +815,19 @@ def insertTestcases(projId, files):
     except Exception as e:
         print(e)
         abort(400)
-§§    finally:
-§§        connection.close()
-§§        engine.dispose()
+    finally:
+        connection.close()
+        engine.dispose()
 
     return "Failed to add Testcase", "error"
 
 
 def updateSettings(projId, settingId, settingValue):
     if len(settingValue) > 0:
-§§        project = models.Fuzzjob.query.filter_by(id=projId).first()
-§§        engine = create_engine(
-§§            'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
-§§        connection = engine.connect()
+        project = models.Fuzzjob.query.filter_by(id=projId).first()
+        engine = create_engine(
+            'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
+        connection = engine.connect()
         try:
             statement = text(UPDATE_SETTINGS)
             data = {"Id": settingId, "SettingValue": settingValue}
@@ -838,31 +838,31 @@ def updateSettings(projId, settingId, settingValue):
             print(e)
             message = "Could not modify setting"
             status = "Error"
-§§        finally:
-§§            connection.close()
-§§            engine.dispose()
+        finally:
+            connection.close()
+            engine.dispose()
     else:
         message = "Value cannot be empty!"
         status = "Error"
 
     return message, status
 
-§§
+
 def deleteElement(projId, elementName, query, data):
     project = models.Fuzzjob.query.filter_by(id = projId).first()
 
-§§    engine = create_engine(
-§§        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
-§§    connection = engine.connect()
+    engine = create_engine(
+        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
+    connection = engine.connect()
     try:
         connection.execute(text(query), data)
         msg, category = elementName + " deleted", "success"
     except Exception as e:
         print(e)
         msg, category = "Error: Could not delete " + elementName, "error"
-§§    finally:
-§§        connection.close()
-§§        engine.dispose()
+    finally:
+        connection.close()
+        engine.dispose()
 
     return msg, category
 
@@ -962,7 +962,7 @@ def insertFormInputForProject(form, request):
     targetFileName = ""
     
     if not myProjName or not form.targetCMDLine.data or form.option_module.data is None or not form.option_module_value.data:
-§§        return ["Error: Could not create project! Check input data!", "error"]
+        return ["Error: Could not create project! Check input data!", "error"]
 
     targetFileUpload = False
 
@@ -973,21 +973,21 @@ def insertFormInputForProject(form, request):
         FTP_CONNECTOR.saveTargetFileOnFTPServer(targetFileData, targetFileName)
         targetFileUpload = True
 
-§§    project = createNewDatabase(name=myProjName)
-§§    db.session.add(project)
-§§    db.session.commit()
-§§    locations = request.form.getlist('location')
+    project = createNewDatabase(name=myProjName)
+    db.session.add(project)
+    db.session.commit()
+    locations = request.form.getlist('location')
 
-§§    for loc in locations:
-§§        location = models.Locations.query.filter_by(Name=loc).first()
-§§        location_fuzzjob = models.LocationFuzzjobs(Location=location.id, Fuzzjob=project.id)
-§§        db.session.add(location_fuzzjob)
-§§        db.session.commit()
+    for loc in locations:
+        location = models.Locations.query.filter_by(Name=loc).first()
+        location_fuzzjob = models.LocationFuzzjobs(Location=location.id, Fuzzjob=project.id)
+        db.session.add(location_fuzzjob)
+        db.session.commit()
 
-§§    engine = create_engine(
-§§        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
-§§    connection = engine.connect()
-§§    try:
+    engine = create_engine(
+        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
+    connection = engine.connect()
+    try:
         data = {"SettingName": 'targetCMDLine', "SettingValue": form.targetCMDLine.data}
         statement = text(INSERT_SETTINGS)
         connection.execute(statement, data)
@@ -1066,19 +1066,19 @@ def insertFormInputForProject(form, request):
                 connection.execute(text(INSERT_NICE_NAME_TESTCASE), {"testcaseID": testcaseID, "newName": f.filename})
                 localId += 1
         else:
-§§            return ["Error: No files were found!", "error"]
+            return ["Error: No files were found!", "error"]
 
-§§        if 'basicBlockFile' in request.files:
-§§            if form.subtype.data == "ALL_GDB":
-§§                setNewBasicBlocks(request.files['basicBlockFile'], project.id)
+        if 'basicBlockFile' in request.files:
+            if form.subtype.data == "ALL_GDB":
+                setNewBasicBlocks(request.files['basicBlockFile'], project.id)
 
-§§        return ["Success: Created new project", "success", project.id]
+        return ["Success: Created new project", "success", project.id]
     except Exception as e:
         print(e)
-§§        return ["Error: " + str(e), "error"]
-§§    finally:
-§§        connection.close()
-§§        engine.dispose()
+        return ["Error: " + str(e), "error"]
+    finally:
+        connection.close()
+        engine.dispose()
 
 
 def getGraphData(projId):
@@ -1087,8 +1087,8 @@ def getGraphData(projId):
     nodes = []
     edges = []
 
-§§    engine = create_engine('mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, project.DBHost, project.DBName))
-§§    connection = engine.connect()
+    engine = create_engine('mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, project.DBHost, project.DBName))
+    connection = engine.connect()
     try:
         result = connection.execute(GET_POPULATION_DETAILS)
 
@@ -1126,13 +1126,13 @@ def getGraphData(projId):
                     numEdges = crashParentRow["NumberEdges"]
                     edge = {"parent": parentCyID, "child": footprintNode["cyId"], "label": numEdges}
                     edges.append(edge)
-§§
+
     except Exception as e:
         print(e)
         pass
-§§    finally:
-§§        connection.close()
-§§        engine.dispose()
+    finally:
+        connection.close()
+        engine.dispose()
 
     graphdata["nodes"] = nodes
     graphdata["edges"] = edges
@@ -1173,15 +1173,15 @@ def deleteFuzzjob(projId):
 
 
 def deleteDatabase(fuzzjobName):
-§§    engine = create_engine(
-§§        'mysql://%s:%s@%s/%s' % (config.DBUSER, config.DBPASS, fluffiResolve(config.DBHOST), config.DEFAULT_DBNAME))
-§§    connection = engine.connect()
+    engine = create_engine(
+        'mysql://%s:%s@%s/%s' % (config.DBUSER, config.DBPASS, fluffiResolve(config.DBHOST), config.DEFAULT_DBNAME))
+    connection = engine.connect()
     try:
         connection.execute("DROP DATABASE {};".format(config.DBPREFIX + fuzzjobName.lower()))
         return True
     except Exception as e:
         print(e)
         return False
-§§    finally:
-§§        connection.close()
-§§        engine.dispose()
+    finally:
+        connection.close()
+        engine.dispose()

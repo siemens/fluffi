@@ -23,7 +23,7 @@ namespace FluffiTester
 	{
 	public:
 
-§§		CommPartnerManager* cPManager = nullptr;
+		CommPartnerManager* cPManager = nullptr;
 
 		TEST_METHOD_INITIALIZE(ModuleInitialize)
 		{
@@ -84,7 +84,7 @@ namespace FluffiTester
 
 			// Proove that every CommPartner is used in correct ratio!
 			for (int i = 0; i < numberOfPartner; i++) {
-§§				Assert::IsTrue(resultedPartnerRatio[i] > (0.09 * numberOfPartnerCalculations), L"Error in resulted CommPartner Ratio!, Proove RNG, weights and logic! (updateCommPartners)");
+				Assert::IsTrue(resultedPartnerRatio[i] > (0.09 * numberOfPartnerCalculations), L"Error in resulted CommPartner Ratio!, Proove RNG, weights and logic! (updateCommPartners)");
 			}
 		}
 

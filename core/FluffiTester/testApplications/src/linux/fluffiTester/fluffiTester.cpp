@@ -30,15 +30,15 @@ std::vector<char> readAllBytesFromFile(std::string filename)
 		return{};
 	}
 
-§§	std::vector<char> result((unsigned int)fileSize);
+	std::vector<char> result((unsigned int)fileSize);
 
 	ifs.seekg(0, std::ios::beg);
-§§	ifs.read((char*)&result[0], fileSize);
+	ifs.read((char*)&result[0], fileSize);
 
 	return result;
 }
 
-§§void parseInput(char* recvbuf) {
+void parseInput(char* recvbuf) {
 
 	char bufferThatIsTooSmall[0x42];
 

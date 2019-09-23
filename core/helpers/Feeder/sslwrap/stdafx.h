@@ -28,4 +28,4 @@ Author(s): Michael Kraus, Thomas Riedmaier, Pascal Eckmann
 #include <openssl/x509.h>
 #include <openssl/x509_vfy.h>
 
-§§extern "C" FILE* __cdecl __iob_func(void);
+extern "C" FILE* __cdecl __iob_func(void);

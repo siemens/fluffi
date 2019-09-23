@@ -42,7 +42,7 @@ class CreateProjectForm(FlaskForm):
     option_module_value = StringField("target_module_path", validators = [DataRequired()])
     filename = FileField(validators = [FileRequired()])
     targetfile = FileField(validators = [FileRequired()])
-§§    basicBlockFile = FileField()
+    basicBlockFile = FileField()
     targets = FieldList(FormField(TargetForm))
     options = FieldList(FormField(OptionForm))
 
@@ -114,11 +114,11 @@ class AddNewSystemForm(FlaskForm):
     add_host = SubmitField('Add')
 
 
-§§class ChangeAgentStarterModeForm(FlaskForm):
-§§    mode = SelectField(label = "Select mode: ", choices = [("active", "ACTIVE"), ("inactive", "INACTIVE"), ("kill", "KILL")])
-§§    execute_change_mode = SubmitField('Change')
-§§
-§§
+class ChangeAgentStarterModeForm(FlaskForm):
+    mode = SelectField(label = "Select mode: ", choices = [("active", "ACTIVE"), ("inactive", "INACTIVE"), ("kill", "KILL")])
+    execute_change_mode = SubmitField('Change')
+
+
 class ChangePXEForm(FlaskForm):
     pxesystem = SelectField(label = "PXE System: ", choices = [])
     execute_change_pxe = SubmitField('Change')

@@ -18,13 +18,13 @@
 THREADS=$(cat /proc/cpuinfo | grep processor | wc -l)
 ARCH=$(file /bin/bash | awk -F',' '{print $2}' | tr -d ' ')
 
-§§rm -rf lib/$ARCH
+rm -rf lib/$ARCH
 
 mkdir -p lib/$ARCH
 
 # Getting afl
 
-§§rm -rf afl
+rm -rf afl
 
 git clone https://github.com/mirrorer/afl.git
 cd afl
@@ -43,4 +43,4 @@ cd ../..
 cp afl/build${ARCH}/libafl.a lib/${ARCH}/libafl.a
 
 
-§§rm -rf afl
+rm -rf afl

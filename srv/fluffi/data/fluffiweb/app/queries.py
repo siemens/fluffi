@@ -12,8 +12,8 @@ INSERT_SETTINGS = (
     "INSERT INTO settings(SettingName, SettingValue) VALUES(:SettingName, :SettingValue)")
 INSERT_MODULE = (
     "INSERT INTO target_modules(ModuleName, ModulePath) VALUES(:ModuleName, :ModulePath)")
-§§INSERT_BLOCK_TO_COVER = (
-§§    "INSERT INTO blocks_to_cover(ModuleID, Offset) VALUES(:ModuleID, :Offset) ON DUPLICATE KEY UPDATE ModuleID = :ModuleID, Offset = :Offset")
+INSERT_BLOCK_TO_COVER = (
+    "INSERT INTO blocks_to_cover(ModuleID, Offset) VALUES(:ModuleID, :Offset) ON DUPLICATE KEY UPDATE ModuleID = :ModuleID, Offset = :Offset")
 NUMBER_OF_NO_LONGER_LISTED = (
     "SELECT Amount FROM billing WHERE Resource='RunTestcasesNoLongerListed'")
 COMPLETED_TESTCASES_COUNT = (
@@ -160,12 +160,12 @@ GET_POPULATION_DETAILS = (
     "LEFT JOIN nice_names_managed_instance as nnmi on it.CreatorServiceDescriptorGUID = nnmi.ServiceDescriptorGUID "
     "WHERE (it.TestCaseType=0 OR it.TestCaseType=5);")
 
-§§GET_CHECKED_RATING = (
-§§    "SELECT it.Rating "
-§§    "FROM interesting_testcases AS it "
-§§    "WHERE TestCaseType=0 AND Rating > (SELECT o.value FROM fluffi_gm.gm_options AS o WHERE setting = 'checkrating')"
-§§    "LIMIT 1")
-§§
+GET_CHECKED_RATING = (
+    "SELECT it.Rating "
+    "FROM interesting_testcases AS it "
+    "WHERE TestCaseType=0 AND Rating > (SELECT o.value FROM fluffi_gm.gm_options AS o WHERE setting = 'checkrating')"
+    "LIMIT 1")
+
 GET_CRASH_DETAILS = (
     "SELECT DISTINCT cd.CrashFootprint FROM crash_descriptions as cd;")
 
@@ -179,20 +179,20 @@ GET_NN_TESTCASE_RAWBYTES = (
     "SELECT it.RawBytes, nnt.NiceName FROM interesting_testcases as it LEFT JOIN nice_names_testcase as nnt "
     "ON it.ID = nnt.TestcaseID "
     "WHERE CreatorServiceDescriptorGUID=:guid AND CreatorLocalID=:localId;")
-§§	
-§§GET_PROJECTS = (
-§§    "SELECT"
-§§        "(SELECT COUNT(*) FROM completed_testcases),"
-§§        "(SELECT Amount FROM billing WHERE Resource='RunTestcasesNoLongerListed'),"
-§§        "SUM(CASE WHEN TestCaseType = 0 THEN 1 ELSE 0 END),"
-§§        "SUM(CASE WHEN TestCaseType = 1 THEN 1 ELSE 0 END),"
-§§        "SUM(CASE WHEN TestCaseType = 2 THEN 1 ELSE 0 END),"
-§§        "SUM(CASE WHEN TestCaseType = 3 THEN 1 ELSE 0 END),"
-§§        "SUM(CASE WHEN TestCaseType = 4 THEN 1 ELSE 0 END),"
-§§        "(SELECT Rating FROM interesting_testcases WHERE TestCaseType=0 AND Rating > "
-§§        "(SELECT o.value FROM fluffi_gm.gm_options AS o WHERE setting = 'checkrating') LIMIT 1)"
-§§    "FROM interesting_testcases;"
-§§)
+	
+GET_PROJECTS = (
+    "SELECT"
+        "(SELECT COUNT(*) FROM completed_testcases),"
+        "(SELECT Amount FROM billing WHERE Resource='RunTestcasesNoLongerListed'),"
+        "SUM(CASE WHEN TestCaseType = 0 THEN 1 ELSE 0 END),"
+        "SUM(CASE WHEN TestCaseType = 1 THEN 1 ELSE 0 END),"
+        "SUM(CASE WHEN TestCaseType = 2 THEN 1 ELSE 0 END),"
+        "SUM(CASE WHEN TestCaseType = 3 THEN 1 ELSE 0 END),"
+        "SUM(CASE WHEN TestCaseType = 4 THEN 1 ELSE 0 END),"
+        "(SELECT Rating FROM interesting_testcases WHERE TestCaseType=0 AND Rating > "
+        "(SELECT o.value FROM fluffi_gm.gm_options AS o WHERE setting = 'checkrating') LIMIT 1)"
+    "FROM interesting_testcases;"
+)
 
 ResetFuzzjobStmts = [
     "UPDATE billing SET amount = 0",
@@ -238,15 +238,15 @@ def getITQueryOfType(n):
     )
 
 
-§§def getITQueryOfTypeNoRaw(n):
-§§    return (
-§§        "SELECT it.ID, it.CreatorServiceDescriptorGUID, it.CreatorLocalID, it.Rating, it.TimeOfInsertion, "
-§§        "nn.NiceName "
-§§        "FROM interesting_testcases AS it "
-§§        "LEFT JOIN nice_names_testcase AS nn ON it.ID = nn.TestcaseID "
-§§        "WHERE TestCaseType={} LIMIT 1000;".format(n)
-§§    )
-§§
-§§
+def getITQueryOfTypeNoRaw(n):
+    return (
+        "SELECT it.ID, it.CreatorServiceDescriptorGUID, it.CreatorLocalID, it.Rating, it.TimeOfInsertion, "
+        "nn.NiceName "
+        "FROM interesting_testcases AS it "
+        "LEFT JOIN nice_names_testcase AS nn ON it.ID = nn.TestcaseID "
+        "WHERE TestCaseType={} LIMIT 1000;".format(n)
+    )
+
+
 def getMICountOfTypeQuery(n):
     return "SELECT COUNT(*) FROM managed_instances WHERE AgentType=" + str(n)

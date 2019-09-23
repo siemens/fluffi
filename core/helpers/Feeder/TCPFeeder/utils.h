@@ -20,8 +20,8 @@ Author(s): Abian Blome, Thomas Riedmaier, Pascal Eckmann
 #define SOCKET_ERROR -1
 
 std::string execCommandAndGetOutput(std::string command);
-§§char** split_commandline(const std::string cmdline);
-§§int memcpy_s(void* a, size_t b, const void* c, size_t d);
+char** split_commandline(const std::string cmdline);
+int memcpy_s(void* a, size_t b, const void* c, size_t d);
 #endif
 
 bool isPortOpen(std::string target, uint16_t port);

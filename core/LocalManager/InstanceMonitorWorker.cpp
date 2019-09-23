@@ -18,7 +18,7 @@ Author(s): Thomas Riedmaier, Abian Blome, Pascal Eckmann
 #include "Util.h"
 #include "LMWorkerThreadState.h"
 
-§§InstanceMonitorWorker::InstanceMonitorWorker(CommInt* commInt, LMWorkerThreadStateBuilder* workerThreadStateBuilder, int loopIntervalMS, std::string location)
+InstanceMonitorWorker::InstanceMonitorWorker(CommInt* commInt, LMWorkerThreadStateBuilder* workerThreadStateBuilder, int loopIntervalMS, std::string location)
 {
 	m_commInt = commInt;
 	m_workerThreadStateBuilder = workerThreadStateBuilder;

@@ -38,7 +38,7 @@ public:
 
 	//Instance management
 	bool addNewManagedInstanceStatus(std::string ServiceDescriptorGUID, std::string newStatus);
-§§	std::vector<FluffiServiceDescriptor> getRegisteredInstancesOfAgentType(AgentType type, std::string location);
+	std::vector<FluffiServiceDescriptor> getRegisteredInstancesOfAgentType(AgentType type, std::string location);
 	std::string getRegisteredInstanceSubType(std::string ServiceDescriptorGUID);
 	std::vector<std::pair<std::string, int>> getRegisteredInstancesNumOfSubTypes();
 	std::vector<std::pair<FluffiServiceDescriptor, AgentType>> getAllRegisteredInstances(std::string location);
@@ -84,7 +84,7 @@ public:
 	//Misc
 	bool initializeBillingTable();
 	bool addRunnerSeconds(unsigned int secondsToAdd);
-§§	bool addRunTestcasesNoLongerListed(unsigned int numberOfTestcasesNoLongerListed);
+	bool addRunTestcasesNoLongerListed(unsigned int numberOfTestcasesNoLongerListed);
 	unsigned long long cleanCompletedTestcasesTableOlderThanXSec(int olderThanInSeconds);
 
 #ifdef _VSTEST

@@ -22,6 +22,6 @@
 uint32_t SWAP32(uint32_t _x);
 uint16_t SWAP16(uint16_t _x);
 uint32_t UR(uint32_t limit);
-§§std::vector<char> mutateWithAFLHavoc(const std::vector<char> input);
+std::vector<char> mutateWithAFLHavoc(const std::vector<char> input);
 
 #endif /* AFL_FLUFFI_INCLUDE */

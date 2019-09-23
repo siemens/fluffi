@@ -25,7 +25,7 @@
   register: stat_result
 
 - debug:
-§§    msg: "{{SUTPath}}/{{SUTDirName}} exists"
+    msg: "{{SUTPath}}/{{SUTDirName}} exists"
   when: stat_result.stat.exists
 
 - name: Ensure directories are 0777
@@ -42,13 +42,13 @@
     state: absent
   when: stat_result.stat.exists
 
-§§- name: Check if the file {{SUTFileName}}.zip already exists
+- name: Check if the file {{SUTFileName}}.zip already exists
   stat:
     path: "{{SUTPath}}/{{SUTDirName}}.zip"
   register: stat2_result
 
 - debug:
-§§    msg: "{{SUTPath}}/{{SUTDirName}}.zip exists"
+    msg: "{{SUTPath}}/{{SUTDirName}}.zip exists"
   when: stat2_result.stat.exists
 
 - name: Ensure file are 0777

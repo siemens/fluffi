@@ -179,7 +179,7 @@ namespace FluffiTester
 			FluffiTestcaseID parentId = FluffiTestcaseID(sd, 111);
 			FluffiTestResult tR = FluffiTestResult(ExitType::Exception_Other, std::vector<FluffiBasicBlock>(), std::string("testMessage"), true);
 
-§§			TestOutcomeDescriptor* outcomeDesc = new TestOutcomeDescriptor(id, parentId, tR);
+			TestOutcomeDescriptor* outcomeDesc = new TestOutcomeDescriptor(id, parentId, tR);
 			testResultManager->pushNewTestOutcomeFromTCRunner(outcomeDesc);
 
 			Assert::IsTrue(testResultManager->isThereAlreadyAToDFor(id), L"The TETestResultManager failed to find the ToD we just pushed");

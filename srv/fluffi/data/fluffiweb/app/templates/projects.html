@@ -22,13 +22,13 @@ Author(s): Junes Najah, Abian Blome, Thomas Riedmaier, Pascal Eckmann, Michael K
 <div class="container">
     <h1>Fuzzjobs</h1>
     <div>
-§§        <a href="/projects/createProject"><button class="btn btn-default">Create Fuzzjob</button></a>
-§§        <a href="/projects/createCustomProject"><button class="btn btn-default">Register Fuzzjob</button></a>
+        <a href="/projects/createProject"><button class="btn btn-default">Create Fuzzjob</button></a>
+        <a href="/projects/createCustomProject"><button class="btn btn-default">Register Fuzzjob</button></a>
     </div>
 </div>
-§§<div class="container">
-§§    {{ flashMessages() }}
-§§</div>
+<div class="container">
+    {{ flashMessages() }}
+</div>
 <hr>
 
 <div class="jumbotron">
@@ -44,25 +44,25 @@ Author(s): Junes Najah, Abian Blome, Thomas Riedmaier, Pascal Eckmann, Michael K
             <th>Name</th>
             <th>Status</th>
             <th>Testcases</th>
-§§            <th>Num Population</th>
-§§            <th>Hangs</th>
-§§            <th>Access violations</th>
-§§            <th>Exceptions</th>
-§§            <th>No response</th>
+            <th>Num Population</th>
+            <th>Hangs</th>
+            <th>Access violations</th>
+            <th>Exceptions</th>
+            <th>No response</th>
             <th>Operations</th>
         </tr>
         </thead>
         <tbody>
         {% for project in projects %}
         <tr>
-§§            <td><a class="{{'alert-bg-table' if project.checkRating }}" href="/projects/view/{{ project.id }}">{{ project.name[:30] }}</a></td>
+            <td><a class="{{'alert-bg-table' if project.checkRating }}" href="/projects/view/{{ project.id }}">{{ project.name[:30] }}</a></td>
             <td>{{ project.status }}</td>
             <td>{{ project.testcases }}</td>
-§§            <td>{{ project.numPopulation }}</td>
-§§            <td>{{ project.numHang }}</td>
-§§            <td>{{ project.numAccessViolation }}</td>
-§§            <td>{{ project.numException }}</td>
-§§            <td>{{ project.numNoResponse }}</td>
+            <td>{{ project.numPopulation }}</td>
+            <td>{{ project.numHang }}</td>
+            <td>{{ project.numAccessViolation }}</td>
+            <td>{{ project.numException }}</td>
+            <td>{{ project.numNoResponse }}</td>
             <td>
                 <form action="{{ url_for('archiveProject', projId=project.id) }}" method="POST" class="archive-form">
                     <input class="btn btn-default" id="{{ project.name }}" type="submit" value="archive"/>

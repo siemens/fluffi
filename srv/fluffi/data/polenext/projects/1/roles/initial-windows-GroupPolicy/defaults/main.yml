@@ -8,7 +8,7 @@
 # 
 # Author(s): Fabian Russwurm, Thomas Riedmaier, Pascal Eckmann
 
-§§# Default variables
+# Default variables
 
 # File name of the executable to apply local group policies
 LGPOExecutableFileName: LGPO.exe

@@ -8,14 +8,14 @@
 # 
 # Author(s): Pascal Eckmann, Thomas Riedmaier
 
-§§# Which driver
-§§type: chipset
-§§
-§§# Folder name on the FTP server
-§§FTPDriverDirname: Driver
-§§
-§§# Prefix of all installer files
-§§installerFilename: install.exe
-§§
-§§# Installer flags per driver installer
-§§installerFlags: /install /passive /norestart
+# Which driver
+type: chipset
+
+# Folder name on the FTP server
+FTPDriverDirname: Driver
+
+# Prefix of all installer files
+installerFilename: install.exe
+
+# Installer flags per driver installer
+installerFlags: /install /passive /norestart

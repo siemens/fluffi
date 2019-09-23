@@ -12,11 +12,11 @@
   set_fact:
     OSRootDirName: "{{OSRootDirNameArgument}}"
 
-§§- name: Clean root directory of the TFTP server
+- name: Clean root directory of the TFTP server
   local_action: "shell rm -r {{TFTPRootPath}}/*"
   ignore_errors: yes
 
-§§- name: Copy root directory to TFTP server
+- name: Copy root directory to TFTP server
   local_action: "shell cp -pr {{TFTPAllRootsPath}}/{{OSRootDirName}}/* {{TFTPRootPath}}/"
 
 #- name: Change DHCP Boot-file

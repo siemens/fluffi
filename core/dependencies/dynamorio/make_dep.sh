@@ -34,13 +34,13 @@ ARCH=$(file /bin/bash | awk -F',' '{print $2}' | tr -d ' ')
 # delete old build results (but do not throw away include/build$ARCH of other architectures)
 mkdir -p include
 find include -mindepth 1 ! -regex '^include/build\(.*\)?' -delete
-§§rm -rf include/build$ARCH
-§§rm -rf dyndist$ARCH
+rm -rf include/build$ARCH
+rm -rf dyndist$ARCH
 
 mkdir -p include
 mkdir -p dyndist$ARCH
 
-§§rm -rf dynamorio
+rm -rf dynamorio
 
 # Getting dynamorio from git
 
@@ -70,7 +70,7 @@ cd dynamorio/
 find . -name '*.h' -exec cp --parents \{\} ../include/ \;
 cd ..
 
-§§rm -rf dynamorio
+rm -rf dynamorio
 
 #Create a minimal drcovlib.h, that is easy to include
-§§awk '/typedef struct _bb_entry_t/,/bb_entry_t;/' include/ext/drcovlib/drcovlib.h > include/ext/drcovlib/drcovlib_min.h
+awk '/typedef struct _bb_entry_t/,/bb_entry_t;/' include/ext/drcovlib/drcovlib.h > include/ext/drcovlib/drcovlib_min.h

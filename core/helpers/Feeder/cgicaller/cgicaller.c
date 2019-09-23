@@ -48,8 +48,8 @@ int main(int argc, char* argv[])
 	sprintf(content_length + 15, "%d", (int)st.st_size);
 
 	//http://www.cgi101.com/book/ch3/text.html
-§§	char* envp[] = { content_length, "CONTENT_TYPE=application/x-www-form-urlencoded","QUERY_STRING=","REMOTE_ADDR=127.0.0.1","REMOTE_PORT=22222","REQUEST_METHOD=POST" , NULL };
-§§	char* target[] = { "/etc/httpd/swarm.cgi", NULL };
+	char* envp[] = { content_length, "CONTENT_TYPE=application/x-www-form-urlencoded","QUERY_STRING=","REMOTE_ADDR=127.0.0.1","REMOTE_PORT=22222","REQUEST_METHOD=POST" , NULL };
+	char* target[] = { "/etc/httpd/swarm.cgi", NULL };
 
 	stdin = freopen(argv[1], "r", stdin);
 

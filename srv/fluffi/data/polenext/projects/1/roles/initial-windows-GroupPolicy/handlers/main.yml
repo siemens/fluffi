@@ -8,13 +8,13 @@
 # 
 # Author(s): Thomas Riedmaier, Fabian Russwurm, Pascal Eckmann
 
-§§- name: Ensure Windows NTP service is running
+- name: Ensure Windows NTP service is running
   #listen: Start and sync windows NTP
   win_service:
     name: W32Time
     start_mode: auto
     state: restarted
 
-§§- name: Force Windows NTP time sync
+- name: Force Windows NTP time sync
   #listen: Start and sync windows NTP
   win_command: w32tm /resync /rediscover

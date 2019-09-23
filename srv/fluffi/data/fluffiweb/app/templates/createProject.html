@@ -27,7 +27,7 @@ Author(s): Junes Najah, Thomas Riedmaier, Pascal Eckmann, Michael Kraus, Abian B
 <div class="jumbotron">
     <div class="container"></div>
 </div>
-§§
+
 <br>
 <div class="container">
     <form action="" enctype="multipart/form-data" method="POST" name="createProject">
@@ -52,7 +52,7 @@ Author(s): Junes Najah, Thomas Riedmaier, Pascal Eckmann, Michael Kraus, Abian B
             </div>
             <br>
             <label for="subtype">Runner Type:</label>
-§§            <select class="form-control runner-type" id="subtype" name="subtype">
+            <select class="form-control runner-type" id="subtype" name="subtype">
                 {% for runnerTypeOption in RunnerTypeOptions %}
                 <option>{{runnerTypeOption}}</option>
                 {% endfor %}
@@ -60,7 +60,7 @@ Author(s): Junes Najah, Thomas Riedmaier, Pascal Eckmann, Michael Kraus, Abian B
             <br>
             <label for="generatorTypes">Generator Types:</label>
             <div>
-§§                <div class="create-project-code" id="chosenGeneratorTypes">{{ defaultSubTypesOfGenerator }}</div>
+                <div class="create-project-code" id="chosenGeneratorTypes">{{ defaultSubTypesOfGenerator }}</div>
             </div>
             <div style="padding-top: 5px">
                 <button class="btn btn-default" data-target="#addGeneratorTypes" data-toggle="modal" type="button">Set
@@ -107,7 +107,7 @@ Author(s): Junes Najah, Thomas Riedmaier, Pascal Eckmann, Michael Kraus, Abian B
             <br>
             <label for="evaluatorTypes">Evaluator Types:</label>
             <div>
-§§                <div class="create-project-code" id="chosenEvaluatorTypes">{{ defaultSubTypesOfEvaluator }}</div>
+                <div class="create-project-code" id="chosenEvaluatorTypes">{{ defaultSubTypesOfEvaluator }}</div>
             </div>
             <div style="padding-top: 5px">
                 <button class="btn btn-default" data-target="#addEvaluatorTypes" data-toggle="modal" type="button">Set
@@ -156,12 +156,12 @@ Author(s): Junes Najah, Thomas Riedmaier, Pascal Eckmann, Michael Kraus, Abian B
             <label for="location">Location:</label>
             <select class="form-control" id="location" multiple name="location">
                 {% for loc in form.location.choices %}
-§§                <option class="create-project-option" value="{{loc}}">{{loc}}</option>
+                <option class="create-project-option" value="{{loc}}">{{loc}}</option>
                 {% endfor %}
             </select>
             <br>
             <label for="targetCMDLine">Target Command Line:</label>
-§§            <input class="form-control create-project-monospace" id="targetCMDLine" name="targetCMDLine"
+            <input class="form-control create-project-monospace" id="targetCMDLine" name="targetCMDLine"
                    placeholder="&quot;c:\path\to\execut able\bin.exe&quot; -flag"
                    type="text">
             <br>
@@ -198,7 +198,7 @@ Author(s): Junes Najah, Thomas Riedmaier, Pascal Eckmann, Michael Kraus, Abian B
                                    value="5000">
                         </td>
                         <td>
-§§                            <button data-toggle="fieldset-remove-rowoption" id="phone-removeoption" type="button" class="btn">
+                            <button data-toggle="fieldset-remove-rowoption" id="phone-removeoption" type="button" class="btn">
                                 <span class="glyphicon glyphicon-remove-circle"></span>
                             </button>
                         </td>
@@ -206,7 +206,7 @@ Author(s): Junes Najah, Thomas Riedmaier, Pascal Eckmann, Michael Kraus, Abian B
                     </tbody>
                 </table>
                 <button data-target="#option-fieldset" data-toggle="fieldset-add-rowoption" id="addOptionRow"
-§§                        type="button" class="btn">
+                        type="button" class="btn">
                     <span class="glyphicon glyphicon-plus"></span>
                 </button>
             </div>
@@ -244,14 +244,14 @@ Author(s): Junes Najah, Thomas Riedmaier, Pascal Eckmann, Michael Kraus, Abian B
                             <input class="form-control" id="1_targetpath" name="1_targetpath" type="text" value="*">
                         </td>
                         <td>
-§§                            <button data-toggle="fieldset-remove-row" id="phone-remove" type="button" class="btn">
+                            <button data-toggle="fieldset-remove-row" id="phone-remove" type="button" class="btn">
                                 <span class="glyphicon glyphicon-remove-circle"></span>
                             </button>
                         </td>
                     </tr>
                     </tbody>
                 </table>
-§§                <button data-target="#phone-fieldset" data-toggle="fieldset-add-row" type="button" class="btn">
+                <button data-target="#phone-fieldset" data-toggle="fieldset-add-row" type="button" class="btn">
                     <span class="glyphicon glyphicon-plus"></span>
                 </button>
                 <div style="margin-top: 30px">
@@ -276,16 +276,16 @@ Author(s): Junes Najah, Thomas Riedmaier, Pascal Eckmann, Michael Kraus, Abian B
                 <br> {{ form.filename(multiple="multiple") }}
                 <br>
             </p>
-§§            <hr>
-§§            <div class="basic-block-upload-box">
-§§                <h3>Basic Blocks:</h3>
-§§                <p>
+            <hr>
+            <div class="basic-block-upload-box">
+                <h3>Basic Blocks:</h3>
+                <p>
 
-§§                    <label for="basicBlockFile">Basic Blocks for GDB</label>
-§§                    <br> {{ form.basicBlockFile() }}
-§§                    <br>
-§§                </p>
-§§            </div>
+                    <label for="basicBlockFile">Basic Blocks for GDB</label>
+                    <br> {{ form.basicBlockFile() }}
+                    <br>
+                </p>
+            </div>
         </div>
         <button class="btn btn-success" id="fuzzButton" type="submit">FLUFFI FUZZ!</button>
     </form>

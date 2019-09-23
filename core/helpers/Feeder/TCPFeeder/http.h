@@ -14,5 +14,5 @@ Author(s): Thomas Riedmaier, Abian Blome, Pascal Eckmann
 #include "stdafx.h"
 
 void performHTTPAuthAndManageSession();
-§§void dropNoDoubleLinebreak(std::vector<char>* bytes);
-§§void fixHTTPContentLength(std::vector<char>* bytes);
+void dropNoDoubleLinebreak(std::vector<char>* bytes);
+void fixHTTPContentLength(std::vector<char>* bytes);

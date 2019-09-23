@@ -8,15 +8,15 @@
 # 
 # Author(s): Pascal Eckmann, Thomas Riedmaier
 
-§§- name: Ensure source directory exists
-§§  win_file:
-§§    path: "{{remoteUtilitiesFilePath}}"
-§§    state: directory
-§§
-§§- name: Get listing of files on FTP {{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{FTPDriverDirnameDirname}}/
-§§  local_action: "shell curl -l {{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{FTPDriverDirname}}/"
-§§  register: fileListing
-§§
-§§- name: Install all driver
-§§  include: fetchAndInstallDriver.yml archiveName="{{item}}"
-§§  with_items: "{{ fileListing.stdout_lines }}"
+- name: Ensure source directory exists
+  win_file:
+    path: "{{remoteUtilitiesFilePath}}"
+    state: directory
+
+- name: Get listing of files on FTP {{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{FTPDriverDirnameDirname}}/
+  local_action: "shell curl -l {{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{FTPDriverDirname}}/"
+  register: fileListing
+
+- name: Install all driver
+  include: fetchAndInstallDriver.yml archiveName="{{item}}"
+  with_items: "{{ fileListing.stdout_lines }}"

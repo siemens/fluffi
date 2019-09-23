@@ -27,9 +27,9 @@
 :: 
 :: Author(s): Thomas Riedmaier, Pascal Eckmann
 
-§§RMDIR /Q/S include
-§§RMDIR /Q/S bin
-§§RMDIR /Q/S lib
+RMDIR /Q/S include
+RMDIR /Q/S bin
+RMDIR /Q/S lib
 
 MKDIR include
 MKDIR include\siemens
@@ -44,7 +44,7 @@ MKDIR lib
 MKDIR lib\x64
 MKDIR lib\x86
 
-§§RMDIR /Q/S protobuf
+RMDIR /Q/S protobuf
 
 REM Building windows protobof staticly. Dynamic builds don't work with /MT or /MTd - only with dll
 
@@ -54,14 +54,14 @@ git checkout 106ffc04be1abf3ff3399f54ccf149815b287dd9
 mkdir build64
 mkdir build86
 cd build64
-§§cmake -G "Visual Studio 14 2015 Win64" -Dprotobuf_BUILD_TESTS=OFF ../cmake
+cmake -G "Visual Studio 14 2015 Win64" -Dprotobuf_BUILD_TESTS=OFF ../cmake
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDebugDll', 'MultiThreadedDebug' } | sc $f.PSPath }"
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDll', 'MultiThreaded' } | sc $f.PSPath }"
 "C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" protobuf.sln /m /t:Build /p:Configuration=Release /p:Platform=x64 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
 "C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" protobuf.sln /m /t:Build /p:Configuration=Debug /p:Platform=x64 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
 cd ..
 cd build86
-§§cmake -G "Visual Studio 14 2015" -Dprotobuf_BUILD_TESTS=OFF ../cmake
+cmake -G "Visual Studio 14 2015" -Dprotobuf_BUILD_TESTS=OFF ../cmake
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDebugDll', 'MultiThreadedDebug' } | sc $f.PSPath }"
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDll', 'MultiThreaded' } | sc $f.PSPath }"
 "C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" protobuf.sln /m /t:Build /p:Configuration=Release /p:Platform=Win32 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
@@ -88,9 +88,9 @@ waitfor SomethingThatIsNeverHappening /t 10 2>NUL
 ::reset errorlevel
 ver > nul
 
-§§RMDIR /Q/S protobuf
+RMDIR /Q/S protobuf
 
-§§bin\x64\protoc.exe --cpp_out="include\siemens\cpp" --csharp_out="include\siemens\csharp" FLUFFI.proto
+bin\x64\protoc.exe --cpp_out="include\siemens\cpp" --csharp_out="include\siemens\csharp" FLUFFI.proto
 
 goto :eof
 

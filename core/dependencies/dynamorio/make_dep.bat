@@ -26,9 +26,9 @@
 :: DAMAGE.
 :: 
 :: Author(s): Thomas Riedmaier, Pascal Eckmann
-§§RMDIR /Q/S include
-§§RMDIR /Q/S dyndist32
-§§RMDIR /Q/S dyndist64
+RMDIR /Q/S include
+RMDIR /Q/S dyndist32
+RMDIR /Q/S dyndist64
 
 
 MKDIR include
@@ -36,7 +36,7 @@ MKDIR dyndist32
 MKDIR dyndist64
 
 
-§§RMDIR /Q/S dynamorio
+RMDIR /Q/S dynamorio
 
 REM Getting dynamorio from git
 
@@ -62,7 +62,7 @@ cd build64
 SETLOCAL
 set PATH=C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin;%PATH%
 call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x64
-§§cmake -G "Visual Studio 12 2013 Win64" -DBUILD_CORE=ON -DBUILD_DOCS=OFF -DBUILD_DRSTATS=OFF -DBUILD_TOOLS=ON -DBUILD_SAMPLES=OFF -DBUILD_TESTS=OFF -DDEBUG=OFF -DCMAKE_WARN_DEPRECATED=OFF  ..
+cmake -G "Visual Studio 12 2013 Win64" -DBUILD_CORE=ON -DBUILD_DOCS=OFF -DBUILD_DRSTATS=OFF -DBUILD_TOOLS=ON -DBUILD_SAMPLES=OFF -DBUILD_TESTS=OFF -DDEBUG=OFF -DCMAKE_WARN_DEPRECATED=OFF  ..
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDebugDll', 'MultiThreadedDebug' } | sc $f.PSPath }"
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDll', 'MultiThreaded' } | sc $f.PSPath }"
 "C:\Program Files (x86)\MSBuild\12.0\Bin\MSBuild.exe" DynamoRIO.sln /m /t:Build /p:Configuration=RelWithDebInfo /p:Platform=x64 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v120"
@@ -71,10 +71,10 @@ cd ..
 cd build86
 SETLOCAL
 call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x86
-§§cmake -G "Visual Studio 12 2013"  -DBUILD_CORE=ON -DBUILD_DOCS=OFF -DBUILD_DRSTATS=OFF -DBUILD_TOOLS=ON -DBUILD_SAMPLES=OFF -DBUILD_TESTS=OFF -DDEBUG=OFF -DCMAKE_WARN_DEPRECATED=OFF  ..
+cmake -G "Visual Studio 12 2013"  -DBUILD_CORE=ON -DBUILD_DOCS=OFF -DBUILD_DRSTATS=OFF -DBUILD_TOOLS=ON -DBUILD_SAMPLES=OFF -DBUILD_TESTS=OFF -DDEBUG=OFF -DCMAKE_WARN_DEPRECATED=OFF  ..
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDebugDll', 'MultiThreadedDebug' } | sc $f.PSPath }"
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDll', 'MultiThreaded' } | sc $f.PSPath }"
-§§"C:\Program Files (x86)\MSBuild\12.0\Bin\MSBuild.exe" DynamoRIO.sln /m /t:Build /p:Configuration=RelWithDebInfo /p:Platform=Win32 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v120"
+"C:\Program Files (x86)\MSBuild\12.0\Bin\MSBuild.exe" DynamoRIO.sln /m /t:Build /p:Configuration=RelWithDebInfo /p:Platform=Win32 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v120"
 ENDLOCAL
 cd ..
 cd ..
@@ -93,7 +93,7 @@ waitfor SomethingThatIsNeverHappening /t 10 2>NUL
 ::reset errorlevel
 ver > nul
 
-§§RMDIR /Q/S dynamorio
+RMDIR /Q/S dynamorio
 
 REM create a minimal drcovlib.h, that is easy to include
 powershell -Command "([string]::Join(\"`n\", $(cat include\ext\drcovlib\drcovlib.h)) -replace '(?ms)^.*typedef struct _bb_entry_t', 'typedef struct _bb_entry_t') -replace '(?ms)} bb_entry_t;.*', '} bb_entry_t;' | Out-file -encoding ASCII include\ext\drcovlib\drcovlib_min.h"

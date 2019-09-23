@@ -17,9 +17,9 @@ bootFileLinux: "pxelinux.0"
 OSRootDirNameOdroid: "windowsServer2016Root"
 bootFileOdroid: "pxeboot.n12"
 
-§§# Parameters provided by user, OS and OSRootDirName are optional
-§§OS: ""
-§§OSRootDirName: ""
+# Parameters provided by user, OS and OSRootDirName are optional
+OS: ""
+OSRootDirName: ""
 
 DHCPConfigPath: "/srv/dnsmasq.d/pxe.conf"
 TFTPAllRootsPath: "/tftp-roots"

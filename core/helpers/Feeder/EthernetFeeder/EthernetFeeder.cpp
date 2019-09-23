@@ -27,7 +27,7 @@ Author(s): Thomas Riedmaier, Pascal Eckmann
 #define ETHER_TYPE	0x0800
 #endif
 
-§§void preprocess(std::vector<char>* bytes) {
+void preprocess(std::vector<char>* bytes) {
 	//add preprocession steps here as needed
 	return;
 }
@@ -48,7 +48,7 @@ void printMacToStream(std::ostream& os, unsigned char MACData[])
 	// os << std::endl;
 }
 
-§§bool sendBytesToTarget(std::vector<char>* fuzzBytes, char* targetMAC, bool waitForResponse) {
+bool sendBytesToTarget(std::vector<char>* fuzzBytes, char* targetMAC, bool waitForResponse) {
 #if defined(_WIN32) || defined(_WIN64)
 	std::cout << "EthernetFeeder::sendBytesToTarget is not yet implemented on Windows." << std::endl;
 	return false;
@@ -66,10 +66,10 @@ void printMacToStream(std::ostream& os, unsigned char MACData[])
 		int sockfd;
 		struct ifreq if_idx;
 		struct ifreq if_mac;
-§§		char* sendbuf = new char[fuzzBytes->size() - 1 + 12];
-§§		struct ether_header* eh = (struct ether_header*) sendbuf;
+		char* sendbuf = new char[fuzzBytes->size() - 1 + 12];
+		struct ether_header* eh = (struct ether_header*) sendbuf;
 		struct sockaddr_ll socket_address;
-§§		const char* ifName = "eth0";
+		const char* ifName = "eth0";
 
 		std::chrono::time_point<std::chrono::system_clock> routineEntryTimeStamp = std::chrono::system_clock::now();
 		std::chrono::time_point<std::chrono::system_clock> timestampToLeave = routineEntryTimeStamp + std::chrono::milliseconds(RESP_TIMEOUT_MS);
@@ -103,12 +103,12 @@ void printMacToStream(std::ostream& os, unsigned char MACData[])
 		/* Construct the Ethernet header */
 		memset(sendbuf, 0, fuzzBytes->size() - 1 + 12);
 		/* Ethernet header */
-§§		eh->ether_shost[0] = ((uint8_t*)&if_mac.ifr_hwaddr.sa_data)[0];
-§§		eh->ether_shost[1] = ((uint8_t*)&if_mac.ifr_hwaddr.sa_data)[1];
-§§		eh->ether_shost[2] = ((uint8_t*)&if_mac.ifr_hwaddr.sa_data)[2];
-§§		eh->ether_shost[3] = ((uint8_t*)&if_mac.ifr_hwaddr.sa_data)[3];
-§§		eh->ether_shost[4] = ((uint8_t*)&if_mac.ifr_hwaddr.sa_data)[4];
-§§		eh->ether_shost[5] = ((uint8_t*)&if_mac.ifr_hwaddr.sa_data)[5];
+		eh->ether_shost[0] = ((uint8_t*)&if_mac.ifr_hwaddr.sa_data)[0];
+		eh->ether_shost[1] = ((uint8_t*)&if_mac.ifr_hwaddr.sa_data)[1];
+		eh->ether_shost[2] = ((uint8_t*)&if_mac.ifr_hwaddr.sa_data)[2];
+		eh->ether_shost[3] = ((uint8_t*)&if_mac.ifr_hwaddr.sa_data)[3];
+		eh->ether_shost[4] = ((uint8_t*)&if_mac.ifr_hwaddr.sa_data)[4];
+		eh->ether_shost[5] = ((uint8_t*)&if_mac.ifr_hwaddr.sa_data)[5];
 		eh->ether_dhost[0] = targetMAC[0];
 		eh->ether_dhost[1] = targetMAC[1];
 		eh->ether_dhost[2] = targetMAC[2];
@@ -144,7 +144,7 @@ void printMacToStream(std::ostream& os, unsigned char MACData[])
 
 		/* Wait for response */
 		if (waitForResponse) {
-§§			//inspired by http://www.microhowto.info/howto/capture_ethernet_frames_using_an_af_packet_socket_in_c.html
+			//inspired by http://www.microhowto.info/howto/capture_ethernet_frames_using_an_af_packet_socket_in_c.html
 			// and https://gist.github.com/austinmarton/2862515
 
 			/* Open AF_PACKET socket, listening for EtherType ETH_P_ALL */
@@ -175,7 +175,7 @@ void printMacToStream(std::ostream& os, unsigned char MACData[])
 			}
 
 			uint8_t buf[65537];
-§§			eh = (struct ether_header*) buf;
+			eh = (struct ether_header*) buf;
 			while (std::chrono::system_clock::now() < timestampToLeave) {
 				/* set timeout */
 				long timeleft = std::chrono::duration_cast<std::chrono::milliseconds>(timestampToLeave - std::chrono::system_clock::now()).count();
@@ -192,12 +192,12 @@ void printMacToStream(std::ostream& os, unsigned char MACData[])
 				int numbytes = recvfrom(sockfd, buf, sizeof(buf), 0, NULL, NULL);
 
 				/* Check the packet is for me AND its from the target */
-§§				if (eh->ether_dhost[0] == ((uint8_t*)&if_mac.ifr_hwaddr.sa_data)[0] &&
-§§					eh->ether_dhost[1] == ((uint8_t*)&if_mac.ifr_hwaddr.sa_data)[1] &&
-§§					eh->ether_dhost[2] == ((uint8_t*)&if_mac.ifr_hwaddr.sa_data)[2] &&
-§§					eh->ether_dhost[3] == ((uint8_t*)&if_mac.ifr_hwaddr.sa_data)[3] &&
-§§					eh->ether_dhost[4] == ((uint8_t*)&if_mac.ifr_hwaddr.sa_data)[4] &&
-§§					eh->ether_dhost[5] == ((uint8_t*)&if_mac.ifr_hwaddr.sa_data)[5] &&
+				if (eh->ether_dhost[0] == ((uint8_t*)&if_mac.ifr_hwaddr.sa_data)[0] &&
+					eh->ether_dhost[1] == ((uint8_t*)&if_mac.ifr_hwaddr.sa_data)[1] &&
+					eh->ether_dhost[2] == ((uint8_t*)&if_mac.ifr_hwaddr.sa_data)[2] &&
+					eh->ether_dhost[3] == ((uint8_t*)&if_mac.ifr_hwaddr.sa_data)[3] &&
+					eh->ether_dhost[4] == ((uint8_t*)&if_mac.ifr_hwaddr.sa_data)[4] &&
+					eh->ether_dhost[5] == ((uint8_t*)&if_mac.ifr_hwaddr.sa_data)[5] &&
 					eh->ether_shost[0] == targetMAC[0] &&
 					eh->ether_shost[1] == targetMAC[1] &&
 					eh->ether_shost[2] == targetMAC[2] &&
@@ -218,9 +218,9 @@ void printMacToStream(std::ostream& os, unsigned char MACData[])
 					std::cout << std::endl;
 
 					std::cout << "EthernetFeeder::However, we are looking for a packet from ";
-§§					printMacToStream(std::cout, (unsigned char*)targetMAC);
+					printMacToStream(std::cout, (unsigned char*)targetMAC);
 					std::cout << " for ";
-§§					printMacToStream(std::cout, (unsigned char*)if_mac.ifr_hwaddr.sa_data);
+					printMacToStream(std::cout, (unsigned char*)if_mac.ifr_hwaddr.sa_data);
 					std::cout << std::endl;
 
 					std::cout << "EthernetFeeder::Let's see, if there are more packets!" << std::endl;
@@ -249,7 +249,7 @@ void printMacToStream(std::ostream& os, unsigned char MACData[])
 
 std::vector<char> readAllBytesFromFile(const std::string filename)
 {
-§§	FILE* inputFile;
+	FILE* inputFile;
 	if (0 != fopen_s(&inputFile, filename.c_str(), "rb")) {
 		std::cout << "EthernetFeeder::readAllBytesFromFile failed to open the file " << filename << std::endl;
 		return{};
@@ -264,9 +264,9 @@ std::vector<char> readAllBytesFromFile(const std::string filename)
 		return{};
 	}
 
-§§	std::vector<char> result((unsigned int)fileSize);
+	std::vector<char> result((unsigned int)fileSize);
 
-§§	size_t bytesRead = static_cast<size_t>(fread((char*)&result[0], 1, fileSize, inputFile));
+	size_t bytesRead = static_cast<size_t>(fread((char*)&result[0], 1, fileSize, inputFile));
 	if (bytesRead != static_cast<size_t>(fileSize)) {
 		std::cout << "readAllBytesFromFile failed to read all bytes! Bytes read: " << bytesRead << ". Filesize " << fileSize << std::endl;
 	}
@@ -276,12 +276,12 @@ std::vector<char> readAllBytesFromFile(const std::string filename)
 	return result;
 }
 
-§§bool isServerAlive(char* targetMAC) {
+bool isServerAlive(char* targetMAC) {
 	std::vector<char> knownGood{ KNOWN_GOOD };
 	return sendBytesToTarget(&knownGood, targetMAC, true);
 }
 
-§§bool waitUntilServerResponds(char* targetMAC) {
+bool waitUntilServerResponds(char* targetMAC) {
 	while (true) {
 		bool isalive = isServerAlive(targetMAC);
 		if (isalive) {
@@ -303,7 +303,7 @@ int main(int argc, char* argv[])
 	}
 
 	//char targetMAC[] = { (char)0x01 ,(char)0x0e ,(char)0xcf ,(char)0x00 ,(char)0x00 ,(char)0x00 };
-§§	char targetMAC[] = { (char)0x3a ,(char)0xe9 ,(char)0x58,(char)0x64 ,(char)0x29 ,(char)0xd1 };
+	char targetMAC[] = { (char)0x3a ,(char)0xe9 ,(char)0x58,(char)0x64 ,(char)0x29 ,(char)0xd1 };
 
 	SharedMemIPC sharedMemIPC_ToRunner(argv[argc - 1]);
 	bool success = sharedMemIPC_ToRunner.initializeAsClient();

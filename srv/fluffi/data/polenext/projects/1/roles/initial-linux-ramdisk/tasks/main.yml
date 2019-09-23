@@ -22,7 +22,7 @@
     group: "{{ansible_ssh_user}}"
   when: not ramdiskDetails.stat.exists
 
-§§- name: Creating ramdisk
+- name: Creating ramdisk
   mount:
     name: "{{ ramdiskPath }}"
     src: tmpfs

@@ -8,27 +8,27 @@
 # 
 # Author(s): Pascal Eckmann, Thomas Riedmaier
 
-§§- name: Fetch driver archive from "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{FTPDriverDirname}}"
-§§  win_get_url: 
-§§    url: "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{FTPDriverDirname}}/{{archiveName}}"
-§§    dest: "{{remoteUtilitiesFilePath}}{{archiveName}}"
-§§
-§§- name: Unzip driver archive
-§§  win_unzip:
+- name: Fetch driver archive from "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{FTPDriverDirname}}"
+  win_get_url: 
+    url: "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{FTPDriverDirname}}/{{archiveName}}"
+    dest: "{{remoteUtilitiesFilePath}}{{archiveName}}"
+
+- name: Unzip driver archive
+  win_unzip:
     src: "{{remoteUtilitiesFilePath}}{{archiveName}}"
     dest: "{{remoteUtilitiesFilePath}}{{(archiveName|splitext)[0]}}\\"
-§§    delete_archive: yes
-§§    
-§§- name: Install drivers "{{remoteUtilitiesFilePath}}{{(archiveName|splitext)[0]}}\\{{installerFilename}}"
-§§  win_package:
+    delete_archive: yes
+    
+- name: Install drivers "{{remoteUtilitiesFilePath}}{{(archiveName|splitext)[0]}}\\{{installerFilename}}"
+  win_package:
     path: "{{remoteUtilitiesFilePath}}{{(archiveName|splitext)[0]}}\\{{installerFilename}}"
-§§    product_id: Microsoft Windows
-§§    arguments: "{{ installerFlags }}"
-§§  ignore_errors: True
-§§
-§§- name: Delete "{{remoteUtilitiesFilePath}}{{(archiveName|splitext)[0]}}"
-§§  win_file:
-§§    path: "{{remoteUtilitiesFilePath}}{{(archiveName|splitext)[0]}}"
+    product_id: Microsoft Windows
+    arguments: "{{ installerFlags }}"
+  ignore_errors: True
+
+- name: Delete "{{remoteUtilitiesFilePath}}{{(archiveName|splitext)[0]}}"
+  win_file:
+    path: "{{remoteUtilitiesFilePath}}{{(archiveName|splitext)[0]}}"
     state: absent
   ignore_errors: True
     

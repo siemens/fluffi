@@ -11,21 +11,21 @@
 # 1. Fetch Fluffi from FTP
 # 2. Unzip fluffi to C
 
-§§- name: Ensure directory exists
+- name: Ensure directory exists
   file:
     path: "{{deploymentPath}}{{architecture}}"
     state: directory
     recurse: yes
 
-§§- name: Delete old files in "{{deploymentPath}}{{architecture}}"
-§§  command: find . -not -path './logs*' -not -path './testcaseFiles*' -delete
-§§  args:
-§§    chdir: "{{deploymentPath}}{{architecture}}/"
-§§   
-§§- name: Fetch FLUFFI from "{{ftpserverURL}}/{{fluffiFTPDirname}}/linux/{{architecture}}/{{fluffiFTPFilename}}"
+- name: Delete old files in "{{deploymentPath}}{{architecture}}"
+  command: find . -not -path './logs*' -not -path './testcaseFiles*' -delete
+  args:
+    chdir: "{{deploymentPath}}{{architecture}}/"
+   
+- name: Fetch FLUFFI from "{{ftpserverURL}}/{{fluffiFTPDirname}}/linux/{{architecture}}/{{fluffiFTPFilename}}"
   get_url: 
     url: "{{ftpserverURL}}/{{fluffiFTPDirname}}/linux/{{architecture}}/{{fluffiFTPFilename}}"
-§§    dest: "{{deploymentPath}}/{{architecture}}/{{fluffiFTPFilename}}"
+    dest: "{{deploymentPath}}/{{architecture}}/{{fluffiFTPFilename}}"
 
 - name: Extract archive {{fluffiFTPFilename}}
   unarchive: 

@@ -43,9 +43,9 @@ std::string wstring_to_utf8(const std::wstring& str)
 	return myconv.to_bytes(str);
 }
 #else
-§§char** split_commandline(const std::string cmdline)
+char** split_commandline(const std::string cmdline)
 {
-§§	char** argv = NULL;
+	char** argv = NULL;
 
 	wordexp_t p;
 
@@ -57,7 +57,7 @@ std::string wstring_to_utf8(const std::wstring& str)
 		return NULL;
 	}
 
-§§	if (!(argv = (char**)calloc(p.we_wordc + 1, sizeof(char*))))
+	if (!(argv = (char**)calloc(p.we_wordc + 1, sizeof(char*))))
 	{
 		wordfree(&p);
 		std::cout << "calloc failed";
@@ -86,7 +86,7 @@ void execCommand(std::string command) {
 	memset(&pi, 0, sizeof(pi));
 	CreateProcess(NULL, const_cast<LPSTR>(command.c_str()), NULL, NULL, false, CREATE_BREAKAWAY_FROM_JOB, NULL, NULL, &si, &pi);
 
-§§	// Successfully created the process. Wait for it to finish.
+	// Successfully created the process. Wait for it to finish.
 	WaitForSingleObject(pi.hProcess, INFINITE);
 
 #else
@@ -94,7 +94,7 @@ void execCommand(std::string command) {
 	pid_t pID = fork();
 	if (pID == 0) // child
 	{
-§§		char** argv = split_commandline(command);
+		char** argv = split_commandline(command);
 
 		execv(argv[0], &argv[1]);
 		printf("Failed to call execv!");
@@ -197,7 +197,7 @@ int startlocal(std::string pathToLocalExecutableAndArgs, std::string additionalC
 #if defined(_WIN32) || defined(_WIN64)
 	std::wstring wpathToLocalExecutableAndArgs = std::wstring(pathToLocalExecutableAndArgs.begin(), pathToLocalExecutableAndArgs.end());
 	int numOfBlocks;
-§§	LPWSTR* szArglist = CommandLineToArgvW(wpathToLocalExecutableAndArgs.c_str(), &numOfBlocks); //for some reasons this does not exist for Ascii :(
+	LPWSTR* szArglist = CommandLineToArgvW(wpathToLocalExecutableAndArgs.c_str(), &numOfBlocks); //for some reasons this does not exist for Ascii :(
 	if (NULL == szArglist || numOfBlocks < 1) {
 		std::cout << "pathToLocalExecutableAndArgs command line invalid";
 		return -1;
@@ -223,7 +223,7 @@ int startlocal(std::string pathToLocalExecutableAndArgs, std::string additionalC
 	LocalFree(szArglist);
 #else
 	std::string tmp = pathToLocalExecutableAndArgs;
-§§	char** argv = split_commandline(tmp);
+	char** argv = split_commandline(tmp);
 	if (argv == NULL || argv[0] == NULL) {
 		std::cout << "Splitting pathToLocalExecutableAndArgs \"" << tmp << "\" failed.";
 		if (argv != NULL) {

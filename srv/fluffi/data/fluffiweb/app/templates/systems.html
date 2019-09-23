@@ -23,9 +23,9 @@ Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
 <div class="container">
     <h1>Systems in FluffiNET</h1>
     <hr>
-§§    {{ flashMessages() }}
+    {{ flashMessages() }}
 </div>
-§§
+
 
 <div class="jumbotron">
     <div class="container"></div>
@@ -36,15 +36,15 @@ Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
 <div class="container">
     <button class="btn btn-info btn-lg" data-target="#modalAddSystem" data-toggle="modal" type="button">Add System
     </button>
-§§    <button class="btn btn-info btn-lg" data-target="#modalLemmingLair" data-toggle="modal" type="button">LEMMINGS LAIR
+    <button class="btn btn-info btn-lg" data-target="#modalLemmingLair" data-toggle="modal" type="button">LEMMINGS LAIR
     </button>
-§§    <a class="btn btn-info btn-lg" href="http://pole.fluffi:8888/" role="button" target="_blank">
-§§        <span class="glyphicon glyphicon-link"></span> Polemarch
-§§    </a>
-§§    <button class="btn btn-info btn-lg" data-target="#modalPXEBoot" data-toggle="modal" type="button">PXE-Boot
-§§    </button>
-§§    <button class="btn btn-info btn-lg" data-target="#modalSettings" data-toggle="modal" type="button">Settings
-§§    </button>
+    <a class="btn btn-info btn-lg" href="http://pole.fluffi:8888/" role="button" target="_blank">
+        <span class="glyphicon glyphicon-link"></span> Polemarch
+    </a>
+    <button class="btn btn-info btn-lg" data-target="#modalPXEBoot" data-toggle="modal" type="button">PXE-Boot
+    </button>
+    <button class="btn btn-info btn-lg" data-target="#modalSettings" data-toggle="modal" type="button">Settings
+    </button>
     <!-- Modal -->
     <div class="modal fade" id="modalAddSystem" role="dialog">
         <div class="modal-dialog">
@@ -58,12 +58,12 @@ Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
                 <div class="modal-body">
                     <form action="{{ url_for('addNewSystemToPolemarch') }}" method="post">
                         {{addNewSystemToPolemarchForm.hostname.label }}
-§§                        {{addNewSystemToPolemarchForm.hostname(class='form-control modal-form')}}
+                        {{addNewSystemToPolemarchForm.hostname(class='form-control modal-form')}}
                         {{addNewSystemToPolemarchForm.hostgroup.label }}
-§§                        {{addNewSystemToPolemarchForm.hostgroup(class='form-control modal-form')}}
-§§                        {{addNewSystemToPolemarchForm.add_host(class='btn btn-primary modal-button')}}
+                        {{addNewSystemToPolemarchForm.hostgroup(class='form-control modal-form')}}
+                        {{addNewSystemToPolemarchForm.add_host(class='btn btn-primary modal-button')}}
                     </form>
-§§                    <p>The extension .fluffi to reach the system is set automatically. Ex. TestVM1</p>
+                    <p>The extension .fluffi to reach the system is set automatically. Ex. TestVM1</p>
                     <hr>
                     <p>
                     <h3>HowTo:</h3>
@@ -72,7 +72,7 @@ Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
                     </p>
                 </div>
                 <div class="modal-footer">
-§§                    <button class="btn btn-danger" data-dismiss="modal" type="button">Close</button>
+                    <button class="btn btn-danger" data-dismiss="modal" type="button">Close</button>
                 </div>
             </div>
         </div>
@@ -87,9 +87,9 @@ Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
                     <h4 class="modal-title">Management of Lemming Cluster</h4>
                 </div>
                 <div class="modal-body">
-§§                    <a class="btn btn-info" href="http://lemmingpi.fluffi/" role="button" target="_blank">
-§§                        <span class="glyphicon glyphicon-link"></span> LEMMINGS LAIR
-§§                    </a>
+                    <a class="btn btn-info" href="http://lemmingpi.fluffi/" role="button" target="_blank">
+                        <span class="glyphicon glyphicon-link"></span> LEMMINGS LAIR
+                    </a>
                     <hr>
                     <p>
                     <h3>HowTo:</h3>
@@ -114,81 +114,81 @@ Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
             </div>
         </div>
     </div>
-§§    <div class="modal fade" id="modalSettings" role="dialog">
-§§        <div class="modal-dialog">
-§§
-§§            <!-- Modal content-->
-§§            <div class="modal-content">
-§§                <div class="modal-header">
-§§                    <button class="close" data-dismiss="modal" type="button">&times;</button>
-§§                    <h4 class="modal-title">Settings</h4>
-§§                </div>
-§§                <div class="modal-body">
-§§                    <h4>Change Agent-Starter-Mode</h4>
-§§                    <p>Current mode: <span class="badge modal-badge"><b>{{agentStarterMode}}</b></span></p>
-§§                    <form action="{{ url_for('changeAgentStarterMode') }}" method="post">
-§§                        {{changeAgentStarterModeForm.mode.label }}
-§§                        {{changeAgentStarterModeForm.mode(class='form-control modal-form')}}
-§§                        {{changeAgentStarterModeForm.execute_change_mode(class='btn btn-primary modal-button')}}
-§§                    </form>
-§§                    <hr>
-§§                    <p>
-§§                    <h3>HowTo:</h3>
-§§                    <p>
-§§                    <h4>Change Agent-Starter-Mode</h4>
-§§                    <p>All agents are checked in the background and if lost they will be restarted. There are three options for this:</p>
-§§                    <ul>
-§§                        <li><b>ACTIVE</b>: Try to keep the desired number of agents.</li>
-§§                        <li><b>INACTIVE</b>: Don't do anything. If an agent dies, it will not be restarted.</li>
-§§                        <li><b>KILL</b>: Kill all running agents.</li>
-§§                    </ul>
-§§                    </p>
-§§                </div>
-§§                <div class="modal-footer">
-§§                    <button class="btn btn-danger" data-dismiss="modal" type="button">Close</button>
-§§                </div>
-§§            </div>
-§§        </div>
-§§    </div>
-§§    <div class="modal fade" id="modalPXEBoot" role="dialog">
-§§        <div class="modal-dialog">
-§§
-§§            <!-- Modal content-->
-§§            <div class="modal-content">
-§§                <div class="modal-header">
-§§                    <button class="close" data-dismiss="modal" type="button">&times;</button>
-§§                    <h4 class="modal-title">PXE-Boot-Image</h4>
-§§                </div>
-§§                <div class="modal-body">
-§§                    <h4>Change PXE-Boot-Image</h4>
-§§                    <p>Current deployed Image: <span class="badge modal-badge"><b>{{bootsystemdir}}</b></span></p>
-§§                    <p>This image is loaded from the FTP server when the PXE-boot is triggered.</p>
-§§                    <form action="{{ url_for('changePXEBootSystemPolemarch', pxebootsystem=pxesystem) }}" method="post">
-§§                        {{changePXEForm.pxesystem.label }}
-§§                        {{changePXEForm.pxesystem(class='form-control modal-form')}}
-§§                        {{changePXEForm.execute_change_pxe(class='btn btn-primary modal-button')}}
-§§                    </form>
-§§                    <hr>
-§§                    <p>
-§§                    <h3>HowTo:</h3>
-§§                    <p>
-§§                    <h4>Change PXE-Boot-Image</h4>
-§§                    <p>Upload your prefered PXE-Boot-Image to the FTP-Server in the <i>/tftp-roots</i> folder and than choose it in this menu.</p>
-§§                    </p>
-§§                </div>
-§§                <div class="modal-footer">
-§§                    <button class="btn btn-danger" data-dismiss="modal" type="button">Close</button>
-§§                </div>
-§§            </div>
-§§        </div>
-§§    </div>
+    <div class="modal fade" id="modalSettings" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="close" data-dismiss="modal" type="button">&times;</button>
+                    <h4 class="modal-title">Settings</h4>
+                </div>
+                <div class="modal-body">
+                    <h4>Change Agent-Starter-Mode</h4>
+                    <p>Current mode: <span class="badge modal-badge"><b>{{agentStarterMode}}</b></span></p>
+                    <form action="{{ url_for('changeAgentStarterMode') }}" method="post">
+                        {{changeAgentStarterModeForm.mode.label }}
+                        {{changeAgentStarterModeForm.mode(class='form-control modal-form')}}
+                        {{changeAgentStarterModeForm.execute_change_mode(class='btn btn-primary modal-button')}}
+                    </form>
+                    <hr>
+                    <p>
+                    <h3>HowTo:</h3>
+                    <p>
+                    <h4>Change Agent-Starter-Mode</h4>
+                    <p>All agents are checked in the background and if lost they will be restarted. There are three options for this:</p>
+                    <ul>
+                        <li><b>ACTIVE</b>: Try to keep the desired number of agents.</li>
+                        <li><b>INACTIVE</b>: Don't do anything. If an agent dies, it will not be restarted.</li>
+                        <li><b>KILL</b>: Kill all running agents.</li>
+                    </ul>
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-danger" data-dismiss="modal" type="button">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modalPXEBoot" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="close" data-dismiss="modal" type="button">&times;</button>
+                    <h4 class="modal-title">PXE-Boot-Image</h4>
+                </div>
+                <div class="modal-body">
+                    <h4>Change PXE-Boot-Image</h4>
+                    <p>Current deployed Image: <span class="badge modal-badge"><b>{{bootsystemdir}}</b></span></p>
+                    <p>This image is loaded from the FTP server when the PXE-boot is triggered.</p>
+                    <form action="{{ url_for('changePXEBootSystemPolemarch', pxebootsystem=pxesystem) }}" method="post">
+                        {{changePXEForm.pxesystem.label }}
+                        {{changePXEForm.pxesystem(class='form-control modal-form')}}
+                        {{changePXEForm.execute_change_pxe(class='btn btn-primary modal-button')}}
+                    </form>
+                    <hr>
+                    <p>
+                    <h3>HowTo:</h3>
+                    <p>
+                    <h4>Change PXE-Boot-Image</h4>
+                    <p>Upload your prefered PXE-Boot-Image to the FTP-Server in the <i>/tftp-roots</i> folder and than choose it in this menu.</p>
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-danger" data-dismiss="modal" type="button">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <hr>
 
 <div class="container">
     {% for group in systems %}
-§§    <h2>Group: <a href="/systems/view/{{ group.Name }}/{{ group.Name }}">{{ group.Name }}</a></h2>
+    <h2>Group: <a href="/systems/view/{{ group.Name }}/{{ group.Name }}">{{ group.Name }}</a></h2>
     <div class="container" style="padding-left: 50px">
         <table class="table">
             <thead>
@@ -212,15 +212,15 @@ Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
                     host.Name }}</a></td>
                 {% endif %}
                 <td style="text-align: left; width: 15%;">{{ host.Status }}</td>
-§§                <td style="text-align: left; width: 15%;">
-§§                    {{ host.InstanceCount }} {% if host.confLM > 0 %} <div class="systems-lm-text">({{host.confLM}} LM)</div> {% endif %}
-§§                </td>
-§§                {% if host.InstanceCount == host.InstanceRun %}
-§§                <td class="instance-run-success">
-§§                    {{ host.InstanceRun }} {% if host.lms > 0 %} <div class="systems-lm-text">({{host.lms}} LM)</div> {% endif %}
+                <td style="text-align: left; width: 15%;">
+                    {{ host.InstanceCount }} {% if host.confLM > 0 %} <div class="systems-lm-text">({{host.confLM}} LM)</div> {% endif %}
+                </td>
+                {% if host.InstanceCount == host.InstanceRun %}
+                <td class="instance-run-success">
+                    {{ host.InstanceRun }} {% if host.lms > 0 %} <div class="systems-lm-text">({{host.lms}} LM)</div> {% endif %}
                 </td>
                 {% else %}
-§§                <td class="instance-run-error">{{ host.InstanceRun }}</td>
+                <td class="instance-run-error">{{ host.InstanceRun }}</td>
                 {% endif %}
                 <td class="update-system-loc">
                     <select class="form-control" id="SystemLocationValue-{{ host.Id }}"

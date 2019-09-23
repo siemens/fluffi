@@ -8,14 +8,14 @@
 # 
 # Author(s): Thomas Riedmaier, Pascal Eckmann
 
-§§[Unit]
-§§Description=Rest Instance Starter
-§§After=network-online.target
-§§
-§§[Service]
+[Unit]
+Description=Rest Instance Starter
+After=network-online.target
+
+[Service]
 User=ansible_ssh_user
-§§Type=simple
+Type=simple
 ExecStart=/usr/bin/python3 /home/ansible_ssh_user/fluffi/persistent/restStarter/main.py /home/ansible_ssh_user/fluffi/persistent/
-§§
-§§[Install]
+
+[Install]
 WantedBy=multi-user.target

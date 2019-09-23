@@ -18,7 +18,7 @@
 #    src: .
 #    dest: "{{remoteUtilitiesFilePath}}\\{{GFlagsDirname}}\\"
 
-§§- name: Fetch GFlag zip file "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{GFlagsDirname}}/{{GFlagsZipFilename}}"
+- name: Fetch GFlag zip file "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{GFlagsDirname}}/{{GFlagsZipFilename}}"
   win_get_url: 
     url: "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{GFlagsDirname}}/{{GFlagsZipFilename}}"
     dest: "{{remoteUtilitiesFilePath}}{{GFlagsDirname}}\\{{GFlagsZipFilename}}"

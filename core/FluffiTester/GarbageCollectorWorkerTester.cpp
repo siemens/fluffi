@@ -172,9 +172,9 @@ namespace GarbageCollectorWorkerTester
 
 			Assert::IsFalse(garbageCollectorWorker.isFileMarkedForDeletion("B"), L"File that is not in the set is somehow marked for deletion");
 
-§§			Assert::IsTrue(garbageCollectorWorker.isFileMarkedForDeletion("A"), L"File that is in the set is somehow NOT marked for deletion(1)");
+			Assert::IsTrue(garbageCollectorWorker.isFileMarkedForDeletion("A"), L"File that is in the set is somehow NOT marked for deletion(1)");
 
-§§			Assert::IsTrue(garbageCollectorWorker.isFileMarkedForDeletion("A"), L"File that is in the set is somehow NOT marked for deletion(2)");
+			Assert::IsTrue(garbageCollectorWorker.isFileMarkedForDeletion("A"), L"File that is in the set is somehow NOT marked for deletion(2)");
 		}
 	};
 }

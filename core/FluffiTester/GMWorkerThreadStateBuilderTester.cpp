@@ -34,7 +34,7 @@ namespace FluffiTester
 		{
 			GMWorkerThreadStateBuilder stateBuilder;
 
-§§			GMWorkerThreadState* thestate = (GMWorkerThreadState*)stateBuilder.constructState();
+			GMWorkerThreadState* thestate = (GMWorkerThreadState*)stateBuilder.constructState();
 			Assert::IsNotNull(thestate);
 
 			Assert::IsNotNull(thestate->m_zeroMQSockets);

@@ -133,4 +133,4 @@ CREATE TABLE IF NOT EXISTS fluffi_gm.system_fuzzjob_instances (
 
 INSERT IGNORE INTO `gm_options` (`id`, `setting`, `value`) VALUES (1, 'bootsystemdir', 'odroidRoot');
 INSERT IGNORE INTO `gm_options` (`id`, `setting`, `value`) VALUES (2, 'agentstartermode', 'active');
-§§INSERT IGNORE INTO `gm_options` (`id`, `setting`, `value`) VALUES (3, 'checkrating', '-10000');
+INSERT IGNORE INTO `gm_options` (`id`, `setting`, `value`) VALUES (3, 'checkrating', '-10000');

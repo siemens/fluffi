@@ -33,5 +33,5 @@
   args:
     chdir: "{{remoteUtilitiesFilePath}}"
   notify:
-§§    - Ensure Windows NTP service is running
-§§    - Force Windows NTP time sync
+    - Ensure Windows NTP service is running
+    - Force Windows NTP time sync

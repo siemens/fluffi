@@ -162,7 +162,7 @@ namespace AbstractionLayerTester
 			Assert::AreEqual(rva, ftr.m_blocks[0].m_rva);
 			Assert::AreEqual(ftr.m_blocks[0].m_rva, ftr2.m_blocks[0].m_rva);
 
-§§			TestResult tr3;
+			TestResult tr3;
 			ftr.setProtobuf(&tr3);
 			FluffiTestResult ftr4{ tr3 };
 

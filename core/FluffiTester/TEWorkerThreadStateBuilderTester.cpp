@@ -33,15 +33,15 @@ namespace FluffiTester
 		{
 			TEWorkerThreadStateBuilder stateBuilder;
 
-§§			TEWorkerThreadState* thestate = (TEWorkerThreadState*)stateBuilder.constructState();
+			TEWorkerThreadState* thestate = (TEWorkerThreadState*)stateBuilder.constructState();
 			Assert::IsNotNull(thestate);
 
 			Assert::IsNotNull(thestate->m_zeroMQSockets);
 
 			zmq::context_t* zeroMQContext = new zmq::context_t();
-§§			zmq::socket_t* sock = new zmq::socket_t(*zeroMQContext, ZMQ_REQ); //ZMQ_REQ<->ZMQ_DEALER
-§§			zmq::socket_t* sock2 = new zmq::socket_t(*zeroMQContext, ZMQ_REQ); //ZMQ_REQ<->ZMQ_DEALER
-§§			zmq::socket_t* sock3 = new zmq::socket_t(*zeroMQContext, ZMQ_REQ); //ZMQ_REQ<->ZMQ_DEALER
+			zmq::socket_t* sock = new zmq::socket_t(*zeroMQContext, ZMQ_REQ); //ZMQ_REQ<->ZMQ_DEALER
+			zmq::socket_t* sock2 = new zmq::socket_t(*zeroMQContext, ZMQ_REQ); //ZMQ_REQ<->ZMQ_DEALER
+			zmq::socket_t* sock3 = new zmq::socket_t(*zeroMQContext, ZMQ_REQ); //ZMQ_REQ<->ZMQ_DEALER
 
 			Assert::IsTrue(thestate->m_zeroMQSockets->insert(std::make_pair(std::make_pair("test", 0), sock)).second);
 			Assert::IsTrue(thestate->m_zeroMQSockets->insert(std::make_pair(std::make_pair("test", 2), sock2)).second);

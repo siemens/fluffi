@@ -125,12 +125,12 @@ function addTypeSetting(subType, name){
 
     $(chosenTypesID).html(chosenGeneratorTypes);
 }
-§§
-§§$("select.runner-type").change(function(){
-§§    var selectedRunnerType = $(this).children("option:selected").val();
-§§    if(selectedRunnerType == "ALL_GDB"){
-§§        $(".basic-block-upload-box").toggleClass("basic-bock-box-visible", false);
-§§    }else{
-§§        $(".basic-block-upload-box").toggleClass("basic-bock-box-visible", true);
-§§    }
-§§}).change();
+
+$("select.runner-type").change(function(){
+    var selectedRunnerType = $(this).children("option:selected").val();
+    if(selectedRunnerType == "ALL_GDB"){
+        $(".basic-block-upload-box").toggleClass("basic-bock-box-visible", false);
+    }else{
+        $(".basic-block-upload-box").toggleClass("basic-bock-box-visible", true);
+    }
+}).change();

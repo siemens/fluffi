@@ -8,14 +8,14 @@
 # 
 # Author(s): Thomas Riedmaier, Pascal Eckmann
 
-§§- name: Start Rest-Instance-Starter python server
-§§  sudo: yes
-§§  systemd:
-§§    scope: system
-§§    name: rest-starter
-§§    no_block: yes
-§§    state: started
-§§    masked: no
-§§  register: result
-§§  async: 30
+- name: Start Rest-Instance-Starter python server
+  sudo: yes
+  systemd:
+    scope: system
+    name: rest-starter
+    no_block: yes
+    state: started
+    masked: no
+  register: result
+  async: 30
   poll: 5

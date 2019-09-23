@@ -56,7 +56,7 @@
 static uint verbose;
 static bool nudge_kills;
 static client_id_t client_id;
-§§static const char* fluffi_pipe = NULL;
+static const char* fluffi_pipe = NULL;
 static int desired_fork_level;
 static int current_fork_level;
 
@@ -85,7 +85,7 @@ enum {
 };
 
 static void
-§§event_nudge(void* drcontext, uint64 argument)
+event_nudge(void* drcontext, uint64 argument)
 {
 	int nudge_arg = (int)argument;
 	int exit_arg = (int)(argument >> 32);
@@ -162,10 +162,10 @@ event_exit(void)
 }
 
 static void
-§§options_init(client_id_t id, int argc, const char* argv[], drcovlib_options_t* ops)
+options_init(client_id_t id, int argc, const char* argv[], drcovlib_options_t* ops)
 {
 	int i;
-§§	const char* token;
+	const char* token;
 	/* default values */
 	nudge_kills = true;
 	desired_fork_level = -1;
@@ -261,7 +261,7 @@ initialize_fluffi_connection() {
 #if defined(_WIN32) || defined(_WIN64)
 #else
 static void
-§§fork_event_handler(void* drcontext)
+fork_event_handler(void* drcontext)
 {
 	current_fork_level++;
 	if(desired_fork_level == current_fork_level){
@@ -274,7 +274,7 @@ static void
 #endif
 
 DR_EXPORT void
-§§dr_client_main(client_id_t id, int argc, const char* argv[])
+dr_client_main(client_id_t id, int argc, const char* argv[])
 {
 	drcovlib_options_t ops = { sizeof(ops), };
 	dr_set_client_name("DrCovMulti", "https://git.fluffi/");
@@ -286,7 +286,7 @@ DR_EXPORT void
 		dr_abort();
 	}
 	if (!dr_using_all_private_caches()) {
-§§		const char* logname;
+		const char* logname;
 		if (drcovlib_logfile(NULL, &logname) == DRCOVLIB_SUCCESS)
 			NOTIFY(1, "<created log file %s>\n", logname);
 	}

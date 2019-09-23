@@ -10,27 +10,27 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Pascal Eckmann, Thomas Riedmaier
 */
 
-§§#include <stdio.h>
-§§#include <stdlib.h>
-§§#include <string.h>
-§§
-§§// compile with 
-§§// gcc -o plugin_c_sample -static plugin_sample.c
-§§
-§§int main(int argc, char** argv, char** envp) {
-§§	if (argc < 2) {
-§§		return 1;
-§§	}
-§§
-§§	if (!strcmp(argv[1], "API")) {
-§§		printf("FLUFFIMONITORING");
-§§	} else if (!strcmp(argv[1], "TYPE")) {
-§§		printf("ALERT");
-§§	} else if (!strcmp(argv[1], "NAME")) {
-§§		printf("C_IS_FUN");
-§§	} else if (!strcmp(argv[1], "RUN")) {
-§§		printf("YOUR PC IS BURNING");
-§§	} else {
-§§		return 1;
-§§	}
-§§}
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// compile with 
+// gcc -o plugin_c_sample -static plugin_sample.c
+
+int main(int argc, char** argv, char** envp) {
+	if (argc < 2) {
+		return 1;
+	}
+
+	if (!strcmp(argv[1], "API")) {
+		printf("FLUFFIMONITORING");
+	} else if (!strcmp(argv[1], "TYPE")) {
+		printf("ALERT");
+	} else if (!strcmp(argv[1], "NAME")) {
+		printf("C_IS_FUN");
+	} else if (!strcmp(argv[1], "RUN")) {
+		printf("YOUR PC IS BURNING");
+	} else {
+		return 1;
+	}
+}

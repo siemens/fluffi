@@ -7,8 +7,8 @@
 :: THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 :: 
 :: Author(s): Thomas Riedmaier, Pascal Eckmann
-§§RMDIR /Q/S include
-§§RMDIR /Q/S lib
+RMDIR /Q/S include
+RMDIR /Q/S lib
 
 MKDIR include
 MKDIR lib
@@ -17,14 +17,14 @@ MKDIR lib\x86
 
 REM Getting easylogging
 
-§§RMDIR /Q/S easyloggingpp
+RMDIR /Q/S easyloggingpp
 
 git clone https://github.com/zuhd-org/easyloggingpp.git
 cd easyloggingpp
 git checkout 5181b4039c04697aac7eac0bde44352cd8901567
 
 REM Writing our config
-§§powershell -Command " @('#define ELPP_NO_DEFAULT_LOG_FILE', '//#define ELPP_DISABLE_INFO_LOGS', '//#define ELPP_NO_LOG_TO_FILE', '#define ELPP_THREAD_SAFE', '#if !defined(_DEBUG) && !defined(DEBUG)', '#define ELPP_DISABLE_DEBUG_LOGS','#endif') + (Get-Content 'src\easylogging++.h') | Set-Content 'src\easylogging++.h'"
+powershell -Command " @('#define ELPP_NO_DEFAULT_LOG_FILE', '//#define ELPP_DISABLE_INFO_LOGS', '//#define ELPP_NO_LOG_TO_FILE', '#define ELPP_THREAD_SAFE', '#if !defined(_DEBUG) && !defined(DEBUG)', '#define ELPP_DISABLE_DEBUG_LOGS','#endif') + (Get-Content 'src\easylogging++.h') | Set-Content 'src\easylogging++.h'"
 
 REM Apply patches for windows colorfull output
 
@@ -58,12 +58,12 @@ cd ..
 copy easyloggingpp\build64\Release\easyloggingpp.lib lib\x64
 
 copy easyloggingpp\build64\Debug\easyloggingppd.lib lib\x64
-§§copy easyloggingpp\build64\easyloggingpp.dir\Debug\easyloggingpp.pdb lib\x64
+copy easyloggingpp\build64\easyloggingpp.dir\Debug\easyloggingpp.pdb lib\x64
 
 copy easyloggingpp\build86\Release\easyloggingpp.lib lib\x86
 
 copy easyloggingpp\build86\Debug\easyloggingppd.lib lib\x86
-§§copy easyloggingpp\build86\easyloggingpp.dir\Debug\easyloggingpp.pdb lib\x86
+copy easyloggingpp\build86\easyloggingpp.dir\Debug\easyloggingpp.pdb lib\x86
 
 copy "easyloggingpp\src\easylogging++.h" include
 
@@ -72,7 +72,7 @@ waitfor SomethingThatIsNeverHappening /t 10 2>NUL
 ::reset errorlevel
 ver > nul
 
-§§RMDIR /Q/S easyloggingpp
+RMDIR /Q/S easyloggingpp
 
 goto :eof
 

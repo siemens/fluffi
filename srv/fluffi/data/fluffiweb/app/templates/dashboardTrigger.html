@@ -201,7 +201,7 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
                 <tbody>
                 {% for project in fuzzjobs %}
                 <tr>
-§§                    <th scope="row"><a class="{{'alert-bg-table-dashboard' if project.checkRating }}" style="color:#ffffff">{{ project.name }}</a></th>
+                    <th scope="row"><a class="{{'alert-bg-table-dashboard' if project.checkRating }}" style="color:#ffffff">{{ project.name }}</a></th>
                     <td style="text-align: center;">{{ project.numPopulation }}</td>
                     <td style="text-align: center;">{{ project.testcases }}</td>
                     <td style="text-align: center;">{{ project.numUniqueCrash }}</td>

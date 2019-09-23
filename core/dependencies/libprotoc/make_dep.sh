@@ -31,9 +31,9 @@
 THREADS=$(cat /proc/cpuinfo | grep processor | wc -l)
 ARCH=$(file /bin/bash | awk -F',' '{print $2}' | tr -d ' ')
 
-§§rm -rf include
-§§rm -rf bin/$ARCH
-§§rm -rf lib/$ARCH
+rm -rf include
+rm -rf bin/$ARCH
+rm -rf lib/$ARCH
 
 mkdir -p include/siemens/cpp
 mkdir -p include/siemens/csharp
@@ -43,14 +43,14 @@ mkdir -p lib/$ARCH
 
 # Building linux protobof staticly. 
 
-§§rm -rf protobuf
+rm -rf protobuf
 
 git clone https://github.com/protocolbuffers/protobuf.git
 cd protobuf
 git checkout 106ffc04be1abf3ff3399f54ccf149815b287dd9
 mkdir -p build$ARCH
 cd build$ARCH
-§§cmake -Dprotobuf_BUILD_TESTS=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=ON ../cmake
+cmake -Dprotobuf_BUILD_TESTS=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=ON ../cmake
 make -j$THREADS
 cd ../..
 
@@ -61,6 +61,6 @@ cd protobuf/src/
 find . -name '*.h' -exec cp --parents \{\} ../../include/ \;
 cd ../..
 
-§§rm -rf protobuf
+rm -rf protobuf
 
-§§bin/$ARCH/protoc --cpp_out="include/siemens/cpp" --csharp_out="include/siemens/csharp" FLUFFI.proto
+bin/$ARCH/protoc --cpp_out="include/siemens/cpp" --csharp_out="include/siemens/csharp" FLUFFI.proto

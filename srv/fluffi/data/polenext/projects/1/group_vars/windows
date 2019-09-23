@@ -8,10 +8,10 @@
 # 
 # Author(s): Fabian Russwurm, Thomas Riedmaier, Michael Kraus, Pascal Eckmann
 
-§§# Mountpoint letter of the ramdisk
+# Mountpoint letter of the ramdisk
 ramDiskMountpointLetter: F
 
-§§# FLUFFI directory name
+# FLUFFI directory name
 deploymentDirName: "FLUFFI"
 
 # SUT directory name
@@ -20,10 +20,10 @@ SUTBaseDirName: "SUT"
 # RestStarter directory name
 RestStarterDirName: "restStarter"
 
-§§# Path where FLUFFI will be deployed
+# Path where FLUFFI will be deployed
 deploymentPath: "C:\\{{deploymentDirName}}"
 
-§§# File path where initial install files are located on the FTP server
+# File path where initial install files are located on the FTP server
 initialInstallPackages: "initial/windows/activePackages"
 
 # File path where initial ansible files are located on the FTP server
@@ -35,5 +35,5 @@ SUTPath: C:\\{{deploymentDirName}}\{{SUTBaseDirName}}
 # Remote path to store the necessary utilities
 remoteUtilitiesFilePath: c:\utils\
 
-§§# Remote path to store the Rest-Instance-Starter python script
+# Remote path to store the Rest-Instance-Starter python script
 restStarterdeploymentPath: "C:\\{{deploymentDirName}}\\{{RestStarterDirName}}"

@@ -12,15 +12,15 @@
 THREADS=$(cat /proc/cpuinfo | grep processor | wc -l)
 ARCH=$(file /bin/bash | awk -F',' '{print $2}' | tr -d ' ')
 
-§§rm -rf include
-§§rm -rf lib/$ARCH
+rm -rf include
+rm -rf lib/$ARCH
 
 mkdir -p include
 mkdir -p lib/$ARCH
 
 # Getting easylogging
 
-§§rm -rf easyloggingpp
+rm -rf easyloggingpp
 
 git clone https://github.com/zuhd-org/easyloggingpp.git
 cd easyloggingpp
@@ -33,7 +33,7 @@ sed -i '1s;^;#define ELPP_NO_DEFAULT_LOG_FILE\n//#define ELPP_DISABLE_INFO_LOGS\
 
 mkdir -p build$ARCH
 cd build$ARCH
-§§cmake -Dbuild_static_lib=ON ..
+cmake -Dbuild_static_lib=ON ..
 make -j$THREADS
 cd ../..
 
@@ -44,5 +44,5 @@ cd easyloggingpp/src/
 find . -name '*.h' -exec cp --parents \{\} ../../include/ \;
 cd ../..
 
-§§rm -rf easyloggingpp
+rm -rf easyloggingpp
 

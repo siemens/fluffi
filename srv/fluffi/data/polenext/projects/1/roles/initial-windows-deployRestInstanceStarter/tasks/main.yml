@@ -12,17 +12,17 @@
   set_fact:
     filePathToFetchFromFTP: "{{ftpserverURL}}/{{ftpRestStarterPath}}"
     
-§§- name: Create a FLUFFI directory
+- name: Create a FLUFFI directory
   win_file:
     path: "{{restStarterdeploymentPath}}"
     state: directory
     
-§§- name: Fetch Rest-Instance-Starter from "{{filePathToFetchFromFTP}}"
+- name: Fetch Rest-Instance-Starter from "{{filePathToFetchFromFTP}}"
   win_get_url: 
     url: "{{filePathToFetchFromFTP}}"
     dest: "{{restStarterdeploymentPath}}\\main.py"
-§§
-§§- name: Fetch Rest-Instance-Starter-Autostart from "{{ftpserverURL}}/restStarter/restInstanceAutostart.bat"
-§§  win_get_url: 
-§§    url: "{{ftpserverURL}}/restStarter/restInstanceAutostart.bat"
-§§    dest: "C:\\Users\\Administrator\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\restInstanceAutostart.bat"
+
+- name: Fetch Rest-Instance-Starter-Autostart from "{{ftpserverURL}}/restStarter/restInstanceAutostart.bat"
+  win_get_url: 
+    url: "{{ftpserverURL}}/restStarter/restInstanceAutostart.bat"
+    dest: "C:\\Users\\Administrator\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\restInstanceAutostart.bat"

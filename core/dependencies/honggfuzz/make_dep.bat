@@ -14,8 +14,8 @@
 :: 
 :: Author(s): Thomas Riedmaier, Pascal Eckmann
 
-§§RMDIR /Q/S include
-§§RMDIR /Q/S lib
+RMDIR /Q/S include
+RMDIR /Q/S lib
 
 MKDIR include
 MKDIR include\libhfcommon
@@ -23,7 +23,7 @@ MKDIR lib
 MKDIR lib\x64
 MKDIR lib\x86
 
-§§RMDIR /Q/S honggfuzz
+RMDIR /Q/S honggfuzz
 
 REM Getting honggfuzz
 
@@ -79,7 +79,7 @@ waitfor SomethingThatIsNeverHappening /t 10 2>NUL
 ::reset errorlevel
 ver > nul
 
-§§RMDIR /Q/S honggfuzz
+RMDIR /Q/S honggfuzz
 
 goto :eof
 

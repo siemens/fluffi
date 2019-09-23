@@ -482,7 +482,7 @@ std::vector<std::pair<std::string, std::string>> GMDatabaseManager::getAllRegist
 		return re;
 	}
 
-§§	MYSQL_RES* result = mysql_store_result(getDBConnection());
+	MYSQL_RES* result = mysql_store_result(getDBConnection());
 	if (result == NULL) {
 		return re;
 	}
@@ -633,7 +633,7 @@ std::vector<std::tuple<int, std::string, std::string>> GMDatabaseManager::getNew
 		return newCommands;
 	}
 
-§§	MYSQL_RES* result = mysql_store_result(getDBConnection());
+	MYSQL_RES* result = mysql_store_result(getDBConnection());
 	if (result == NULL) {
 		return newCommands;
 	}
@@ -693,7 +693,7 @@ std::string GMDatabaseManager::EXECUTE_TEST_STATEMENT(const std::string query) {
 		return "";
 	}
 
-§§	MYSQL_RES* result = mysql_store_result(getDBConnection());
+	MYSQL_RES* result = mysql_store_result(getDBConnection());
 	if (result == NULL) {
 		return "";
 	}

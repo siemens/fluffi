@@ -11,24 +11,24 @@ Author(s): Pascal Eckmann, Thomas Riedmaier
 #>
 
 # detect if win server 2008, if yes, install 
-§§
-§§Write-Host (Get-WmiObject -class Win32_OperatingSystem).Caption
-§§
-§§If((Get-WmiObject -class Win32_OperatingSystem).Caption -like '*2008*'){
-§§	$scriptRoot = Split-Path $script:MyInvocation.MyCommand.Path
-§§	$Source = "$scriptRoot\updatesWS2008"
-§§	$Destination = "C:\updatesWS2008\"
-§§	New-Item -ItemType directory -Path $Destination -Force
-§§	Copy-Item -Path $Source\*.* -Destination $Destination -Force
-§§
-§§	$dotNetPath = "C:\updatesWS2008\NDP452-KB2901907-x86-x64-AllOS-ENU.exe"
-§§	$proc1 = Start-Process $dotNetPath -argumentlist "/passive /norestart" -Passthru
-§§	do {start-sleep -Milliseconds 500}
-§§	until ($proc1.HasExited)
-§§
-§§	$updatePath = "C:\updatesWS2008\Windows6.1-KB2819745-x64-MultiPkg.msu" 
-§§	$proc2 = Start-Process "wusa" -argumentlist "$updatePath /quiet /norestart" -Passthru
-§§	do {start-sleep -Milliseconds 500}
-§§	until ($proc2.HasExited)
-§§
-§§}
+
+Write-Host (Get-WmiObject -class Win32_OperatingSystem).Caption
+
+If((Get-WmiObject -class Win32_OperatingSystem).Caption -like '*2008*'){
+	$scriptRoot = Split-Path $script:MyInvocation.MyCommand.Path
+	$Source = "$scriptRoot\updatesWS2008"
+	$Destination = "C:\updatesWS2008\"
+	New-Item -ItemType directory -Path $Destination -Force
+	Copy-Item -Path $Source\*.* -Destination $Destination -Force
+
+	$dotNetPath = "C:\updatesWS2008\NDP452-KB2901907-x86-x64-AllOS-ENU.exe"
+	$proc1 = Start-Process $dotNetPath -argumentlist "/passive /norestart" -Passthru
+	do {start-sleep -Milliseconds 500}
+	until ($proc1.HasExited)
+
+	$updatePath = "C:\updatesWS2008\Windows6.1-KB2819745-x64-MultiPkg.msu" 
+	$proc2 = Start-Process "wusa" -argumentlist "$updatePath /quiet /norestart" -Passthru
+	do {start-sleep -Milliseconds 500}
+	until ($proc2.HasExited)
+
+}

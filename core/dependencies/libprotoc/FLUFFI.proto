@@ -96,8 +96,8 @@ message GetStatusResponse {
 }
 
 message SetTGsAndTEsRequest {
-§§  repeated ServiceAndWeigth tgs = 1;
-§§  repeated ServiceAndWeigth tes = 2;
+  repeated ServiceAndWeigth tgs = 1;
+  repeated ServiceAndWeigth tes = 2;
 }
 
 message SetTGsAndTEsResponse {
@@ -106,13 +106,13 @@ message SetTGsAndTEsResponse {
 
 
 message ServiceAndWeigth{
-§§  ServiceDescriptor serviceDescriptor = 1;
-§§  uint32 weight = 2;	
+  ServiceDescriptor serviceDescriptor = 1;
+  uint32 weight = 2;	
 }
 
 message ServiceDescriptor{
  string serviceHostAndPort = 1;
-§§ string guid = 2;
+ string guid = 2;
 }
 
 enum AgentType {
@@ -125,9 +125,9 @@ enum AgentType {
 
 message RegisterAtLMRequest{
   AgentType type = 1;
-§§  repeated string implementedAgentSubTypes = 2;
-§§  ServiceDescriptor serviceDescriptor = 3;
-§§  string location = 4;
+  repeated string implementedAgentSubTypes = 2;
+  ServiceDescriptor serviceDescriptor = 3;
+  string location = 4;
 }
 
 
@@ -138,7 +138,7 @@ message RegisterAtLMResponse{
 
 message RegisterAtGMRequest{
   AgentType type = 1;
-§§  repeated string implementedAgentSubTypes = 2;
+  repeated string implementedAgentSubTypes = 2;
   ServiceDescriptor serviceDescriptor = 3;
   string location = 4;
 }
@@ -163,50 +163,50 @@ message GetTestcaseRequest{
 }
 
 message TestcaseID{
-§§  ServiceDescriptor serviceDescriptor = 1;
-§§  uint64 localID = 2;
+  ServiceDescriptor serviceDescriptor = 1;
+  uint64 localID = 2;
 }
 
 message GetTestcaseResponse{
   bool success = 1;
-§§  TestcaseID id = 2;
-§§  TestcaseID parentId = 3;
-§§  bytes testCaseFirstChunk = 4; //up to CommInt::chunkSizeInBytes bytes
-§§  bool isLastChunk = 5;
-§§  bool forceFullCoverage= 6;
+  TestcaseID id = 2;
+  TestcaseID parentId = 3;
+  bytes testCaseFirstChunk = 4; //up to CommInt::chunkSizeInBytes bytes
+  bool isLastChunk = 5;
+  bool forceFullCoverage= 6;
 }
 
 enum ExitType {
-§§   CleanExit = 0;
+   CleanExit = 0;
    Hang = 1;
-§§   Exception_AccessViolation = 2;
-§§   Exception_Other = 3;
+   Exception_AccessViolation = 2;
+   Exception_Other = 3;
 }
 
 message ModuleNameToID{
-§§  string moduleName = 1;
-§§  int32 moduleID = 2;
-§§  string modulePath = 3; //Only for modules where paths are important (i.e. when multiple modules exist with the same name) - if not wanted set to '*'
+  string moduleName = 1;
+  int32 moduleID = 2;
+  string modulePath = 3; //Only for modules where paths are important (i.e. when multiple modules exist with the same name) - if not wanted set to '*'
 }
 
 message BasicBlock{
-§§  uint64 RVA = 1;
-§§  int32 moduleID = 2;
+  uint64 RVA = 1;
+  int32 moduleID = 2;
 }
 
 message TestResult{
-§§  ExitType exitType = 1;
-§§  repeated BasicBlock blocks = 2;
-§§  string crashFootprint = 3; //optional! Only set if ExitType Exception_AccessViolation or Exception_Other
-§§  bool hasFullCoverage = 4;
+  ExitType exitType = 1;
+  repeated BasicBlock blocks = 2;
+  string crashFootprint = 3; //optional! Only set if ExitType Exception_AccessViolation or Exception_Other
+  bool hasFullCoverage = 4;
 }
 
 message PutTestResultRequest{
-§§  TestcaseID id = 1;
-§§  TestcaseID parentId = 2; 
-§§  TestResult result = 3;
-§§  bytes testCaseFirstChunk = 4; //up to CommInt::chunkSizeInBytes bytes
-§§  bool isLastChunk = 5;
+  TestcaseID id = 1;
+  TestcaseID parentId = 2; 
+  TestResult result = 3;
+  bytes testCaseFirstChunk = 4; //up to CommInt::chunkSizeInBytes bytes
+  bool isLastChunk = 5;
   ServiceDescriptor sdOfRunner = 6; 
 }
 
@@ -215,18 +215,18 @@ message PutTestResultResponse{
 }
 
 enum TestEvaluation{
-§§   Keep = 0;
+   Keep = 0;
    Discard = 1;
 }
 
 message PutTestEvaluationRequest{
-§§  TestcaseID id = 1;
-§§  TestcaseID parentId = 2;
-§§  TestEvaluation eval = 3;
-§§  int32 parentRatingDelta = 4;
-§§  TestResult result = 5; //optional! If TestEvaluation says discard will not be set!
-§§  bytes testCaseFirstChunk = 6; //up to CommInt::chunkSizeInBytes bytes,  optional! If TestEvaluation says discard will not be set!
-§§  bool isLastChunk = 7; //optional! If TestEvaluation says discard will not be set!
+  TestcaseID id = 1;
+  TestcaseID parentId = 2;
+  TestEvaluation eval = 3;
+  int32 parentRatingDelta = 4;
+  TestResult result = 5; //optional! If TestEvaluation says discard will not be set!
+  bytes testCaseFirstChunk = 6; //up to CommInt::chunkSizeInBytes bytes,  optional! If TestEvaluation says discard will not be set!
+  bool isLastChunk = 7; //optional! If TestEvaluation says discard will not be set!
   ServiceDescriptor sdOfEvaluator = 8; //optional! If TestEvaluation says discard will not be set!
 }
 
@@ -238,16 +238,16 @@ message GetCurrentBlockCoverageRequest{
 }
 
 message GetCurrentBlockCoverageResponse{
-§§  repeated BasicBlock blocks = 1;
+  repeated BasicBlock blocks = 1;
 }
 
 message GetNewCompletedTestcaseIDsRequest{
-§§  uint64 lastUpdateTimeStamp = 1;
+  uint64 lastUpdateTimeStamp = 1;
 }
 
 message GetNewCompletedTestcaseIDsResponse{
-§§  uint64 updateTimeStamp = 1;
-§§  repeated TestcaseID IDs = 2;
+  uint64 updateTimeStamp = 1;
+  repeated TestcaseID IDs = 2;
 }
 
 message GetTestcaseToMutateRequest{
@@ -255,17 +255,17 @@ message GetTestcaseToMutateRequest{
 }
 
 message GetTestcaseToMutateResponse{
-§§  TestcaseID id = 1;
-§§  bytes testCaseFirstChunk = 2; //up to CommInt::chunkSizeInBytes bytes
-§§  bool isLastChunk = 3;
+  TestcaseID id = 1;
+  bytes testCaseFirstChunk = 2; //up to CommInt::chunkSizeInBytes bytes
+  bool isLastChunk = 3;
   bool alsoRunWithoutMutation = 4;
 }
 
 message ReportTestcaseWithNoResultRequest{
-§§  TestcaseID id = 1;
-§§  TestcaseID parentId = 2;
-§§  bytes testCaseFirstChunk = 3; //up to CommInt::chunkSizeInBytes bytes
-§§  bool isLastChunk = 4;
+  TestcaseID id = 1;
+  TestcaseID parentId = 2;
+  bytes testCaseFirstChunk = 3; //up to CommInt::chunkSizeInBytes bytes
+  bool isLastChunk = 4;
 }
 
 message ReportTestcaseWithNoResultResponse{
@@ -273,14 +273,14 @@ message ReportTestcaseWithNoResultResponse{
 }
 
 message GetTestCaseChunkRequest{
-§§  TestcaseID id = 1;
-§§  int32 chunkID = 2; 
+  TestcaseID id = 1;
+  int32 chunkID = 2; 
 }
 
 message GetTestCaseChunkResponse{
-§§  int32 chunkID = 1; 
-§§  bytes testCaseChunk = 2; //up to CommInt::chunkSizeInBytes bytes
-§§  bool isLastChunk = 3;
+  int32 chunkID = 1; 
+  bytes testCaseChunk = 2; //up to CommInt::chunkSizeInBytes bytes
+  bool isLastChunk = 3;
 }
 
 
@@ -292,18 +292,18 @@ message RequestTypeNotImplementedResponse{
 }
 
 message GetFuzzJobConfigurationRequest{
-§§  ServiceDescriptor serviceDescriptor = 1; //There are settings that depend on who is asking
+  ServiceDescriptor serviceDescriptor = 1; //There are settings that depend on who is asking
 }
 
 message Setting{
-§§  string settingName = 1;
-§§  string settingValue = 2;
+  string settingName = 1;
+  string settingValue = 2;
 }
 
 message GetFuzzJobConfigurationResponse{
-§§  repeated ModuleNameToID targetModules = 1;
-§§  repeated BasicBlock targetBlocks = 2;
-§§  repeated Setting settings = 3;
+  repeated ModuleNameToID targetModules = 1;
+  repeated BasicBlock targetBlocks = 2;
+  repeated Setting settings = 3;
 }
 
 message KillInstanceRequest{
@@ -315,7 +315,7 @@ message KillInstanceResponse{
 
 message IsAgentWelcomedRequest{
   AgentType type = 1;
-§§  repeated string implementedAgentSubTypes = 2;
+  repeated string implementedAgentSubTypes = 2;
 }
 
 message IsAgentWelcomedResponse{

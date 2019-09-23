@@ -32,15 +32,15 @@ std::vector<char> readAllBytesFromFile(std::string filename)
 		return{};
 	}
 
-§§	std::vector<char> result((unsigned int)fileSize);
+	std::vector<char> result((unsigned int)fileSize);
 
 	ifs.seekg(0, std::ios::beg);
-§§	ifs.read((char*)&result[0], fileSize);
+	ifs.read((char*)&result[0], fileSize);
 
 	return result;
 }
 
-§§void parseInput(char* recvbuf) {
+void parseInput(char* recvbuf) {
 
 	char bufferThatIsTooSmall[0x42];
 
@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
 		SharedMemMessageType messageType = message.getMessageType();
 		if (messageType == SHARED_MEM_MESSAGE_FUZZ_FILENAME) {
 			int fileNameSize = message.getDataSize() + 1;
-§§			char* targetFile = new char[fileNameSize];
+			char* targetFile = new char[fileNameSize];
 			memset(targetFile, 0, fileNameSize);
 			memcpy(targetFile, message.getDataPointer(), fileNameSize - 1);
 

@@ -20,24 +20,24 @@
     owner: "{{ansible_ssh_user}}"
     group: "{{ansible_ssh_user}}"
 
-§§- name: Fetch Rest-Instance-Starter from "{{filePathToFetchFromFTP}}"
+- name: Fetch Rest-Instance-Starter from "{{filePathToFetchFromFTP}}"
   get_url: 
     url: "{{filePathToFetchFromFTP}}"
-§§    dest: "{{restStarterdeploymentPath}}/main.py"
+    dest: "{{restStarterdeploymentPath}}/main.py"
     force: yes
-§§    
-§§- name: Change permission of system folder in systemd
-§§  sudo: yes
-§§  file: 
-§§    dest: /etc/systemd/system
-§§    owner: root 
-§§    group: root 
-§§    mode: 0777 
-§§
-§§- name: Fetch Rest-Instance-Starter-Service from "{{ftpserverURL}}/restStarter/rest-starter.service"
-§§  get_url: 
-§§    url: "{{ftpserverURL}}/restStarter/rest-starter.service"
-§§    dest: "/etc/systemd/system/rest-starter.service"
+    
+- name: Change permission of system folder in systemd
+  sudo: yes
+  file: 
+    dest: /etc/systemd/system
+    owner: root 
+    group: root 
+    mode: 0777 
+
+- name: Fetch Rest-Instance-Starter-Service from "{{ftpserverURL}}/restStarter/rest-starter.service"
+  get_url: 
+    url: "{{ftpserverURL}}/restStarter/rest-starter.service"
+    dest: "/etc/systemd/system/rest-starter.service"
     force: yes
 
 - name: Replace placeholder with actual ansible user
@@ -45,21 +45,21 @@
     path: "/etc/systemd/system/rest-starter.service"
     regexp: "ansible_ssh_user"
     replace: "{{ansible_ssh_user}}"
-§§  
-§§- name: Enable service for rest-starter
-§§  sudo: yes
-§§  systemd:
-§§    scope: system
-§§    no_block: yes
-§§    name: rest-starter
-§§    enabled: yes
-§§    masked: no
-§§    daemon_reload: yes
-§§  register: result
-§§  async: 30
-§§  poll: 5
-§§
-§§
-§§
-§§
-§§ 
+  
+- name: Enable service for rest-starter
+  sudo: yes
+  systemd:
+    scope: system
+    no_block: yes
+    name: rest-starter
+    enabled: yes
+    masked: no
+    daemon_reload: yes
+  register: result
+  async: 30
+  poll: 5
+
+
+
+
+ 

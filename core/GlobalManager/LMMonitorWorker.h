@@ -19,7 +19,7 @@ class GMWorkerThreadState;
 class LMMonitorWorker
 {
 public:
-§§	LMMonitorWorker(CommInt* commInt, GMWorkerThreadStateBuilder* workerThreadStateBuilder, int loopIntervalMS);;
+	LMMonitorWorker(CommInt* commInt, GMWorkerThreadStateBuilder* workerThreadStateBuilder, int loopIntervalMS);;
 	~LMMonitorWorker();
 
 	void workerMain();

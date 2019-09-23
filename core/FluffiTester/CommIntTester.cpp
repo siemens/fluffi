@@ -26,15 +26,15 @@ namespace CommIntTester
 	{
 	public:
 
-§§		bool CheckPortTCP(unsigned short int dwPort, const char* ipAddressStr)
+		bool CheckPortTCP(unsigned short int dwPort, const char* ipAddressStr)
 		{
-§§			struct hostent* remoteHost = gethostbyname(ipAddressStr);
+			struct hostent* remoteHost = gethostbyname(ipAddressStr);
 			if (remoteHost == NULL) {
 				return false;
 			}
 
 			struct in_addr remoteHostAddr;
-§§			remoteHostAddr.s_addr = *(u_long*)remoteHost->h_addr_list[0];
+			remoteHostAddr.s_addr = *(u_long*)remoteHost->h_addr_list[0];
 
 			struct sockaddr_in client;
 
@@ -46,7 +46,7 @@ namespace CommIntTester
 
 			sock = (int)socket(AF_INET, SOCK_STREAM, 0);
 
-§§			int result = connect(sock, (struct sockaddr*) &client, sizeof(client));
+			int result = connect(sock, (struct sockaddr*) &client, sizeof(client));
 
 			if (result == 0) return true; // port is active and used
 			else return false;
@@ -60,24 +60,24 @@ namespace CommIntTester
 		TEST_METHOD(CommInt_getFLUFFIMessageHandler)
 		{
 			TRWorkerThreadStateBuilder workerStateBuilder;
-§§			CommInt ci((IWorkerThreadStateBuilder*)&workerStateBuilder, 1, 1);
-§§			IFLUFFIMessageHandler* h = ci.getFLUFFIMessageHandler(FLUFFIMessage::FluffCase::kRequestTypeNotImplementedRequest);
-§§			boolean debug = dynamic_cast<NotImplementedHandler*>(h) != nullptr;;
-§§			Assert::IsTrue(dynamic_cast<NotImplementedHandler*>(h) != nullptr, L"The handler for kRequestTypeNotImplementedRequest was not the expected one");
+			CommInt ci((IWorkerThreadStateBuilder*)&workerStateBuilder, 1, 1);
+			IFLUFFIMessageHandler* h = ci.getFLUFFIMessageHandler(FLUFFIMessage::FluffCase::kRequestTypeNotImplementedRequest);
+			boolean debug = dynamic_cast<NotImplementedHandler*>(h) != nullptr;;
+			Assert::IsTrue(dynamic_cast<NotImplementedHandler*>(h) != nullptr, L"The handler for kRequestTypeNotImplementedRequest was not the expected one");
 
 			h = ci.getFLUFFIMessageHandler(FLUFFIMessage::FluffCase::kKillInstanceRequest);
-§§			Assert::IsTrue(dynamic_cast<NotImplementedHandler*>(h) != nullptr, L"The handler for a not implemented request was not the expected one");
+			Assert::IsTrue(dynamic_cast<NotImplementedHandler*>(h) != nullptr, L"The handler for a not implemented request was not the expected one");
 
 			KillInstanceRequestHandler killHandler;
 			ci.registerFLUFFIMessageHandler(&killHandler, FLUFFIMessage::FluffCase::kKillInstanceRequest);
 			h = ci.getFLUFFIMessageHandler(FLUFFIMessage::FluffCase::kKillInstanceRequest);
-§§			Assert::IsTrue(dynamic_cast<KillInstanceRequestHandler*>(h) != nullptr, L"The handler for a kKillInstanceRequest was not the expected one");
+			Assert::IsTrue(dynamic_cast<KillInstanceRequestHandler*>(h) != nullptr, L"The handler for a kKillInstanceRequest was not the expected one");
 		}
 
 		TEST_METHOD(CommInt_getMyListeningPort)
 		{
 			TRWorkerThreadStateBuilder workerStateBuilder;
-§§			CommInt ci((IWorkerThreadStateBuilder*)&workerStateBuilder, 1, 1);
+			CommInt ci((IWorkerThreadStateBuilder*)&workerStateBuilder, 1, 1);
 			int port = ci.getMyListeningPort();
 			Assert::IsTrue(CheckPortTCP(port, "127.0.0.1"), L"The port that the commint claimed to open cannot be connected");
 		}
@@ -85,7 +85,7 @@ namespace CommIntTester
 		TEST_METHOD(CommInt_getMyGUID)
 		{
 			TRWorkerThreadStateBuilder workerStateBuilder;
-§§			CommInt ci((IWorkerThreadStateBuilder*)&workerStateBuilder, 1, 1);
+			CommInt ci((IWorkerThreadStateBuilder*)&workerStateBuilder, 1, 1);
 			std::string myGUID = ci.getMyGUID();
 			Assert::IsTrue(myGUID != "", L"MyGUID is empty!");
 		}
@@ -93,7 +93,7 @@ namespace CommIntTester
 		TEST_METHOD(CommInt_getOwnServiceDescriptor)
 		{
 			TRWorkerThreadStateBuilder workerStateBuilder;
-§§			CommInt ci((IWorkerThreadStateBuilder*)&workerStateBuilder, 1, 1);
+			CommInt ci((IWorkerThreadStateBuilder*)&workerStateBuilder, 1, 1);
 			FluffiServiceDescriptor mySD = ci.getOwnServiceDescriptor();
 			std::vector<std::string> hapParts = Util::splitString(mySD.m_serviceHostAndPort, ":");
 			Assert::IsTrue(hapParts.size() == 2, L"My own service desciptor has a host and port string that does not have the format aa:bb");
@@ -105,7 +105,7 @@ namespace CommIntTester
 		TEST_METHOD(CommInt_getFreeListeningPort)
 		{
 			TRWorkerThreadStateBuilder workerStateBuilder;
-§§			CommInt ci((IWorkerThreadStateBuilder*)&workerStateBuilder, 1, 1);
+			CommInt ci((IWorkerThreadStateBuilder*)&workerStateBuilder, 1, 1);
 			int freePort = ci.getFreeListeningPort();
 
 			//Check if socket can be bound
@@ -115,7 +115,7 @@ namespace CommIntTester
 			mySockaddr.sin_family = AF_INET;
 			mySockaddr.sin_port = htons(freePort);
 			InetPton(AF_INET, "127.0.0.1", &(mySockaddr.sin_addr));
-§§			int result = bind(sock, (sockaddr*)&mySockaddr, sizeof(mySockaddr));
+			int result = bind(sock, (sockaddr*)&mySockaddr, sizeof(mySockaddr));
 			closesocket(sock);
 			Assert::IsTrue(result == 0, L"Could not bind to the allegedly free listen port");
 		}

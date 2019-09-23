@@ -8,7 +8,7 @@
 # 
 # Author(s): Junes Najah, Michael Kraus, Abian Blome, Pascal Eckmann, Fabian Russwurm, Thomas Riedmaier
 
-§§from flask import flash, redirect, url_for, request, session, g, send_file, abort, Markup
+from flask import flash, redirect, url_for, request, session, g, send_file, abort, Markup
 from werkzeug.exceptions import HTTPException
 from app import app, db, models
 
@@ -18,7 +18,7 @@ from .helpers import *
 from .forms import *
 from .constants import *
 
-§§import json, io, os, shutil
+import json, io, os, shutil
 import requests
 
 @app.route("/")
@@ -126,7 +126,7 @@ def createSetting(projId):
                            settingForm = settingForm,
                            moduleForm = moduleForm)
 
-§§
+
 @app.route("/projects/<int:projId>/uploadNewTargetZip", methods = ["GET", "POST"])
 def uploadNewTargetZip(projId):
     if request.method == "POST":        
@@ -134,32 +134,32 @@ def uploadNewTargetZip(projId):
         if not targetFile:
             flash("Invalid file", "error")
             return redirect(request.url)        
-§§        if not ('.' in targetFile.filename and targetFile.filename.rsplit('.', 1)[1].lower() in set(["zip"])):
-§§            flash("Only *.zip files are allowed!", "error")
+        if not ('.' in targetFile.filename and targetFile.filename.rsplit('.', 1)[1].lower() in set(["zip"])):
+            flash("Only *.zip files are allowed!", "error")
             return redirect(request.url)
         msg, category = uploadNewTarget(targetFile)
         flash(msg, category)
         return redirect("/projects/view/%d" % projId)
     return redirect("/projects/view/%d" % projId)
 
-§§
-§§@app.route("/projects/<int:projId>/uploadNewBasicBlocks", methods=["GET", "POST"])
-§§def uploadNewBasicBlocks(projId):
-§§    if request.method == "POST":
-§§        targetFile = request.files["uploadFile"]
-§§        if not targetFile:
-§§            flash("Invalid file", "error")
-§§            return redirect(request.url)
-§§        if not ('.' in targetFile.filename and targetFile.filename.rsplit('.', 1)[1].lower() in {"txt", "csv"}):
-§§            flash("Only *.txt or *.csv files are allowed!", "error")
-§§            return redirect(request.url)
-§§        msg, category = setNewBasicBlocks(targetFile, projId)
-§§        flash(msg, category)
-§§        return redirect("/projects/view/%d" % projId)
-§§
-§§    return redirect("/projects/view/%d" % projId)
-§§
-§§
+
+@app.route("/projects/<int:projId>/uploadNewBasicBlocks", methods=["GET", "POST"])
+def uploadNewBasicBlocks(projId):
+    if request.method == "POST":
+        targetFile = request.files["uploadFile"]
+        if not targetFile:
+            flash("Invalid file", "error")
+            return redirect(request.url)
+        if not ('.' in targetFile.filename and targetFile.filename.rsplit('.', 1)[1].lower() in {"txt", "csv"}):
+            flash("Only *.txt or *.csv files are allowed!", "error")
+            return redirect(request.url)
+        msg, category = setNewBasicBlocks(targetFile, projId)
+        flash(msg, category)
+        return redirect("/projects/view/%d" % projId)
+
+    return redirect("/projects/view/%d" % projId)
+
+
 @app.route("/projects/<int:projId>/resetFuzzjob", methods = ["GET", "POST"])
 def resetFuzzjob(projId):
     deletePopulation = request.form.get("deletePopulation") == "delete"
@@ -247,7 +247,7 @@ def removeLocation(locId):
 
 @app.route("/projects/<int:projId>/population")
 def viewPopulation(projId):
-§§    data = getGeneralInformationData(projId, getITQueryOfTypeNoRaw(TESTCASE_TYPES["population"]))
+    data = getGeneralInformationData(projId, getITQueryOfTypeNoRaw(TESTCASE_TYPES["population"]))
     data.name = "Population"
     data.redirect = "population"
     data.downloadName = "downloadPopulation"
@@ -274,7 +274,7 @@ def downloadTestcaseSet(projId):
 
     if os.path.exists(path):
         shutil.rmtree(path)
-§§
+
     if (createArchive(projId, "population", getITQueryOfType(TESTCASE_TYPES["population"])) and
             createArchive(projId, "hangs", getITQueryOfType(TESTCASE_TYPES["hangs"])) and
             createArchive(projId, "unique_crashes", UNIQUE_CRASHES) and
@@ -283,7 +283,7 @@ def downloadTestcaseSet(projId):
             createArchive(projId, "access_vio_total", getITQueryOfType(TESTCASE_TYPES["accessViolations"])) and
             createArchive(projId, "no_response", getITQueryOfType(TESTCASE_TYPES["noResponses"]))):
         shutil.make_archive("testcaseSet", "zip", path)
-§§        return send_file(getDownloadPath() + "testcaseSet.zip", as_attachment=True)
+        return send_file(getDownloadPath() + "testcaseSet.zip", as_attachment=True)
 
     flash("Error creating the archive", "error")
 
@@ -293,7 +293,7 @@ def downloadTestcaseSet(projId):
 @app.route("/projects/<int:projId>/population/download")
 def downloadPopulation(projId):
     if createArchive(projId, "population", getITQueryOfType(TESTCASE_TYPES["population"])):
-§§        return send_file(getDownloadPath() + "population.zip", as_attachment = True, cache_timeout = 0)
+        return send_file(getDownloadPath() + "population.zip", as_attachment = True, cache_timeout = 0)
     flash("Error creating the archive", "error")
 
     return redirect("/projects/%d/population" % projId)
@@ -301,7 +301,7 @@ def downloadPopulation(projId):
 
 @app.route("/projects/<int:projId>/hangs")
 def viewHangs(projId):
-§§    data = getGeneralInformationData(projId, getITQueryOfTypeNoRaw(TESTCASE_TYPES["hangs"]))
+    data = getGeneralInformationData(projId, getITQueryOfTypeNoRaw(TESTCASE_TYPES["hangs"]))
     data.name = "Hangs"
     data.redirect = "hangs"
     data.downloadName = "downloadHangs"
@@ -313,7 +313,7 @@ def viewHangs(projId):
 
 @app.route("/projects/<int:projId>/accessVioTotal")
 def viewAccessVioTotal(projId):
-§§    data = getGeneralInformationData(projId, getITQueryOfTypeNoRaw(TESTCASE_TYPES["accessViolations"]))
+    data = getGeneralInformationData(projId, getITQueryOfTypeNoRaw(TESTCASE_TYPES["accessViolations"]))
     data.name = "Access Violations"
     data.redirect = "accessVioTotal"
     data.downloadName = "downloadAccessVioTotal"
@@ -337,7 +337,7 @@ def viewAccessVioUnique(projId):
 
 @app.route("/projects/<int:projId>/totalCrashes")
 def viewTotalCrashes(projId):
-§§    data = getGeneralInformationData(projId, getITQueryOfTypeNoRaw(TESTCASE_TYPES["crashes"]))
+    data = getGeneralInformationData(projId, getITQueryOfTypeNoRaw(TESTCASE_TYPES["crashes"]))
     data.name = "Crashes"
     data.redirect = "totalCrashes"
     data.downloadName = "downloadTotalCrashes"
@@ -361,7 +361,7 @@ def viewUniqueCrashes(projId):
 
 @app.route("/projects/<int:projId>/noResponse")
 def viewNoResponses(projId):
-§§    data = getGeneralInformationData(projId, getITQueryOfTypeNoRaw(TESTCASE_TYPES["noResponses"]))
+    data = getGeneralInformationData(projId, getITQueryOfTypeNoRaw(TESTCASE_TYPES["noResponses"]))
     data.name = "No Responses"
     data.redirect = "noResponse"
     data.downloadName = "downloadNoResponses"
@@ -669,18 +669,18 @@ def removeProjectSetting(projId, settingId):
 @app.route("/projects/createProject", methods = ["GET", "POST"])
 def createProject():
     form = CreateProjectForm()
-§§    # msg, category = "", ""
+    # msg, category = "", ""
 
     if request.method == 'POST' and form.is_submitted:
-§§        result = []
-§§        result.extend(insertFormInputForProject(form, request))
+        result = []
+        result.extend(insertFormInputForProject(form, request))
 
-§§        flash(result[0], result[1])
-§§        if result[1] == "error":
-§§            return redirect(url_for("projects"))
-§§        else:
-§§            return redirect("/projects/view/%d" % result[2])
-§§    else:
+        flash(result[0], result[1])
+        if result[1] == "error":
+            return redirect(url_for("projects"))
+        else:
+            return redirect("/projects/view/%d" % result[2])
+    else:
         form = CreateProjectForm()
         form.location.choices = [l.Name for l in db.session.query(models.Locations.Name)]
         sortedRunnerTypeOptions = sorted(JSON_CONFIG["RunnerTypeOptions"])
@@ -721,7 +721,7 @@ def viewProjectGraph(projId):
     return renderTemplate("viewProjectGraph.html",
                            title = "Create custom project",
                            fuzzjobname = fuzzjobname)
-§§
+
 
 @app.route("/projects/<int:projId>/testcaseGraph", methods = ["GET"])
 def viewTestcaseGraph(projId):
@@ -777,17 +777,17 @@ def commands():
 def systems():
     groups = []
     addNewSystemToPolemarchForm = AddNewSystemForm()
-§§    projIds = models.Fuzzjob.query.all()
-§§
-    managedInstancesAll = []
-§§    actualAgentStarterMode = models.GmOptions.query.filter_by(setting = "agentstartermode").first().value.upper()
-§§    changeAgentStarterModeForm = ChangeAgentStarterModeForm()
-§§    changePXEForm = ChangePXEForm()
-§§    bootsystemdir = models.GmOptions.query.filter_by(setting = "bootsystemdir").first().value
-§§    availablePXEsystems = FTP_CONNECTOR.getListOfFilesOnFTPServer("tftp-roots/")
-§§    changePXEForm.pxesystem.choices = availablePXEsystems
+    projIds = models.Fuzzjob.query.all()
 
-§§    for project in projIds:
+    managedInstancesAll = []
+    actualAgentStarterMode = models.GmOptions.query.filter_by(setting = "agentstartermode").first().value.upper()
+    changeAgentStarterModeForm = ChangeAgentStarterModeForm()
+    changePXEForm = ChangePXEForm()
+    bootsystemdir = models.GmOptions.query.filter_by(setting = "bootsystemdir").first().value
+    availablePXEsystems = FTP_CONNECTOR.getListOfFilesOnFTPServer("tftp-roots/")
+    changePXEForm.pxesystem.choices = availablePXEsystems
+
+    for project in projIds:
         managedInstances, summarySection, localmanagers = getManagedInstancesAndSummary(project.id)
         managedInstancesAll.append(managedInstances)
 
@@ -811,11 +811,11 @@ def systems():
                                        models.Systems).group_by(models.SystemFuzzjobInstances.System).join(
                                                     models.Systems).filter(
                                                     models.SystemFuzzjobInstances.System == models.Systems.id).all()
-§§        instanceLM = db.session.query(models.SystemFuzzjobInstances,
-§§                                      func.sum(models.SystemFuzzjobInstances.InstanceCount).label('lm'),
-§§                                      models.Systems).group_by(models.SystemFuzzjobInstances.System).join(
-§§                                      models.Systems).filter(and_(models.SystemFuzzjobInstances.System == models.Systems.id),
-§§                                                             (models.SystemFuzzjobInstances.AgentType == 4)).all()
+        instanceLM = db.session.query(models.SystemFuzzjobInstances,
+                                      func.sum(models.SystemFuzzjobInstances.InstanceCount).label('lm'),
+                                      models.Systems).group_by(models.SystemFuzzjobInstances.System).join(
+                                      models.Systems).filter(and_(models.SystemFuzzjobInstances.System == models.Systems.id),
+                                                             (models.SystemFuzzjobInstances.AgentType == 4)).all()
 
         localMan = db.session.query(models.Localmanagers).all()
         systemLocations = db.session.query(models.SystemsLocation, models.Systems, models.Locations).join(
@@ -825,16 +825,16 @@ def systems():
         for system in systemLocations:
             for group in groups:
                 for h in group.hosts:
-§§                    h.confLM = 0
-§§                    h.InstanceCount = 0
+                    h.confLM = 0
+                    h.InstanceCount = 0
                     if h.Name == system[1].Name:
                         h.Location = system[2].Name
                     for s in instancesum:
                         if h.Name.strip() == s[2].Name.strip():
                             h.InstanceCount = s[1]
-§§                            for lm in instanceLM:
-§§                                if s[2].Name.strip() == lm[2].Name.strip() and lm[1] > 0:
-§§                                    h.confLM = lm[1]
+                            for lm in instanceLM:
+                                if s[2].Name.strip() == lm[2].Name.strip() and lm[1] > 0:
+                                    h.confLM = lm[1]
 
         for group in groups:
             for h in group.hosts:
@@ -875,12 +875,12 @@ def systems():
                            title = "Systems",
                            systems = groups,
                            locations = locations,
-§§                           addNewSystemToPolemarchForm = addNewSystemToPolemarchForm,
+                           addNewSystemToPolemarchForm = addNewSystemToPolemarchForm,
                            changePXEForm = changePXEForm,
                            bootsystemdir = bootsystemdir,
-§§                           availablePXEsystems = availablePXEsystems,
-§§                           agentStarterMode = actualAgentStarterMode,
-§§                           changeAgentStarterModeForm = changeAgentStarterModeForm)
+                           availablePXEsystems = availablePXEsystems,
+                           agentStarterMode = actualAgentStarterMode,
+                           changeAgentStarterModeForm = changeAgentStarterModeForm)
 
 
 @app.route("/systems/changePXE", methods = ["POST"])
@@ -889,12 +889,12 @@ def changePXEBootSystemPolemarch():
         newPXESystem = str(request.form.getlist('pxesystem')[0])
         arguments = {}
         arguments['OSRootDirNameArgument'] = newPXESystem
-§§        pxeResponse = ANSIBLE_REST_CONNECTOR.executePlaybook('changePXEBoot.yml', 'master', arguments)
+        pxeResponse = ANSIBLE_REST_CONNECTOR.executePlaybook('changePXEBoot.yml', 'master', arguments)
         bootsystemdirEntry = models.GmOptions.query.filter_by(setting = "bootsystemdir").first()
         bootsystemdirEntry.value = newPXESystem
         db.session.commit()
-§§        successMessage = Markup("Changed PXE-Boot system to <b>" + newPXESystem.upper() + "</b>!")
-§§        flash(successMessage, "success")
+        successMessage = Markup("Changed PXE-Boot system to <b>" + newPXESystem.upper() + "</b>!")
+        flash(successMessage, "success")
         return redirect(url_for('systems'))
     except Exception as e:
         print(e)
@@ -930,23 +930,23 @@ def addNewSystemToPolemarch():
         return redirect(url_for('systems'))
 
 
-§§@app.route("/systems/changeAgentStarterMode", methods = ["POST"])
-§§def changeAgentStarterMode():
-§§    try:
-§§        newMode = str(request.form.getlist('mode')[0])
-§§        agentStarterModeEntry = models.GmOptions.query.filter_by(setting="agentstartermode").first()
-§§        agentStarterModeEntry.value = newMode
-§§        db.session.commit()
-§§        successMessage = Markup("Changed Agent-Starter-Mode to <b>" + newMode.upper() + "</b>!")
-§§        flash(successMessage, "success")
-§§        return redirect(url_for('systems'))
-§§    except Exception as e:
-§§        print(e)
-§§        flash("Error changing agent-starter-mode!", "error")
-§§
-§§    return redirect(url_for('systems'))
-§§
-§§
+@app.route("/systems/changeAgentStarterMode", methods = ["POST"])
+def changeAgentStarterMode():
+    try:
+        newMode = str(request.form.getlist('mode')[0])
+        agentStarterModeEntry = models.GmOptions.query.filter_by(setting="agentstartermode").first()
+        agentStarterModeEntry.value = newMode
+        db.session.commit()
+        successMessage = Markup("Changed Agent-Starter-Mode to <b>" + newMode.upper() + "</b>!")
+        flash(successMessage, "success")
+        return redirect(url_for('systems'))
+    except Exception as e:
+        print(e)
+        flash("Error changing agent-starter-mode!", "error")
+
+    return redirect(url_for('systems'))
+
+
 @app.route("/systems/removeDevSystem/<string:hostName>/<string:hostId>", methods = ["GET"])
 def removeDevSystemFromPolemarch(hostName, hostId):
     removeResult = ANSIBLE_REST_CONNECTOR.removeDevSystem(hostId)
@@ -1154,10 +1154,10 @@ def viewSystemInitialSetup(hostname):
 def viewDeployFluffi(hostname):
     # validate and execute playbook
     architecture = str(request.form.getlist('architecture')[0])
-§§    location = db.session.query(models.SystemsLocation, models.Systems, models.Locations).join(
-§§        models.Systems).filter(models.SystemsLocation.System == models.Systems.id).filter_by(Name=hostname).join(
-§§        models.Locations).filter(models.SystemsLocation.Location == models.Locations.id).first()
-§§    arguments = {'architecture': architecture.split("-")[1], 'location': location[2].Name}
+    location = db.session.query(models.SystemsLocation, models.Systems, models.Locations).join(
+        models.Systems).filter(models.SystemsLocation.System == models.Systems.id).filter_by(Name=hostname).join(
+        models.Locations).filter(models.SystemsLocation.Location == models.Locations.id).first()
+    arguments = {'architecture': architecture.split("-")[1], 'location': location[2].Name}
     historyURL = ANSIBLE_REST_CONNECTOR.executePlaybook('deployFluffi.yml', hostname, arguments)
 
     if historyURL is not None:

@@ -8,5 +8,5 @@
 # 
 # Author(s): Thomas Riedmaier, Pascal Eckmann
 
-§§# Installer flags per driver installer
-§§installerFlags: /install /passive /norestart
+# Installer flags per driver installer
+installerFlags: /install /passive /norestart

@@ -19,7 +19,7 @@ class LMWorkerThreadState;
 class InstanceMonitorWorker
 {
 public:
-§§	InstanceMonitorWorker(CommInt* commInt, LMWorkerThreadStateBuilder* workerThreadStateBuilder, int loopIntervalMS, std::string location);
+	InstanceMonitorWorker(CommInt* commInt, LMWorkerThreadStateBuilder* workerThreadStateBuilder, int loopIntervalMS, std::string location);
 	virtual ~InstanceMonitorWorker();
 
 	void workerMain();

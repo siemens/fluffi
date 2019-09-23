@@ -55,7 +55,7 @@ std::wstring getCMDLineFromPID(int targetPID) {
 		return L"";
 	}
 
-§§	char* cmdlineBytes = new char[targetProcessParameters.CommandLine.Length + 4];
+	char* cmdlineBytes = new char[targetProcessParameters.CommandLine.Length + 4];
 	memset(cmdlineBytes, 0, targetProcessParameters.CommandLine.Length + 4);
 	ReadProcessMemory(targetHandle, targetProcessParameters.CommandLine.Buffer, cmdlineBytes, targetProcessParameters.CommandLine.Length, &numberOfBytesRead);
 	if (numberOfBytesRead != targetProcessParameters.CommandLine.Length) {

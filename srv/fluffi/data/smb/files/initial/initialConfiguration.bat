@@ -37,4 +37,4 @@ net start winrm
 Powershell.exe -executionpolicy bypass -File "%~dp0installUpdatesOnWS2008.ps1"
 Powershell.exe -executionpolicy bypass -File "%~dp0setHostname.ps1"
 Powershell.exe -executionpolicy bypass -File "%~dp0reboot.ps1"
-§§
+

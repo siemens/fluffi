@@ -12,7 +12,7 @@
 THREADS=$(cat /proc/cpuinfo | grep processor | wc -l)
 ARCH=$(file /bin/bash | awk -F',' '{print $2}' | tr -d ' ')
 
-§§rm -rf bin/$ARCH
+rm -rf bin/$ARCH
 
 mkdir -p bin/$ARCH
 
@@ -29,7 +29,7 @@ cd ..
 
 # Getting & building radamsa
 
-§§rm -rf radamsa
+rm -rf radamsa
 
 git clone https://gitlab.com/akihe/radamsa
 cd radamsa
@@ -41,6 +41,6 @@ cd ..
 
 cp radamsa/bin/radamsa bin/$ARCH/radamsa.exe
 
-§§rm -rf owl
-§§rm -rf radamsa
+rm -rf owl
+rm -rf radamsa
 

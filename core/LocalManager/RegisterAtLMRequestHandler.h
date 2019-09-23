@@ -28,7 +28,7 @@ public:
 private:
 #endif // _VSTEST
 
-§§	static std::string decideSubAgentType(LMDatabaseManager* dbManager, AgentType type, const google::protobuf::RepeatedPtrField< std::string > implementedSubtypes);
+	static std::string decideSubAgentType(LMDatabaseManager* dbManager, AgentType type, const google::protobuf::RepeatedPtrField< std::string > implementedSubtypes);
 
 	std::string m_mylocation;
 	std::string m_myfuzzjob;

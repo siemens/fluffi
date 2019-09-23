@@ -14,13 +14,13 @@
 :: 
 :: Author(s): Thomas Riedmaier, Pascal Eckmann
 
-§§RMDIR /Q/S lib
+RMDIR /Q/S lib
 
 MKDIR lib
 MKDIR lib\x64
 MKDIR lib\x86
 
-§§RMDIR /Q/S afl
+RMDIR /Q/S afl
 
 REM Getting afl
 
@@ -73,7 +73,7 @@ waitfor SomethingThatIsNeverHappening /t 10 2>NUL
 ::reset errorlevel
 ver > nul
 
-§§RMDIR /Q/S afl
+RMDIR /Q/S afl
 
 goto :eof
 

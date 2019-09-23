@@ -16,15 +16,15 @@
 THREADS=$(cat /proc/cpuinfo | grep processor | wc -l)
 ARCH=$(file /bin/bash | awk -F',' '{print $2}' | tr -d ' ')
 
-§§rm -rf lib/$ARCH
-§§rm -rf include
+rm -rf lib/$ARCH
+rm -rf include
 
 mkdir -p lib/$ARCH
 mkdir -p include
 
 # Getting util-linux (contains libuuid)
 
-§§rm -rf util-linux
+rm -rf util-linux
 
 git clone https://github.com/karelzak/util-linux.git
 cd util-linux
@@ -55,10 +55,10 @@ DEFINES="-DHAVE_ERR -DHAVE_ERRX -DHAVE_ERR_H -DHAVE_GETRANDOM -DHAVE_JRAND48 -DH
 
 wait
 
-§§ar rcs libuuid.a compare.o copy.o gen_uuid.o isnull.o pack.o parse.o predefined.o unpack.o unparse.o uuid_time.o randutils.o md5.o sha1.o
+ar rcs libuuid.a compare.o copy.o gen_uuid.o isnull.o pack.o parse.o predefined.o unpack.o unparse.o uuid_time.o randutils.o md5.o sha1.o
 cd ../..
 
 cp util-linux/build${ARCH}/libuuid.a lib/${ARCH}/libuuid.a
 cp util-linux/libuuid/src/uuid.h include/uuid.h
 
-§§rm -rf util-linux
+rm -rf util-linux

@@ -23,7 +23,7 @@ Author(s): Junes Najah, Abian Blome, Thomas Riedmaier, Michael Kraus, Pascal Eck
 {% block content %}
 <div class="container">
     <div class="row">
-§§        <div class="col-md-6 {{'alert-bg' if project.checkRating }}"><h1>{{ project.name }}</h1></div>
+        <div class="col-md-6 {{'alert-bg' if project.checkRating }}"><h1>{{ project.name }}</h1></div>
         <div class="col-md-6" style="padding-top:25px">
             <form action="{{ url_for('archiveProject', projId=project.id) }}" method="POST" class="archive-form-2">
                 <input class="confirm btn btn-default" type="submit" value="Archive Project"/>
@@ -31,11 +31,11 @@ Author(s): Junes Najah, Abian Blome, Thomas Riedmaier, Michael Kraus, Pascal Eck
         </div>
     </div>
 </div>
-§§<div class="container">
-§§    <div class="row">
-§§        {{ flashMessages() }}
-§§    </div>
-§§</div>
+<div class="container">
+    <div class="row">
+        {{ flashMessages() }}
+    </div>
+</div>
 <hr>
 
 <div class="container">
@@ -450,43 +450,43 @@ Author(s): Junes Najah, Abian Blome, Thomas Riedmaier, Michael Kraus, Pascal Eck
     </div>
 </div>
 
-§§{% set glob = {} %}
-§§{% for setting in project.settings %}
-§§    {% if (setting.name == 'runnerType') and (setting.value == 'ALL_GDB') %} <!-- ALL_GDB coded in config.json -->
-§§        {% set _ = glob.update({'width':'4', 'gdb':true}) %}
-§§    {% endif %}
-§§    {% if (setting.name == 'runnerType') and (setting.value != 'ALL_GDB') %} <!-- ALL_GDB coded in config.json -->
-§§                {% set _ = glob.update({'width':'6', 'gdb':false}) %}
-§§    {% endif %}
-§§{% endfor %}
-§§
+{% set glob = {} %}
+{% for setting in project.settings %}
+    {% if (setting.name == 'runnerType') and (setting.value == 'ALL_GDB') %} <!-- ALL_GDB coded in config.json -->
+        {% set _ = glob.update({'width':'4', 'gdb':true}) %}
+    {% endif %}
+    {% if (setting.name == 'runnerType') and (setting.value != 'ALL_GDB') %} <!-- ALL_GDB coded in config.json -->
+                {% set _ = glob.update({'width':'6', 'gdb':false}) %}
+    {% endif %}
+{% endfor %}
+
 <div class="container">
     <div class="row">
-§§        <div class="col-md-{{ glob.width }}" style="padding-bottom: 35px">
+        <div class="col-md-{{ glob.width }}" style="padding-bottom: 35px">
             <h2>Upload new Target <span class="glyphicon glyphicon-info-sign" data-placement="right" data-toggle="tooltip"
-§§                                            style="font-size: 20px" title="This will only save the new *.zip file!"></span>
+                                            style="font-size: 20px" title="This will only save the new *.zip file!"></span>
             </h2>
             <form action="{{ url_for('uploadNewTargetZip', projId=project.id) }}" method="POST" enctype=multipart/form-data>
-§§                <p>Upload new Target as *.zip file:</p>
+                <p>Upload new Target as *.zip file:</p>
                 <input name="uploadFile" type="file" required>
                 <input class="btn btn-primary" type="submit" value="Upload" style="margin-top:15px"/>
             </form>
         </div>
-§§
-§§        {% if glob.gdb %}
-§§        <div class="col-md-4" style="padding-bottom: 35px">
-§§            <h2>Upload new Basic Blocks for GDB <span class="glyphicon glyphicon-info-sign" data-placement="right" data-toggle="tooltip"
-§§                                            style="font-size: 20px" title="Upload file with following style: 'module, offset'!"></span>
-§§            </h2>
-§§            <form action="{{ url_for('uploadNewBasicBlocks', projId=project.id) }}" method="POST" enctype=multipart/form-data>
-§§                <p>Upload new BasicBlocks for GDB as *.txt or *.csv file:</p>
-§§                <input name="uploadFile" type="file" required>
-§§                <input class="btn btn-primary" type="submit" value="Upload" style="margin-top:15px"/>
-§§            </form>
-§§        </div>
-§§        {% endif %}
-§§
-§§        <div class="col-md-{{ glob.width }}" style="padding-bottom: 35px">
+
+        {% if glob.gdb %}
+        <div class="col-md-4" style="padding-bottom: 35px">
+            <h2>Upload new Basic Blocks for GDB <span class="glyphicon glyphicon-info-sign" data-placement="right" data-toggle="tooltip"
+                                            style="font-size: 20px" title="Upload file with following style: 'module, offset'!"></span>
+            </h2>
+            <form action="{{ url_for('uploadNewBasicBlocks', projId=project.id) }}" method="POST" enctype=multipart/form-data>
+                <p>Upload new BasicBlocks for GDB as *.txt or *.csv file:</p>
+                <input name="uploadFile" type="file" required>
+                <input class="btn btn-primary" type="submit" value="Upload" style="margin-top:15px"/>
+            </form>
+        </div>
+        {% endif %}
+
+        <div class="col-md-{{ glob.width }}" style="padding-bottom: 35px">
             <h2>Reset Fuzzjob <span class="glyphicon glyphicon-info-sign" data-placement="right" data-toggle="tooltip"
                                     style="font-size: 20px" title="Clears all tables except Settings and Target Modules"></span>
             </h2>

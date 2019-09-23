@@ -14,7 +14,7 @@
     state: present
   become: yes
 
-§§- name: Creating new directory for deploying FLUFFI
+- name: Creating new directory for deploying FLUFFI
   file:
     dest: "{{ deploymentPath }}" 
     mode: 00777 

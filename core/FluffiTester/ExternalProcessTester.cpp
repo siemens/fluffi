@@ -106,7 +106,7 @@ namespace ExternalProcessTester
 			procInfo.hProcess = GetCurrentProcess();
 			procInfo.hThread = GetCurrentThread();
 
-§§			HINSTANCE kernel32Handle = LoadLibrary("kernel32.dll");
+			HINSTANCE kernel32Handle = LoadLibrary("kernel32.dll");
 			SIZE_T llAddress = (SIZE_T)GetProcAddress(kernel32Handle, "LoadLibraryA");
 			SIZE_T llRVA = llAddress - (SIZE_T)kernel32Handle;
 			std::stringstream oss;
@@ -342,7 +342,7 @@ namespace ExternalProcessTester
 				Assert::IsTrue(success, L"could not attach to process!");
 
 				Assert::IsTrue(IsProcessRunning(ep.getProcessID()), L"the external process appears not to be running");
-§§				std::shared_ptr<DebugExecutionOutput> t = std::make_shared<DebugExecutionOutput>();
+				std::shared_ptr<DebugExecutionOutput> t = std::make_shared<DebugExecutionOutput>();
 				ep.debug(2000, t, false, false);
 				Assert::IsTrue(t->m_terminationType == DebugExecutionOutput::PROCESS_TERMINATION_TYPE::EXCEPTION_ACCESSVIOLATION, L"Access violation was not observed! It was " + t->m_terminationType);
 			}
@@ -373,7 +373,7 @@ namespace ExternalProcessTester
 					Assert::IsTrue(success, L"could not attach to process!");
 
 					Assert::IsTrue(IsProcessRunning(ep.getProcessID()), L"the external process appears not to be running");
-§§					std::shared_ptr<DebugExecutionOutput> t = std::make_shared<DebugExecutionOutput>();
+					std::shared_ptr<DebugExecutionOutput> t = std::make_shared<DebugExecutionOutput>();
 					ep.debug(3000, t, false, false);
 					Assert::IsTrue(t->m_terminationType == DebugExecutionOutput::PROCESS_TERMINATION_TYPE::EXCEPTION_ACCESSVIOLATION);
 				}
@@ -410,7 +410,7 @@ namespace ExternalProcessTester
 				Assert::IsTrue(success, L"could not attach to process!");
 
 				Assert::IsTrue(IsProcessRunning(ep.getProcessID()), L"the external process appears not to be running");
-§§				std::shared_ptr<DebugExecutionOutput> t = std::make_shared<DebugExecutionOutput>();
+				std::shared_ptr<DebugExecutionOutput> t = std::make_shared<DebugExecutionOutput>();
 				ep.debug(3000, t, false, false);
 				Assert::IsTrue(t->m_terminationType == DebugExecutionOutput::PROCESS_TERMINATION_TYPE::CLEAN);
 
@@ -445,7 +445,7 @@ namespace ExternalProcessTester
 				Assert::IsTrue(success, L"could not attach to process!");
 
 				Assert::IsTrue(IsProcessRunning(ep.getProcessID()), L"the external process appears not to be running");
-§§				std::shared_ptr<DebugExecutionOutput> t = std::make_shared<DebugExecutionOutput>();
+				std::shared_ptr<DebugExecutionOutput> t = std::make_shared<DebugExecutionOutput>();
 				ep.debug(2000, t, false,false);
 				Assert::IsTrue(t->m_terminationType == DebugExecutionOutput::PROCESS_TERMINATION_TYPE::EXCEPTION_ACCESSVIOLATION);
 			}*/
@@ -558,7 +558,7 @@ namespace ExternalProcessTester
 				Assert::IsTrue(preHandles + 25 > postHandles, L"There seems to be a handle leak (1)");
 			}
 
-§§			//Detect handle leaks when starting target with ExternalProcess::CHILD_OUTPUT_TYPE::OUTPUT
+			//Detect handle leaks when starting target with ExternalProcess::CHILD_OUTPUT_TYPE::OUTPUT
 			{
 				DWORD preHandles = 0;
 				DWORD postHandles = 0;

@@ -10,9 +10,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Pascal Eckmann
 #>
 
-§§$url = "https://github.com/shirou/mqttcli/releases/download/0.0.3/mqttcli_windows_amd64.exe"
-§§$output = "$PSScriptRoot\mqttcli.exe"
-§§
-§§Invoke-WebRequest -Uri $url -OutFile $output
-§§
+$url = "https://github.com/shirou/mqttcli/releases/download/0.0.3/mqttcli_windows_amd64.exe"
+$output = "$PSScriptRoot\mqttcli.exe"
+
+Invoke-WebRequest -Uri $url -OutFile $output
+
 Compress-Archive -LiteralPath $PSScriptRoot\installMonitoring.ps1, $PSScriptRoot\sysmon.ps1, $PSScriptRoot\mqttcli.exe, $PSScriptRoot\install.bat -DestinationPath $PSScriptRoot\DeployMonitoring.zip -Force

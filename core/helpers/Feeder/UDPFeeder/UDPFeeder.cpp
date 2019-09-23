@@ -26,22 +26,22 @@ Author(s): Thomas Riedmaier, Pascal Eckmann
 #define closesocket close
 #endif
 
-§§void preprocess(std::vector<char>* bytes) {
+void preprocess(std::vector<char>* bytes) {
 	//add preprocession steps here as needed
 	return;
 }
 
-§§bool sendBytesToPort(std::vector<char>* fuzzBytes, int serverport, bool waitForResponse) {
+bool sendBytesToPort(std::vector<char>* fuzzBytes, int serverport, bool waitForResponse) {
 	struct sockaddr_in si_other;
 	SOCKETTYPE s;
-§§	int slen = sizeof(si_other);
+	int slen = sizeof(si_other);
 
 	if ((s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
 		std::cout << "socket failed" << std::endl;
 		return false;
 	}
 
-§§	memset((char*)&si_other, 0, sizeof(si_other));
+	memset((char*)&si_other, 0, sizeof(si_other));
 	si_other.sin_family = AF_INET;
 	si_other.sin_port = htons(serverport);
 
@@ -56,7 +56,7 @@ Author(s): Thomas Riedmaier, Pascal Eckmann
 	}
 
 	size_t fuzzBytesSize = (size_t)fuzzBytes->size();
-§§	char* fuzzByteArray = &(*fuzzBytes)[0];
+	char* fuzzByteArray = &(*fuzzBytes)[0];
 
 	fuzzBytesSize = fuzzBytesSize > 65506 ? 65506 : fuzzBytesSize;
 
@@ -68,8 +68,8 @@ Author(s): Thomas Riedmaier, Pascal Eckmann
 
 	if (waitForResponse) {
 #if defined(_WIN32) || defined(_WIN64)
-§§		DWORD timeout_MS = RESP_TIMEOUT_MS;
-§§		if (setsockopt(s, SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout_MS, sizeof(timeout_MS)) < 0) {
+		DWORD timeout_MS = RESP_TIMEOUT_MS;
+		if (setsockopt(s, SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout_MS, sizeof(timeout_MS)) < 0) {
 #else
 		struct timeval tv;
 		tv.tv_sec = RESP_TIMEOUT_MS / 1000;
@@ -82,7 +82,7 @@ Author(s): Thomas Riedmaier, Pascal Eckmann
 		}
 
 		char buf[1];
-§§		int blen = recvfrom(s, buf, sizeof(buf), 0, (struct sockaddr*) &si_other, (socklen_t*)&slen);
+		int blen = recvfrom(s, buf, sizeof(buf), 0, (struct sockaddr*) &si_other, (socklen_t*)&slen);
 		if (blen == -1) {
 #if defined(_WIN32) || defined(_WIN64)
 			if (WSAGetLastError() != WSAEMSGSIZE) {
@@ -107,7 +107,7 @@ bool isServerAlive(int targetPort) {
 
 std::vector<char> readAllBytesFromFile(const std::string filename)
 {
-§§	FILE* inputFile;
+	FILE* inputFile;
 	if (0 != fopen_s(&inputFile, filename.c_str(), "rb")) {
 		std::cout << "UDPFeeder::readAllBytesFromFile failed to open the file " << filename;
 		return{};
@@ -122,9 +122,9 @@ std::vector<char> readAllBytesFromFile(const std::string filename)
 		return{};
 	}
 
-§§	std::vector<char> result((unsigned int)fileSize);
+	std::vector<char> result((unsigned int)fileSize);
 
-§§	size_t bytesRead = static_cast<size_t>(fread((char*)&result[0], 1, fileSize, inputFile));
+	size_t bytesRead = static_cast<size_t>(fread((char*)&result[0], 1, fileSize, inputFile));
 	if (bytesRead != static_cast<size_t>(fileSize)) {
 		std::cout << "readAllBytesFromFile failed to read all bytes! Bytes read: " << bytesRead << ". Filesize " << fileSize;
 	}

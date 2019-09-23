@@ -18,15 +18,15 @@
 THREADS=$(cat /proc/cpuinfo | grep processor | wc -l)
 ARCH=$(file /bin/bash | awk -F',' '{print $2}' | tr -d ' ')
 
-§§rm -rf lib/$ARCH
-§§rm -rf include
+rm -rf lib/$ARCH
+rm -rf include
 
 mkdir -p lib/$ARCH
 mkdir -p include/libhfcommon
 
 # Getting honggfuzz
 
-§§rm -rf honggfuzz
+rm -rf honggfuzz
 
 git clone https://github.com/google/honggfuzz.git
 cd honggfuzz
@@ -50,4 +50,4 @@ cp honggfuzz/mangle.h include
 cp honggfuzz/honggfuzz.h include
 cp honggfuzz/libhfcommon/util.h include/libhfcommon
 
-§§rm -rf honggfuzz
+rm -rf honggfuzz

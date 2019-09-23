@@ -24,8 +24,8 @@ namespace FluffiTester
 	{
 	public:
 
-§§		TGTestcaseManager* testcaseManager = nullptr;
-§§		GarbageCollectorWorker* garbageCollector = nullptr;
+		TGTestcaseManager* testcaseManager = nullptr;
+		GarbageCollectorWorker* garbageCollector = nullptr;
 
 		TEST_METHOD_INITIALIZE(ModuleInitialize)
 		{
@@ -100,7 +100,7 @@ namespace FluffiTester
 			Assert::AreEqual(poppedTestcase2.getNumOfProcessingAttempts(), oldNumOfProcessingAttempts2 + 1, L"Error testcases in pendingTestcaseQueue corrupted: (pushNewGeneratedTestcases)");
 
 			// Proove Exception if Queue is empty
-§§			TGTestcaseManager* testcaseManagerLocal = testcaseManager;
+			TGTestcaseManager* testcaseManagerLocal = testcaseManager;
 			auto f = [testcaseManagerLocal] { testcaseManagerLocal->popPendingTCForProcessing(); };
 			Assert::ExpectException<std::runtime_error>(f);
 		}
@@ -147,7 +147,7 @@ namespace FluffiTester
 			Assert::AreEqual(poppedTestcase2.getNumOfProcessingAttempts(), oldNumOfProcessingAttempts2 + 1, L"Error popping testcases from pendingTestcaseQueue: (popPendingTCForProcessing)");
 
 			// Proove Exception if Queue is empty
-§§			TGTestcaseManager* testcaseManagerLocal = testcaseManager;
+			TGTestcaseManager* testcaseManagerLocal = testcaseManager;
 			auto f = [testcaseManagerLocal] { testcaseManagerLocal->popPendingTCForProcessing(); };
 			Assert::ExpectException<std::runtime_error>(f);
 		}
@@ -181,12 +181,12 @@ namespace FluffiTester
 			Assert::AreEqual(testcaseManager->getPendingTestcaseQueueSize(), (size_t)0, L"Error popping TestcaseS from pendingTestcaseQueue into sentButNotEvaluatedSet: (removeEvaluatedTestcases)");
 			Assert::AreEqual(testcaseManager->getSentButNotEvaluatedTestcaseSetSize(), (size_t)2, L"Error popping TestcaseS from pendingTestcaseQueue into sentButNotEvaluatedSet: (removeEvaluatedTestcases)");
 
-§§			google::protobuf::RepeatedPtrField< TestcaseID > evaluatedTestcases = google::protobuf::RepeatedPtrField< TestcaseID >();
-§§			TestcaseID* tmp1 = new TestcaseID();
+			google::protobuf::RepeatedPtrField< TestcaseID > evaluatedTestcases = google::protobuf::RepeatedPtrField< TestcaseID >();
+			TestcaseID* tmp1 = new TestcaseID();
 			tmp1->CopyFrom(id1.getProtobuf());
 			evaluatedTestcases.AddAllocated(tmp1);
 
-§§			TestcaseID* tmp2 = new TestcaseID();
+			TestcaseID* tmp2 = new TestcaseID();
 			tmp2->CopyFrom(id2.getProtobuf());
 			evaluatedTestcases.AddAllocated(tmp2);
 
@@ -259,8 +259,8 @@ namespace FluffiTester
 			// Test Method
 			Assert::AreEqual(testcaseManager->getSentButNotEvaluatedTestcaseSetSize(), (size_t)3, L"Error calculating size of sentButNotEvaluatedTestcaseSet: (getSentButNotEvaluatedTestcaseSetSize)");
 
-§§			google::protobuf::RepeatedPtrField< TestcaseID > evaluatedTestcases = google::protobuf::RepeatedPtrField< TestcaseID >();
-§§			TestcaseID* tmp2 = new TestcaseID();
+			google::protobuf::RepeatedPtrField< TestcaseID > evaluatedTestcases = google::protobuf::RepeatedPtrField< TestcaseID >();
+			TestcaseID* tmp2 = new TestcaseID();
 			tmp2->CopyFrom(id2.getProtobuf());
 			evaluatedTestcases.AddAllocated(tmp2);
 

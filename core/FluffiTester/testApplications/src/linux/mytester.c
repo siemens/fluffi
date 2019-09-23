@@ -40,16 +40,16 @@ int main() {
 
 	Util::setDefaultLogOptions("mytest.log");
 
-§§	LOG(INFO) << "Starting RUN tests!";
+	LOG(INFO) << "Starting RUN tests!";
 
 	//normal execution should print "option 0 do nothing"
 	{
 		ExternalProcess ep(DEBUGGERTESTER + " 0", ExternalProcess::CHILD_OUTPUT_TYPE::OUTPUT);
 		bool success =ep.initProcess();
-§§		LOG(INFO) << "init 1:" << success;
+		LOG(INFO) << "init 1:" << success;
 
 		success =ep.run();
-§§		LOG(INFO) << "run 1:" << success;
+		LOG(INFO) << "run 1:" << success;
 
 
 
@@ -61,10 +61,10 @@ int main() {
 	{
 		ExternalProcess ep(DEBUGGERTESTER + " 1", ExternalProcess::CHILD_OUTPUT_TYPE::OUTPUT);
 		bool success =ep.initProcess();
-§§		LOG(INFO) << "init 2:" << success;
+		LOG(INFO) << "init 2:" << success;
 
 		success =ep.run();
-§§		LOG(INFO) << "run 2:" << success;
+		LOG(INFO) << "run 2:" << success;
 
 
 
@@ -76,10 +76,10 @@ int main() {
 	{
 		ExternalProcess ep(DEBUGGERTESTER + " 3", ExternalProcess::CHILD_OUTPUT_TYPE::OUTPUT);
 		bool success =ep.initProcess();
-§§		LOG(INFO) << "init 3:" << success;
+		LOG(INFO) << "init 3:" << success;
 
 		success =ep.run();
-§§		LOG(INFO) << "run 3:" << success;
+		LOG(INFO) << "run 3:" << success;
 
 
 
@@ -89,19 +89,19 @@ int main() {
 
 
 
-§§	LOG(INFO) << "RUN Tests completed!";
+	LOG(INFO) << "RUN Tests completed!";
 
 
-§§	LOG(INFO) << "Starting RUNANDWAIT tests!";
+	LOG(INFO) << "Starting RUNANDWAIT tests!";
 
 	//normal execution should print "option 0 do nothing"
 	{
 		ExternalProcess ep(DEBUGGERTESTER + " 0", ExternalProcess::CHILD_OUTPUT_TYPE::OUTPUT);
 		bool success =ep.initProcess();
-§§		LOG(INFO) << "init 1:" << success;
+		LOG(INFO) << "init 1:" << success;
 
 		success =ep.runAndWaitForCompletion(20000);
-§§		LOG(INFO) << "runAndWaitForCompletion 1:" << success;
+		LOG(INFO) << "runAndWaitForCompletion 1:" << success;
 
 
 
@@ -113,10 +113,10 @@ int main() {
 	{
 		ExternalProcess ep(DEBUGGERTESTER + " 1", ExternalProcess::CHILD_OUTPUT_TYPE::OUTPUT);
 		bool success =ep.initProcess();
-§§		LOG(INFO) << "init 2:" << success;
+		LOG(INFO) << "init 2:" << success;
 
 		success =ep.runAndWaitForCompletion(20000);
-§§		LOG(INFO) << "runAndWaitForCompletion 2:" << success;
+		LOG(INFO) << "runAndWaitForCompletion 2:" << success;
 
 
 
@@ -128,10 +128,10 @@ int main() {
 	{
 		ExternalProcess ep(DEBUGGERTESTER + " 3", ExternalProcess::CHILD_OUTPUT_TYPE::OUTPUT);
 		bool success =ep.initProcess();
-§§		LOG(INFO) << "init 3:" << success;
+		LOG(INFO) << "init 3:" << success;
 
 		success =ep.runAndWaitForCompletion(20000);
-§§		LOG(INFO) << "runAndWaitForCompletion 3:" << success;
+		LOG(INFO) << "runAndWaitForCompletion 3:" << success;
 
 
 
@@ -143,10 +143,10 @@ int main() {
 	{
 		ExternalProcess ep(DEBUGGERTESTER + " 3", ExternalProcess::CHILD_OUTPUT_TYPE::OUTPUT);
 		bool success =ep.initProcess();
-§§		LOG(INFO) << "init 4:" << success;
+		LOG(INFO) << "init 4:" << success;
 
 		success =ep.runAndWaitForCompletion(5000);
-§§		LOG(INFO) << "runAndWaitForCompletion 4:" << success;
+		LOG(INFO) << "runAndWaitForCompletion 4:" << success;
 
 
 
@@ -156,23 +156,23 @@ int main() {
 
 
 
-§§	LOG(INFO) << "RUNANDWAIT Tests completed!";
+	LOG(INFO) << "RUNANDWAIT Tests completed!";
 
 
 
 
 
-§§	LOG(INFO) << "Starting DEBUG tests!";
+	LOG(INFO) << "Starting DEBUG tests!";
 
 	//normal execution should print "option 0 do nothing"
 	{
 		ExternalProcess ep(DEBUGGERTESTER + " 0", ExternalProcess::CHILD_OUTPUT_TYPE::OUTPUT);
 		bool success =ep.initProcess();
-§§		LOG(INFO) << "init 1 :" << success;
+		LOG(INFO) << "init 1 :" << success;
 
 		std::shared_ptr<DebugExecutionOutput> dex = std::make_shared<DebugExecutionOutput>();
 		ep.debug(20000,dex,false,false);
-§§		LOG(INFO) << "debug 1:" << dex->m_terminationDescription;
+		LOG(INFO) << "debug 1:" << dex->m_terminationDescription;
 
 
 
@@ -184,11 +184,11 @@ int main() {
 	{
 		ExternalProcess ep(DEBUGGERTESTER + " 1", ExternalProcess::CHILD_OUTPUT_TYPE::OUTPUT);
 		bool success =ep.initProcess();
-§§		LOG(INFO) << "init 2:" << success;
+		LOG(INFO) << "init 2:" << success;
 
 		std::shared_ptr<DebugExecutionOutput> dex = std::make_shared<DebugExecutionOutput>();
 		ep.debug(20000,dex,false,false);
-§§		LOG(INFO) << "debug 2:" << dex->m_terminationDescription;
+		LOG(INFO) << "debug 2:" << dex->m_terminationDescription;
 
 
 
@@ -200,11 +200,11 @@ int main() {
 	{
 		ExternalProcess ep(DEBUGGERTESTER + " 2", ExternalProcess::CHILD_OUTPUT_TYPE::OUTPUT);
 		bool success =ep.initProcess();
-§§		LOG(INFO) << "init 3:" << success;
+		LOG(INFO) << "init 3:" << success;
 
 		std::shared_ptr<DebugExecutionOutput> dex = std::make_shared<DebugExecutionOutput>();
 		ep.debug(20000,dex,false,false);
-§§		LOG(INFO) << "debug 3:" << dex->m_terminationDescription;
+		LOG(INFO) << "debug 3:" << dex->m_terminationDescription;
 
 
 
@@ -216,11 +216,11 @@ int main() {
 	{
 		ExternalProcess ep(DEBUGGERTESTER + " 3", ExternalProcess::CHILD_OUTPUT_TYPE::OUTPUT);
 		bool success =ep.initProcess();
-§§		LOG(INFO) << "init 4:" << success;
+		LOG(INFO) << "init 4:" << success;
 
 		std::shared_ptr<DebugExecutionOutput> dex = std::make_shared<DebugExecutionOutput>();
 		ep.debug(20000,dex,false,false);
-§§		LOG(INFO) << "debug 4:" << dex->m_terminationDescription;
+		LOG(INFO) << "debug 4:" << dex->m_terminationDescription;
 
 
 
@@ -232,11 +232,11 @@ int main() {
 	{
 		ExternalProcess ep(DEBUGGERTESTER + " 3", ExternalProcess::CHILD_OUTPUT_TYPE::OUTPUT);
 		bool success =ep.initProcess();
-§§		LOG(INFO) << "init 5:" << success;
+		LOG(INFO) << "init 5:" << success;
 
 		std::shared_ptr<DebugExecutionOutput> dex = std::make_shared<DebugExecutionOutput>();
 		ep.debug(5000,dex,false,false);
-§§		LOG(INFO) << "debug 5:" << dex->m_terminationDescription;
+		LOG(INFO) << "debug 5:" << dex->m_terminationDescription;
 
 
 
@@ -246,10 +246,10 @@ int main() {
 
 
 
-§§	LOG(INFO) << "DEBUG Tests completed!";
+	LOG(INFO) << "DEBUG Tests completed!";
 
 
-§§	LOG(INFO) << "Starting ATTACH tests!";
+	LOG(INFO) << "Starting ATTACH tests!";
 
 	//attach to sleeping program - then run
 	{
@@ -258,17 +258,17 @@ int main() {
 
 		ExternalProcess ep(DEBUGGERTESTER, ExternalProcess::CHILD_OUTPUT_TYPE::OUTPUT);
 		bool success =ep.attachToProcess();
-§§		LOG(INFO) << "attach 1:" << success;
+		LOG(INFO) << "attach 1:" << success;
 
 		success =ep.run();
-§§		LOG(INFO) << "run 1:" << success;
+		LOG(INFO) << "run 1:" << success;
 
 
-§§		LOG(INFO) << "done with run - waiting";
+		LOG(INFO) << "done with run - waiting";
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(20000));
 
-§§		LOG(INFO) << "done with waiting";
+		LOG(INFO) << "done with waiting";
 	}
 
 
@@ -280,10 +280,10 @@ int main() {
 
 		ExternalProcess ep(DEBUGGERTESTER, ExternalProcess::CHILD_OUTPUT_TYPE::OUTPUT);
 		bool success =ep.attachToProcess();
-§§		LOG(INFO) << "attach 2:" << success;
+		LOG(INFO) << "attach 2:" << success;
 
 		success =ep.runAndWaitForCompletion(20000);
-§§		LOG(INFO) << "runAndWaitForCompletion 2:" << success;
+		LOG(INFO) << "runAndWaitForCompletion 2:" << success;
 
 
 
@@ -298,11 +298,11 @@ int main() {
 
 		ExternalProcess ep(DEBUGGERTESTER, ExternalProcess::CHILD_OUTPUT_TYPE::OUTPUT);
 		bool success =ep.attachToProcess();
-§§		LOG(INFO) << "attach 3:" << success;
+		LOG(INFO) << "attach 3:" << success;
 
 		std::shared_ptr<DebugExecutionOutput> dex = std::make_shared<DebugExecutionOutput>();
 		ep.debug(5000,dex,false,false);
-§§		LOG(INFO) << "debug 3:" << dex->m_terminationDescription;
+		LOG(INFO) << "debug 3:" << dex->m_terminationDescription;
 
 
 
@@ -317,11 +317,11 @@ int main() {
 
 		ExternalProcess ep(DEBUGGERTESTER, ExternalProcess::CHILD_OUTPUT_TYPE::OUTPUT);
 		bool success =ep.attachToProcess();
-§§		LOG(INFO) << "attach 4:" << success;
+		LOG(INFO) << "attach 4:" << success;
 
 		std::shared_ptr<DebugExecutionOutput> dex = std::make_shared<DebugExecutionOutput>();
 		ep.debug(20000,dex,false,false);
-§§		LOG(INFO) << "debug 4:" << dex->m_terminationDescription;
+		LOG(INFO) << "debug 4:" << dex->m_terminationDescription;
 
 
 
@@ -330,24 +330,24 @@ int main() {
 	}
 
 
-§§	LOG(INFO) << "ATTACH tests completed!";
+	LOG(INFO) << "ATTACH tests completed!";
 
-§§	LOG(INFO) << "Starting CONSOLE Redirect tests!";
+	LOG(INFO) << "Starting CONSOLE Redirect tests!";
 
 	{
 		ExternalProcess ep1(CONSOLEREFLECTOR, ExternalProcess::CHILD_OUTPUT_TYPE::SPECIAL);
 		bool success = ep1.initProcess();
 		if(!success){
-§§			LOG(ERROR) << "Failed to initialize the target process";
+			LOG(ERROR) << "Failed to initialize the target process";
 		}
 
 		success = ep1.run();
 		if(!success){
-§§			LOG(ERROR) << "Failed to run the target process";
+			LOG(ERROR) << "Failed to run the target process";
 		}
 
-§§		std::istream* is = ep1.getStdOutIstream();
-§§		std::ostream* os = ep1.getStdInOstream();
+		std::istream* is = ep1.getStdOutIstream();
+		std::ostream* os = ep1.getStdInOstream();
 
 		std::string mytestString = "myteststring\n";
 
@@ -367,7 +367,7 @@ int main() {
 		nbytesRead = is->readsome(buf, sizeof(buf));
 
 		if(nbytesRead != 24){
-§§			LOG(ERROR) << "Failed to read the test input from the target's stdout";
+			LOG(ERROR) << "Failed to read the test input from the target's stdout";
 		}
 
 		if(std::string(buf) != "myteststringmyteststring"){

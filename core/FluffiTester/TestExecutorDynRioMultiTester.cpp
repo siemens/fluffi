@@ -42,7 +42,7 @@ namespace FluffiTester
 			return ret == WAIT_TIMEOUT;
 		}
 
-§§		bool matchesBlocklist(uint32_t* basicBlocks, int elementsInList, std::shared_ptr<DebugExecutionOutput> exout) {
+		bool matchesBlocklist(uint32_t* basicBlocks, int elementsInList, std::shared_ptr<DebugExecutionOutput> exout) {
 			std::vector<FluffiBasicBlock>tmp = exout->getCoveredBasicBlocks();
 			std::set<FluffiBasicBlock> uniqueCoveredBlocks(tmp.begin(), tmp.end());
 
@@ -50,7 +50,7 @@ namespace FluffiTester
 				return false;
 			}
 			for (auto elem : uniqueCoveredBlocks) {
-§§				uint32_t* el = std::find(&basicBlocks[0], &basicBlocks[elementsInList], elem.m_rva);
+				uint32_t* el = std::find(&basicBlocks[0], &basicBlocks[elementsInList], elem.m_rva);
 				if (el == &basicBlocks[elementsInList]) {
 					return false;
 				}
@@ -235,7 +235,7 @@ namespace FluffiTester
 				fout << (char)0;
 				fout.close();
 
-§§				std::shared_ptr<DebugExecutionOutput> exout = multiEx.execute(tid, true);
+				std::shared_ptr<DebugExecutionOutput> exout = multiEx.execute(tid, true);
 				Assert::IsTrue(exout->m_terminationType == DebugExecutionOutput::CLEAN, L"The expected clean execution was not observed");
 				if (true)
 				{
@@ -345,7 +345,7 @@ namespace FluffiTester
 				}
 
 				//1---------------------------------------------------------
-§§				std::shared_ptr<DebugExecutionOutput> exout = multiEx.execute(tid1, true);
+				std::shared_ptr<DebugExecutionOutput> exout = multiEx.execute(tid1, true);
 				Assert::IsTrue(exout->m_terminationType == DebugExecutionOutput::CLEAN, L"The expected clean execution was not observed(1)");
 				if (saveBlocksToFile)
 				{
@@ -576,7 +576,7 @@ namespace FluffiTester
 				fout << (char)3;
 				fout.close();
 
-§§				std::shared_ptr<DebugExecutionOutput> exout = multiEx.execute(tid, true);
+				std::shared_ptr<DebugExecutionOutput> exout = multiEx.execute(tid, true);
 				Assert::IsTrue(exout->m_terminationType == DebugExecutionOutput::TIMEOUT, L"The expected timeout was not detected");
 
 				garbageCollector.markFileForDelete(testcaseFile);
@@ -616,7 +616,7 @@ namespace FluffiTester
 				fout << (char)2;
 				fout.close();
 
-§§				std::shared_ptr<DebugExecutionOutput> exout = multiEx.execute(tid, true);
+				std::shared_ptr<DebugExecutionOutput> exout = multiEx.execute(tid, true);
 				Assert::IsTrue(exout->m_terminationType == DebugExecutionOutput::EXCEPTION_OTHER, L"The expected crash was not detected");
 				Assert::IsTrue(exout->m_lastCrash == "InstrumentedDebuggerTester.exe+0x000017a4", L"The expected crash address was not the expected one");
 
@@ -653,7 +653,7 @@ namespace FluffiTester
 				fout << (char)1;
 				fout.close();
 
-§§				std::shared_ptr<DebugExecutionOutput> exout = multiEx.execute(tid, true);
+				std::shared_ptr<DebugExecutionOutput> exout = multiEx.execute(tid, true);
 				Assert::IsTrue(exout->m_terminationType == DebugExecutionOutput::EXCEPTION_ACCESSVIOLATION, L"The expected access violation was not detected");
 				Assert::IsTrue(exout->m_lastCrash == "InstrumentedDebuggerTester.exe+0x000017b1", L"The expected crash address was not the expected one");
 
@@ -672,7 +672,7 @@ namespace FluffiTester
 			std::string testcaseDir = "testtestcaseDir";
 			std::string pipeName = "testpipe";
 			std::string feedercmdline = "";
-§§			std::string errormsg = "";
+			std::string errormsg = "";
 			int initializationTimeoutMS = 0;
 			std::string dynregfileName = std::string(getenv("USERPROFILE")) + "\\dynamorio\\notepad.exe.config64";
 
@@ -853,7 +853,7 @@ namespace FluffiTester
 				fout << (char)0;
 				fout.close();
 
-§§				std::shared_ptr<DebugExecutionOutput> exout = multiEx.execute(tid, true);
+				std::shared_ptr<DebugExecutionOutput> exout = multiEx.execute(tid, true);
 				Assert::IsTrue(exout->m_terminationType == DebugExecutionOutput::EXCEPTION_OTHER, L"The expected crash reported by feeder was not detected");
 				Assert::IsTrue(exout->m_lastCrash == "FEEDER CLAIMS CRASH", L"The expected crash address was not the expected one");
 

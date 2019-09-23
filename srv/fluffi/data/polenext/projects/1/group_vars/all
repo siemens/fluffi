@@ -8,10 +8,10 @@
 # 
 # Author(s): Thomas Riedmaier, Fabian Russwurm, Pascal Eckmann, Michael Kraus
 
-§§# Hostname of the ntp host to sync
+# Hostname of the ntp host to sync
 ntpServerHostname: ntp.fluffi
 
-§§# Executable names based on FLUFFI component
+# Executable names based on FLUFFI component
 executableNames: 
   TR: TestcaseRunner
   TG: TestcaseGenerator
@@ -22,8 +22,8 @@ executableNames:
 # Is used for large file transfers to windows machines
 ftpserverURL: ftp://ftp.fluffi
 
-§§# Path where the ISOs are located on the FTP server
+# Path where the ISOs are located on the FTP server
 isosPathName: isos
 
-§§# File path where to find Rest-Instance-Starter on FTP server
+# File path where to find Rest-Instance-Starter on FTP server
 ftpRestStarterPath: "restStarter/main.py"

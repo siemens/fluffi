@@ -20,13 +20,13 @@ Author(s): Abian Blome, Thomas Riedmaier, Pascal Eckmann, Roman Bendt
 #define closesocket close
 #define INVALID_SOCKET -1
 #define SOCKET_ERROR -1
-§§int memcpy_s(void* a, size_t b, const void* c, size_t d) {
+int memcpy_s(void* a, size_t b, const void* c, size_t d) {
 	return ((memcpy(a, c, std::min(b, d)) == a) ? 0 : -1);
 }
 
-§§char** split_commandline(const std::string cmdline)
+char** split_commandline(const std::string cmdline)
 {
-§§	char** argv = NULL;
+	char** argv = NULL;
 
 	wordexp_t p;
 
@@ -38,7 +38,7 @@ Author(s): Abian Blome, Thomas Riedmaier, Pascal Eckmann, Roman Bendt
 		return NULL;
 	}
 
-§§	if (!(argv = (char**)calloc(p.we_wordc + 1, sizeof(char*))))
+	if (!(argv = (char**)calloc(p.we_wordc + 1, sizeof(char*))))
 	{
 		wordfree(&p);
 		std::cout << "TCPFeeder: calloc failed" << std::endl;
@@ -71,7 +71,7 @@ std::string execCommandAndGetOutput(std::string command) {
 		close(link[0]);
 		close(link[1]);
 
-§§		char** argv = split_commandline(command);
+		char** argv = split_commandline(command);
 
 		execvp(argv[0], &argv[1]);
 		std::cout << "TCPFeeder: Failed to call execv:" << errno << std::endl;
@@ -129,7 +129,7 @@ bool isPortOpen(std::string target, uint16_t port)
 	}
 
 	// Connect to server.
-§§	iResult = connect(connectSocket, (struct sockaddr*)&saServer, sizeof(saServer));
+	iResult = connect(connectSocket, (struct sockaddr*)&saServer, sizeof(saServer));
 	if (iResult == SOCKET_ERROR) {
 		closesocket(connectSocket);
 		connectSocket = INVALID_SOCKET;
@@ -164,7 +164,7 @@ std::vector<std::string> splitString(std::string str, std::string token) {
 
 std::vector<char> readAllBytesFromFile(const std::string filename)
 {
-§§	FILE* inputFile;
+	FILE* inputFile;
 	if (0 != fopen_s(&inputFile, filename.c_str(), "rb")) {
 		std::cout << "TCPFeeder: readAllBytesFromFile failed to open the file " << filename << std::endl;
 		return{};
@@ -179,9 +179,9 @@ std::vector<char> readAllBytesFromFile(const std::string filename)
 		return{};
 	}
 
-§§	std::vector<char> result((unsigned int)fileSize);
+	std::vector<char> result((unsigned int)fileSize);
 
-§§	fread((char*)&result[0], fileSize, 1, inputFile);
+	fread((char*)&result[0], fileSize, 1, inputFile);
 
 	fclose(inputFile);
 
@@ -193,7 +193,7 @@ int getServerPortFromPID(int targetPID) {
 	// Declare and initialize variables
 	PMIB_TCPTABLE2 pTcpTable;
 
-§§	pTcpTable = (MIB_TCPTABLE2*)malloc(sizeof(MIB_TCPTABLE2));
+	pTcpTable = (MIB_TCPTABLE2*)malloc(sizeof(MIB_TCPTABLE2));
 	if (pTcpTable == NULL) {
 		std::cout << "TCPFeeder.getServerPortFromPID: Error allocating memory (1)" << std::endl;
 		return 0;
@@ -204,7 +204,7 @@ int getServerPortFromPID(int targetPID) {
 	// get the necessary size into the ulSize variable
 	if (GetTcpTable2(pTcpTable, &ulSize, TRUE) == ERROR_INSUFFICIENT_BUFFER) {
 		free(pTcpTable);
-§§		pTcpTable = (MIB_TCPTABLE2*)malloc(ulSize);
+		pTcpTable = (MIB_TCPTABLE2*)malloc(ulSize);
 		if (pTcpTable == NULL) {
 			std::cout << "TCPFeeder.getServerPortFromPID: Error allocating memory (2)" << std::endl;
 			return 0;

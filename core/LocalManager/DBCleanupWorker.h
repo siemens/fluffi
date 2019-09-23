@@ -20,7 +20,7 @@ class LMWorkerThreadState;
 class DBCleanupWorker
 {
 public:
-§§	DBCleanupWorker(CommInt* commInt, LMWorkerThreadStateBuilder* workerThreadStateBuilder, int timeBetweenTwoCleanupRoundsInMS, std::string location);
+	DBCleanupWorker(CommInt* commInt, LMWorkerThreadStateBuilder* workerThreadStateBuilder, int timeBetweenTwoCleanupRoundsInMS, std::string location);
 	virtual ~DBCleanupWorker();
 
 	void workerMain();

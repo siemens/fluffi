@@ -57,7 +57,7 @@
     mode: 01755
 
 - name: Execute install script of the SUT on the remote machine
-§§  sudo: yes
+  sudo: yes
   shell: "{{deploymentScriptPath}}"
   args:
     chdir: "{{remoteUtilitiesFilePath}}/{{PackageDirName}}"

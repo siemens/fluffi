@@ -56,7 +56,7 @@ namespace FluffiTester
 			//No Agents running. I can do TypeA
 			{
 				AgentType type = AgentType::TestcaseGenerator;
-§§				google::protobuf::RepeatedPtrField< std::string > implementedSubtypes;
+				google::protobuf::RepeatedPtrField< std::string > implementedSubtypes;
 				implementedSubtypes.Add("TypeA");
 				std::string re = RegisterAtLMRequestHandler::decideSubAgentType(dbman, type, implementedSubtypes);
 				Assert::IsTrue(re == "TypeA", L"I can only do TypeA. TypeA should have been returned");
@@ -65,7 +65,7 @@ namespace FluffiTester
 			//No Agents running. I can do TypeB
 			{
 				AgentType type = AgentType::TestcaseGenerator;
-§§				google::protobuf::RepeatedPtrField< std::string > implementedSubtypes;
+				google::protobuf::RepeatedPtrField< std::string > implementedSubtypes;
 				implementedSubtypes.Add("TypeB");
 				std::string re = RegisterAtLMRequestHandler::decideSubAgentType(dbman, type, implementedSubtypes);
 				Assert::IsTrue(re == "TypeB", L"I can only do TypeB. TypeB should have been returned");
@@ -74,7 +74,7 @@ namespace FluffiTester
 			//No Agents running. I can do TypeA AND TypeB
 			{
 				AgentType type = AgentType::TestcaseGenerator;
-§§				google::protobuf::RepeatedPtrField< std::string > implementedSubtypes;
+				google::protobuf::RepeatedPtrField< std::string > implementedSubtypes;
 				implementedSubtypes.Add("TypeA");
 				implementedSubtypes.Add("TypeB");
 				std::string re = RegisterAtLMRequestHandler::decideSubAgentType(dbman, type, implementedSubtypes);
@@ -84,7 +84,7 @@ namespace FluffiTester
 			//No Agents running. I can do TypeC
 			{
 				AgentType type = AgentType::TestcaseGenerator;
-§§				google::protobuf::RepeatedPtrField< std::string > implementedSubtypes;
+				google::protobuf::RepeatedPtrField< std::string > implementedSubtypes;
 				implementedSubtypes.Add("TypeC");
 				std::string re = RegisterAtLMRequestHandler::decideSubAgentType(dbman, type, implementedSubtypes);
 				Assert::IsTrue(re == "", L"I can only do TypeC. This should return in an empty result");
@@ -95,7 +95,7 @@ namespace FluffiTester
 			//One TypeA agent running. I can do TypeA
 			{
 				AgentType type = AgentType::TestcaseGenerator;
-§§				google::protobuf::RepeatedPtrField< std::string > implementedSubtypes;
+				google::protobuf::RepeatedPtrField< std::string > implementedSubtypes;
 				implementedSubtypes.Add("TypeA");
 				std::string re = RegisterAtLMRequestHandler::decideSubAgentType(dbman, type, implementedSubtypes);
 				Assert::IsTrue(re == "TypeA", L"I can only do TypeA. TypeA should have been returned (2)");
@@ -104,7 +104,7 @@ namespace FluffiTester
 			//One TypeA agent running. I can do TypeB
 			{
 				AgentType type = AgentType::TestcaseGenerator;
-§§				google::protobuf::RepeatedPtrField< std::string > implementedSubtypes;
+				google::protobuf::RepeatedPtrField< std::string > implementedSubtypes;
 				implementedSubtypes.Add("TypeB");
 				std::string re = RegisterAtLMRequestHandler::decideSubAgentType(dbman, type, implementedSubtypes);
 				Assert::IsTrue(re == "TypeB", L"I can only do TypeB. TypeB should have been returned (2)");
@@ -113,7 +113,7 @@ namespace FluffiTester
 			//One TypeA agent running. I can do TypeA AND TypeB
 			{
 				AgentType type = AgentType::TestcaseGenerator;
-§§				google::protobuf::RepeatedPtrField< std::string > implementedSubtypes;
+				google::protobuf::RepeatedPtrField< std::string > implementedSubtypes;
 				implementedSubtypes.Add("TypeA");
 				implementedSubtypes.Add("TypeB");
 				std::string re = RegisterAtLMRequestHandler::decideSubAgentType(dbman, type, implementedSubtypes);
@@ -123,7 +123,7 @@ namespace FluffiTester
 			//One TypeA agent running. I can do TypeC
 			{
 				AgentType type = AgentType::TestcaseGenerator;
-§§				google::protobuf::RepeatedPtrField< std::string > implementedSubtypes;
+				google::protobuf::RepeatedPtrField< std::string > implementedSubtypes;
 				implementedSubtypes.Add("TypeC");
 				std::string re = RegisterAtLMRequestHandler::decideSubAgentType(dbman, type, implementedSubtypes);
 				Assert::IsTrue(re == "", L"I can only do TypeC. This should return in an empty result (2)");
@@ -136,7 +136,7 @@ namespace FluffiTester
 			//No Agents running. I can do TypeA AND TypeB
 			{
 				AgentType type = AgentType::TestcaseGenerator;
-§§				google::protobuf::RepeatedPtrField< std::string > implementedSubtypes;
+				google::protobuf::RepeatedPtrField< std::string > implementedSubtypes;
 				implementedSubtypes.Add("TypeA");
 				implementedSubtypes.Add("TypeB");
 				std::string re = RegisterAtLMRequestHandler::decideSubAgentType(dbman, type, implementedSubtypes);
@@ -148,7 +148,7 @@ namespace FluffiTester
 			//One TypeB running. I can do TypeA AND TypeB
 			{
 				AgentType type = AgentType::TestcaseGenerator;
-§§				google::protobuf::RepeatedPtrField< std::string > implementedSubtypes;
+				google::protobuf::RepeatedPtrField< std::string > implementedSubtypes;
 				implementedSubtypes.Add("TypeA");
 				implementedSubtypes.Add("TypeB");
 				std::string re = RegisterAtLMRequestHandler::decideSubAgentType(dbman, type, implementedSubtypes);
@@ -160,7 +160,7 @@ namespace FluffiTester
 			//One TypeA, One TypeB running. I can do TypeA AND TypeB
 			{
 				AgentType type = AgentType::TestcaseGenerator;
-§§				google::protobuf::RepeatedPtrField< std::string > implementedSubtypes;
+				google::protobuf::RepeatedPtrField< std::string > implementedSubtypes;
 				implementedSubtypes.Add("TypeA");
 				implementedSubtypes.Add("TypeB");
 				std::string re = RegisterAtLMRequestHandler::decideSubAgentType(dbman, type, implementedSubtypes);
