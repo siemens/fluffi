@@ -95,7 +95,6 @@ services:
             - /etc/localtime:/etc/localtime:ro
             - ./data/mon/influxdb:/var/lib/influxdb 
             - ./data/mon/scripted.js:/usr/share/grafana/public/dashboards/scripted.js
-            - ./data/mon/FLUFFIboard.json:/etc/grafana/provisioning/jsons/FLUFFIboard.json
             - ./data/mon/FLUFFIboard1.json:/etc/grafana/provisioning/jsons/FLUFFIboard1.json
             - ./data/mon/FLUFFIboard2.json:/etc/grafana/provisioning/jsons/FLUFFIboard2.json
             - ./data/mon/grafana:/usr/share/grafana/data
