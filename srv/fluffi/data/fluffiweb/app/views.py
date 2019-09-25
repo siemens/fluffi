@@ -18,8 +18,10 @@ from .helpers import *
 from .forms import *
 from .constants import *
 
-import json, io, os, shutil
+import json, io, os, shutil, random
 import requests
+
+archive_threads = {}
 
 @app.route("/")
 @app.route("/index")
@@ -292,11 +294,44 @@ def downloadTestcaseSet(projId):
 
 @app.route("/projects/<int:projId>/population/download")
 def downloadPopulation(projId):
-    if createArchive(projId, "population", getITQueryOfType(TESTCASE_TYPES["population"])):
-        return send_file(getDownloadPath() + "population.zip", as_attachment = True, cache_timeout = 0)
-    flash("Error creating the archive", "error")
+    global archive_threads
+    name = "population"
+    nice_name = "Population"
 
-    return redirect("/projects/%d/population" % projId)
+    thread_id = len(archive_threads) + 1
+    archive_threads[thread_id] = CreateArchive(projId, name, getITQueryOfType(TESTCASE_TYPES[name]))
+    archive_threads[thread_id].setMaxVal()
+    archive_threads[thread_id].start()
+
+    print(thread_id)
+
+    return renderTemplate("progressDownload.html",
+                          thread_id=thread_id,
+                          max_val=archive_threads[thread_id].max_val,
+                          nice_name=nice_name,
+                          download=name + ".zip")
+
+    #if createArchive(projId, "population", getITQueryOfType(TESTCASE_TYPES["population"])):
+    #    return send_file(getDownloadPath() + "population.zip", as_attachment = True, cache_timeout = 0)
+    #flash("Error creating the archive", "error")
+
+    #return redirect("/projects/%d/population" % projId)
+
+
+@app.route('/progress/<int:thread_id>')
+def progress(thread_id):
+    global archive_threads
+    print("threadgedöhns", archive_threads[thread_id].max_val + 1, archive_threads[thread_id].progress, str(archive_threads[thread_id].progress), os.path.isfile(getDownloadPath() + archive_threads[thread_id].name + ".zip"))
+    if (archive_threads[thread_id].max_val is archive_threads[thread_id].progress and
+            os.path.isfile(getDownloadPath() + archive_threads[thread_id].name + ".zip")):
+        archive_threads[thread_id].progress = -1
+
+    return str(archive_threads[thread_id].progress)
+
+
+@app.route('/download/<string:archive>')
+def downloadArchive(archive):
+    return send_file(getDownloadPath() + archive, as_attachment=True, cache_timeout = 0)
 
 
 @app.route("/projects/<int:projId>/hangs")

@@ -34,7 +34,7 @@ from config import LOCAL_DEV
 
 scheduler = BackgroundScheduler()
 scheduler.configure(timezone = utc)
-scheduler.add_job(deleteZipAndTempFiles, 'interval', minutes=3)
+#scheduler.add_job(deleteZipAndTempFiles, 'interval', minutes=3)
 
 if not LOCAL_DEV:
     scheduler.add_job(healthCheck, 'interval', minutes = 0.5)

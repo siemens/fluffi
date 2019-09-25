@@ -20,6 +20,8 @@ SQLALCHEMY_TRACK_MODIFICATIONS = False
 WTF_CSRF_ENABLED = True
 SECRET_KEY = "asdf"
 BOOTSTRAP_SERVE_LOCAL = True
+SEND_FILE_MAX_AGE_DEFAULT = 0
+
 
 DBHOST = "localhost" if LOCAL_DEV else socket.gethostbyname('db.fluffi')
 DBUSER = "root" if LOCAL_DEV else "fluffi_gm"

@@ -12,6 +12,7 @@ import io
 import csv
 import os
 import shutil
+import threading
 import subprocess
 from base64 import b64encode
 from os import system, unlink
@@ -136,6 +137,82 @@ def getLocations():
 
 def getDownloadPath():
     return app.root_path[:-3]
+
+
+class CreateArchive(threading.Thread):
+    def __init__(self, projId, name, statement, data = None):
+        super().__init__()
+        self.progress = 0
+        self.projId = projId
+        self.name = name
+        self.statement = statement
+        self.data = data
+        self.max_val = 0
+        self.error = (0, "")
+
+    def setMaxVal(self):
+        project = models.Fuzzjob.query.filter_by(id=self.projId).first()
+
+        engine = create_engine(
+            'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
+        connection = engine.connect()
+
+        try:
+            result = connection.execute(getITCountOfTypeQuery(0))
+            self.max_val = int((result.fetchone()[0])/100) + 1
+        except Exception as e:
+            print(e, self.name, self.statement)
+        finally:
+            connection.close()
+            engine.dispose()
+
+    def run(self):
+        print(self.projId, "Project ID", self.name)
+
+        path = app.root_path + "/tmp/" + self.name
+        zipFilePath = getDownloadPath() + self.name + ".zip"
+
+        if os.path.isfile(zipFilePath):
+            os.remove(zipFilePath)
+        if os.path.exists(path):
+            shutil.rmtree(path)
+
+        os.makedirs(path)
+        project = models.Fuzzjob.query.filter_by(id=self.projId).first()
+
+        engine = create_engine(
+            'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
+        connection = engine.connect()
+        try:
+            print(self.statement)
+            for block in range(0, self.max_val):
+                self.progress = block + 1
+
+                block_statement = self.statement[:-1] + " LIMIT " + str(block * 100) + ", 100;"
+
+                result = connection.execute(block_statement) if self.data is None else connection.execute(block_statement,
+                                                                                                         self.data)
+                for row in result:
+                    if 'NiceName' in row.keys():
+                        fileName = row["NiceName"] if row["NiceName"] else "{}_id{}".format(
+                            row["CreatorServiceDescriptorGUID"],
+                            row["ID"])
+                    else:
+                        fileName = "{}_id{}".format(row["CreatorServiceDescriptorGUID"], row["ID"])
+                    rawData = row["RawBytes"]
+                    f = open(path + "/" + fileName, "wb+")
+                    f.write(rawData)
+                    f.close()
+
+            shutil.make_archive(self.name, "zip", path)
+
+            print(self.name, path)
+        except Exception as e:
+            self.error = (2, str(e))
+            print(e, self.name, self.statement)
+        finally:
+            connection.close()
+            engine.dispose()
 
 
 def createArchive(projId, name, statement, data = None):
