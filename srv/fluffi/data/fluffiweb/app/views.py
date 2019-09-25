@@ -247,18 +247,6 @@ def removeLocation(locId):
     return redirect("/locations")
 
 
-@app.route("/projects/<int:projId>/population")
-def viewPopulation(projId):
-    data = getGeneralInformationData(projId, getITQueryOfTypeNoRaw(TESTCASE_TYPES["population"]))
-    data.name = "Population"
-    data.redirect = "population"
-    data.downloadName = "downloadPopulation"
-
-    return renderTemplate("viewTCsTempl.html",
-                           title = "View Population",
-                           data = data)
-
-
 @app.route("/projects/<int:projId>/renameElement", methods = ["POST"])
 def renameElement(projId):
     if not request.json:
@@ -292,41 +280,41 @@ def downloadTestcaseSet(projId):
     return redirect("/projects/view/%d" % projId)
 
 
-@app.route("/projects/<int:projId>/population/download")
-def downloadPopulation(projId):
+def createZipArchive(projId, name, nice_name, count_statement, statement):
     global archive_threads
-    name = "population"
-    nice_name = "Population"
 
-    thread_id = len(archive_threads) + 1
-    archive_threads[thread_id] = CreateArchive(projId, name, getITQueryOfType(TESTCASE_TYPES[name]))
-    archive_threads[thread_id].setMaxVal()
-    archive_threads[thread_id].start()
+    if len(archive_threads) is 0:
+        thread_id = len(archive_threads) + 1
+        archive_threads[thread_id] = CreateArchive(projId, name, count_statement, statement)
+        archive_threads[thread_id].setMaxVal()
+        archive_threads[thread_id].start()
 
-    print(thread_id)
-
-    return renderTemplate("progressDownload.html",
-                          thread_id=thread_id,
-                          max_val=archive_threads[thread_id].max_val,
-                          nice_name=nice_name,
-                          download=name + ".zip")
-
-    #if createArchive(projId, "population", getITQueryOfType(TESTCASE_TYPES["population"])):
-    #    return send_file(getDownloadPath() + "population.zip", as_attachment = True, cache_timeout = 0)
-    #flash("Error creating the archive", "error")
-
-    #return redirect("/projects/%d/population" % projId)
+        return renderTemplate("progressDownload.html",
+                              thread_id=thread_id,
+                              max_val=archive_threads[thread_id].max_val,
+                              nice_name=nice_name,
+                              download=name + ".zip")
+    else:
+        return renderTemplate("progressDownload.html",
+                              thread_id=-1,
+                              max_val=10,
+                              nice_name=nice_name,
+                              download=name)
 
 
 @app.route('/progress/<int:thread_id>')
 def progress(thread_id):
     global archive_threads
-    print("threadgedöhns", archive_threads[thread_id].max_val + 1, archive_threads[thread_id].progress, str(archive_threads[thread_id].progress), os.path.isfile(getDownloadPath() + archive_threads[thread_id].name + ".zip"))
     if (archive_threads[thread_id].max_val is archive_threads[thread_id].progress and
-            os.path.isfile(getDownloadPath() + archive_threads[thread_id].name + ".zip")):
-        archive_threads[thread_id].progress = -1
-
-    return str(archive_threads[thread_id].progress)
+            os.path.isfile(getDownloadPath() + archive_threads[thread_id].name + ".zip") and
+            archive_threads[thread_id].status[0] is 1):
+        archive_threads.clear()
+        return str(-1)
+    elif archive_threads[thread_id].status[0] is 2:
+        flash("Error creating the archive: " + archive_threads[thread_id].status[1], "error")
+        return str(archive_threads[thread_id].progress)
+    else:
+        return str(archive_threads[thread_id].progress)
 
 
 @app.route('/download/<string:archive>')
@@ -334,16 +322,24 @@ def downloadArchive(archive):
     return send_file(getDownloadPath() + archive, as_attachment=True, cache_timeout = 0)
 
 
-@app.route("/projects/<int:projId>/hangs")
-def viewHangs(projId):
-    data = getGeneralInformationData(projId, getITQueryOfTypeNoRaw(TESTCASE_TYPES["hangs"]))
-    data.name = "Hangs"
-    data.redirect = "hangs"
-    data.downloadName = "downloadHangs"
+@app.route("/projects/<int:projId>/population")
+def viewPopulation(projId):
+    data = getGeneralInformationData(projId, getITQueryOfTypeNoRaw(TESTCASE_TYPES["population"]))
+    data.name = "Population"
+    data.redirect = "population"
+    data.downloadName = "downloadPopulation"
 
     return renderTemplate("viewTCsTempl.html",
-                           title = "View Hangs",
+                           title = "View Population",
                            data = data)
+
+
+@app.route("/projects/<int:projId>/population/download")
+def downloadPopulation(projId):
+    name = "population"
+    nice_name = "Population"
+
+    return createZipArchive(projId, name, nice_name, getITCountOfTypeQuery(TESTCASE_TYPES[name]), getITQueryOfType(TESTCASE_TYPES[name]))
 
 
 @app.route("/projects/<int:projId>/accessVioTotal")
@@ -358,6 +354,14 @@ def viewAccessVioTotal(projId):
                            data = data)
 
 
+@app.route("/projects/<int:projId>/accessVioTotal/download")
+def downloadAccessVioTotal(projId):
+    name = "accessViolations"
+    nice_name = "Access Violations (Total)"
+
+    return createZipArchive(projId, name, nice_name, getITCountOfTypeQuery(TESTCASE_TYPES[name]), getITQueryOfType(TESTCASE_TYPES[name]))
+
+
 @app.route("/projects/<int:projId>/accessVioUnique")
 def viewAccessVioUnique(projId):
     data = getGeneralInformationData(projId, UNIQUE_ACCESS_VIOLATION)
@@ -368,6 +372,14 @@ def viewAccessVioUnique(projId):
     return renderTemplate("viewTCsTempl.html",
                            title = "View Unique Access Violations",
                            data = data)
+
+
+@app.route("/projects/<int:projId>/accessVioUnique/download")
+def downloadAccessVioUnique(projId):
+    name = "access_vio_unique"
+    nice_name = "Access Violations (Unique)"
+
+    return createZipArchive(projId, name, nice_name, NUM_UNIQUE_ACCESS_VIOLATION, UNIQUE_ACCESS_VIOLATION)
 
 
 @app.route("/projects/<int:projId>/totalCrashes")
@@ -382,6 +394,14 @@ def viewTotalCrashes(projId):
                            data = data)
 
 
+@app.route("/projects/<int:projId>/totalCrashes/download")
+def downloadTotalCrashes(projId):
+    name = "crashes"
+    nice_name = "Crashes (Total)"
+
+    return createZipArchive(projId, name, nice_name, getITCountOfTypeQuery(TESTCASE_TYPES[name]), getITQueryOfType(TESTCASE_TYPES[name]))
+
+
 @app.route("/projects/<int:projId>/uniqueCrashes")
 def viewUniqueCrashes(projId):
     data = getGeneralInformationData(projId, UNIQUE_CRASHES)
@@ -392,6 +412,34 @@ def viewUniqueCrashes(projId):
     return renderTemplate("viewTCsTempl.html",
                            title = "View Unique Crashes",
                            data = data)
+
+
+@app.route("/projects/<int:projId>/uniqueCrashes/download")
+def downloadUniqueCrashes(projId):
+    name = "unique_crashes"
+    nice_name = "Crashes (Unique)"
+
+    return createZipArchive(projId, name, nice_name, NUM_UNIQUE_CRASH, UNIQUE_CRASHES)
+
+
+@app.route("/projects/<int:projId>/hangs")
+def viewHangs(projId):
+    data = getGeneralInformationData(projId, getITQueryOfTypeNoRaw(TESTCASE_TYPES["hangs"]))
+    data.name = "Hangs"
+    data.redirect = "hangs"
+    data.downloadName = "downloadHangs"
+
+    return renderTemplate("viewTCsTempl.html",
+                           title = "View Hangs",
+                           data = data)
+
+
+@app.route("/projects/<int:projId>/hangs/download")
+def downloadHangs(projId):
+    name = "hangs"
+    nice_name = "Hangs"
+
+    return createZipArchive(projId, name, nice_name, getITCountOfTypeQuery(TESTCASE_TYPES[name]), getITQueryOfType(TESTCASE_TYPES[name]))
 
 
 @app.route("/projects/<int:projId>/noResponse")
@@ -406,64 +454,12 @@ def viewNoResponses(projId):
                            data = data)
 
 
-@app.route("/projects/<int:projId>/accessVioTotal/download")
-def downloadAccessVioTotal(projId):
-    if createArchive(projId, "access_vio_total", getITQueryOfType(TESTCASE_TYPES["accessViolations"])):
-        return send_file(getDownloadPath() + "access_vio_total.zip", as_attachment = True)
-
-    flash("Error creating the archive", "error")
-
-    return redirect("/projects/%d/accessVioTotal" % projId)
-
-
-@app.route("/projects/<int:projId>/accessVioUnique/download")
-def downloadAccessVioUnique(projId):
-    if createArchive(projId, "access_vio_unique", UNIQUE_ACCESS_VIOLATION):
-        return send_file(getDownloadPath() + "access_vio_unique.zip", as_attachment = True)
-
-    flash("Error creating the archive", "error")
-
-    return redirect("/projects/%d/accessVioUnique" % projId)
-
-
-@app.route("/projects/<int:projId>/totalCrashes/download")
-def downloadTotalCrashes(projId):
-    if createArchive(projId, "total_crashes", getITQueryOfType(TESTCASE_TYPES["crashes"])):
-        return send_file(getDownloadPath() + "total_crashes.zip", as_attachment = True)
-
-    flash("Error creating the archive", "error")
-
-    return redirect("/projects/%d/totalCrashes" % projId)
-
-
-@app.route("/projects/<int:projId>/uniqueCrashes/download")
-def downloadUniqueCrashes(projId):
-    if createArchive(projId, "unique_crashes", UNIQUE_CRASHES):
-        return send_file(getDownloadPath() + "unique_crashes.zip", as_attachment = True)
-
-    flash("Error creating the archive", "error")
-
-    return redirect("/projects/%d/uniqueCrashes" % projId)
-
-
-@app.route("/projects/<int:projId>/hangs/download")
-def downloadHangs(projId):
-    if createArchive(projId, "hangs", getITQueryOfType(TESTCASE_TYPES["hangs"])):
-        return send_file(getDownloadPath() + "hangs.zip", as_attachment = True)
-
-    flash("Error creating the archive", "error")
-
-    return redirect("/projects/%d/hangs" % projId)
-
-
 @app.route("/projects/<int:projId>/noResponse/download")
 def downloadNoResponses(projId):
-    if createArchive(projId, "no_response", getITQueryOfType(TESTCASE_TYPES["noResponses"])):
-        return send_file(getDownloadPath() + "no_response.zip", as_attachment = True)
+    name = "noResponses"
+    nice_name = "No Response"
 
-    flash("Error creating the archive", "error")
-
-    return redirect("/projects/%d/noResponse" % projId)
+    return createZipArchive(projId, name, nice_name, getITCountOfTypeQuery(TESTCASE_TYPES[name]), getITQueryOfType(TESTCASE_TYPES[name]))
 
 
 @app.route("/projects/<int:projId>/violations")

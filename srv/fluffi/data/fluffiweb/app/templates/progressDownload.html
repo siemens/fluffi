@@ -21,17 +21,23 @@ $( document ).ready(function() {
 function check_progress() {
     function worker() {
         var task_id = $('#thread_id').text();
-        $.get('/progress/' + task_id, function(progress) {
-            if(progress == -1){
-                $('.progress-bar').css('width', '100%').attr('aria-valuenow', '100').text('Ready!');
-                $('#download_button').removeClass('disabled').attr('aria-disabled', 'false')
-            }else{
-                var max_val = $('.progress-bar').attr('aria-valuemax')
-                var percentage = (progress*100/max_val).toFixed(1)
-                $('.progress-bar').css('width', percentage+'%').attr('aria-valuenow', progress).text(percentage+'%');
-                setTimeout(worker, 500);
-            }
-        });
+        if(task_id < 0) {
+            $('.progress').addClass('progress-hidden');
+            $('#download_button').addClass('progress-hidden');
+            $('#download_error').removeClass('progress-hidden');
+        }else{
+            $.get('/progress/' + task_id, function(progress) {
+                if(progress == -1){
+                    $('.progress-bar').css('width', '100%').attr('aria-valuenow', '100').text('Ready!');
+                    $('#download_button').removeClass('disabled').attr('aria-disabled', 'false')
+                }else{
+                    var max_val = $('.progress-bar').attr('aria-valuemax')
+                    var percentage = (progress*100/max_val).toFixed(1)
+                    $('.progress-bar').css('width', percentage+'%').attr('aria-valuenow', progress).text(percentage+'%');
+                    setTimeout(worker, 500);
+                }
+            });
+        }
     }
     worker();
 }
@@ -44,7 +50,8 @@ function check_progress() {
 <hr>
 
 <div class="container">
-        <div id="thread_id">{{ thread_id }}</div>
+        <div id="download_error" class="progress-hidden">Error creating the archive: Only one download can be started at a time.</div>
+        <div id="thread_id" class="progress-hidden">{{ thread_id }}</div>
         <div class="progress">
             <div class="progress-bar" role="progressbar" id="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="{{ max_val }}"></div>
         </div>

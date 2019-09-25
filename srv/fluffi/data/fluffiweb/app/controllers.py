@@ -140,15 +140,17 @@ def getDownloadPath():
 
 
 class CreateArchive(threading.Thread):
-    def __init__(self, projId, name, statement, data = None):
+    def __init__(self, projId, name, count_statement, statement, data = None):
         super().__init__()
         self.progress = 0
         self.projId = projId
         self.name = name
+        self.count_statement = count_statement
         self.statement = statement
         self.data = data
         self.max_val = 0
-        self.error = (0, "")
+        # status: 0 = default/running, 1 = success, 2 = error
+        self.status = (0, "")
 
     def setMaxVal(self):
         project = models.Fuzzjob.query.filter_by(id=self.projId).first()
@@ -158,9 +160,10 @@ class CreateArchive(threading.Thread):
         connection = engine.connect()
 
         try:
-            result = connection.execute(getITCountOfTypeQuery(0))
+            result = connection.execute(self.count_statement)
             self.max_val = int((result.fetchone()[0])/100) + 1
         except Exception as e:
+            self.status = (2, str(e))
             print(e, self.name, self.statement)
         finally:
             connection.close()
@@ -204,12 +207,13 @@ class CreateArchive(threading.Thread):
                     f.write(rawData)
                     f.close()
 
-            shutil.make_archive(self.name, "zip", path)
+            filename = shutil.make_archive(self.name, "zip", path)
+            if os.path.exists(path):
+                shutil.rmtree(path)
 
-            print(self.name, path)
+            self.status = (1, "File " + filename + " created.")
         except Exception as e:
-            self.error = (2, str(e))
-            print(e, self.name, self.statement)
+            self.status = (2, str(e))
         finally:
             connection.close()
             engine.dispose()
