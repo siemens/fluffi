@@ -102,6 +102,17 @@ UNIQUE_ACCESS_VIOLATION = (
     " WHERE it.TestCaseType=2 Group by cd.CrashFootprint) av "     
     "LEFT JOIN nice_names_testcase AS nn ON av.ID = nn.TestcaseID;")
 
+UNIQUE_ACCESS_VIOLATION_NO_RAW = (
+    "SELECT av.ID, av.TestCaseType, av.CreatorServiceDescriptorGUID, av.CreatorLocalID, av.Rating, "
+    "av.TimeOfInsertion, nn.NiceName "
+    "FROM "
+    "(SELECT cd.CrashFootprint, it.TestCaseType, it.CreatorServiceDescriptorGUID, it.CreatorLocalID, it.Rating, "
+    "it.TimeOfInsertion, it.ID, it.RawBytes"
+    " FROM interesting_testcases AS it"
+    " JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
+    " WHERE it.TestCaseType=2 Group by cd.CrashFootprint) av "     
+    "LEFT JOIN nice_names_testcase AS nn ON av.ID = nn.TestcaseID;")
+
 NUM_UNIQUE_CRASH = (
     "SELECT count(*) "
     "FROM (SELECT cd.CrashFootprint, it.TestCaseType FROM interesting_testcases AS it "
@@ -111,6 +122,19 @@ NUM_UNIQUE_CRASH = (
 
 UNIQUE_CRASHES = (
     "SELECT oc.CrashFootprint, oc.ID, oc.TestCaseType, oc.RawBytes, oc.CreatorServiceDescriptorGUID, "
+    "oc.CreatorLocalID, oc.Rating, oc.TimeOfInsertion, nn.NiceName "
+    "FROM "
+    "(SELECT cd.CrashFootprint, it.TestCaseType, it.CreatorServiceDescriptorGUID, it.CreatorLocalID, "
+    "it.Rating, it.TimeOfInsertion, it.ID, it.RawBytes"
+    " FROM interesting_testcases AS it"
+    " JOIN crash_descriptions AS cd"
+    " ON it.ID = cd.CreatorTestcaseID "
+    " GROUP BY cd.CrashFootprint) oc " 
+    "LEFT JOIN nice_names_testcase AS nn ON oc.ID = nn.TestcaseID "
+    "WHERE TestCaseType=3;")
+
+UNIQUE_CRASHES_NO_RAW = (
+    "SELECT oc.ID, oc.TestCaseType, oc.CreatorServiceDescriptorGUID, "
     "oc.CreatorLocalID, oc.Rating, oc.TimeOfInsertion, nn.NiceName "
     "FROM "
     "(SELECT cd.CrashFootprint, it.TestCaseType, it.CreatorServiceDescriptorGUID, it.CreatorLocalID, "

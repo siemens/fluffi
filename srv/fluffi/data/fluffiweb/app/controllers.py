@@ -139,79 +139,82 @@ def getDownloadPath():
     return app.root_path[:-3]
 
 
-class CreateArchive(threading.Thread):
-    def __init__(self, projId, name, count_statement, statement, data = None):
+class CreateTestcaseArchive(threading.Thread):
+    def __init__(self, projId, name_list, count_statement_list, statement_list):
         super().__init__()
         self.progress = 0
         self.projId = projId
-        self.name = name
-        self.count_statement = count_statement
-        self.statement = statement
-        self.data = data
-        self.max_val = 0
+        self.name_list = name_list
+        self.count_statement_list = count_statement_list
+        self.statement_list = statement_list
+        self.max_val_list = []
         # status: 0 = default/running, 1 = success, 2 = error
         self.status = (0, "")
 
     def setMaxVal(self):
         project = models.Fuzzjob.query.filter_by(id=self.projId).first()
-
         engine = create_engine(
             'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
         connection = engine.connect()
-
         try:
-            result = connection.execute(self.count_statement)
-            self.max_val = int((result.fetchone()[0])/100) + 1
+            for count_statement in self.count_statement_list:
+                result = connection.execute(count_statement)
+                self.max_val_list.append(int((result.fetchone()[0])/20) + 1)
         except Exception as e:
             self.status = (2, str(e))
-            print(e, self.name, self.statement)
         finally:
             connection.close()
             engine.dispose()
 
     def run(self):
-        print(self.projId, "Project ID", self.name)
-
-        path = app.root_path + "/tmp/" + self.name
-        zipFilePath = getDownloadPath() + self.name + ".zip"
-
-        if os.path.isfile(zipFilePath):
-            os.remove(zipFilePath)
-        if os.path.exists(path):
-            shutil.rmtree(path)
-
-        os.makedirs(path)
         project = models.Fuzzjob.query.filter_by(id=self.projId).first()
-
         engine = create_engine(
             'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
         connection = engine.connect()
         try:
-            print(self.statement)
-            for block in range(0, self.max_val):
-                self.progress = block + 1
+            for num, statement in enumerate(self.statement_list):
+                path = app.root_path + "/tmp/" + self.name_list[num]
+                if len(self.name_list) == 1:
+                    zipFilePath = getDownloadPath() + self.name_list[num] + ".zip"
+                else:
+                    zipFilePath = getDownloadPath() + "testcase_set.zip"
 
-                block_statement = self.statement[:-1] + " LIMIT " + str(block * 100) + ", 100;"
+                if os.path.isfile(zipFilePath):
+                    os.remove(zipFilePath)
+                if os.path.exists(path):
+                    shutil.rmtree(path)
 
-                result = connection.execute(block_statement) if self.data is None else connection.execute(block_statement,
-                                                                                                         self.data)
-                for row in result:
-                    if 'NiceName' in row.keys():
-                        fileName = row["NiceName"] if row["NiceName"] else "{}_id{}".format(
-                            row["CreatorServiceDescriptorGUID"],
-                            row["ID"])
+                os.makedirs(path)
+
+                for block in range(0, self.max_val_list[num]):
+                    self.progress = self.progress + 1
+                    block_statement = statement[:-1] + " LIMIT " + str(block * 20) + ", 20;"
+                    result = connection.execute(block_statement)
+
+                    for row in result:
+                        if 'NiceName' in row.keys():
+                            fileName = row["NiceName"] if row["NiceName"] else "{}_id{}".format(
+                                row["CreatorServiceDescriptorGUID"],
+                                row["ID"])
+                        else:
+                            fileName = "{}_id{}".format(row["CreatorServiceDescriptorGUID"], row["ID"])
+                        rawData = row["RawBytes"]
+                        f = open(path + "/" + fileName, "wb+")
+                        f.write(rawData)
+                        f.close()
+
+                print(len(self.statement_list), num)
+                if len(self.statement_list) == num + 1:
+                    if len(self.statement_list) > 1:
+                        path = app.root_path + "/tmp"
+                        filename = shutil.make_archive("testcase_set", "zip", path)
                     else:
-                        fileName = "{}_id{}".format(row["CreatorServiceDescriptorGUID"], row["ID"])
-                    rawData = row["RawBytes"]
-                    f = open(path + "/" + fileName, "wb+")
-                    f.write(rawData)
-                    f.close()
+                        filename = shutil.make_archive(self.name_list[num], "zip", path)
 
-            filename = shutil.make_archive(self.name, "zip", path)
-            if os.path.exists(path):
-                shutil.rmtree(path)
+                    self.status = (1, "File " + filename + " created.")
+                    if os.path.exists(path):
+                        shutil.rmtree(path)
 
-            self.status = (1, "File " + filename + " created.")
         except Exception as e:
             self.status = (2, str(e))
         finally:
