@@ -10,14 +10,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Roman Bendt
 -->
 
-ln -s $(pwd) ~/go/src/CaRRoT
 
 # Concepts
 
 is this text?
-	-> jep, analyze the content
+	-> yes, analyze the content
 	-> nope, does this contain text?
-		-> jep, find all strings
+		-> yep, find all strings
 		-> nope, done
 
 -> is there bitfields in the non text part that can be interpreted as ints?
@@ -27,6 +26,6 @@ everything smaller than file length (offs, len)
 	-> can we correlate some of these with known offsets and lengths?
 
 are there magic bytes at the beginning?
-	->jep
+	->yes
 	->nope, are there magic bytes inside, that are in non ascii places?
 
