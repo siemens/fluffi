@@ -29,21 +29,6 @@ services:
             - ./data/dnsmasq/dnsmasq.conf:/etc/dnsmasq.conf
             - ./data/dnsmasq/dnsmasq.leases:/var/lib/misc/dnsmasq.leases
             - ./data/tftp:/srv/tftp
-              #    gitea:
-              #        build: ./gitea
-              #        #restart: always
-              #        environment:
-              #            - USER=git
-              #            - USER_UID=1000
-              #            - USER_GID=1000
-              #        ports:
-              #            - 3000:3000
-              #            - 2222:2222
-              #        user: git
-              #        volumes:
-              #            - /etc/localtime:/etc/localtime:ro
-              #            - ./data/gitea/varlib:/var/lib/gitea
-              #            - ./data/gitea/home:/home/git
     ntp:
         build: ./ntp
         restart: always
