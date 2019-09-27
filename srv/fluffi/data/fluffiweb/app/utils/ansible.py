@@ -117,18 +117,17 @@ class AnsibleRESTConnector:
             return False
 
     def getHostAliveState(self):
-        #self.executePlaybook("checkHostAlive.yml", "all")
         url = self.ansibleURL + "history/?mode=checkHostAlive.yml"
         requests.session().close()
-        response = requests.get(url, auth=self.auth, headers={'Connection':'close'}) # Should already be sorted
+        response = requests.get(url, auth=self.auth, headers = {'User-Agent':'Python', 'Connection':'close'}) # Should already be sorted
         jsonResults = json.loads(response.text)
         lastHostCheckResultURL = ""
         for result in jsonResults['results']:
             if result['status'].lower() not in {"run", "running", "delay"}: # --> filter out some states, because no result available
-                lastHostCheckResultURL = self.ansibleURL + "history/" + str(result['id'])
+                lastHostCheckResultURL = self.ansibleURL + "history/" + str(result['id']) + "/"
                 break
 
-        response = requests.get(lastHostCheckResultURL, auth=self.auth)
+        response = requests.get(lastHostCheckResultURL, auth=self.auth, headers = {'User-Agent':'Python', 'Connection':'close'})
         jsonResults = json.loads(response.text)
         getResultURL = jsonResults['raw_stdout']# --> get result
         response = requests.get(getResultURL, auth = self.auth, headers = {'User-Agent':'Python', 'Connection':'close'})
@@ -162,7 +161,7 @@ class AnsibleRESTConnector:
                 hosts.append(host)
             
         url = self.ansibleURL + 'group/'
-        res = requests.get(url, auth = self.auth, headers = {'Connection':'close'})
+        res = requests.get(url, auth = self.auth, headers = {'User-Agent':'Python', 'Connection':'close'})
         groups = []
         if res.ok:
             data = res.json()
@@ -176,7 +175,7 @@ class AnsibleRESTConnector:
                     continue
                 groups.append(group)
                 url = group.URL
-                resHosts = requests.get(url, auth = self.auth, headers = {'Connection':'close'})
+                resHosts = requests.get(url, auth = self.auth, headers = {'User-Agent':'Python', 'Connection':'close'})
                 if resHosts.ok:
                     dataHosts = resHosts.json()
                     for h in dataHosts['results']:
