@@ -65,13 +65,13 @@ To set it up you firstly need to set up the central server with docker installed
 Copy the FLUFFI repo to that machine (or clone it there).
 
 ```
-git clone  --depth 1 --branch master https://git.fluffi/team-fluffi/fluffi-private.git ./FLUFFIandFUN
+git clone  --depth 1 --branch master https://github.com/siemens/fluffi.git ./fluffigit
 ```
 
 Copy the server part to /srv/fluffi
 
 ```
-rsync -ai --delete --exclude={'data/ftp/files/archive','data/ftp/files/fluffi','data/ftp/files/initial','data/ftp/files/odroid','data/ftp/files/SUT','data/ftp/files/tftp-roots','data/ftp/files/ubuntu-mirror','data/ftp/files/deploy','data/tftp','data/smb/files/server2008','data/smb/files/server2016','data/dnsmasq/dnsmasq.leases','data/gitea/varlib','data/gitea/home','data/mon/grafana','data/mon/influxdb'} ./FLUFFIandFUN/public/srv/fluffi/ /srv/fluffi/
+rsync -ai --delete --exclude={'data/ftp/files/archive','data/ftp/files/fluffi','data/ftp/files/initial','data/ftp/files/odroid','data/ftp/files/SUT','data/ftp/files/tftp-roots','data/ftp/files/ubuntu-mirror','data/ftp/files/deploy','data/tftp','data/smb/files/server2008','data/smb/files/server2016','data/dnsmasq/dnsmasq.leases','data/mon/grafana','data/mon/influxdb'} ./fluffigit/srv/fluffi/ /srv/fluffi/
 ```
 
 Apply changes to the default configuration. We recommend you to:

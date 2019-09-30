@@ -277,7 +277,7 @@ DR_EXPORT void
 dr_client_main(client_id_t id, int argc, const char* argv[])
 {
 	drcovlib_options_t ops = { sizeof(ops), };
-	dr_set_client_name("DrCovMulti", "https://git.fluffi/");
+	dr_set_client_name("DrCovMulti", "https://github.com/siemens/fluffi");
 	client_id = id;
 
 	options_init(id, argc, argv, &ops);
