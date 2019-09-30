@@ -65,24 +65,6 @@ def createDefaultSubtypes(subTypes):
     return default
 
 
-def deleteZipAndTempFiles():
-    rootPath = app.root_path[:-3]
-    tmpFolderPath = app.root_path + "/tmp"    
-    deleteTime = datetime.timestamp(datetime.now() - timedelta(minutes=1))
-    
-    if os.path.exists(tmpFolderPath):
-        folderTimestamp = os.stat(tmpFolderPath).st_mtime
-        if folderTimestamp < deleteTime:
-            shutil.rmtree(tmpFolderPath)
-
-    for file in os.listdir(rootPath):
-        if file.endswith(".zip"):
-            zipFilePath = os.path.join(rootPath, file)
-            zipFileTimestamp = os.stat(zipFilePath).st_mtime
-            if zipFileTimestamp < deleteTime:
-                os.remove(zipFilePath)
-
-
 def createDefaultSubtypesList(subTypes):
     default = []
     for i in range(0, len(subTypes)):
