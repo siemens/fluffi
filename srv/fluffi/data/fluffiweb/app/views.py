@@ -18,8 +18,10 @@ from .helpers import *
 from .forms import *
 from .constants import *
 
-import json, io, os, shutil
+import json, io, os, shutil, random
 import requests
+
+archive_threads = {}
 
 @app.route("/")
 @app.route("/index")
@@ -68,24 +70,38 @@ def removeProject(projId):
 
 @app.route("/projects/archive/<int:projId>", methods = ["POST"])
 def archiveProject(projId):
-    fuzzjob = models.Fuzzjob.query.filter_by(id = projId).first()
+    global archive_threads
+    project = models.Fuzzjob.query.filter_by(id=projId).first()
+    nice_name = project.name
 
-    if fuzzjob:
-        success = archiveDatabase(fuzzjob.name)
-        if success:
-            _, category = deleteFuzzjob(projId)
-            success = deleteDatabase(fuzzjob.name)
-            if success and category == "success":
-                flash("Successfully archived Fuzzjob!", "success")
-            else:
-                flash("Error while deleting fuzzjob or database!", "error")
-            return redirect(url_for("projects"))
-        else:
-            flash("Error: Failed to archive database!", "error")
-            return redirect(url_for("projects"))
+    if len(archive_threads) is 0:
+        thread_id = len(archive_threads) + 1
+        archive_threads[thread_id] = ArchiveProject(projId)
+        archive_threads[thread_id].start()
+        return renderTemplate("progressArchiveFuzzjob.html",
+                              thread_id=thread_id,
+                              nice_name=nice_name)
     else:
-        flash("Error: Fuzzjob does not exist!", "error")
-        return redirect(url_for("projects"))
+        return renderTemplate("progressArchiveFuzzjob.html",
+                              thread_id=-1,
+                              nice_name=nice_name)
+
+
+@app.route('/progressArchiveFuzzjob/<int:thread_id>')
+def progressArchiveFuzzjob(thread_id):
+    global archive_threads
+    if len(archive_threads) > 0:
+        if archive_threads[thread_id].status[0] is 0 or archive_threads[thread_id].status[0] == 1:
+            return str(archive_threads[thread_id].status[1])
+        elif archive_threads[thread_id].status[0] is 2:
+            archive_threads.clear()
+            return ""
+        elif archive_threads[thread_id].status[0] is 3:
+            message = str(archive_threads[thread_id].status[1])
+            archive_threads.clear()
+            return message
+    else:
+        return ""
 
 
 @app.route("/locations/<int:locId>/delProject/<int:projId>")
@@ -245,18 +261,6 @@ def removeLocation(locId):
     return redirect("/locations")
 
 
-@app.route("/projects/<int:projId>/population")
-def viewPopulation(projId):
-    data = getGeneralInformationData(projId, getITQueryOfTypeNoRaw(TESTCASE_TYPES["population"]))
-    data.name = "Population"
-    data.redirect = "population"
-    data.downloadName = "downloadPopulation"
-
-    return renderTemplate("viewTCsTempl.html",
-                           title = "View Population",
-                           data = data)
-
-
 @app.route("/projects/<int:projId>/renameElement", methods = ["POST"])
 def renameElement(projId):
     if not request.json:
@@ -270,45 +274,113 @@ def renameElement(projId):
 
 @app.route("/projects/<int:projId>/download")
 def downloadTestcaseSet(projId):
-    path = app.root_path + "/tmp"
+    project = models.Fuzzjob.query.filter_by(id=projId).first()
+    name = [
+        "population",
+        "accessViolations",
+        "accessViolationsUnique",
+        "crashes",
+        "crashesUnique",
+        "hangs",
+        "noResponses"
+    ]
+    nice_name = project.name + ": Testcase Set"
+    statement_count = [
+        getITCountOfTypeQuery(TESTCASE_TYPES[name[0]]),
+        getITCountOfTypeQuery(TESTCASE_TYPES[name[1]]),
+        NUM_UNIQUE_ACCESS_VIOLATION,
+        getITCountOfTypeQuery(TESTCASE_TYPES[name[3]]),
+        NUM_UNIQUE_CRASH,
+        getITCountOfTypeQuery(TESTCASE_TYPES[name[5]]),
+        getITCountOfTypeQuery(TESTCASE_TYPES[name[6]]),
+    ]
+    statement = [
+        getITQueryOfType(TESTCASE_TYPES[name[0]]),
+        getITQueryOfType(TESTCASE_TYPES[name[1]]),
+        UNIQUE_ACCESS_VIOLATION,
+        getITQueryOfType(TESTCASE_TYPES[name[3]]),
+        UNIQUE_CRASHES,
+        getITQueryOfType(TESTCASE_TYPES[name[5]]),
+        getITQueryOfType(TESTCASE_TYPES[name[6]]),
+    ]
 
-    if os.path.exists(path):
-        shutil.rmtree(path)
+    return createZipArchive(projId, name, nice_name, statement_count, statement)
 
-    if (createArchive(projId, "population", getITQueryOfType(TESTCASE_TYPES["population"])) and
-            createArchive(projId, "hangs", getITQueryOfType(TESTCASE_TYPES["hangs"])) and
-            createArchive(projId, "unique_crashes", UNIQUE_CRASHES) and
-            createArchive(projId, "total_crashes", getITQueryOfType(TESTCASE_TYPES["crashes"])) and
-            createArchive(projId, "access_vio_unique", UNIQUE_ACCESS_VIOLATION) and
-            createArchive(projId, "access_vio_total", getITQueryOfType(TESTCASE_TYPES["accessViolations"])) and
-            createArchive(projId, "no_response", getITQueryOfType(TESTCASE_TYPES["noResponses"]))):
-        shutil.make_archive("testcaseSet", "zip", path)
-        return send_file(getDownloadPath() + "testcaseSet.zip", as_attachment=True)
 
-    flash("Error creating the archive", "error")
+def createZipArchive(projId, name, nice_name, count_statement, statement):
+    global archive_threads
 
-    return redirect("/projects/view/%d" % projId)
+    if len(archive_threads) is 0:
+        thread_id = len(archive_threads) + 1
+        archive_threads[thread_id] = CreateTestcaseArchive(projId, name, count_statement, statement)
+        archive_threads[thread_id].setMaxVal()
+        archive_threads[thread_id].start()
+
+        max_val = 0
+        for val in archive_threads[thread_id].max_val_list:
+            max_val = max_val + val
+
+        if len(archive_threads[thread_id].name_list) == 1:
+            download = archive_threads[thread_id].name_list[0] + ".zip"
+        else:
+            download = "testcase_set.zip"
+
+        return renderTemplate("progressDownload.html",
+                              thread_id=thread_id,
+                              max_val=max_val,
+                              nice_name=nice_name,
+                              download=download)
+    else:
+        return renderTemplate("progressDownload.html",
+                              thread_id=-1,
+                              max_val=10,
+                              nice_name=nice_name,
+                              download="error")
+
+
+@app.route('/progressDownload/<int:thread_id>')
+def progressDownload(thread_id):
+    global archive_threads
+
+    if len(archive_threads[thread_id].name_list) == 1:
+        path = getDownloadPath() + archive_threads[thread_id].name_list[0] + ".zip"
+    else:
+        path = getDownloadPath() + "testcase_set.zip"
+
+    if os.path.isfile(path) and archive_threads[thread_id].status[0] is 1:
+        archive_threads.clear()
+        return str(-1)
+    elif archive_threads[thread_id].status[0] is 2:
+        flash("Error creating the archive: " + archive_threads[thread_id].status[1], "error")
+        return str(archive_threads[thread_id].progress)
+    else:
+        return str(archive_threads[thread_id].progress)
+
+
+@app.route('/download/<string:archive>')
+def downloadArchive(archive):
+    return send_file(getDownloadPath() + archive, as_attachment=True, cache_timeout = 0)
+
+
+@app.route("/projects/<int:projId>/population")
+def viewPopulation(projId):
+    data = getGeneralInformationData(projId, getITQueryOfTypeNoRaw(TESTCASE_TYPES["population"]))
+    data.name = "Population"
+    data.redirect = "population"
+    data.downloadName = "downloadPopulation"
+
+    return renderTemplate("viewTCsTempl.html",
+                           title = "View Population",
+                           data = data)
 
 
 @app.route("/projects/<int:projId>/population/download")
 def downloadPopulation(projId):
-    if createArchive(projId, "population", getITQueryOfType(TESTCASE_TYPES["population"])):
-        return send_file(getDownloadPath() + "population.zip", as_attachment = True, cache_timeout = 0)
-    flash("Error creating the archive", "error")
+    project = models.Fuzzjob.query.filter_by(id=projId).first()
+    name = ["population"]
+    nice_name = project.name + ": Population"
 
-    return redirect("/projects/%d/population" % projId)
-
-
-@app.route("/projects/<int:projId>/hangs")
-def viewHangs(projId):
-    data = getGeneralInformationData(projId, getITQueryOfTypeNoRaw(TESTCASE_TYPES["hangs"]))
-    data.name = "Hangs"
-    data.redirect = "hangs"
-    data.downloadName = "downloadHangs"
-
-    return renderTemplate("viewTCsTempl.html",
-                           title = "View Hangs",
-                           data = data)
+    return createZipArchive(projId, name, nice_name, [getITCountOfTypeQuery(TESTCASE_TYPES[name[0]])], [getITQueryOfType(TESTCASE_TYPES[name[0]])])
 
 
 @app.route("/projects/<int:projId>/accessVioTotal")
@@ -323,9 +395,18 @@ def viewAccessVioTotal(projId):
                            data = data)
 
 
+@app.route("/projects/<int:projId>/accessVioTotal/download")
+def downloadAccessVioTotal(projId):
+    project = models.Fuzzjob.query.filter_by(id=projId).first()
+    name = ["accessViolations"]
+    nice_name = project.name + ": Access Violations (Total)"
+
+    return createZipArchive(projId, name, nice_name, [getITCountOfTypeQuery(TESTCASE_TYPES[name[0]])], [getITQueryOfType(TESTCASE_TYPES[name[0]])])
+
+
 @app.route("/projects/<int:projId>/accessVioUnique")
 def viewAccessVioUnique(projId):
-    data = getGeneralInformationData(projId, UNIQUE_ACCESS_VIOLATION)
+    data = getGeneralInformationData(projId, UNIQUE_ACCESS_VIOLATION_NO_RAW)
     data.name = "Unique Access Violations"
     data.redirect = "accessVioUnique"
     data.downloadName = "downloadAccessVioUnique"
@@ -333,6 +414,15 @@ def viewAccessVioUnique(projId):
     return renderTemplate("viewTCsTempl.html",
                            title = "View Unique Access Violations",
                            data = data)
+
+
+@app.route("/projects/<int:projId>/accessVioUnique/download")
+def downloadAccessVioUnique(projId):
+    project = models.Fuzzjob.query.filter_by(id=projId).first()
+    name = ["accessViolationsUnique"]
+    nice_name = project.name + ": Access Violations (Unique)"
+
+    return createZipArchive(projId, name, nice_name, [NUM_UNIQUE_ACCESS_VIOLATION], [UNIQUE_ACCESS_VIOLATION])
 
 
 @app.route("/projects/<int:projId>/totalCrashes")
@@ -347,9 +437,18 @@ def viewTotalCrashes(projId):
                            data = data)
 
 
+@app.route("/projects/<int:projId>/totalCrashes/download")
+def downloadTotalCrashes(projId):
+    project = models.Fuzzjob.query.filter_by(id=projId).first()
+    name = ["crashes"]
+    nice_name = project.name + ": Crashes (Total)"
+
+    return createZipArchive(projId, name, nice_name, [getITCountOfTypeQuery(TESTCASE_TYPES[name[0]])], [getITQueryOfType(TESTCASE_TYPES[name[0]])])
+
+
 @app.route("/projects/<int:projId>/uniqueCrashes")
 def viewUniqueCrashes(projId):
-    data = getGeneralInformationData(projId, UNIQUE_CRASHES)
+    data = getGeneralInformationData(projId, UNIQUE_CRASHES_NO_RAW)
     data.name = "Unique Crashes"
     data.redirect = "uniqueCrashes"
     data.downloadName = "downloadUniqueCrashes"
@@ -357,6 +456,36 @@ def viewUniqueCrashes(projId):
     return renderTemplate("viewTCsTempl.html",
                            title = "View Unique Crashes",
                            data = data)
+
+
+@app.route("/projects/<int:projId>/uniqueCrashes/download")
+def downloadUniqueCrashes(projId):
+    project = models.Fuzzjob.query.filter_by(id=projId).first()
+    name = ["crashesUnique"]
+    nice_name = project.name + ": Crashes (Unique)"
+
+    return createZipArchive(projId, name, nice_name, [NUM_UNIQUE_CRASH], [UNIQUE_CRASHES])
+
+
+@app.route("/projects/<int:projId>/hangs")
+def viewHangs(projId):
+    data = getGeneralInformationData(projId, getITQueryOfTypeNoRaw(TESTCASE_TYPES["hangs"]))
+    data.name = "Hangs"
+    data.redirect = "hangs"
+    data.downloadName = "downloadHangs"
+
+    return renderTemplate("viewTCsTempl.html",
+                           title = "View Hangs",
+                           data = data)
+
+
+@app.route("/projects/<int:projId>/hangs/download")
+def downloadHangs(projId):
+    project = models.Fuzzjob.query.filter_by(id=projId).first()
+    name = ["hangs"]
+    nice_name = project.name + ": Hangs"
+
+    return createZipArchive(projId, name, nice_name, [getITCountOfTypeQuery(TESTCASE_TYPES[name[0]])], [getITQueryOfType(TESTCASE_TYPES[name[0]])])
 
 
 @app.route("/projects/<int:projId>/noResponse")
@@ -371,64 +500,13 @@ def viewNoResponses(projId):
                            data = data)
 
 
-@app.route("/projects/<int:projId>/accessVioTotal/download")
-def downloadAccessVioTotal(projId):
-    if createArchive(projId, "access_vio_total", getITQueryOfType(TESTCASE_TYPES["accessViolations"])):
-        return send_file(getDownloadPath() + "access_vio_total.zip", as_attachment = True)
-
-    flash("Error creating the archive", "error")
-
-    return redirect("/projects/%d/accessVioTotal" % projId)
-
-
-@app.route("/projects/<int:projId>/accessVioUnique/download")
-def downloadAccessVioUnique(projId):
-    if createArchive(projId, "access_vio_unique", UNIQUE_ACCESS_VIOLATION):
-        return send_file(getDownloadPath() + "access_vio_unique.zip", as_attachment = True)
-
-    flash("Error creating the archive", "error")
-
-    return redirect("/projects/%d/accessVioUnique" % projId)
-
-
-@app.route("/projects/<int:projId>/totalCrashes/download")
-def downloadTotalCrashes(projId):
-    if createArchive(projId, "total_crashes", getITQueryOfType(TESTCASE_TYPES["crashes"])):
-        return send_file(getDownloadPath() + "total_crashes.zip", as_attachment = True)
-
-    flash("Error creating the archive", "error")
-
-    return redirect("/projects/%d/totalCrashes" % projId)
-
-
-@app.route("/projects/<int:projId>/uniqueCrashes/download")
-def downloadUniqueCrashes(projId):
-    if createArchive(projId, "unique_crashes", UNIQUE_CRASHES):
-        return send_file(getDownloadPath() + "unique_crashes.zip", as_attachment = True)
-
-    flash("Error creating the archive", "error")
-
-    return redirect("/projects/%d/uniqueCrashes" % projId)
-
-
-@app.route("/projects/<int:projId>/hangs/download")
-def downloadHangs(projId):
-    if createArchive(projId, "hangs", getITQueryOfType(TESTCASE_TYPES["hangs"])):
-        return send_file(getDownloadPath() + "hangs.zip", as_attachment = True)
-
-    flash("Error creating the archive", "error")
-
-    return redirect("/projects/%d/hangs" % projId)
-
-
 @app.route("/projects/<int:projId>/noResponse/download")
 def downloadNoResponses(projId):
-    if createArchive(projId, "no_response", getITQueryOfType(TESTCASE_TYPES["noResponses"])):
-        return send_file(getDownloadPath() + "no_response.zip", as_attachment = True)
+    project = models.Fuzzjob.query.filter_by(id=projId).first()
+    name = ["noResponses"]
+    nice_name = project.name + ": No Response"
 
-    flash("Error creating the archive", "error")
-
-    return redirect("/projects/%d/noResponse" % projId)
+    return createZipArchive(projId, name, nice_name, [getITCountOfTypeQuery(TESTCASE_TYPES[name[0]])], [getITQueryOfType(TESTCASE_TYPES[name[0]])])
 
 
 @app.route("/projects/<int:projId>/violations")
