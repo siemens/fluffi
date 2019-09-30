@@ -65,7 +65,7 @@ To set it up you firstly need to set up the central server with docker installed
 Copy the FLUFFI repo to that machine (or clone it there).
 
 ```
-git clone  --depth 1 --branch master https://git.fluffi/team-fluffi/fluffi-private.git ./FLUFFIandFUN
+git clone  --depth 1 --branch master https://github.com/siemens/fluffi.git ./FLUFFIandFUN/public
 ```
 
 Copy the server part to /srv/fluffi
