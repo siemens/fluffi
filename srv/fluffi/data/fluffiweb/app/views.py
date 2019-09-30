@@ -70,24 +70,38 @@ def removeProject(projId):
 
 @app.route("/projects/archive/<int:projId>", methods = ["POST"])
 def archiveProject(projId):
-    fuzzjob = models.Fuzzjob.query.filter_by(id = projId).first()
+    global archive_threads
+    project = models.Fuzzjob.query.filter_by(id=projId).first()
+    nice_name = project.name
 
-    if fuzzjob:
-        success = archiveDatabase(fuzzjob.name)
-        if success:
-            _, category = deleteFuzzjob(projId)
-            success = deleteDatabase(fuzzjob.name)
-            if success and category == "success":
-                flash("Successfully archived Fuzzjob!", "success")
-            else:
-                flash("Error while deleting fuzzjob or database!", "error")
-            return redirect(url_for("projects"))
-        else:
-            flash("Error: Failed to archive database!", "error")
-            return redirect(url_for("projects"))
+    if len(archive_threads) is 0:
+        thread_id = len(archive_threads) + 1
+        archive_threads[thread_id] = ArchiveProject(projId)
+        archive_threads[thread_id].start()
+        return renderTemplate("progressArchiveFuzzjob.html",
+                              thread_id=thread_id,
+                              nice_name=nice_name)
     else:
-        flash("Error: Fuzzjob does not exist!", "error")
-        return redirect(url_for("projects"))
+        return renderTemplate("progressArchiveFuzzjob.html",
+                              thread_id=-1,
+                              nice_name=nice_name)
+
+
+@app.route('/progressArchiveFuzzjob/<int:thread_id>')
+def progressArchiveFuzzjob(thread_id):
+    global archive_threads
+    if len(archive_threads) > 0:
+        if archive_threads[thread_id].status[0] is 0 or archive_threads[thread_id].status[0] == 1:
+            return str(archive_threads[thread_id].status[1])
+        elif archive_threads[thread_id].status[0] is 2:
+            archive_threads.clear()
+            return ""
+        elif archive_threads[thread_id].status[0] is 3:
+            message = str(archive_threads[thread_id].status[1])
+            archive_threads.clear()
+            return message
+    else:
+        return ""
 
 
 @app.route("/locations/<int:locId>/delProject/<int:projId>")
@@ -264,9 +278,9 @@ def downloadTestcaseSet(projId):
     name = [
         "population",
         "accessViolations",
-        "access_vio_unique",
+        "accessViolationsUnique",
         "crashes",
-        "unique_crashes",
+        "crashesUnique",
         "hangs",
         "noResponses"
     ]
@@ -324,8 +338,8 @@ def createZipArchive(projId, name, nice_name, count_statement, statement):
                               download="error")
 
 
-@app.route('/progress/<int:thread_id>')
-def progress(thread_id):
+@app.route('/progressDownload/<int:thread_id>')
+def progressDownload(thread_id):
     global archive_threads
 
     if len(archive_threads[thread_id].name_list) == 1:

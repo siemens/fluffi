@@ -152,6 +152,7 @@ class CreateTestcaseArchive(threading.Thread):
         self.status = (0, "")
 
     def setMaxVal(self):
+        print(self.name_list)
         project = models.Fuzzjob.query.filter_by(id=self.projId).first()
         engine = create_engine(
             'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
@@ -1238,7 +1239,7 @@ def archiveDatabase(nameOfDB):
     fileName = config.DBPREFIX + nameOfDB.lower() + ".sql.gz"
     success = FTP_CONNECTOR.saveArchivedProjectOnFTPServer(fileName)
     os.remove(fileName)
-    
+
     return success
 
 
@@ -1269,3 +1270,63 @@ def deleteDatabase(fuzzjobName):
     finally:
         connection.close()
         engine.dispose()
+
+
+class ArchiveProject(threading.Thread):
+    def __init__(self, projId):
+        super().__init__()
+        self.projId = projId
+        # status: 0 = default/running, 1 = success, 2 = error, 3 = finish
+        self.status = (0, "Step 0/4: Start archiving fuzzjob.")
+
+    def run(self):
+        fuzzjob = models.Fuzzjob.query.filter_by(id=self.projId).first()
+
+        if fuzzjob:
+            try:
+                scriptFile = os.path.join(app.root_path, "archiveDB.sh")
+                returncode = subprocess.call(
+                    [scriptFile, config.DBUSER, config.DBPASS, config.DBPREFIX, fuzzjob.name.lower(), config.DBHOST])
+                if returncode != 0:
+                    self.status = (2, str("Error Step 1/4: Database couldn't be archived."))
+                else:
+                    self.status = (1, str("Step 1/4: Database archived."))
+            except Exception as e:
+                print(e)
+                self.status = (2, str(e))
+
+            if self.status[0] is not 2:
+                fileName = config.DBPREFIX + fuzzjob.name.lower() + ".sql.gz"
+                success = FTP_CONNECTOR.saveArchivedProjectOnFTPServer(fileName)
+                if success:
+                    self.status = (1, "Step 2/4: Archived project saved on ftp server.")
+                else:
+                    self.status = (2, "Step 2/4: Archived project couldn't be saved on ftp server.")
+
+                os.remove(fileName)
+
+                if self.status[0] == 1:
+                    try:
+                        if models.Fuzzjob.query.filter_by(id=self.projId).first() is not None:
+                            fuzzjob = models.Fuzzjob.query.filter_by(id=self.projId).first()
+                            db.session.delete(fuzzjob)
+                            db.session.commit()
+                            self.status = (1, 'Step 3/4: Fuzzjob sucessfully deleted.')
+                        else:
+                            self.status = (2, 'Step 3/4: Fuzzjob not found.')
+                    except Exception as e:
+                        self.status = (2, str(e))
+
+                    if self.status[0] == 1:
+                        engine = create_engine(
+                            'mysql://%s:%s@%s/%s' % (
+                            config.DBUSER, config.DBPASS, fluffiResolve(config.DBHOST), config.DEFAULT_DBNAME))
+                        connection = engine.connect()
+                        try:
+                            connection.execute("DROP DATABASE {};".format(config.DBPREFIX + fuzzjob.name.lower()))
+                            self.status = (3, 'Step 4/4: Database deleted.')
+                        except Exception as e:
+                            self.status = (2, str(e))
+                        finally:
+                            connection.close()
+                            engine.dispose()
