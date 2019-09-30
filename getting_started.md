@@ -117,4 +117,4 @@ You are now ready to use FLUFFI. See [the usage section](usage.md) for informati
 
 FLUFFI was never meant to be used in hostile environments, which is why FLUFFI's internal protocol is not hardened against attacks at all. It is therefore recommended, to operate FLUFFI in an isolated environment, to which you can restrict access.
 
-Furthermore, it is strongly recomended to change Polemarch's user credentials, which are initially admin:admin.
+Furthermore, it is strongly recommended to change Polemarch's user credentials, which are initially admin:admin.

@@ -20,5 +20,5 @@ FLUSH PRIVILEGES;
 mysql -u root < createGMDB.sql
 
 
-Perfmon could be done e.g.  With http://pmmdemo.percona.com/
+Perfmon could be done e.g. with http://pmmdemo.percona.com/
 
