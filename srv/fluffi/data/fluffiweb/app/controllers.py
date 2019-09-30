@@ -10,8 +10,6 @@
 
 import io
 import csv
-import os
-import shutil
 import threading
 import subprocess
 from base64 import b64encode
@@ -19,10 +17,7 @@ from os import system, unlink
 
 from flask import abort
 from sqlalchemy import *
-from sqlalchemy.orm import scoped_session
-from sqlalchemy.orm import sessionmaker
 
-import config
 from app import db, models
 from .constants import *
 from .helpers import *
@@ -221,46 +216,6 @@ class CreateTestcaseArchive(threading.Thread):
         finally:
             connection.close()
             engine.dispose()
-
-
-def createArchive(projId, name, statement, data = None):
-    path = app.root_path + "/tmp/" + name
-    zipFilePath = getDownloadPath() + name + ".zip"
-
-    if os.path.isfile(zipFilePath):
-        os.remove(zipFilePath)
-    if os.path.exists(path):
-        shutil.rmtree(path)
-
-    os.makedirs(path)
-    project = models.Fuzzjob.query.filter_by(id = projId).first()
-
-    engine = create_engine(
-        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
-    connection = engine.connect()
-    try:
-        result = connection.execute(statement) if data is None else connection.execute(statement, data)
-
-        for row in result:
-            if 'NiceName' in row.keys():
-                fileName = row["NiceName"] if row["NiceName"] else "{}_id{}".format(row["CreatorServiceDescriptorGUID"],
-                                                                                    row["ID"])
-            else:
-                fileName = "{}_id{}".format(row["CreatorServiceDescriptorGUID"], row["ID"])
-            rawData = row["RawBytes"]
-            f = open(path + "/" + fileName, "wb+")
-            f.write(rawData)
-            f.close()
-
-        shutil.make_archive(name, "zip", path)
-        print(name, path)
-    except Exception as e:
-        print(e, name, statement)
-        return False
-    finally:
-        connection.close()
-        engine.dispose()
-    return True
 
 
 def getLocationFormWithChoices(projId, locationForm):
@@ -1223,53 +1178,6 @@ def getGraphData(projId):
     graphdata["edges"] = edges
 
     return graphdata
-
-
-def archiveDatabase(nameOfDB):
-    try:
-        scriptFile = os.path.join(app.root_path, "archiveDB.sh")
-        returncode = subprocess.call(
-            [scriptFile, config.DBUSER, config.DBPASS, config.DBPREFIX, nameOfDB.lower(), config.DBHOST])
-        if returncode != 0:
-            return False
-    except Exception as e:
-        print(e)
-        return False
-
-    fileName = config.DBPREFIX + nameOfDB.lower() + ".sql.gz"
-    success = FTP_CONNECTOR.saveArchivedProjectOnFTPServer(fileName)
-    os.remove(fileName)
-
-    return success
-
-
-def deleteFuzzjob(projId):
-    try:
-        if models.Fuzzjob.query.filter_by(id = projId).first() is not None:
-            fuzzjob = models.Fuzzjob.query.filter_by(id = projId).first()
-            db.session.delete(fuzzjob)
-            db.session.commit()
-            return "Fuzzjob deleted", "success"
-        else:
-            return "Fuzzjob not found", "error"
-    except Exception as e:
-        print(e)
-        return "Exception while deleting fuzzjob", "error"
-
-
-def deleteDatabase(fuzzjobName):
-    engine = create_engine(
-        'mysql://%s:%s@%s/%s' % (config.DBUSER, config.DBPASS, fluffiResolve(config.DBHOST), config.DEFAULT_DBNAME))
-    connection = engine.connect()
-    try:
-        connection.execute("DROP DATABASE {};".format(config.DBPREFIX + fuzzjobName.lower()))
-        return True
-    except Exception as e:
-        print(e)
-        return False
-    finally:
-        connection.close()
-        engine.dispose()
 
 
 class ArchiveProject(threading.Thread):

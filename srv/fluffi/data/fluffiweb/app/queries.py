@@ -38,8 +38,6 @@ GET_MAX_LOCALID = (
     "SELECT MAX(CreatorLocalID) FROM interesting_testcases WHERE CreatorServiceDescriptorGUID='initial'")
 UPDATE_SETTINGS = (
     "UPDATE settings SET SettingValue=:SettingValue WHERE ID=:Id")
-GET_RAWBYTES_FROM_IT_WITH_LOCALID = (
-    "SELECT RawBytes FROM interesting_testcases WHERE CreatorServiceDescriptorGUID=:guid AND CreatorLocalID=:localId")
 UPDATE_NICE_NAME_TESTCASE = (
     "UPDATE nice_names_testcase SET NiceName=:newName WHERE TestcaseID=:testcaseID")
 UPDATE_NICE_NAME_MANAGED_INSTANACE = (
@@ -237,10 +235,29 @@ def getCrashesOrViosOfFootprint(footprint):
         "WHERE cd.CrashFootprint='{}' AND (it.TestCaseType=2 OR it.TestCaseType=3);".format(footprint)
     )
 
+def getCrashesOrViosOfFootprintCount(footprint):
+    return (
+        "SELECT count(*) "
+        "FROM interesting_testcases AS it "
+        "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
+        "LEFT JOIN nice_names_testcase AS nn ON it.ID = nn.TestcaseID "
+        "WHERE cd.CrashFootprint='{}' AND (it.TestCaseType=2 OR it.TestCaseType=3);".format(footprint)
+    )
+
 
 def getCrashesQuery(footprint, testCaseType):
     return (
         "SELECT it.CreatorServiceDescriptorGUID, it.RawBytes, it.ID, nn.NiceName "
+        "FROM interesting_testcases AS it "
+        "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
+        "LEFT JOIN nice_names_testcase AS nn ON it.ID = nn.TestcaseID "
+        "WHERE cd.CrashFootprint='{}' AND it.TestCaseType={};".format(footprint, testCaseType)
+    )
+
+
+def getCrashesQueryCount(footprint, testCaseType):
+    return (
+        "SELECT COUNT(*)"
         "FROM interesting_testcases AS it "
         "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
         "LEFT JOIN nice_names_testcase AS nn ON it.ID = nn.TestcaseID "
