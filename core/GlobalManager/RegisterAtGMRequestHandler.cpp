@@ -82,6 +82,7 @@ void RegisterAtGMRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerTh
 			ServiceDescriptor* ptrToServiceDescriptor = new ServiceDescriptor();
 			ptrToServiceDescriptor->CopyFrom(lmServiceDescriptor.getProtobuf());
 			registerResponse->set_allocated_lmservicedescriptor(ptrToServiceDescriptor);
+			registerResponse->set_retrylater(false);
 			LOG(DEBUG) << "Sending message with LMServiceDescriptor" << lmServiceDescriptor.m_guid << "/" << lmServiceDescriptor.m_serviceHostAndPort;
 		}
 		else
@@ -122,6 +123,7 @@ void RegisterAtGMRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerTh
 				LMConfiguration* ptrToLMConfiguration = new LMConfiguration();
 				ptrToLMConfiguration->CopyFrom(lmConfiguration.getProtobuf());
 				registerResponse->set_allocated_lmconfiguration(ptrToLMConfiguration);
+				registerResponse->set_retrylater(false);
 				LOG(DEBUG) << "Sending message with LMConfiguration";
 				gmWorkerThreadState->dbManager->setLMForLocationAndFuzzJob(location, req->registeratgmrequest().servicedescriptor(), fuzzjob);
 				LOG(DEBUG) << "Registering LM";
