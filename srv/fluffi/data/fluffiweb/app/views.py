@@ -922,12 +922,12 @@ def systems():
     newWorkers = []
 
     for worker in workers:
-        yetInList = false
+        yetInList = False
         for mi in managedInstancesAll:
             for i in mi["instances"]:
                 if i["ServiceDescriptorGUID"].strip() == worker.Servicedescriptorguid.strip():
-                    yetInList = true
-        if yetInList == false:
+                    yetInList = True
+        if not yetInList:
             newWorkers.append(worker)
 
     try:
