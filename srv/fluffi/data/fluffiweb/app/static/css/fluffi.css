@@ -289,12 +289,12 @@ Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
     padding: 0;
 }
 
-#download_error {
+#download_error,#error {
     background-color: #ffa500;
     padding: 20px;
     font-size: 20px;
     border-radius: 6px;
-    margin-bottom: 20px;
+    margin: 20px 0;
 }
 
 #process_info {
@@ -311,4 +311,8 @@ Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
     width: 0px;
     margin: 0;
     padding: 0 !important;
+}
+
+#status_link_btn {
+    margin-top: 15px;
 }
