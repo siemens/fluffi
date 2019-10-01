@@ -135,16 +135,18 @@ def getDownloadPath():
 
 
 class CreateTestcaseArchive(threading.Thread):
-    def __init__(self, projId, name_list, count_statement_list, statement_list):
+    def __init__(self, projId, nice_name, name_list, count_statement_list, statement_list):
         super().__init__()
         self.progress = 0
         self.projId = projId
+        self.nice_name = nice_name
         self.name_list = name_list
         self.count_statement_list = count_statement_list
         self.statement_list = statement_list
         self.max_val_list = []
         # status: 0 = default/running, 1 = success, 2 = error
         self.status = (0, "")
+        self.stop = False
 
     def setMaxVal(self):
         print(self.name_list)
@@ -168,54 +170,60 @@ class CreateTestcaseArchive(threading.Thread):
             'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
         connection = engine.connect()
         try:
-            for num, statement in enumerate(self.statement_list):
-                path = app.root_path + "/tmp/" + self.name_list[num]
-                if len(self.name_list) == 1:
-                    zipFilePath = getDownloadPath() + self.name_list[num] + ".zip"
-                else:
-                    zipFilePath = getDownloadPath() + "testcase_set.zip"
-
-                if os.path.isfile(zipFilePath):
-                    os.remove(zipFilePath)
-                if os.path.exists(path):
-                    shutil.rmtree(path)
-
-                os.makedirs(path)
-
-                for block in range(0, self.max_val_list[num]):
-                    self.progress = self.progress + 1
-                    block_statement = statement[:-1] + " LIMIT " + str(block * 20) + ", 20;"
-                    result = connection.execute(block_statement)
-
-                    for row in result:
-                        if 'NiceName' in row.keys():
-                            fileName = row["NiceName"] if row["NiceName"] else "{}_id{}".format(
-                                row["CreatorServiceDescriptorGUID"],
-                                row["ID"])
+            if not self.stop:
+                for num, statement in enumerate(self.statement_list):
+                    if not self.stop:
+                        path = app.root_path + "/tmp/" + self.name_list[num]
+                        if len(self.name_list) == 1:
+                            zipFilePath = getDownloadPath() + self.name_list[num] + ".zip"
                         else:
-                            fileName = "{}_id{}".format(row["CreatorServiceDescriptorGUID"], row["ID"])
-                        rawData = row["RawBytes"]
-                        f = open(path + "/" + fileName, "wb+")
-                        f.write(rawData)
-                        f.close()
+                            zipFilePath = getDownloadPath() + "testcase_set.zip"
+                        if os.path.isfile(zipFilePath):
+                            os.remove(zipFilePath)
+                        if os.path.exists(path):
+                            shutil.rmtree(path)
+                        os.makedirs(path)
 
-                print(len(self.statement_list), num)
-                if len(self.statement_list) == num + 1:
-                    if len(self.statement_list) > 1:
-                        path = app.root_path + "/tmp"
-                        filename = shutil.make_archive("testcase_set", "zip", path)
-                    else:
-                        filename = shutil.make_archive(self.name_list[num], "zip", path)
+                        for block in range(0, self.max_val_list[num]):
+                            if not self.stop:
+                                self.progress = self.progress + 1
+                                block_statement = statement[:-1] + " LIMIT " + str(block * 20) + ", 20;"
+                                result = connection.execute(block_statement)
 
-                    self.status = (1, "File " + filename + " created.")
-                    if os.path.exists(path):
-                        shutil.rmtree(path)
+                                for row in result:
+                                    if 'NiceName' in row.keys():
+                                        fileName = row["NiceName"] if row["NiceName"] else "{}_id{}".format(
+                                            row["CreatorServiceDescriptorGUID"],
+                                            row["ID"])
+                                    else:
+                                        fileName = "{}_id{}".format(row["CreatorServiceDescriptorGUID"], row["ID"])
+                                    rawData = row["RawBytes"]
+                                    f = open(path + "/" + fileName, "wb+")
+                                    f.write(rawData)
+                                    f.close()
 
+                        if len(self.statement_list) == num + 1 or not self.stop:
+                            if len(self.statement_list) > 1:
+                                path = app.root_path + "/tmp"
+                                filename = shutil.make_archive("testcase_set", "zip", path)
+                            else:
+                                filename = shutil.make_archive(self.name_list[num], "zip", path)
+
+                            self.status = (1, "File " + filename + " created.")
+                            if os.path.exists(path):
+                                shutil.rmtree(path, ignore_errors=True)
         except Exception as e:
+            print(str(e))
             self.status = (2, str(e))
         finally:
             connection.close()
             engine.dispose()
+
+    def end(self):
+        self.stop = True
+        path = app.root_path + "/tmp"
+        if os.path.exists(path):
+            shutil.rmtree(path, ignore_errors=True)
 
 
 def getLocationFormWithChoices(projId, locationForm):
@@ -1181,16 +1189,18 @@ def getGraphData(projId):
 
 
 class ArchiveProject(threading.Thread):
-    def __init__(self, projId):
+    def __init__(self, projId, nice_name):
         super().__init__()
         self.projId = projId
+        self.nice_name = nice_name
         # status: 0 = default/running, 1 = success, 2 = error, 3 = finish
         self.status = (0, "Step 0/4: Start archiving fuzzjob.")
+        self.stop = False
 
     def run(self):
         fuzzjob = models.Fuzzjob.query.filter_by(id=self.projId).first()
 
-        if fuzzjob:
+        if fuzzjob or not self.stop:
             try:
                 scriptFile = os.path.join(app.root_path, "archiveDB.sh")
                 returncode = subprocess.call(
@@ -1203,7 +1213,7 @@ class ArchiveProject(threading.Thread):
                 print(e)
                 self.status = (2, str(e))
 
-            if self.status[0] is not 2:
+            if self.status[0] is not 2 or not self.stop:
                 fileName = config.DBPREFIX + fuzzjob.name.lower() + ".sql.gz"
                 success = FTP_CONNECTOR.saveArchivedProjectOnFTPServer(fileName)
                 if success:
@@ -1213,7 +1223,7 @@ class ArchiveProject(threading.Thread):
 
                 os.remove(fileName)
 
-                if self.status[0] == 1:
+                if self.status[0] == 1 or not self.stop:
                     try:
                         if models.Fuzzjob.query.filter_by(id=self.projId).first() is not None:
                             fuzzjob = models.Fuzzjob.query.filter_by(id=self.projId).first()
@@ -1225,7 +1235,7 @@ class ArchiveProject(threading.Thread):
                     except Exception as e:
                         self.status = (2, str(e))
 
-                    if self.status[0] == 1:
+                    if self.status[0] == 1 or not self.stop:
                         engine = create_engine(
                             'mysql://%s:%s@%s/%s' % (
                             config.DBUSER, config.DBPASS, fluffiResolve(config.DBHOST), config.DEFAULT_DBNAME))
@@ -1238,3 +1248,6 @@ class ArchiveProject(threading.Thread):
                         finally:
                             connection.close()
                             engine.dispose()
+
+    def end(self):
+        self.stop = True

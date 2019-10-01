@@ -23,12 +23,18 @@ function check_progress() {
         var task_id = $('#thread_id').text();
         if(task_id < 0) {
             $('#process_info').addClass('progress-hidden');
+            $('#stop_download_button').addClass('progress-hidden');
             $('#download_error').removeClass('progress-hidden');
         }else{
             $.get('/progressArchiveFuzzjob/' + task_id, function(progress) {
                 if(progress != ""){
-                    $('#process_info').text(progress);
-                    setTimeout(worker, 500);
+                    if(progress.substring(0, 8) == "Step 4/4"){
+                        $('#process_info').text(progress);
+                        $('#stop_download_button').addClass('disabled').attr('aria-disabled', 'true');
+                    }else{
+                        $('#process_info').text(progress);
+                        setTimeout(worker, 500);
+                    }
                 }
             });
         }
@@ -45,11 +51,17 @@ function check_progress() {
 
 <div class="container">
     <h3 id="nice_name">Fuzzjob: {{ nice_name }}</h3>
-    <div id="download_error" class="progress-hidden">Error archiving fuzzjob: Only one download or archiving process can be started at a time.</div>
+    <div id="download_error" class="progress-hidden">
+        Error archiving fuzzjob: Only one download or archiving process can be started at a time.<br />
+        <a href="/statusDownload" class="btn btn-danger" id="status_link_btn" role="button">Actual Download/Archiving Process</a>
+    </div>
     <div id="process_info">Step 0/4: Start archiving fuzzjob.</div>
     <div id="thread_id" class="progress-hidden">{{ thread_id }}</div>
     <a href="/projects" class="btn btn-primary btn-lg" role="button">
         Back to Projects
+    </a>
+    <a href="{{ url_for('stopProcess', thread_id=thread_id)}}" class="btn btn-danger btn-lg" id="stop_download_button" role="button">
+        <span class="glyphicon glyphicon-remove"></span>
     </a>
 </div>
 

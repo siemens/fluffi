@@ -65,10 +65,11 @@ def archiveProject(projId):
     global archive_threads
     project = models.Fuzzjob.query.filter_by(id=projId).first()
     nice_name = project.name
+    print(nice_name)
 
     if len(archive_threads) is 0:
-        thread_id = len(archive_threads) + 1
-        archive_threads[thread_id] = ArchiveProject(projId)
+        thread_id = 0
+        archive_threads[thread_id] = ArchiveProject(projId, nice_name)
         archive_threads[thread_id].start()
         return renderTemplate("progressArchiveFuzzjob.html",
                               thread_id=thread_id,
@@ -82,12 +83,14 @@ def archiveProject(projId):
 @app.route('/progressArchiveFuzzjob/<int:thread_id>')
 def progressArchiveFuzzjob(thread_id):
     global archive_threads
+
     if len(archive_threads) > 0:
         if archive_threads[thread_id].status[0] is 0 or archive_threads[thread_id].status[0] == 1:
             return str(archive_threads[thread_id].status[1])
         elif archive_threads[thread_id].status[0] is 2:
-            archive_threads.clear()
-            return ""
+            errorMessage = "Error: " + archive_threads[thread_id].status[1]
+            stopProcess(thread_id)
+            return errorMessage
         elif archive_threads[thread_id].status[0] is 3:
             message = str(archive_threads[thread_id].status[1])
             archive_threads.clear()
@@ -303,8 +306,8 @@ def createZipArchive(projId, name, nice_name, count_statement, statement):
     global archive_threads
 
     if len(archive_threads) is 0:
-        thread_id = len(archive_threads) + 1
-        archive_threads[thread_id] = CreateTestcaseArchive(projId, name, count_statement, statement)
+        thread_id = 0
+        archive_threads[thread_id] = CreateTestcaseArchive(projId, nice_name, name, count_statement, statement)
         archive_threads[thread_id].setMaxVal()
         archive_threads[thread_id].start()
 
@@ -322,6 +325,7 @@ def createZipArchive(projId, name, nice_name, count_statement, statement):
                               max_val=max_val,
                               nice_name=nice_name,
                               download=download)
+
     else:
         return renderTemplate("progressDownload.html",
                               thread_id=-1,
@@ -330,23 +334,70 @@ def createZipArchive(projId, name, nice_name, count_statement, statement):
                               download="error")
 
 
+@app.route('/statusDownload')
+def statusDownload():
+    if len(archive_threads) > 0:
+        thread_id = 0
+        max_val = 0
+        nice_name = archive_threads[thread_id].nice_name
+
+        if isinstance(archive_threads[thread_id], ArchiveProject):
+
+            return renderTemplate("progressArchiveFuzzjob.html",
+                                  thread_id=thread_id,
+                                  nice_name=nice_name)
+        else:
+            for val in archive_threads[thread_id].max_val_list:
+                max_val = max_val + val
+
+            if len(archive_threads[thread_id].name_list) == 1:
+                download = archive_threads[thread_id].name_list[0] + ".zip"
+            else:
+                download = "testcase_set.zip"
+
+            return renderTemplate("progressDownload.html",
+                                  thread_id=thread_id,
+                                  max_val=max_val,
+                                  nice_name=nice_name,
+                                  download=download)
+    else:
+        return redirect(url_for("projects"))
+
+
 @app.route('/progressDownload/<int:thread_id>')
 def progressDownload(thread_id):
     global archive_threads
 
-    if len(archive_threads[thread_id].name_list) == 1:
-        path = getDownloadPath() + archive_threads[thread_id].name_list[0] + ".zip"
-    else:
-        path = getDownloadPath() + "testcase_set.zip"
+    if len(archive_threads) > 0:
+        if len(archive_threads[thread_id].name_list) == 1:
+            path = getDownloadPath() + archive_threads[thread_id].name_list[0] + ".zip"
+        else:
+            path = getDownloadPath() + "testcase_set.zip"
 
-    if os.path.isfile(path) and archive_threads[thread_id].status[0] is 1:
-        archive_threads.clear()
-        return str(-1)
-    elif archive_threads[thread_id].status[0] is 2:
-        flash("Error creating the archive: " + archive_threads[thread_id].status[1], "error")
-        return str(archive_threads[thread_id].progress)
+        if os.path.isfile(path) and archive_threads[thread_id].status[0] is 1:
+            archive_threads.clear()
+            return str(-1)
+        elif archive_threads[thread_id].status[0] is 2:
+            errorMessage = "Error: " + archive_threads[thread_id].status[1]
+            stopProcess(thread_id)
+            return errorMessage
+        else:
+            return str(archive_threads[thread_id].progress)
     else:
-        return str(archive_threads[thread_id].progress)
+        return "NONE"
+
+
+@app.route('/stopProcess/<int:thread_id>')
+def stopProcess(thread_id):
+    global archive_threads
+    if thread_id is -1:
+        return redirect(url_for("statusDownload"))
+    elif len(archive_threads) > 0:
+        archive_threads[thread_id].end()
+        archive_threads.clear()
+        return redirect(url_for("projects"))
+    else:
+        return redirect(url_for("statusDownload"))
 
 
 @app.route('/download/<string:archive>')
