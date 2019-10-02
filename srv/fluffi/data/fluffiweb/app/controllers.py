@@ -469,8 +469,7 @@ def getLocation(locId):
     for l in models.LocationFuzzjobs.query.filter_by(Location = locId).all():
         currentFuzzjob = models.Fuzzjob.query.filter_by(id = l.Fuzzjob).first()
         location.projects.append(currentFuzzjob)
-    location.workers = models.Workers.query.filter_by(Location = locId, Fuzzjob = None).all()
-
+    location.workers = models.Workers.query.filter(models.Workers.Location == locId, models.Workers.Fuzzjob == None, models.Workers.Agenttype != 4).all()
     return location
 
 
