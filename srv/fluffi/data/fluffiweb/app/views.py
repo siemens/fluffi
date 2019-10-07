@@ -17,10 +17,11 @@ from .helpers import *
 from .forms import *
 from .constants import *
 
-import json, os
+import json, os, time
 import requests
 
 archive_threads = {}
+lock = LockFile()
 
 
 @app.route("/")
@@ -67,10 +68,11 @@ def archiveProject(projId):
     nice_name = project.name
     print(nice_name)
 
-    if len(archive_threads) is 0:
+    if len(archive_threads) is 0 and lock.check_file():
         thread_id = 0
-        archive_threads[thread_id] = ArchiveProject(projId, nice_name)
+        archive_threads[thread_id] = ArchiveProject(lock, projId, nice_name)
         archive_threads[thread_id].start()
+        lock.write_file("ArchiveProject", thread_id, nice_name)
         return renderTemplate("progressArchiveFuzzjob.html",
                               thread_id=thread_id,
                               nice_name=nice_name)
@@ -84,7 +86,8 @@ def archiveProject(projId):
 def progressArchiveFuzzjob(thread_id):
     global archive_threads
 
-    if len(archive_threads) > 0:
+    if len(archive_threads) > 0 and not lock.check_file():
+        print(lock.read_view_value())
         if archive_threads[thread_id].status[0] is 0 or archive_threads[thread_id].status[0] == 1:
             return str(archive_threads[thread_id].status[1])
         elif archive_threads[thread_id].status[0] is 2:
@@ -305,9 +308,9 @@ def downloadTestcaseSet(projId):
 def createZipArchive(projId, name, nice_name, count_statement, statement):
     global archive_threads
 
-    if len(archive_threads) is 0:
+    if len(archive_threads) is 0 and lock.check_file():
         thread_id = 0
-        archive_threads[thread_id] = CreateTestcaseArchive(projId, nice_name, name, count_statement, statement)
+        archive_threads[thread_id] = CreateTestcaseArchive(lock, projId, nice_name, name, count_statement, statement)
         archive_threads[thread_id].setMaxVal()
         archive_threads[thread_id].start()
 
@@ -319,6 +322,8 @@ def createZipArchive(projId, name, nice_name, count_statement, statement):
             download = archive_threads[thread_id].name_list[0] + ".zip"
         else:
             download = "testcase_set.zip"
+
+        lock.write_file("CreateTestcaseArchive", thread_id, nice_name, max_val, download)
 
         return renderTemplate("progressDownload.html",
                               thread_id=thread_id,
@@ -336,64 +341,58 @@ def createZipArchive(projId, name, nice_name, count_statement, statement):
 
 @app.route('/statusDownload')
 def statusDownload():
-    if len(archive_threads) > 0:
-        thread_id = 0
-        max_val = 0
-        nice_name = archive_threads[thread_id].nice_name
+    if len(archive_threads) > 0 or not lock.check_file():
+        file_content = lock.read_file()
 
-        if isinstance(archive_threads[thread_id], ArchiveProject):
-
+        if file_content['THREAD_TYPE'] == "ArchiveProject":
             return renderTemplate("progressArchiveFuzzjob.html",
-                                  thread_id=thread_id,
-                                  nice_name=nice_name)
+                                  thread_id=file_content['THREAD_ID'],
+                                  nice_name=file_content['NICE_NAME'])
         else:
-            for val in archive_threads[thread_id].max_val_list:
-                max_val = max_val + val
-
-            if len(archive_threads[thread_id].name_list) == 1:
-                download = archive_threads[thread_id].name_list[0] + ".zip"
-            else:
-                download = "testcase_set.zip"
-
             return renderTemplate("progressDownload.html",
-                                  thread_id=thread_id,
-                                  max_val=max_val,
-                                  nice_name=nice_name,
-                                  download=download)
+                                  thread_id=file_content['THREAD_ID'],
+                                  max_val=file_content['MAX_VAL'],
+                                  nice_name=file_content['NICE_NAME'],
+                                  download=file_content['DOWNLOAD_PATH'])
     else:
         return redirect(url_for("projects"))
 
 
 @app.route('/progressDownload/<int:thread_id>')
 def progressDownload(thread_id):
-    global archive_threads
-
-    if len(archive_threads) > 0:
-        if len(archive_threads[thread_id].name_list) == 1:
-            path = getDownloadPath() + archive_threads[thread_id].name_list[0] + ".zip"
+    print(lock.read_file())
+    if not lock.check_file():
+        file_content = lock.read_file()
+        if file_content['THREAD_ID'] == str(thread_id):
+            download_path = file_content['DOWNLOAD_PATH']
+            if len(download_path) > 1:
+                path = download_path
+            else:
+                path = getDownloadPath() + "testcase_set.zip"
+            if os.path.isfile(path) and file_content['STATUS'] == "1":
+                lock.delete_file()
+                archive_threads.clear()
+                return str(-1)
+            elif file_content['STATUS'] == "2":
+                error_message = file_content['MESSAGE']
+                stopProcess(thread_id)
+                return error_message
+            else:
+                return file_content['PROGRESS']
         else:
-            path = getDownloadPath() + "testcase_set.zip"
-
-        if os.path.isfile(path) and archive_threads[thread_id].status[0] is 1:
-            archive_threads.clear()
-            return str(-1)
-        elif archive_threads[thread_id].status[0] is 2:
-            errorMessage = "Error: " + archive_threads[thread_id].status[1]
-            stopProcess(thread_id)
-            return errorMessage
-        else:
-            return str(archive_threads[thread_id].progress)
+            return "NONE"
     else:
         return "NONE"
 
 
 @app.route('/stopProcess/<int:thread_id>')
 def stopProcess(thread_id):
-    global archive_threads
+    print("stop")
     if thread_id is -1:
         return redirect(url_for("statusDownload"))
-    elif len(archive_threads) > 0:
-        archive_threads[thread_id].end()
+    elif len(archive_threads) > 0 or not lock.check_file():
+        lock.change_file_entry("END", "1")
+        lock.delete_file()
         archive_threads.clear()
         return redirect(url_for("projects"))
     else:

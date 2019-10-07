@@ -33,7 +33,7 @@ function check_progress() {
                         $('#stop_download_button').addClass('disabled').attr('aria-disabled', 'true');
                     }else{
                         $('#process_info').text(progress);
-                        setTimeout(worker, 500);
+                        setTimeout(worker, 1000);
                     }
                 }
             });

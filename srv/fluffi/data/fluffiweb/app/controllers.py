@@ -12,6 +12,7 @@ import io
 import csv
 import threading
 import subprocess
+import fileinput
 from base64 import b64encode
 from os import system, unlink
 
@@ -132,98 +133,6 @@ def getLocations():
 
 def getDownloadPath():
     return app.root_path[:-3]
-
-
-class CreateTestcaseArchive(threading.Thread):
-    def __init__(self, projId, nice_name, name_list, count_statement_list, statement_list):
-        super().__init__()
-        self.progress = 0
-        self.projId = projId
-        self.nice_name = nice_name
-        self.name_list = name_list
-        self.count_statement_list = count_statement_list
-        self.statement_list = statement_list
-        self.max_val_list = []
-        # status: 0 = default/running, 1 = success, 2 = error
-        self.status = (0, "")
-        self.stop = False
-
-    def setMaxVal(self):
-        print(self.name_list)
-        project = models.Fuzzjob.query.filter_by(id=self.projId).first()
-        engine = create_engine(
-            'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
-        connection = engine.connect()
-        try:
-            for count_statement in self.count_statement_list:
-                result = connection.execute(count_statement)
-                self.max_val_list.append(int((result.fetchone()[0])/20) + 1)
-        except Exception as e:
-            self.status = (2, str(e))
-        finally:
-            connection.close()
-            engine.dispose()
-
-    def run(self):
-        project = models.Fuzzjob.query.filter_by(id=self.projId).first()
-        engine = create_engine(
-            'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
-        connection = engine.connect()
-        try:
-            if not self.stop:
-                for num, statement in enumerate(self.statement_list):
-                    if not self.stop:
-                        path = app.root_path + "/tmp/" + self.name_list[num]
-                        if len(self.name_list) == 1:
-                            zipFilePath = getDownloadPath() + self.name_list[num] + ".zip"
-                        else:
-                            zipFilePath = getDownloadPath() + "testcase_set.zip"
-                        if os.path.isfile(zipFilePath):
-                            os.remove(zipFilePath)
-                        if os.path.exists(path):
-                            shutil.rmtree(path)
-                        os.makedirs(path)
-
-                        for block in range(0, self.max_val_list[num]):
-                            if not self.stop:
-                                self.progress = self.progress + 1
-                                block_statement = statement[:-1] + " LIMIT " + str(block * 20) + ", 20;"
-                                result = connection.execute(block_statement)
-
-                                for row in result:
-                                    if 'NiceName' in row.keys():
-                                        fileName = row["NiceName"] if row["NiceName"] else "{}_id{}".format(
-                                            row["CreatorServiceDescriptorGUID"],
-                                            row["ID"])
-                                    else:
-                                        fileName = "{}_id{}".format(row["CreatorServiceDescriptorGUID"], row["ID"])
-                                    rawData = row["RawBytes"]
-                                    f = open(path + "/" + fileName, "wb+")
-                                    f.write(rawData)
-                                    f.close()
-
-                        if len(self.statement_list) == num + 1 or not self.stop:
-                            if len(self.statement_list) > 1:
-                                path = app.root_path + "/tmp"
-                                filename = shutil.make_archive("testcase_set", "zip", path)
-                            else:
-                                filename = shutil.make_archive(self.name_list[num], "zip", path)
-
-                            self.status = (1, "File " + filename + " created.")
-                            if os.path.exists(path):
-                                shutil.rmtree(path, ignore_errors=True)
-        except Exception as e:
-            print(str(e))
-            self.status = (2, str(e))
-        finally:
-            connection.close()
-            engine.dispose()
-
-    def end(self):
-        self.stop = True
-        path = app.root_path + "/tmp"
-        if os.path.exists(path):
-            shutil.rmtree(path, ignore_errors=True)
 
 
 def getLocationFormWithChoices(projId, locationForm):
@@ -1187,62 +1096,194 @@ def getGraphData(projId):
     return graphdata
 
 
-class ArchiveProject(threading.Thread):
-    def __init__(self, projId, nice_name):
+class CreateTestcaseArchive(threading.Thread):
+    def __init__(self, lock, projId, nice_name, name_list, count_statement_list, statement_list):
         super().__init__()
+        self.lock = lock
+        self.progress = 0
+        self.projId = projId
+        self.nice_name = nice_name
+        self.name_list = name_list
+        self.count_statement_list = count_statement_list
+        self.statement_list = statement_list
+        self.max_val_list = []
+        # status: 0 = default/running, 1 = success, 2 = error
+        self.status = (0, "")
+        self.stop = False
+
+    def setMaxVal(self):
+        project = models.Fuzzjob.query.filter_by(id=self.projId).first()
+        engine = create_engine(
+            'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
+        connection = engine.connect()
+        try:
+            for count_statement in self.count_statement_list:
+                result = connection.execute(count_statement)
+                self.max_val_list.append(int((result.fetchone()[0])/20) + 1)
+        except Exception as e:
+            self.lock.change_file_entry("STATUS", "2")
+            self.lock.change_file_entry("MESSAGE", str(e))
+            self.status = (2, str(e))
+        finally:
+            connection.close()
+            engine.dispose()
+
+    def run(self):
+        project = models.Fuzzjob.query.filter_by(id=self.projId).first()
+        engine = create_engine(
+            'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
+        connection = engine.connect()
+        try:
+            print("hello", self.lock.check_file(), self.lock.read_file_entry("END"))
+            if self.lock.read_file_entry("END") == "0" or not self.stop:
+                for num, statement in enumerate(self.statement_list):
+                    print(self.lock.read_file_entry("END"))
+                    if self.lock.read_file_entry("END") == "0" or not self.stop:
+                        path = app.root_path + "/tmp/" + self.name_list[num]
+                        if len(self.name_list) == 1:
+                            zipFilePath = getDownloadPath() + self.name_list[num] + ".zip"
+                        else:
+                            zipFilePath = getDownloadPath() + "testcase_set.zip"
+                        if os.path.isfile(zipFilePath):
+                            os.remove(zipFilePath)
+                        if os.path.exists(path):
+                            shutil.rmtree(path)
+                        os.makedirs(path)
+
+                        for block in range(0, self.max_val_list[num]):
+                            if self.lock.read_file_entry("END") == "0":
+                                self.progress = self.progress + 1
+                                self.lock.change_file_entry("PROGRESS", str(self.progress))
+                                block_statement = statement[:-1] + " LIMIT " + str(block * 20) + ", 20;"
+                                result = connection.execute(block_statement)
+
+                                for row in result:
+                                    if 'NiceName' in row.keys():
+                                        fileName = row["NiceName"] if row["NiceName"] else "{}_id{}".format(
+                                            row["CreatorServiceDescriptorGUID"],
+                                            row["ID"])
+                                    else:
+                                        fileName = "{}_id{}".format(row["CreatorServiceDescriptorGUID"], row["ID"])
+                                    rawData = row["RawBytes"]
+                                    f = open(path + "/" + fileName, "wb+")
+                                    f.write(rawData)
+                                    f.close()
+                            else:
+                                self.end()
+
+                        if len(self.statement_list) == num + 1 or (self.lock.read_file_entry("END") == "0" or not self.stop):
+                            if len(self.statement_list) > 1:
+                                path = app.root_path + "/tmp"
+                                filename = shutil.make_archive("testcase_set", "zip", path)
+                            else:
+                                filename = shutil.make_archive(self.name_list[num], "zip", path)
+
+                            self.lock.change_file_entry("STATUS", "1")
+                            self.lock.change_file_entry("MESSAGE", "File " + filename + " created.")
+                            self.status = (1, "File " + filename + " created.")
+                            if os.path.exists(path):
+                                shutil.rmtree(path, ignore_errors=True)
+                        else:
+                            self.end()
+                    else:
+                        self.end()
+            else:
+                self.end()
+        except Exception as e:
+            print(str(e))
+            self.lock.change_file_entry("STATUS", "2")
+            self.lock.change_file_entry("MESSAGE", str(e))
+            self.status = (2, str(e))
+        finally:
+            connection.close()
+            engine.dispose()
+
+    def end(self):
+        self.stop = True
+        path = app.root_path + "/tmp"
+        if os.path.exists(path):
+            shutil.rmtree(path, ignore_errors=True)
+
+
+class ArchiveProject(threading.Thread):
+    def __init__(self, lock, projId, nice_name):
+        super().__init__()
+        self.lock = lock
         self.projId = projId
         self.nice_name = nice_name
         # status: 0 = default/running, 1 = success, 2 = error, 3 = finish
+        self.lock.change_file_entry("STATUS", "0")
+        self.lock.change_file_entry("MESSAGE", "Step 0/4: Start archiving fuzzjob.")
         self.status = (0, "Step 0/4: Start archiving fuzzjob.")
         self.stop = False
 
     def run(self):
         fuzzjob = models.Fuzzjob.query.filter_by(id=self.projId).first()
 
-        if fuzzjob or not self.stop:
+        if fuzzjob or (self.lock.read_file_entry("END") == "0" or not self.stop):
             try:
                 scriptFile = os.path.join(app.root_path, "archiveDB.sh")
                 returncode = subprocess.call(
                     [scriptFile, config.DBUSER, config.DBPASS, config.DBPREFIX, fuzzjob.name.lower(), config.DBHOST])
                 if returncode != 0:
+                    self.lock.change_file_entry("STATUS", "2")
+                    self.lock.change_file_entry("MESSAGE", "Error Step 1/4: Database couldn't be archived.")
                     self.status = (2, str("Error Step 1/4: Database couldn't be archived."))
                 else:
+                    self.lock.change_file_entry("STATUS", "1")
+                    self.lock.change_file_entry("MESSAGE", "Step 1/4: Database archived.")
                     self.status = (1, str("Step 1/4: Database archived."))
             except Exception as e:
                 print(e)
+                self.lock.change_file_entry("STATUS", "2")
+                self.lock.change_file_entry("MESSAGE", str(e))
                 self.status = (2, str(e))
 
-            if self.status[0] is not 2 or not self.stop:
+            if self.status[0] is not 2 or (self.lock.read_file_entry("END") == "0" or not self.stop):
                 fileName = config.DBPREFIX + fuzzjob.name.lower() + ".sql.gz"
                 success = FTP_CONNECTOR.saveArchivedProjectOnFTPServer(fileName)
                 if success:
+                    self.lock.change_file_entry("STATUS", "1")
+                    self.lock.change_file_entry("MESSAGE", "Step 2/4: Archived project saved on ftp server.")
                     self.status = (1, "Step 2/4: Archived project saved on ftp server.")
                 else:
+                    self.lock.change_file_entry("STATUS", "2")
+                    self.lock.change_file_entry("MESSAGE", "Step 2/4: Archived project couldn't be saved on ftp server.")
                     self.status = (2, "Step 2/4: Archived project couldn't be saved on ftp server.")
 
                 os.remove(fileName)
 
-                if self.status[0] == 1 or not self.stop:
+                if self.status[0] == 1 or (self.lock.read_file_entry("END") == "0" or not self.stop):
                     try:
                         if models.Fuzzjob.query.filter_by(id=self.projId).first() is not None:
                             fuzzjob = models.Fuzzjob.query.filter_by(id=self.projId).first()
                             db.session.delete(fuzzjob)
                             db.session.commit()
+                            self.lock.change_file_entry("STATUS", "1")
+                            self.lock.change_file_entry("MESSAGE", "Step 3/4: Fuzzjob sucessfully deleted.")
                             self.status = (1, 'Step 3/4: Fuzzjob sucessfully deleted.')
                         else:
+                            self.lock.change_file_entry("STATUS", "2")
+                            self.lock.change_file_entry("MESSAGE", "Step 3/4: Fuzzjob not found.")
                             self.status = (2, 'Step 3/4: Fuzzjob not found.')
                     except Exception as e:
+                        self.lock.change_file_entry("STATUS", "2")
+                        self.lock.change_file_entry("MESSAGE", str(e))
                         self.status = (2, str(e))
 
-                    if self.status[0] == 1 or not self.stop:
+                    if self.status[0] == 1 or self.lock.read_file_entry("END") == "0":
                         engine = create_engine(
                             'mysql://%s:%s@%s/%s' % (
                             config.DBUSER, config.DBPASS, fluffiResolve(config.DBHOST), config.DEFAULT_DBNAME))
                         connection = engine.connect()
                         try:
                             connection.execute("DROP DATABASE {};".format(config.DBPREFIX + fuzzjob.name.lower()))
+                            self.lock.change_file_entry("STATUS", "3")
+                            self.lock.change_file_entry("MESSAGE", "Step 4/4: Database deleted.")
                             self.status = (3, 'Step 4/4: Database deleted.')
                         except Exception as e:
+                            self.lock.change_file_entry("STATUS", "2")
+                            self.lock.change_file_entry("MESSAGE", str(e))
                             self.status = (2, str(e))
                         finally:
                             connection.close()
@@ -1250,3 +1291,73 @@ class ArchiveProject(threading.Thread):
 
     def end(self):
         self.stop = True
+
+class LockFile:
+
+    def __init__(self):
+        self.write_allow = False
+        self.file_path = getDownloadPath() + "download.lock"
+
+    # if lock file in dir: return False
+    def check_file(self):
+        if os.path.isfile(self.file_path) or os.path.isfile(self.file_path + '.bak'):
+            file_status = True
+        else:
+            file_status = False
+
+        if not file_status:
+            self.write_allow = True
+
+        return not file_status
+
+    def write_file(self, thread_type, thread_id, nice_name, max_val=0, download=""):
+        if self.check_file():
+            file_w = open(self.file_path, "a")
+            file_w.write("THREAD_TYPE=" + thread_type + "\n" +
+                         "THREAD_ID=" + str(thread_id) + "\n" +
+                         "NICE_NAME=" + nice_name + "\n" +
+                         "PROGRESS=0\n" +
+                         "MAX_VAL=" + str(max_val) + "\n" +
+                         "STATUS=\n" +
+                         "MESSAGE=\n" +
+                         "DOWNLOAD_PATH=" + download + "\n" +
+                         "END=0\n")
+            file_w.close()
+
+    def read_file(self):
+        file_r = open(self.file_path, "r")
+        content = {}
+        for line in file_r:
+            content[line.split("=", 1)[0]] = line.split("=", 1)[1].replace('\n', '')
+        file_r.close()
+        return content
+
+    def read_file_entry(self, entry):
+        file_r = open(self.file_path, "r")
+        for num, line in enumerate(file_r):
+            if entry in line:
+                file_r.close()
+                return line.split("=", 1)[1].replace('\n', '')
+        file_r.close()
+        return ""
+
+    def change_file_entry(self, entry, value):
+        if self.write_allow:
+            file = open(self.file_path, 'r')
+            lines = file.readlines()
+            file.close()
+            for num, line in enumerate(lines):
+                if entry in line:
+                    lines[num] = entry + "=" + value + "\n"
+            out = open(self.file_path + ".bak", 'w')
+            out.writelines(lines)
+            out.close()
+            os.rename(self.file_path + ".bak", self.file_path)
+
+    def delete_file(self):
+        if self.write_allow:
+            if os.path.isfile(self.file_path):
+                os.remove(self.file_path)
+            self.write_allow = False
+
+
