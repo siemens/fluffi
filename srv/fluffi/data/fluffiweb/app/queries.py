@@ -86,8 +86,8 @@ NUM_UNIQUE_ACCESS_VIOLATION = (
     "(SELECT cd.CrashFootprint, it.TestCaseType "
     "FROM interesting_testcases AS it "
     "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
-    "WHERE it.TestCaseType=2 Group by cd.CrashFootprint) "
-    "violations")
+    "WHERE it.TestCaseType=2 GROUP BY cd.CrashFootprint) "
+    "violations;")
 
 UNIQUE_ACCESS_VIOLATION = (
     "SELECT av.CrashFootprint, av.TestCaseType, av.CreatorServiceDescriptorGUID, av.CreatorLocalID, av.Rating, "
@@ -143,13 +143,6 @@ UNIQUE_CRASHES_NO_RAW = (
     " GROUP BY cd.CrashFootprint) oc " 
     "LEFT JOIN nice_names_testcase AS nn ON oc.ID = nn.TestcaseID "
     "WHERE TestCaseType=3;")
-
-NUM_UNIQUE_ACCESS_VIOLATION_TYPE_2 = (
-    "SELECT count(*) "
-    "FROM (SELECT cd.CrashFootprint, it.TestCaseType FROM interesting_testcases AS it "
-    "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
-    "GROUP BY cd.CrashFootprint) "
-    "observedCrashes WHERE TestCaseType=2")
 
 MANAGED_INSTANCES_HOST_AND_PORT_AGENT_TYPE = (
     "SELECT managed_instances.ServiceDescriptorHostAndPort "
