@@ -82,7 +82,7 @@ def listFuzzJobs():
             result = connection.execute(getITCountOfTypeQuery(1)) 
             project.numHang = result.fetchone()[0]
 
-            result = connection.execute(NUM_UNIQUE_ACCESS_VIOLATION_TYPE_2)
+            result = connection.execute(NUM_UNIQUE_ACCESS_VIOLATION)
             project.numUniqueAccessViolation = result.fetchone()[0]
 
             result = connection.execute(getITCountOfTypeQuery(4))
