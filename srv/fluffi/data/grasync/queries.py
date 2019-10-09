@@ -22,10 +22,8 @@ UNIQUE_TESTCASES=(
     "SELECT COUNT(*) FROM "
         "(SELECT cd.CrashFootprint, it.TestCaseType FROM interesting_testcases AS it "
         "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
-        "GROUP BY cd.CrashFootprint) observedCrashes "
-    "WHERE TestCaseType=:tcType;"
+        "WHERE TestCaseType=:tcType GROUP BY cd.CrashFootprint) testcases;"
 )
-
 
 INSTANCE_PERFORMANCE_STATS=(
     "SELECT managed_instances_statuses.ID, managed_instances_statuses.ServiceDescriptorGUID, managed_instances.AgentType, "
