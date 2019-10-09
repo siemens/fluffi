@@ -12,7 +12,7 @@ import io
 import csv
 import threading
 import subprocess
-import fileinput
+import time
 from base64 import b64encode
 from os import system, unlink
 
@@ -1110,16 +1110,19 @@ class CreateTestcaseArchive(threading.Thread):
         # status: 0 = default/running, 1 = success, 2 = error
         self.status = (0, "")
         self.stop = False
+        file = open("error.txt", 'a+')
+        file.write("Thread " + self.nice_name + " \n")
+        file.close()
 
     def setMaxVal(self):
-        project = models.Fuzzjob.query.filter_by(id=self.projId).first()
+        project = models.Fuzzjob.query.filter_by(id = self.projId).first()
         engine = create_engine(
             'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
         connection = engine.connect()
         try:
             for count_statement in self.count_statement_list:
                 result = connection.execute(count_statement)
-                self.max_val_list.append(int((result.fetchone()[0])/20) + 1)
+                self.max_val_list.append(int((result.fetchone()[0]) / 20) + 1)
         except Exception as e:
             self.lock.change_file_entry("STATUS", "2")
             self.lock.change_file_entry("MESSAGE", str(e))
@@ -1129,15 +1132,13 @@ class CreateTestcaseArchive(threading.Thread):
             engine.dispose()
 
     def run(self):
-        project = models.Fuzzjob.query.filter_by(id=self.projId).first()
+        project = models.Fuzzjob.query.filter_by(id = self.projId).first()
         engine = create_engine(
             'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
         connection = engine.connect()
         try:
-            print("hello", self.lock.check_file(), self.lock.read_file_entry("END"))
             if self.lock.read_file_entry("END") == "0" or not self.stop:
                 for num, statement in enumerate(self.statement_list):
-                    print(self.lock.read_file_entry("END"))
                     if self.lock.read_file_entry("END") == "0" or not self.stop:
                         path = app.root_path + "/tmp/" + self.name_list[num]
                         if len(self.name_list) == 1:
@@ -1171,7 +1172,7 @@ class CreateTestcaseArchive(threading.Thread):
                             else:
                                 self.end()
 
-                        if len(self.statement_list) == num + 1 or (self.lock.read_file_entry("END") == "0" or not self.stop):
+                        if len(self.statement_list) == num + 1 or self.stop:
                             if len(self.statement_list) > 1:
                                 path = app.root_path + "/tmp"
                                 filename = shutil.make_archive("testcase_set", "zip", path)
@@ -1180,11 +1181,10 @@ class CreateTestcaseArchive(threading.Thread):
 
                             self.lock.change_file_entry("STATUS", "1")
                             self.lock.change_file_entry("MESSAGE", "File " + filename + " created.")
+                            self.lock.change_file_entry("END", "1")
                             self.status = (1, "File " + filename + " created.")
                             if os.path.exists(path):
-                                shutil.rmtree(path, ignore_errors=True)
-                        else:
-                            self.end()
+                                shutil.rmtree(path, ignore_errors = True)
                     else:
                         self.end()
             else:
@@ -1193,6 +1193,7 @@ class CreateTestcaseArchive(threading.Thread):
             print(str(e))
             self.lock.change_file_entry("STATUS", "2")
             self.lock.change_file_entry("MESSAGE", str(e))
+            self.lock.change_file_entry("END", "1")
             self.status = (2, str(e))
         finally:
             connection.close()
@@ -1202,7 +1203,7 @@ class CreateTestcaseArchive(threading.Thread):
         self.stop = True
         path = app.root_path + "/tmp"
         if os.path.exists(path):
-            shutil.rmtree(path, ignore_errors=True)
+            shutil.rmtree(path, ignore_errors = True)
 
 
 class ArchiveProject(threading.Thread):
@@ -1218,7 +1219,7 @@ class ArchiveProject(threading.Thread):
         self.stop = False
 
     def run(self):
-        fuzzjob = models.Fuzzjob.query.filter_by(id=self.projId).first()
+        fuzzjob = models.Fuzzjob.query.filter_by(id = self.projId).first()
 
         if fuzzjob or (self.lock.read_file_entry("END") == "0" or not self.stop):
             try:
@@ -1228,6 +1229,7 @@ class ArchiveProject(threading.Thread):
                 if returncode != 0:
                     self.lock.change_file_entry("STATUS", "2")
                     self.lock.change_file_entry("MESSAGE", "Error Step 1/4: Database couldn't be archived.")
+                    self.lock.change_file_entry("END", "1")
                     self.status = (2, str("Error Step 1/4: Database couldn't be archived."))
                 else:
                     self.lock.change_file_entry("STATUS", "1")
@@ -1237,6 +1239,7 @@ class ArchiveProject(threading.Thread):
                 print(e)
                 self.lock.change_file_entry("STATUS", "2")
                 self.lock.change_file_entry("MESSAGE", str(e))
+                self.lock.change_file_entry("END", "1")
                 self.status = (2, str(e))
 
             if self.status[0] is not 2 or (self.lock.read_file_entry("END") == "0" or not self.stop):
@@ -1248,15 +1251,17 @@ class ArchiveProject(threading.Thread):
                     self.status = (1, "Step 2/4: Archived project saved on ftp server.")
                 else:
                     self.lock.change_file_entry("STATUS", "2")
-                    self.lock.change_file_entry("MESSAGE", "Step 2/4: Archived project couldn't be saved on ftp server.")
+                    self.lock.change_file_entry("MESSAGE",
+                                                "Step 2/4: Archived project couldn't be saved on ftp server.")
+                    self.lock.change_file_entry("END", "1")
                     self.status = (2, "Step 2/4: Archived project couldn't be saved on ftp server.")
 
                 os.remove(fileName)
 
                 if self.status[0] == 1 or (self.lock.read_file_entry("END") == "0" or not self.stop):
                     try:
-                        if models.Fuzzjob.query.filter_by(id=self.projId).first() is not None:
-                            fuzzjob = models.Fuzzjob.query.filter_by(id=self.projId).first()
+                        if models.Fuzzjob.query.filter_by(id = self.projId).first() is not None:
+                            fuzzjob = models.Fuzzjob.query.filter_by(id = self.projId).first()
                             db.session.delete(fuzzjob)
                             db.session.commit()
                             self.lock.change_file_entry("STATUS", "1")
@@ -1265,21 +1270,24 @@ class ArchiveProject(threading.Thread):
                         else:
                             self.lock.change_file_entry("STATUS", "2")
                             self.lock.change_file_entry("MESSAGE", "Step 3/4: Fuzzjob not found.")
+                            self.lock.change_file_entry("END", "1")
                             self.status = (2, 'Step 3/4: Fuzzjob not found.')
                     except Exception as e:
                         self.lock.change_file_entry("STATUS", "2")
                         self.lock.change_file_entry("MESSAGE", str(e))
+                        self.lock.change_file_entry("END", "1")
                         self.status = (2, str(e))
 
                     if self.status[0] == 1 or self.lock.read_file_entry("END") == "0":
                         engine = create_engine(
                             'mysql://%s:%s@%s/%s' % (
-                            config.DBUSER, config.DBPASS, fluffiResolve(config.DBHOST), config.DEFAULT_DBNAME))
+                                config.DBUSER, config.DBPASS, fluffiResolve(config.DBHOST), config.DEFAULT_DBNAME))
                         connection = engine.connect()
                         try:
                             connection.execute("DROP DATABASE {};".format(config.DBPREFIX + fuzzjob.name.lower()))
                             self.lock.change_file_entry("STATUS", "3")
                             self.lock.change_file_entry("MESSAGE", "Step 4/4: Database deleted.")
+                            self.lock.change_file_entry("END", "1")
                             self.status = (3, 'Step 4/4: Database deleted.')
                         except Exception as e:
                             self.lock.change_file_entry("STATUS", "2")
@@ -1292,72 +1300,113 @@ class ArchiveProject(threading.Thread):
     def end(self):
         self.stop = True
 
-class LockFile:
 
+class LockFile:
     def __init__(self):
         self.write_allow = False
         self.file_path = getDownloadPath() + "download.lock"
 
     # if lock file in dir: return False
     def check_file(self):
-        if os.path.isfile(self.file_path) or os.path.isfile(self.file_path + '.bak'):
-            file_status = True
-        else:
-            file_status = False
 
-        if not file_status:
+        file_available = False
+        for x in range(0, 5):
+            if os.access(self.file_path, os.F_OK):
+                file_available = True
+            file = open("error.txt", 'a+')
+            file.write("count " + str(x) + " " + str(file_available) + " \n")
+            file.close()
+            time.sleep(0.01)
+
+        file = open("error.txt", 'a+')
+        file_text = ""
+        if file_available:
+            file_text = self.read_file()
+            file.write("Check FILE - TRUE" + str(file_text) + "\n")
+        else:
+            file.write("Check FILE - FALSE\n")
+        file.close()
+
+        if not file_available:
             self.write_allow = True
 
-        return not file_status
+        return not file_available
 
-    def write_file(self, thread_type, thread_id, nice_name, max_val=0, download=""):
+    def write_file(self, thread_type, thread_id, nice_name, max_val = 0, download = ""):
         if self.check_file():
             file_w = open(self.file_path, "a")
-            file_w.write("THREAD_TYPE=" + thread_type + "\n" +
-                         "THREAD_ID=" + str(thread_id) + "\n" +
-                         "NICE_NAME=" + nice_name + "\n" +
-                         "PROGRESS=0\n" +
-                         "MAX_VAL=" + str(max_val) + "\n" +
-                         "STATUS=\n" +
-                         "MESSAGE=\n" +
-                         "DOWNLOAD_PATH=" + download + "\n" +
-                         "END=0\n")
+            file_w.write("THREAD_TYPE = " + thread_type + "\n" +
+                         "THREAD_ID = " + str(thread_id) + "\n" +
+                         "NICE_NAME = " + nice_name + "\n" +
+                         "PROGRESS = 0\n" +
+                         "MAX_VAL = " + str(max_val) + "\n" +
+                         "STATUS = \n" +
+                         "MESSAGE = \n" +
+                         "DOWNLOAD_PATH = " + download + "\n" +
+                         "END = 0\n")
             file_w.close()
 
     def read_file(self):
-        file_r = open(self.file_path, "r")
-        content = {}
-        for line in file_r:
-            content[line.split("=", 1)[0]] = line.split("=", 1)[1].replace('\n', '')
-        file_r.close()
-        return content
+        if os.access(self.file_path + ".bak", os.R_OK):
+            os.rename(self.file_path + ".bak", self.file_path)
+        if os.access(self.file_path, os.R_OK):
+            file_r = open(self.file_path, "r")
+            content = {}
+            for line in file_r:
+                line_list = line.split(" = ", 1)
+                if '\n' in line:
+                    value = line_list[1].replace('\n', '')
+                else:
+                    value = line_list[1]
+                content[line_list[0]] = value
+            file_r.close()
+            return content
+        else:
+            return ""
 
     def read_file_entry(self, entry):
-        file_r = open(self.file_path, "r")
-        for num, line in enumerate(file_r):
-            if entry in line:
-                file_r.close()
-                return line.split("=", 1)[1].replace('\n', '')
-        file_r.close()
-        return ""
+        if os.access(self.file_path + ".bak", os.R_OK):
+            os.rename(self.file_path + ".bak", self.file_path)
+        if os.access(self.file_path, os.R_OK):
+            file_r = open(self.file_path, "r")
+            for num, line in enumerate(file_r):
+                if entry in line:
+                    file_r.close()
+                    line_list = line.split(" = ", 1)
+                    if '\n' in line:
+                        value = line_list[1].replace('\n', '')
+                    else:
+                        value = line_list[1]
+                    return value
+            file_r.close()
+            return ""
+        else:
+            return ""
 
     def change_file_entry(self, entry, value):
-        if self.write_allow:
+        if self.write_allow and os.access(self.file_path, os.R_OK):
             file = open(self.file_path, 'r')
             lines = file.readlines()
             file.close()
             for num, line in enumerate(lines):
                 if entry in line:
-                    lines[num] = entry + "=" + value + "\n"
-            out = open(self.file_path + ".bak", 'w')
+                    lines[num] = entry + " = " + value + "\n"
+            out = open(self.file_path + ".bak", 'w+')
             out.writelines(lines)
             out.close()
             os.rename(self.file_path + ".bak", self.file_path)
 
     def delete_file(self):
-        if self.write_allow:
-            if os.path.isfile(self.file_path):
-                os.remove(self.file_path)
+        if self.write_allow and os.access(self.file_path, os.R_OK):
+            os.remove(self.file_path)
             self.write_allow = False
-
-
+        else:
+            file = open("error.txt", 'a+')
+            file_text = ""
+            if os.access(self.file_path, os.R_OK):
+                file_text = self.read_file()
+            file.write("DELETE FILE - " + str(file_text) + "\n")
+            file.close()
+            if (os.access(self.file_path, os.R_OK) and
+                    self.read_file_entry("END") == "1"):
+                os.remove(self.file_path)

@@ -66,38 +66,41 @@ def archiveProject(projId):
     global archive_threads
     project = models.Fuzzjob.query.filter_by(id=projId).first()
     nice_name = project.name
-    print(nice_name)
 
-    if len(archive_threads) is 0 and lock.check_file():
+    if lock.check_file():
+        archive_threads.clear()
         thread_id = 0
+        lock.write_file("ArchiveProject", thread_id, nice_name)
         archive_threads[thread_id] = ArchiveProject(lock, projId, nice_name)
         archive_threads[thread_id].start()
-        lock.write_file("ArchiveProject", thread_id, nice_name)
         return renderTemplate("progressArchiveFuzzjob.html",
                               thread_id=thread_id,
                               nice_name=nice_name)
     else:
-        return renderTemplate("progressArchiveFuzzjob.html",
-                              thread_id=-1,
-                              nice_name=nice_name)
+        lock.delete_file()
+        if lock.check_file():
+            archiveProject(projId)
+        else:
+            return renderTemplate("progressArchiveFuzzjob.html",
+                                  thread_id=-1,
+                                  nice_name=nice_name)
 
 
 @app.route('/progressArchiveFuzzjob/<int:thread_id>')
 def progressArchiveFuzzjob(thread_id):
-    global archive_threads
-
-    if len(archive_threads) > 0 and not lock.check_file():
-        print(lock.read_view_value())
-        if archive_threads[thread_id].status[0] is 0 or archive_threads[thread_id].status[0] == 1:
-            return str(archive_threads[thread_id].status[1])
-        elif archive_threads[thread_id].status[0] is 2:
-            errorMessage = "Error: " + archive_threads[thread_id].status[1]
-            stopProcess(thread_id)
-            return errorMessage
-        elif archive_threads[thread_id].status[0] is 3:
-            message = str(archive_threads[thread_id].status[1])
-            archive_threads.clear()
-            return message
+    if not lock.check_file():
+        file_content = lock.read_file()
+        if file_content['THREAD_ID'] == str(thread_id):
+            if file_content['STATUS'] == "0" or file_content['STATUS'] == "1":
+                return file_content['MESSAGE']
+            elif file_content['STATUS'] == "2" or file_content['STATUS'] == "3":
+                error_message = file_content['MESSAGE']
+                stopProcess(thread_id)
+                return error_message
+            else:
+                return file_content['MESSAGE']
+        else:
+            return ""
     else:
         return ""
 
@@ -308,7 +311,8 @@ def downloadTestcaseSet(projId):
 def createZipArchive(projId, name, nice_name, count_statement, statement):
     global archive_threads
 
-    if len(archive_threads) is 0 and lock.check_file():
+    if lock.check_file():
+        archive_threads.clear()
         thread_id = 0
         archive_threads[thread_id] = CreateTestcaseArchive(lock, projId, nice_name, name, count_statement, statement)
         archive_threads[thread_id].setMaxVal()
@@ -332,16 +336,20 @@ def createZipArchive(projId, name, nice_name, count_statement, statement):
                               download=download)
 
     else:
+        if lock.read_file_entry("END") == "1":
+            lock.delete_file()
+            if lock.check_file():
+                createZipArchive(projId, name, nice_name, count_statement, statement)
         return renderTemplate("progressDownload.html",
-                              thread_id=-1,
-                              max_val=10,
-                              nice_name=nice_name,
-                              download="error")
+                                  thread_id=-1,
+                                  max_val=10,
+                                  nice_name=nice_name,
+                                  download="error")
 
 
 @app.route('/statusDownload')
 def statusDownload():
-    if len(archive_threads) > 0 or not lock.check_file():
+    if not lock.check_file():
         file_content = lock.read_file()
 
         if file_content['THREAD_TYPE'] == "ArchiveProject":
@@ -360,18 +368,18 @@ def statusDownload():
 
 @app.route('/progressDownload/<int:thread_id>')
 def progressDownload(thread_id):
-    print(lock.read_file())
     if not lock.check_file():
         file_content = lock.read_file()
         if file_content['THREAD_ID'] == str(thread_id):
             download_path = file_content['DOWNLOAD_PATH']
+
             if len(download_path) > 1:
                 path = download_path
             else:
                 path = getDownloadPath() + "testcase_set.zip"
+
             if os.path.isfile(path) and file_content['STATUS'] == "1":
-                lock.delete_file()
-                archive_threads.clear()
+                stopProcess(thread_id)
                 return str(-1)
             elif file_content['STATUS'] == "2":
                 error_message = file_content['MESSAGE']
@@ -387,10 +395,9 @@ def progressDownload(thread_id):
 
 @app.route('/stopProcess/<int:thread_id>')
 def stopProcess(thread_id):
-    print("stop")
     if thread_id is -1:
         return redirect(url_for("statusDownload"))
-    elif len(archive_threads) > 0 or not lock.check_file():
+    elif not lock.check_file():
         lock.change_file_entry("END", "1")
         lock.delete_file()
         archive_threads.clear()
