@@ -1110,12 +1110,9 @@ class CreateTestcaseArchive(threading.Thread):
         # status: 0 = default/running, 1 = success, 2 = error
         self.status = (0, "")
         self.stop = False
-        file = open("error.txt", 'a+')
-        file.write("Thread " + self.nice_name + " \n")
-        file.close()
 
     def setMaxVal(self):
-        project = models.Fuzzjob.query.filter_by(id = self.projId).first()
+        project = models.Fuzzjob.query.filter_by(id=self.projId).first()
         engine = create_engine(
             'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
         connection = engine.connect()
@@ -1132,7 +1129,7 @@ class CreateTestcaseArchive(threading.Thread):
             engine.dispose()
 
     def run(self):
-        project = models.Fuzzjob.query.filter_by(id = self.projId).first()
+        project = models.Fuzzjob.query.filter_by(id=self.projId).first()
         engine = create_engine(
             'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
         connection = engine.connect()
@@ -1140,16 +1137,20 @@ class CreateTestcaseArchive(threading.Thread):
             if self.lock.read_file_entry("END") == "0" or not self.stop:
                 for num, statement in enumerate(self.statement_list):
                     if self.lock.read_file_entry("END") == "0" or not self.stop:
-                        path = app.root_path + "/tmp/" + self.name_list[num]
+                        tmp_path = app.root_path + "/tmp/" + self.name_list[num]
                         if len(self.name_list) == 1:
                             zipFilePath = getDownloadPath() + self.name_list[num] + ".zip"
                         else:
                             zipFilePath = getDownloadPath() + "testcase_set.zip"
+                        print(zipFilePath)
                         if os.path.isfile(zipFilePath):
                             os.remove(zipFilePath)
-                        if os.path.exists(path):
-                            shutil.rmtree(path)
-                        os.makedirs(path)
+                        if os.path.exists(tmp_path):
+                            shutil.rmtree(tmp_path)
+                        print("test")
+                        print(os.makedirs(tmp_path))
+                        if os.path.isfile(tmp_path):
+                            print(tmp_path)
 
                         for block in range(0, self.max_val_list[num]):
                             if self.lock.read_file_entry("END") == "0":
@@ -1166,7 +1167,7 @@ class CreateTestcaseArchive(threading.Thread):
                                     else:
                                         fileName = "{}_id{}".format(row["CreatorServiceDescriptorGUID"], row["ID"])
                                     rawData = row["RawBytes"]
-                                    f = open(path + "/" + fileName, "wb+")
+                                    f = open(tmp_path + "/" + fileName, "wb+")
                                     f.write(rawData)
                                     f.close()
                             else:
@@ -1174,17 +1175,17 @@ class CreateTestcaseArchive(threading.Thread):
 
                         if len(self.statement_list) == num + 1 or self.stop:
                             if len(self.statement_list) > 1:
-                                path = app.root_path + "/tmp"
-                                filename = shutil.make_archive("testcase_set", "zip", path)
+                                tmp_path = app.root_path + "/tmp"
+                                filename = shutil.make_archive("testcase_set", "zip", tmp_path)
                             else:
-                                filename = shutil.make_archive(self.name_list[num], "zip", path)
+                                filename = shutil.make_archive(self.name_list[num], "zip", tmp_path)
 
                             self.lock.change_file_entry("STATUS", "1")
                             self.lock.change_file_entry("MESSAGE", "File " + filename + " created.")
                             self.lock.change_file_entry("END", "1")
                             self.status = (1, "File " + filename + " created.")
-                            if os.path.exists(path):
-                                shutil.rmtree(path, ignore_errors = True)
+                            if os.path.exists(tmp_path):
+                                shutil.rmtree(tmp_path, ignore_errors=True)
                     else:
                         self.end()
             else:
@@ -1201,9 +1202,9 @@ class CreateTestcaseArchive(threading.Thread):
 
     def end(self):
         self.stop = True
-        path = app.root_path + "/tmp"
-        if os.path.exists(path):
-            shutil.rmtree(path, ignore_errors = True)
+        tmp_path = app.root_path + "/tmp"
+        if os.path.exists(tmp_path):
+            shutil.rmtree(tmp_path, ignore_errors=True)
 
 
 class ArchiveProject(threading.Thread):
@@ -1219,7 +1220,7 @@ class ArchiveProject(threading.Thread):
         self.stop = False
 
     def run(self):
-        fuzzjob = models.Fuzzjob.query.filter_by(id = self.projId).first()
+        fuzzjob = models.Fuzzjob.query.filter_by(id=self.projId).first()
 
         if fuzzjob or (self.lock.read_file_entry("END") == "0" or not self.stop):
             try:
@@ -1260,8 +1261,8 @@ class ArchiveProject(threading.Thread):
 
                 if self.status[0] == 1 or (self.lock.read_file_entry("END") == "0" or not self.stop):
                     try:
-                        if models.Fuzzjob.query.filter_by(id = self.projId).first() is not None:
-                            fuzzjob = models.Fuzzjob.query.filter_by(id = self.projId).first()
+                        if models.Fuzzjob.query.filter_by(id=self.projId).first() is not None:
+                            fuzzjob = models.Fuzzjob.query.filter_by(id=self.projId).first()
                             db.session.delete(fuzzjob)
                             db.session.commit()
                             self.lock.change_file_entry("STATUS", "1")
@@ -1310,40 +1311,28 @@ class LockFile:
     def check_file(self):
 
         file_available = False
-        for x in range(0, 5):
+        for x in range(0, 2):
             if os.access(self.file_path, os.F_OK):
                 file_available = True
-            file = open("error.txt", 'a+')
-            file.write("count " + str(x) + " " + str(file_available) + " \n")
-            file.close()
             time.sleep(0.01)
-
-        file = open("error.txt", 'a+')
-        file_text = ""
-        if file_available:
-            file_text = self.read_file()
-            file.write("Check FILE - TRUE" + str(file_text) + "\n")
-        else:
-            file.write("Check FILE - FALSE\n")
-        file.close()
 
         if not file_available:
             self.write_allow = True
 
         return not file_available
 
-    def write_file(self, thread_type, thread_id, nice_name, max_val = 0, download = ""):
+    def write_file(self, thread_type, thread_id, nice_name, max_val=0, download=""):
         if self.check_file():
             file_w = open(self.file_path, "a")
-            file_w.write("THREAD_TYPE = " + thread_type + "\n" +
-                         "THREAD_ID = " + str(thread_id) + "\n" +
-                         "NICE_NAME = " + nice_name + "\n" +
-                         "PROGRESS = 0\n" +
-                         "MAX_VAL = " + str(max_val) + "\n" +
-                         "STATUS = \n" +
-                         "MESSAGE = \n" +
-                         "DOWNLOAD_PATH = " + download + "\n" +
-                         "END = 0\n")
+            file_w.write("THREAD_TYPE=" + thread_type + "\n" +
+                         "THREAD_ID=" + str(thread_id) + "\n" +
+                         "NICE_NAME=" + nice_name + "\n" +
+                         "PROGRESS=0\n" +
+                         "MAX_VAL=" + str(max_val) + "\n" +
+                         "STATUS=\n" +
+                         "MESSAGE=\n" +
+                         "DOWNLOAD_PATH=" + download + "\n" +
+                         "END=0\n")
             file_w.close()
 
     def read_file(self):
@@ -1353,7 +1342,7 @@ class LockFile:
             file_r = open(self.file_path, "r")
             content = {}
             for line in file_r:
-                line_list = line.split(" = ", 1)
+                line_list = line.split("=", 1)
                 if '\n' in line:
                     value = line_list[1].replace('\n', '')
                 else:
@@ -1372,7 +1361,7 @@ class LockFile:
             for num, line in enumerate(file_r):
                 if entry in line:
                     file_r.close()
-                    line_list = line.split(" = ", 1)
+                    line_list = line.split("=", 1)
                     if '\n' in line:
                         value = line_list[1].replace('\n', '')
                     else:
@@ -1390,7 +1379,7 @@ class LockFile:
             file.close()
             for num, line in enumerate(lines):
                 if entry in line:
-                    lines[num] = entry + " = " + value + "\n"
+                    lines[num] = entry + "=" + value + "\n"
             out = open(self.file_path + ".bak", 'w+')
             out.writelines(lines)
             out.close()
@@ -1401,12 +1390,6 @@ class LockFile:
             os.remove(self.file_path)
             self.write_allow = False
         else:
-            file = open("error.txt", 'a+')
-            file_text = ""
-            if os.access(self.file_path, os.R_OK):
-                file_text = self.read_file()
-            file.write("DELETE FILE - " + str(file_text) + "\n")
-            file.close()
             if (os.access(self.file_path, os.R_OK) and
                     self.read_file_entry("END") == "1"):
                 os.remove(self.file_path)
