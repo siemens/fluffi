@@ -7,37 +7,9 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-Author(s): Thomas Riedmaier
+Author(s): Thomas Riedmaier, Roman Bendt
 -->
 
 # Overview
 
-CaRRoT is a mutator that tries to guess how input is structured. Based on these guesses, it tries to generate (semi-) correct mutations.
-
-To do so it relies on a number of heuristics
-
-
-# Implemented  heuristics
-
-#### Text
-
-Is this text?
-- yes -> analyze the content
-- no -> does this contain text?
-  - yes -> find all strings
-  - no -> done
-
-#### Bitfields
-
-Are there bitfields in the non text part that can be interpreted as ints?
-- small (negative) numbers 
-- known magic values such as 80, 443, 
-- everything smaller than file length (offs, len)
-  - can we correlate some of these with known offsets and lengths?
-
-#### Magic bytes
-
-Are there magic bytes at the beginning?
-- yes
-- no -> are there magic bytes inside, that are in non ascii places?
-
+Oedipus is a mutator that tries to combine two entries of the population to generate inputs that are radically new.
