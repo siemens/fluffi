@@ -20,13 +20,13 @@ $( document ).ready(function() {
 
 function check_progress() {
     function worker() {
-        var task_id = $('#thread_id').text();
+        var task_id = 1
         if(task_id < 0) {
             $('#process_info').addClass('progress-hidden');
             $('#stop_download_button').addClass('progress-hidden');
             $('#download_error').removeClass('progress-hidden');
         }else{
-            $.get('/progressArchiveFuzzjob/' + task_id, function(progress) {
+            $.get('/progressArchiveFuzzjob', function(progress) {
                 if(progress != ""){
                     if(progress.substring(0, 8) == "Step 4/4"){
                         $('#process_info').text(progress);
@@ -56,11 +56,10 @@ function check_progress() {
         <a href="/statusDownload" class="btn btn-danger" id="status_link_btn" role="button">Actual Download/Archiving Process</a>
     </div>
     <div id="process_info">Step 0/4: Start archiving fuzzjob.</div>
-    <div id="thread_id" class="progress-hidden">{{ thread_id }}</div>
     <a href="/projects" class="btn btn-primary btn-lg" role="button">
         Back to Projects
     </a>
-    <a href="{{ url_for('stopProcess', thread_id=thread_id)}}" class="btn btn-danger btn-lg" id="stop_download_button" role="button">
+    <a href="{{ url_for('stopProcess')}}" class="btn btn-danger btn-lg" id="stop_download_button" role="button">
         <span class="glyphicon glyphicon-remove"></span>
     </a>
 </div>

@@ -6,7 +6,7 @@
 # 
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # 
-# Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Abian Blome, Fabian Russwurm, Thomas Riedmaier
+# Author(s): Junes Najah, Michael Kraus, Abian Blome, Pascal Eckmann, Fabian Russwurm, Thomas Riedmaier
 
 from flask import flash, redirect, url_for, request, send_file, Markup
 from werkzeug.exceptions import HTTPException
@@ -17,10 +17,10 @@ from .helpers import *
 from .forms import *
 from .constants import *
 
-import json, os, time
+import json
+import os
 import requests
 
-archive_threads = {}
 lock = LockFile()
 
 
@@ -63,44 +63,37 @@ def projects():
 
 @app.route("/projects/archive/<int:projId>", methods=["POST"])
 def archiveProject(projId):
-    global archive_threads
     project = models.Fuzzjob.query.filter_by(id=projId).first()
     nice_name = project.name
 
     if lock.check_file():
-        archive_threads.clear()
-        thread_id = 0
-        lock.write_file("ArchiveProject", thread_id, nice_name)
-        archive_threads[thread_id] = ArchiveProject(lock, projId, nice_name)
-        archive_threads[thread_id].start()
-        return renderTemplate("progressArchiveFuzzjob.html",
-                              thread_id=thread_id,
-                              nice_name=nice_name)
-    else:
-        lock.delete_file()
-        if lock.check_file():
-            archiveProject(projId)
-        else:
-            return renderTemplate("progressArchiveFuzzjob.html",
-                                  thread_id=-1,
-                                  nice_name=nice_name)
+        proc = subprocess.Popen(["python", "./app/utils/downloader.py", lock.file_path, str(projId), nice_name, "archive"])
+        pid_ = proc.pid
+        time_to_wait = 20
+        time_counter = 0
+        while not os.path.exists(lock.file_path):
+            time.sleep(0.25)
+            time_counter += 1
+            if time_counter > time_to_wait:
+                break
+        lock.change_file_entry("PID", str(pid_))
+
+    return redirect("/statusDownload")
 
 
 @app.route('/progressArchiveFuzzjob/<int:thread_id>')
-def progressArchiveFuzzjob(thread_id):
+def progressArchiveFuzzjob():
     if not lock.check_file():
         file_content = lock.read_file()
-        if file_content['THREAD_ID'] == str(thread_id):
-            if file_content['STATUS'] == "0" or file_content['STATUS'] == "1":
-                return file_content['MESSAGE']
-            elif file_content['STATUS'] == "2" or file_content['STATUS'] == "3":
-                error_message = file_content['MESSAGE']
-                stopProcess(thread_id)
-                return error_message
-            else:
-                return file_content['MESSAGE']
+        if file_content['STATUS'] == "0" or file_content['STATUS'] == "1":
+            return file_content['MESSAGE']
+        elif file_content['STATUS'] == "2" or file_content['STATUS'] == "3":
+            error_message = file_content['MESSAGE']
+            subprocess.Popen(["kill", file_content['PID']])
+            lock.delete_file()
+            return error_message
         else:
-            return ""
+            return file_content['MESSAGE']
     else:
         return ""
 
@@ -276,75 +269,35 @@ def renameElement(projId):
 @app.route("/projects/<int:projId>/download")
 def downloadTestcaseSet(projId):
     project = models.Fuzzjob.query.filter_by(id=projId).first()
-    name = [
-        "population",
-        "accessViolations",
-        "accessViolationsUnique",
-        "crashes",
-        "crashesUnique",
-        "hangs",
-        "noResponses"
-    ]
     nice_name = project.name + ": Testcase Set"
-    statement_count = [
-        getITCountOfTypeQuery(TESTCASE_TYPES[name[0]]),
-        getITCountOfTypeQuery(TESTCASE_TYPES[name[1]]),
-        NUM_UNIQUE_ACCESS_VIOLATION,
-        getITCountOfTypeQuery(TESTCASE_TYPES[name[3]]),
-        NUM_UNIQUE_CRASH,
-        getITCountOfTypeQuery(TESTCASE_TYPES[name[5]]),
-        getITCountOfTypeQuery(TESTCASE_TYPES[name[6]]),
-    ]
-    statement = [
-        getITQueryOfType(TESTCASE_TYPES[name[0]]),
-        getITQueryOfType(TESTCASE_TYPES[name[1]]),
-        UNIQUE_ACCESS_VIOLATION,
-        getITQueryOfType(TESTCASE_TYPES[name[3]]),
-        UNIQUE_CRASHES,
-        getITQueryOfType(TESTCASE_TYPES[name[5]]),
-        getITQueryOfType(TESTCASE_TYPES[name[6]]),
-    ]
 
-    return createZipArchive(projId, name, nice_name, statement_count, statement)
+    return createZipArchive(projId, nice_name, "testcaseSet")
 
 
-def createZipArchive(projId, name, nice_name, count_statement, statement):
-    global archive_threads
-
+def createZipArchive(projId, nice_name, type):
     if lock.check_file():
-        archive_threads.clear()
-        thread_id = 0
-        archive_threads[thread_id] = CreateTestcaseArchive(lock, projId, nice_name, name, count_statement, statement)
-        archive_threads[thread_id].setMaxVal()
-        archive_threads[thread_id].start()
+        tmp_path = os.getcwd() + "/temp"
+        print(projId, nice_name, tmp_path, type)
+        proc = subprocess.Popen([
+            "/usr/bin/python3.6", "./app/utils/downloader.py",
+            lock.file_path,
+            str(projId),
+            nice_name,
+            "download",
+            type,
+            tmp_path
+        ])
+        pid_ = proc.pid
+        time_to_wait = 20
+        time_counter = 0
+        while not os.path.exists(lock.file_path):
+            time.sleep(0.25)
+            time_counter += 1
+            if time_counter > time_to_wait:
+                break
+        lock.change_file_entry("PID", str(pid_))
 
-        max_val = 0
-        for val in archive_threads[thread_id].max_val_list:
-            max_val = max_val + val
-
-        if len(archive_threads[thread_id].name_list) == 1:
-            download = archive_threads[thread_id].name_list[0] + ".zip"
-        else:
-            download = "testcase_set.zip"
-
-        lock.write_file("CreateTestcaseArchive", thread_id, nice_name, max_val, download)
-
-        return renderTemplate("progressDownload.html",
-                              thread_id=thread_id,
-                              max_val=max_val,
-                              nice_name=nice_name,
-                              download=download)
-
-    else:
-        if lock.read_file_entry("END") == "1":
-            lock.delete_file()
-            if lock.check_file():
-                createZipArchive(projId, name, nice_name, count_statement, statement)
-        return renderTemplate("progressDownload.html",
-                                  thread_id=-1,
-                                  max_val=10,
-                                  nice_name=nice_name,
-                                  download="error")
+    return redirect("/statusDownload")
 
 
 @app.route('/statusDownload')
@@ -352,13 +305,11 @@ def statusDownload():
     if not lock.check_file():
         file_content = lock.read_file()
 
-        if file_content['THREAD_TYPE'] == "ArchiveProject":
+        if file_content['TYPE'] == "archive":
             return renderTemplate("progressArchiveFuzzjob.html",
-                                  thread_id=file_content['THREAD_ID'],
                                   nice_name=file_content['NICE_NAME'])
         else:
             return renderTemplate("progressDownload.html",
-                                  thread_id=file_content['THREAD_ID'],
                                   max_val=file_content['MAX_VAL'],
                                   nice_name=file_content['NICE_NAME'],
                                   download=file_content['DOWNLOAD_PATH'])
@@ -366,41 +317,39 @@ def statusDownload():
         return redirect(url_for("projects"))
 
 
-@app.route('/progressDownload/<int:thread_id>')
-def progressDownload(thread_id):
+@app.route('/progressDownload')
+def progressDownload():
     if not lock.check_file():
         file_content = lock.read_file()
-        if file_content['THREAD_ID'] == str(thread_id):
-            download_path = file_content['DOWNLOAD_PATH']
+        download_path = file_content['DOWNLOAD_PATH']
 
-            if len(download_path) > 1:
-                path = download_path
-            else:
-                path = getDownloadPath() + "testcase_set.zip"
-
-            if os.path.isfile(path) and file_content['STATUS'] == "1":
-                stopProcess(thread_id)
-                return str(-1)
-            elif file_content['STATUS'] == "2":
-                error_message = file_content['MESSAGE']
-                stopProcess(thread_id)
-                return error_message
-            else:
-                return file_content['PROGRESS']
+        if len(download_path) > 1:
+            path = download_path
         else:
-            return "NONE"
+            path = getDownloadPath() + "testcase_set.zip"
+
+        if os.path.isfile(path) and file_content['STATUS'] == "1":
+            subprocess.Popen(["kill", file_content['PID']])
+            lock.delete_file()
+            return str(-1)
+        elif file_content['STATUS'] == "2":
+            error_message = file_content['MESSAGE']
+            subprocess.Popen(["kill", file_content['PID']])
+            lock.delete_file()
+            return error_message
+        else:
+            return file_content['PROGRESS']
+
     else:
         return "NONE"
 
 
-@app.route('/stopProcess/<int:thread_id>')
-def stopProcess(thread_id):
-    if thread_id is -1:
-        return redirect(url_for("statusDownload"))
-    elif not lock.check_file():
+@app.route('/stopProcess')
+def stopProcess():
+    if not lock.check_file():
         lock.change_file_entry("END", "1")
+        subprocess.Popen(["kill", lock.read_file_entry('PID')])
         lock.delete_file()
-        archive_threads.clear()
         return redirect(url_for("projects"))
     else:
         return redirect(url_for("statusDownload"))
@@ -426,11 +375,10 @@ def viewPopulation(projId):
 @app.route("/projects/<int:projId>/population/download")
 def downloadPopulation(projId):
     project = models.Fuzzjob.query.filter_by(id=projId).first()
-    name = ["population"]
+    type = "population"
     nice_name = project.name + ": Population"
 
-    return createZipArchive(projId, name, nice_name, [getITCountOfTypeQuery(TESTCASE_TYPES[name[0]])],
-                            [getITQueryOfType(TESTCASE_TYPES[name[0]])])
+    return createZipArchive(projId, nice_name, type)
 
 
 @app.route("/projects/<int:projId>/accessVioTotal")
@@ -448,11 +396,10 @@ def viewAccessVioTotal(projId):
 @app.route("/projects/<int:projId>/accessVioTotal/download")
 def downloadAccessVioTotal(projId):
     project = models.Fuzzjob.query.filter_by(id=projId).first()
-    name = ["accessViolations"]
+    type = "accessViolations"
     nice_name = project.name + ": Access Violations (Total)"
 
-    return createZipArchive(projId, name, nice_name, [getITCountOfTypeQuery(TESTCASE_TYPES[name[0]])],
-                            [getITQueryOfType(TESTCASE_TYPES[name[0]])])
+    return createZipArchive(projId, nice_name, type)
 
 
 @app.route("/projects/<int:projId>/accessVioUnique")
@@ -470,10 +417,10 @@ def viewAccessVioUnique(projId):
 @app.route("/projects/<int:projId>/accessVioUnique/download")
 def downloadAccessVioUnique(projId):
     project = models.Fuzzjob.query.filter_by(id=projId).first()
-    name = ["accessViolationsUnique"]
+    type = "accessViolationsUnique"
     nice_name = project.name + ": Access Violations (Unique)"
 
-    return createZipArchive(projId, name, nice_name, [NUM_UNIQUE_ACCESS_VIOLATION], [UNIQUE_ACCESS_VIOLATION])
+    return createZipArchive(projId, nice_name, type)
 
 
 @app.route("/projects/<int:projId>/totalCrashes")
@@ -491,11 +438,10 @@ def viewTotalCrashes(projId):
 @app.route("/projects/<int:projId>/totalCrashes/download")
 def downloadTotalCrashes(projId):
     project = models.Fuzzjob.query.filter_by(id=projId).first()
-    name = ["crashes"]
+    type = "crashes"
     nice_name = project.name + ": Crashes (Total)"
 
-    return createZipArchive(projId, name, nice_name, [getITCountOfTypeQuery(TESTCASE_TYPES[name[0]])],
-                            [getITQueryOfType(TESTCASE_TYPES[name[0]])])
+    return createZipArchive(projId, nice_name, type)
 
 
 @app.route("/projects/<int:projId>/uniqueCrashes")
@@ -513,10 +459,10 @@ def viewUniqueCrashes(projId):
 @app.route("/projects/<int:projId>/uniqueCrashes/download")
 def downloadUniqueCrashes(projId):
     project = models.Fuzzjob.query.filter_by(id=projId).first()
-    name = ["crashesUnique"]
+    type = "crashesUnique"
     nice_name = project.name + ": Crashes (Unique)"
 
-    return createZipArchive(projId, name, nice_name, [NUM_UNIQUE_CRASH], [UNIQUE_CRASHES])
+    return createZipArchive(projId, nice_name, type)
 
 
 @app.route("/projects/<int:projId>/hangs")
@@ -534,11 +480,10 @@ def viewHangs(projId):
 @app.route("/projects/<int:projId>/hangs/download")
 def downloadHangs(projId):
     project = models.Fuzzjob.query.filter_by(id=projId).first()
-    name = ["hangs"]
+    type = "hangs"
     nice_name = project.name + ": Hangs"
 
-    return createZipArchive(projId, name, nice_name, [getITCountOfTypeQuery(TESTCASE_TYPES[name[0]])],
-                            [getITQueryOfType(TESTCASE_TYPES[name[0]])])
+    return createZipArchive(projId, nice_name, type)
 
 
 @app.route("/projects/<int:projId>/noResponse")
@@ -556,11 +501,11 @@ def viewNoResponses(projId):
 @app.route("/projects/<int:projId>/noResponse/download")
 def downloadNoResponses(projId):
     project = models.Fuzzjob.query.filter_by(id=projId).first()
-    name = ["noResponses"]
+    type = "noResponses"
     nice_name = project.name + ": No Response"
 
-    return createZipArchive(projId, name, nice_name, [getITCountOfTypeQuery(TESTCASE_TYPES[name[0]])],
-                            [getITQueryOfType(TESTCASE_TYPES[name[0]])])
+    return createZipArchive(projId, nice_name, type)
+
 
 
 @app.route("/projects/<int:projId>/violations")
@@ -575,21 +520,19 @@ def viewViolations(projId):
 @app.route("/projects/<int:projId>/crashes/download/<string:footprint>/<int:testCaseType>")
 def downloadCrashes(projId, footprint, testCaseType):
     project = models.Fuzzjob.query.filter_by(id=projId).first()
-    name = ["crashes"]
+    type = "crashesFootprintTestcase " + str(footprint) + " " + str(testCaseType)
     nice_name = project.name + ": Crashes (Footprint)"
 
-    return createZipArchive(projId, name, nice_name, [getCrashesQueryCount(footprint, testCaseType)],
-                            [getCrashesQuery(footprint, testCaseType)])
+    return createZipArchive(projId, nice_name, type)
 
 
 @app.route("/projects/<int:projId>/crashesorvio/download/<string:footprint>")
 def downloadCrashesOrViolations(projId, footprint):
     project = models.Fuzzjob.query.filter_by(id=projId).first()
-    name = ["crashes_or_vio_of_footprint"]
+    type = "crashesOrViolationFootprint " + str(footprint)
     nice_name = project.name + ": Crashes and Violations (Footprint)"
 
-    return createZipArchive(projId, name, nice_name, [getCrashesOrViosOfFootprintCount(footprint)],
-                            [getCrashesOrViosOfFootprint(footprint)])
+    return createZipArchive(projId, nice_name, type)
 
 
 @app.route("/projects/<int:projId>/getTestcase/<string:testcaseId>")
