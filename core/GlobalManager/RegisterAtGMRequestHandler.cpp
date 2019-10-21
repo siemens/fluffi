@@ -118,13 +118,13 @@ void RegisterAtGMRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerTh
 			}
 			else
 			{
-				//A race condition could happen here, if multiple LocalManagers request at the same time. Currently the last one wins due to constraints in the database
+				//A race condition could happen here, if multiple LocalManagers request at the same time. Currently the first one wins due to constraints in the database
 				FluffiLMConfiguration lmConfiguration = dbManager->getLMConfigurationForFuzzJob(fuzzjob);
 				LMConfiguration* ptrToLMConfiguration = new LMConfiguration();
 				ptrToLMConfiguration->CopyFrom(lmConfiguration.getProtobuf());
 				registerResponse->set_allocated_lmconfiguration(ptrToLMConfiguration);
 				registerResponse->set_retrylater(false);
-				LOG(DEBUG) << "Sending message with LMConfiguration";
+				LOG(INFO) << "Registering " << fsd << " for fuzzjob " << fuzzjob;
 				gmWorkerThreadState->dbManager->setLMForLocationAndFuzzJob(location, req->registeratgmrequest().servicedescriptor(), fuzzjob);
 				LOG(DEBUG) << "Registering LM";
 			}
