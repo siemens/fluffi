@@ -122,7 +122,7 @@ void RegisterAtGMRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerTh
 				LMConfiguration* ptrToLMConfiguration = new LMConfiguration();
 				ptrToLMConfiguration->CopyFrom(lmConfiguration.getProtobuf());
 				registerResponse->set_allocated_lmconfiguration(ptrToLMConfiguration);
-				LOG(INFO) << "Registering " << fsd << " for fuzzjob " << fuzzjob;
+				LOG(INFO) << "Registering " << fsd.m_guid << " for fuzzjob " << fuzzjob;
 				gmWorkerThreadState->dbManager->setLMForLocationAndFuzzJob(location, req->registeratgmrequest().servicedescriptor(), fuzzjob);
 				LOG(DEBUG) << "Registering LM";
 			}
