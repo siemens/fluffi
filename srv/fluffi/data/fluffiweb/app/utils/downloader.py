@@ -122,18 +122,22 @@ class ArchiveProject:
         self.projId = projId
         self.nice_name = nice_name
         # status: 0 = default/running, 1 = success, 2 = error, 3 = finish
-        lock_change_file_entry("STATUS", "0")
-        lock_change_file_entry("MESSAGE", "Step 0/4: Start archiving fuzzjob.")
         self.status = (0, "Step 0/4: Start archiving fuzzjob.")
         self.type = "archive"
+        print("init")
 
     def set_values(self):
         lock_write_file(self.type, self.nice_name)
+        lock_change_file_entry("STATUS", "0")
+        lock_change_file_entry("MESSAGE", "Step 0/4: Start archiving fuzzjob.")
+        print("set values")
 
     def run(self):
+        print("call run")
         fuzzjob = models.Fuzzjob.query.filter_by(id=self.projId).first()
 
         if fuzzjob or (lock_read_file_entry("END") == "0"):
+            print("inside run")
             try:
                 scriptFile = os.path.join(app.root_path, "archiveDB.sh")
                 returncode = subprocess.call(
@@ -282,7 +286,10 @@ def lock_write_file(type, nice_name, max_val=0, download="", pid=0):
 
 def lock_read_file():
     if os.access(lock_path + ".bak", os.R_OK):
-        os.rename(lock_path + ".bak", lock_path)
+        try:
+            os.rename(lock_path + ".bak", lock_path)
+        except Exception as e:
+            print(str(e))
     if os.access(lock_path, os.R_OK):
         file_r = open(lock_path, "r")
         content = {}
@@ -301,7 +308,10 @@ def lock_read_file():
 
 def lock_read_file_entry(entry):
     if os.access(lock_path + ".bak", os.R_OK):
-        os.rename(lock_path + ".bak", lock_path)
+        try:
+            os.rename(lock_path + ".bak", lock_path)
+        except Exception as e:
+            print(str(e))
     if os.access(lock_path, os.R_OK):
         file_r = open(lock_path, "r")
         for num, line in enumerate(file_r):
@@ -394,16 +404,15 @@ def main():
             statement = [statement[position]]
         
         tmp_path = sys.argv[6]
-        print("out", sys.argv)
 
         process = CreateTestcaseArchive(proj_id, nice_name, name, statement_count, statement, tmp_path)
         process.set_values()
         process.run()
 
-        # here class to download
     elif sys.argv[4] == "archive":
-        print("run archiving")
-        # here class to archive
+        process = ArchiveProject(proj_id, nice_name)
+        process.set_values()
+        process.run()
 
 
 if __name__ == "__main__":

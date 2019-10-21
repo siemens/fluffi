@@ -20,24 +20,16 @@ $( document ).ready(function() {
 
 function check_progress() {
     function worker() {
-        var task_id = 1
-        if(task_id < 0) {
-            $('#process_info').addClass('progress-hidden');
-            $('#stop_download_button').addClass('progress-hidden');
-            $('#download_error').removeClass('progress-hidden');
-        }else{
-            $.get('/progressArchiveFuzzjob', function(progress) {
-                if(progress != ""){
-                    if(progress.substring(0, 8) == "Step 4/4"){
-                        $('#process_info').text(progress);
-                        $('#stop_download_button').addClass('disabled').attr('aria-disabled', 'true');
-                    }else{
-                        $('#process_info').text(progress);
-                        setTimeout(worker, 1000);
-                    }
-                }
-            });
-        }
+        $.get('/progressArchiveFuzzjob', function(progress) {
+            console.log(progress);
+            if(progress.substring(0, 8) == "Step 4/4"){
+                $('#process_info').text(progress);
+                $('#stop_download_button').addClass('disabled').attr('aria-disabled', 'true');
+            }else{
+                $('#process_info').text(progress);
+                setTimeout(worker, 250);
+            }
+        });
     }
     worker();
 }

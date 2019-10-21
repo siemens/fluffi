@@ -1126,7 +1126,10 @@ class LockFile:
 
     def read_file(self):
         if os.access(self.file_path + ".bak", os.R_OK):
-            os.rename(self.file_path + ".bak", self.file_path)
+            try:
+                os.rename(self.file_path + ".bak", self.file_path)
+            except Exception as e:
+                print(str(e))
         if os.access(self.file_path, os.R_OK):
             file_r = open(self.file_path, "r")
             content = {}
@@ -1144,7 +1147,10 @@ class LockFile:
 
     def read_file_entry(self, entry):
         if os.access(self.file_path + ".bak", os.R_OK):
-            os.rename(self.file_path + ".bak", self.file_path)
+            try:
+                os.rename(self.file_path + ".bak", self.file_path)
+            except Exception as e:
+                print(str(e))
         if os.access(self.file_path, os.R_OK):
             file_r = open(self.file_path, "r")
             for num, line in enumerate(file_r):
@@ -1162,7 +1168,6 @@ class LockFile:
             return ""
 
     def change_file_entry(self, entry, value):
-        print(entry, value)
         if os.access(self.file_path, os.R_OK):
             file = open(self.file_path, 'r')
             lines = file.readlines()
