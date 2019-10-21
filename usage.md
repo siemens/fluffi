@@ -108,9 +108,9 @@ Which one to choose depends on how you prepared your target. The `QemuUserSingle
 FLUFFI supports various Testcase generators. You can use as many of them as you like. Currently Implemented are:
 - `RadamsaMutator`
 - `AFLMutator`
-- `[CarrotMutator](core/CaRRoT)`
+- [CarrotMutator](core/CaRRoT)
 - `HonggfuzzMutator`
-- `[OedipusMutator](core/Oedipus)`
+- [OedipusMutator](core/Oedipus)
 - `ExternalMutator` (Allows easy addition of custom mutators):
    In this case you need to specify an additional setting: `extGeneratorDirectory`
    This setting points to a directory. In this directory, FLUFFI will insert a file called `fuzzjob.name` containing the name of the current FuzzJob.
