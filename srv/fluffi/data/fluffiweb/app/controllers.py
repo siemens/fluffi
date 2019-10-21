@@ -1178,7 +1178,10 @@ class LockFile:
             out = open(self.file_path + ".bak", 'w+')
             out.writelines(lines)
             out.close()
-            os.rename(self.file_path + ".bak", self.file_path)
+            try:
+                os.rename(self.file_path + ".bak", self.file_path)
+            except Exception as e:
+                print(str(e))
 
     def delete_file(self):
         if os.access(self.file_path, os.R_OK):

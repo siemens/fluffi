@@ -83,10 +83,8 @@ def archiveProject(projId):
 
 @app.route('/progressArchiveFuzzjob')
 def progressArchiveFuzzjob():
-    print("call progressArchiveFJ")
     if not lock.check_file():
         file_content = lock.read_file()
-        print(file_content)
         if file_content['STATUS'] == "0" or file_content['STATUS'] == "1":
             return file_content['MESSAGE']
         elif file_content['STATUS'] == "2" or file_content['STATUS'] == "3":
@@ -279,7 +277,6 @@ def downloadTestcaseSet(projId):
 def createZipArchive(projId, nice_name, type):
     if lock.check_file():
         tmp_path = os.getcwd() + "/temp"
-        print(projId, nice_name, tmp_path, type)
         proc = subprocess.Popen([
             "/usr/bin/python3.6", "./app/utils/downloader.py",
             lock.file_path,

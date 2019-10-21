@@ -1,3 +1,13 @@
+# Copyright 2017-2019 Siemens AG
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+# Author(s): Pascal Eckmann
+
 from sqlalchemy import *
 from app import db, models
 from app.queries import *
@@ -25,7 +35,6 @@ class CreateTestcaseArchive:
         # status: 0 = default/running, 1 = success, 2 = error
         self.status = (0, "")
         self.type = "download"
-        print("initial")
 
     def set_values(self):
         project = models.Fuzzjob.query.filter_by(id=self.projId).first()
@@ -55,7 +64,6 @@ class CreateTestcaseArchive:
         finally:
             connection.close()
             engine.dispose()
-            print("set values")
 
     def run(self):
         project = models.Fuzzjob.query.filter_by(id=self.projId).first()
@@ -124,20 +132,16 @@ class ArchiveProject:
         # status: 0 = default/running, 1 = success, 2 = error, 3 = finish
         self.status = (0, "Step 0/4: Start archiving fuzzjob.")
         self.type = "archive"
-        print("init")
 
     def set_values(self):
         lock_write_file(self.type, self.nice_name)
         lock_change_file_entry("STATUS", "0")
         lock_change_file_entry("MESSAGE", "Step 0/4: Start archiving fuzzjob.")
-        print("set values")
 
     def run(self):
-        print("call run")
         fuzzjob = models.Fuzzjob.query.filter_by(id=self.projId).first()
 
         if fuzzjob or (lock_read_file_entry("END") == "0"):
-            print("inside run")
             try:
                 scriptFile = os.path.join(app.root_path, "archiveDB.sh")
                 returncode = subprocess.call(
