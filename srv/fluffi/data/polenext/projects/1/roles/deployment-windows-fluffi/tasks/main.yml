@@ -27,11 +27,17 @@
     src: "{{deploymentPath}}\\{{architecture}}\\{{fluffiFTPFilename}}"
     dest: "{{deploymentPath}}\\{{architecture}}\\"
     delete_archive: yes
+    
+- name: Parse location to host
+  set_fact:
+    loc: "{{item.value}}"
+  with_dict: "{{location}}"
+  when: "inventory_hostname == item.key"
 
 - name: Create persistent shortcuts on desktop
   win_shortcut:
     src: "{{deploymentPath}}\\{{architecture}}\\{{item.value}}.exe"
-    args: "{{location}}"
+    args: "{{loc}}"
     dest: '%USERPROFILE%\Desktop\{{item.key}}{{architecture}}Disk.lnk'
     directory: "{{deploymentPath}}\\{{architecture}}\\"
   when: createShortcut
@@ -40,7 +46,7 @@
 - name: Create ramdisk shortcuts on desktop
   win_shortcut:
     src: "{{ramDiskMountpointLetter}}:\\{{deploymentDirName}}\\{{architecture}}\\{{item.value}}.exe"
-    args: "{{location}}"
+    args: "{{loc}}"
     dest: '%USERPROFILE%\Desktop\{{item.key}}{{architecture}}Ram.lnk'
     directory: "{{ramDiskMountpointLetter}}:\\{{deploymentDirName}}\\{{architecture}}\\"
   when: createShortcut

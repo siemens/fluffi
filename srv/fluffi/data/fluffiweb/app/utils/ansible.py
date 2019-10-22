@@ -70,6 +70,30 @@ class AnsibleRESTConnector:
 
         return system
 
+    def getSystemsOfGroup(self, group):
+        systems = []
+        url = self.ansibleURL + "group/"
+
+        try:
+            # Sending post request to execute playbook to add new system
+            response = requests.get(url, auth=self.auth)
+            jsonResult = json.loads(response.text)
+            for entry in jsonResult['results']:
+                if entry['name'] == group:
+                    print(entry['id'])
+                    url = self.ansibleURL + "group/" + str(entry['id']) + "/host/"
+                    print(url)
+                    response = requests.get(url, auth=self.auth)
+                    jsonResult = json.loads(response.text)
+                    print(jsonResult)
+                    for entry in jsonResult['results']:
+                        systems.append(entry['name'])
+
+        except Exception as e:
+            print("Exception: Cannot list hosts. Check group name.", str(e))
+        finally:
+            return systems
+
     # calls Polemarch REST API to add a new linked system to fluffi network
     # must assign to a group (linux or windows)
     def addNewSystem(self, hostname, group):
