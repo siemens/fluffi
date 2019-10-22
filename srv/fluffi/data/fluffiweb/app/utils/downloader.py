@@ -9,7 +9,7 @@
 # Author(s): Pascal Eckmann
 
 from sqlalchemy import *
-from app import db, models
+from app import db, models, controllers
 from app.queries import *
 from app.helpers import *
 from app.constants import *
@@ -130,13 +130,26 @@ class ArchiveProject:
         self.projId = projId
         self.nice_name = nice_name
         # status: 0 = default/running, 1 = success, 2 = error, 3 = finish
-        self.status = (0, "Step 0/4: Start archiving fuzzjob.")
+        self.status = (0, "Step 0/5: Start archiving fuzzjob.")
         self.type = "archive"
 
     def set_values(self):
         lock_write_file(self.type, self.nice_name)
         lock_change_file_entry("STATUS", "0")
-        lock_change_file_entry("MESSAGE", "Step 0/4: Start archiving fuzzjob.")
+        lock_change_file_entry("MESSAGE", "Step 0/5: Start archiving fuzzjob.")
+
+    def kill_agents(self):
+        try:
+            local_managers = controllers.getLocalManager(self.projId)
+            controllers.addCommandToKillInstanceType(self.projId, 4)
+            for lm in local_managers:
+                controllers.addCommand(self.projId, lm['ServiceDescriptorGUID'], lm['ServiceDescriptorHostAndPort'])
+            lock_change_file_entry("MESSAGE", "Step 1/5: Killed running agents.")
+        except Exception as e:
+            print(str(e))
+            lock_change_file_entry("STATUS", "2")
+            lock_change_file_entry("MESSAGE", "Step 1/5: Running agents couldn't be killed.")
+            lock_change_file_entry("END", "1")
 
     def run(self):
         fuzzjob = models.Fuzzjob.query.filter_by(id=self.projId).first()
@@ -148,13 +161,13 @@ class ArchiveProject:
                     [scriptFile, config.DBUSER, config.DBPASS, config.DBPREFIX, fuzzjob.name.lower(), config.DBHOST])
                 if returncode != 0:
                     lock_change_file_entry("STATUS", "2")
-                    lock_change_file_entry("MESSAGE", "Error Step 1/4: Database couldn't be archived.")
+                    lock_change_file_entry("MESSAGE", "Error Step 2/5: Database couldn't be archived.")
                     lock_change_file_entry("END", "1")
-                    self.status = (2, str("Error Step 1/4: Database couldn't be archived."))
+                    self.status = (2, str("Error Step 2/5: Database couldn't be archived."))
                 else:
                     lock_change_file_entry("STATUS", "1")
-                    lock_change_file_entry("MESSAGE", "Step 1/4: Database archived.")
-                    self.status = (1, str("Step 1/4: Database archived."))
+                    lock_change_file_entry("MESSAGE", "Step 2/5: Database archived.")
+                    self.status = (1, str("Step 2/5: Database archived."))
             except Exception as e:
                 print(e)
                 lock_change_file_entry("STATUS", "2")
@@ -167,14 +180,14 @@ class ArchiveProject:
                 success = FTP_CONNECTOR.saveArchivedProjectOnFTPServer(fileName)
                 if success:
                     lock_change_file_entry("STATUS", "1")
-                    lock_change_file_entry("MESSAGE", "Step 2/4: Archived project saved on ftp server.")
-                    self.status = (1, "Step 2/4: Archived project saved on ftp server.")
+                    lock_change_file_entry("MESSAGE", "Step 3/5: Archived project saved on ftp server.")
+                    self.status = (1, "Step 3/5: Archived project saved on ftp server.")
                 else:
                     lock_change_file_entry("STATUS", "2")
                     lock_change_file_entry("MESSAGE",
-                                                "Step 2/4: Archived project couldn't be saved on ftp server.")
+                                                "Step 3/5: Archived project couldn't be saved on ftp server.")
                     lock_change_file_entry("END", "1")
-                    self.status = (2, "Step 2/4: Archived project couldn't be saved on ftp server.")
+                    self.status = (2, "Step 3/5: Archived project couldn't be saved on ftp server.")
 
                 os.remove(fileName)
 
@@ -185,13 +198,13 @@ class ArchiveProject:
                             db.session.delete(fuzzjob)
                             db.session.commit()
                             lock_change_file_entry("STATUS", "1")
-                            lock_change_file_entry("MESSAGE", "Step 3/4: Fuzzjob sucessfully deleted.")
-                            self.status = (1, 'Step 3/4: Fuzzjob sucessfully deleted.')
+                            lock_change_file_entry("MESSAGE", "Step 4/5: Fuzzjob sucessfully deleted.")
+                            self.status = (1, 'Step 4/5: Fuzzjob sucessfully deleted.')
                         else:
                             lock_change_file_entry("STATUS", "2")
-                            lock_change_file_entry("MESSAGE", "Step 3/4: Fuzzjob not found.")
+                            lock_change_file_entry("MESSAGE", "Step 4/5: Fuzzjob not found.")
                             lock_change_file_entry("END", "1")
-                            self.status = (2, 'Step 3/4: Fuzzjob not found.')
+                            self.status = (2, 'Step 4/5: Fuzzjob not found.')
                     except Exception as e:
                         lock_change_file_entry("STATUS", "2")
                         lock_change_file_entry("MESSAGE", str(e))
@@ -206,9 +219,9 @@ class ArchiveProject:
                         try:
                             connection.execute("DROP DATABASE {};".format(config.DBPREFIX + fuzzjob.name.lower()))
                             lock_change_file_entry("STATUS", "3")
-                            lock_change_file_entry("MESSAGE", "Step 4/4: Database deleted.")
+                            lock_change_file_entry("MESSAGE", "Step 5/5: Database deleted.")
                             lock_change_file_entry("END", "1")
-                            self.status = (3, 'Step 4/4: Database deleted.')
+                            self.status = (3, 'Step 5/5: Database deleted.')
                         except Exception as e:
                             lock_change_file_entry("STATUS", "2")
                             lock_change_file_entry("MESSAGE", str(e))
@@ -416,6 +429,7 @@ def main():
     elif sys.argv[4] == "archive":
         process = ArchiveProject(proj_id, nice_name)
         process.set_values()
+        process.kill_agents()
         process.run()
 
 

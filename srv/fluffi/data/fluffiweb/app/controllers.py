@@ -381,6 +381,31 @@ def getLocation(locId):
     return location
 
 
+def getLocalManager(projId):
+    localManagers = []
+    project = models.Fuzzjob.query.filter_by(id=projId).first()
+
+    engine = create_engine(
+        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), "fluffi_gm"))
+    connection = engine.connect()
+    try:
+        resultLM = connection.execute(text(GET_LOCAL_MANAGERS), {"fuzzjobID": projId})
+
+        for row in resultLM:
+            localManager = {"ServiceDescriptorGUID": row["ServiceDescriptorGUID"],
+                            "ServiceDescriptorHostAndPort": row["ServiceDescriptorHostAndPort"]}
+            localManagers.append(localManager)
+
+    except Exception as e:
+        print(e)
+        pass
+    finally:
+        connection.close()
+        engine.dispose()
+
+    return localManagers
+
+
 def getManagedInstancesAndSummary(projId):
     # new data in Status will be added to the instances in managedInstances automatically - you just need to add them in
     # viewManagedInstances.html
