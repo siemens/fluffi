@@ -1228,10 +1228,24 @@ def viewSystemInitialSetup(hostname):
 def viewDeployFluffi(hostname):
     # validate and execute playbook
     architecture = str(request.form.getlist('architecture')[0])
-    location = db.session.query(models.SystemsLocation, models.Systems, models.Locations).join(
-        models.Systems).filter(models.SystemsLocation.System == models.Systems.id).filter_by(Name=hostname).join(
-        models.Locations).filter(models.SystemsLocation.Location == models.Locations.id).first()
-    arguments = {'architecture': architecture.split("-")[1], 'location': location[2].Name}
+    system_object = ANSIBLE_REST_CONNECTOR.getSystemObjectByName(hostname)
+    print(system_object)
+    location = "{"
+    if system_object.IsGroup:
+        systems_list = ANSIBLE_REST_CONNECTOR.getSystemsOfGroup(hostname)
+        for num, system in enumerate(systems_list):
+            location = location + "\"" + system + "\":\"" + (db.session.query(models.SystemsLocation, models.Systems, models.Locations).join(
+                models.Systems).filter(models.SystemsLocation.System == models.Systems.id).filter_by(Name=system).join(
+                models.Locations).filter(models.SystemsLocation.Location == models.Locations.id).first())[2].Name + "\""
+            if num < len(systems_list) - 1:
+                location = location + ","
+    else:
+        location = location + "\"" + hostname + "\":\"" + (db.session.query(models.SystemsLocation, models.Systems, models.Locations).join(
+            models.Systems).filter(models.SystemsLocation.System == models.Systems.id).filter_by(Name=hostname).join(
+            models.Locations).filter(models.SystemsLocation.Location == models.Locations.id).first())[2].Name + "\""
+    location = location + "}"
+
+    arguments = {'architecture': architecture.split("-")[1], 'location': location}
     historyURL = ANSIBLE_REST_CONNECTOR.executePlaybook('deployFluffi.yml', hostname, arguments)
 
     if historyURL is not None:
