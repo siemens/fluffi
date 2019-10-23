@@ -8,7 +8,7 @@
 # 
 # Author(s): Thomas Riedmaier, Pascal Eckmann
 
-- name: Restart ntp
+- name: restart ntp
   service:
     name: "ntp"
     state: restarted
