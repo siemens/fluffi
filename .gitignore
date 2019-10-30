@@ -121,3 +121,6 @@ core/x64/
 core/x86-64/
 srv/fluffi/data/fluffiweb/app/static/3rdParty/
 srv/fluffi/data/fluffiweb/app/static/bootstrap/
+core/helpers/fuzzcmp/x64/
+core/helpers/fuzzcmp/memcmp.cpp
+core/helpers/fuzzcmp/strcmp.cpp
