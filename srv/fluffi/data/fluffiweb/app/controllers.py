@@ -10,18 +10,14 @@
 
 import io
 import csv
-import os
-import shutil
 import subprocess
+import time
 from base64 import b64encode
 from os import system, unlink
 
 from flask import abort
 from sqlalchemy import *
-from sqlalchemy.orm import scoped_session
-from sqlalchemy.orm import sessionmaker
 
-import config
 from app import db, models
 from .constants import *
 from .helpers import *
@@ -85,7 +81,7 @@ def listFuzzJobs():
             result = connection.execute(getITCountOfTypeQuery(1)) 
             project.numHang = result.fetchone()[0]
 
-            result = connection.execute(NUM_UNIQUE_ACCESS_VIOLATION_TYPE_2)
+            result = connection.execute(NUM_UNIQUE_ACCESS_VIOLATION)
             project.numUniqueAccessViolation = result.fetchone()[0]
 
             result = connection.execute(getITCountOfTypeQuery(4))
@@ -136,46 +132,6 @@ def getLocations():
 
 def getDownloadPath():
     return app.root_path[:-3]
-
-
-def createArchive(projId, name, statement, data = None):
-    path = app.root_path + "/tmp/" + name
-    zipFilePath = getDownloadPath() + name + ".zip"
-
-    if os.path.isfile(zipFilePath):
-        os.remove(zipFilePath)
-    if os.path.exists(path):
-        shutil.rmtree(path)
-
-    os.makedirs(path)
-    project = models.Fuzzjob.query.filter_by(id = projId).first()
-
-    engine = create_engine(
-        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
-    connection = engine.connect()
-    try:
-        result = connection.execute(statement) if data is None else connection.execute(statement, data)
-
-        for row in result:
-            if 'NiceName' in row.keys():
-                fileName = row["NiceName"] if row["NiceName"] else "{}_id{}".format(row["CreatorServiceDescriptorGUID"],
-                                                                                    row["ID"])
-            else:
-                fileName = "{}_id{}".format(row["CreatorServiceDescriptorGUID"], row["ID"])
-            rawData = row["RawBytes"]
-            f = open(path + "/" + fileName, "wb+")
-            f.write(rawData)
-            f.close()
-
-        shutil.make_archive(name, "zip", path)
-        print(name, path)
-    except Exception as e:
-        print(e, name, statement)
-        return False
-    finally:
-        connection.close()
-        engine.dispose()
-    return True
 
 
 def getLocationFormWithChoices(projId, locationForm):
@@ -421,9 +377,33 @@ def getLocation(locId):
     for l in models.LocationFuzzjobs.query.filter_by(Location = locId).all():
         currentFuzzjob = models.Fuzzjob.query.filter_by(id = l.Fuzzjob).first()
         location.projects.append(currentFuzzjob)
-    location.workers = models.Workers.query.filter_by(Location = locId, Fuzzjob = None).all()
-
+    location.workers = models.Workers.query.filter(models.Workers.Location == locId, models.Workers.Fuzzjob == None, models.Workers.Agenttype != 4).all()
     return location
+
+
+def getLocalManager(projId):
+    localManagers = []
+    project = models.Fuzzjob.query.filter_by(id=projId).first()
+
+    engine = create_engine(
+        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), "fluffi_gm"))
+    connection = engine.connect()
+    try:
+        resultLM = connection.execute(text(GET_LOCAL_MANAGERS), {"fuzzjobID": projId})
+
+        for row in resultLM:
+            localManager = {"ServiceDescriptorGUID": row["ServiceDescriptorGUID"],
+                            "ServiceDescriptorHostAndPort": row["ServiceDescriptorHostAndPort"]}
+            localManagers.append(localManager)
+
+    except Exception as e:
+        print(e)
+        pass
+    finally:
+        connection.close()
+        engine.dispose()
+
+    return localManagers
 
 
 def getManagedInstancesAndSummary(projId):
@@ -1140,48 +1120,101 @@ def getGraphData(projId):
     return graphdata
 
 
-def archiveDatabase(nameOfDB):
-    try:
-        scriptFile = os.path.join(app.root_path, "archiveDB.sh")
-        returncode = subprocess.call(
-            [scriptFile, config.DBUSER, config.DBPASS, config.DBPREFIX, nameOfDB.lower(), config.DBHOST])
-        if returncode != 0:
-            return False
-    except Exception as e:
-        print(e)
-        return False
+class LockFile:
+    file_path = os.getcwd() + "/download.lock"
+    tmp_path = os.getcwd() + "/temp"
 
-    fileName = config.DBPREFIX + nameOfDB.lower() + ".sql.gz"
-    success = FTP_CONNECTOR.saveArchivedProjectOnFTPServer(fileName)
-    os.remove(fileName)
-    
-    return success
+    # if lock file in dir: return False
+    def check_file(self):
 
+        file_available = False
+        for x in range(0, 2):
+            if os.access(self.file_path, os.F_OK):
+                file_available = True
+            time.sleep(0.01)
 
-def deleteFuzzjob(projId):
-    try:
-        if models.Fuzzjob.query.filter_by(id = projId).first() is not None:
-            fuzzjob = models.Fuzzjob.query.filter_by(id = projId).first()
-            db.session.delete(fuzzjob)
-            db.session.commit()
-            return "Fuzzjob deleted", "success"
+        return not file_available
+
+    def write_file(self, type, nice_name, pid=0, max_val=0, download=""):
+        if self.check_file():
+            file_w = open(self.file_path, "a")
+            file_w.write("TYPE=" + type + "\n" +
+                         "PID=" + str(pid) + "\n" +
+                         "NICE_NAME=" + nice_name + "\n" +
+                         "PROGRESS=0\n" +
+                         "MAX_VAL=" + str(max_val) + "\n" +
+                         "STATUS=\n" +
+                         "MESSAGE=\n" +
+                         "DOWNLOAD_PATH=" + download + "\n" +
+                         "END=0\n")
+            file_w.close()
+
+    def read_file(self):
+        if os.access(self.file_path + ".bak", os.R_OK):
+            try:
+                os.rename(self.file_path + ".bak", self.file_path)
+            except Exception as e:
+                print(str(e))
+        if os.access(self.file_path, os.R_OK):
+            file_r = open(self.file_path, "r")
+            content = {}
+            for line in file_r:
+                line_list = line.split("=", 1)
+                if '\n' in line:
+                    value = line_list[1].replace('\n', '')
+                else:
+                    value = line_list[1]
+                content[line_list[0]] = value
+            file_r.close()
+            return content
         else:
-            return "Fuzzjob not found", "error"
-    except Exception as e:
-        print(e)
-        return "Exception while deleting fuzzjob", "error"
+            return ""
 
+    def read_file_entry(self, entry):
+        if os.access(self.file_path + ".bak", os.R_OK):
+            try:
+                os.rename(self.file_path + ".bak", self.file_path)
+            except Exception as e:
+                print(str(e))
+        if os.access(self.file_path, os.R_OK):
+            file_r = open(self.file_path, "r")
+            for num, line in enumerate(file_r):
+                if entry in line:
+                    file_r.close()
+                    line_list = line.split("=", 1)
+                    if '\n' in line:
+                        value = line_list[1].replace('\n', '')
+                    else:
+                        value = line_list[1]
+                    return value
+            file_r.close()
+            return ""
+        else:
+            return ""
 
-def deleteDatabase(fuzzjobName):
-    engine = create_engine(
-        'mysql://%s:%s@%s/%s' % (config.DBUSER, config.DBPASS, fluffiResolve(config.DBHOST), config.DEFAULT_DBNAME))
-    connection = engine.connect()
-    try:
-        connection.execute("DROP DATABASE {};".format(config.DBPREFIX + fuzzjobName.lower()))
-        return True
-    except Exception as e:
-        print(e)
-        return False
-    finally:
-        connection.close()
-        engine.dispose()
+    def change_file_entry(self, entry, value):
+        if os.access(self.file_path, os.R_OK):
+            file = open(self.file_path, 'r')
+            lines = file.readlines()
+            file.close()
+            for num, line in enumerate(lines):
+                if entry in line:
+                    lines[num] = entry + "=" + value + "\n"
+            out = open(self.file_path + ".bak", 'w+')
+            out.writelines(lines)
+            out.close()
+            try:
+                os.rename(self.file_path + ".bak", self.file_path)
+            except Exception as e:
+                print(str(e))
+
+    def delete_file(self):
+        if os.access(self.file_path, os.R_OK):
+            if os.path.exists(self.tmp_path):
+                shutil.rmtree(self.tmp_path, ignore_errors=True)
+            os.remove(self.file_path)
+        else:
+            if os.access(self.file_path, os.R_OK) and self.read_file_entry("END") == "1":
+                if os.path.exists(self.tmp_path):
+                    shutil.rmtree(self.tmp_path, ignore_errors=True)
+                os.remove(self.file_path)

@@ -92,10 +92,10 @@ So in order to get the system up & running there is a `LocalManager` aka LM that
 
 ![alt text](FLUFFILocalArchitecture.png "FLUFFI's local architecture")
 
-#### b) The overal architecture
+#### b) The overall architecture
 Here an overview of the FLUFFI system:
 
-- Multiple fuzzing clusters work together on one job (they share a databse)
+- Multiple fuzzing clusters work together on one job (they share a database)
 - There can be multiple Jobs at the same time
 - A `GlobalManager` aka GM coordinates FLUFFI
 - New Resources register at the `GlobalManager` and are assigned to jobs
@@ -116,19 +116,19 @@ Please note that this graphic does not contain the messages that involve the Glo
 - KillInstance
 - IsAgentWelcomed
 
-A IsAgentWelcomed is sent to a LM by the GM when a new agent is assigned to a Fuzzjob by the GUI BEFORE the agent is actually told to connect to the LM. The LM can reply with "yes you are welcomed", or "no I do not need you". The latter is the case e.g. when a X64 runner attempts to connect to a X84 Fuzzjob. In the future, this answer should also be given to TGs or TEs, if a LM does not want them for a job or already has as many as it needs.
+A IsAgentWelcomed is sent to a LM by the GM when a new agent is assigned to a FuzzJob by the GUI BEFORE the agent is actually told to connect to the LM. The LM can reply with "yes you are welcomed", or "no I do not need you". The latter is the case e.g. when a X64 runner attempts to connect to a X84 FuzzJob. In the future, this answer should also be given to TGs or TEs, if a LM does not want them for a job or already has as many as it needs.
 
 ### 4) Locations
-FLUFFI is meant to run in a (potentially larger) network. In order to keep message polution to a minimum, the concept of Locations was introduced.
+FLUFFI is meant to run in a (potentially larger) network. In order to keep message pollution to a minimum, the concept of Locations was introduced.
 
 A location is something like a Server Room. Let's say there are two server rooms: One in Building A, one in Building B. Then there should be two locations A, and B.
 
-Each active FuzzJob needs a `LocalManager` in each location in which it is active (see also the overal architecture graphic). All of them communicate with a single database. 
+Each active FuzzJob needs a `LocalManager` in each location in which it is active (see also the overall architecture graphic). All of them communicate with a single database. 
 
 All Agents (TR, TE, TG) register at the GM and tell them their location. The GM then decides which FuzzJob, a Agent should work on and forwards the Agent to the LM for his location.
 
 
-As a result, the messaging load between the Agents and the central instances (project database and GM) is minimzed.
+As a result, the messaging load between the Agents and the central instances (project database and GM) is minimized.
 
 Furthermore, there is a "Development" location.
 
@@ -188,7 +188,6 @@ Of course, you can also ignore the existing code base and create your own FLUFFI
 FLUFFI expects the following services:
 
 - 10.66.0.1: dns server
-- git.fluffi: FLUFFI's GIT
 - apt.fluffi: An UBUNTU package cache
 - ftp.fluffi: FLUFFI's FTP server
 - smb.fluffi: FLUFFI's SMB server
@@ -198,7 +197,7 @@ FLUFFI expects the following services:
 - web.fluffi: FLUFFI's web application
 - mon.fluffi: FLUFFI's MQTT/Influx monitoring
 - pole.fluffi: Polemarch server
-- dashsync.fluffi: A server to syncronize FLUFFI's dashboard
+- dashsync.fluffi: A server to synchronize FLUFFI's dashboard
 
 ## Deployment
-Deployment of FLUFFI binaries in the production environment is done over ansible via the `Systems` tab in the web ui. What will be deployed is the latest version uploaded to ftp.flufi, eg by the scripts in [the build environment](build). If the lm-database scheme changed since the last deployment, a migration sript needs to be provided and run on all existing Fuzzjobs.
+Deployment of FLUFFI binaries in the production environment is done over ansible via the `Systems` tab in the web ui. What will be deployed is the latest version uploaded to ftp.flufi, e.g. by the scripts in [the build environment](build). If the lm-database scheme changed since the last deployment, a migration script needs to be provided and run on all existing FuzzJobs.

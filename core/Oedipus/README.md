@@ -7,18 +7,9 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-Author(s): Thomas Riedmaier
+Author(s): Thomas Riedmaier, Roman Bendt
 -->
 
-If you want to install the FLUFFI db on a Windows server, start with my.ini.
+# Overview
 
-Then create users and database with
-
-CREATE USER 'fluffi_gm'@'%' IDENTIFIED BY 'fluffi_gm';
-GRANT ALL ON *.* TO 'fluffi_gm'@'%';
-FLUSH PRIVILEGES;
-mysql -u root < createGMDB.sql
-
-
-Perfmon could be done e.g. with http://pmmdemo.percona.com/
-
+Oedipus is a mutator that tries to combine two entries of the population to generate inputs that are radically new.

@@ -58,11 +58,25 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
     tableSize = $('#fuzzjobTable tbody tr').length;
     if(tableSize == 0){
       //still show grafana monitoring if there are no active fuzzjobs
-      socket.emit('syncProject', {send: 'load', project: 'grafana1', time: 'noTime', time2: 'noTime'}); 
-      socket.emit('syncProject', {send: 'show', project: 'grafana1', time: 'noTime', time2: 'noTime'});
-      socket.emit('syncProject', {send: 'load', project: 'grafana2', time: 'noTime', time2: 'noTime'}); 
-      socket.emit('syncProject', {send: 'show', project: 'grafana2', time: 'noTime', time2: 'noTime'});
-      setTimeout(function(){ location.reload(true); }, 60000);
+      //load and show grafana 1
+      console.log("send load grafana 1");
+      socket.emit('syncProject', {send: 'load', project: 'grafana1', time: 'noTime', time2: 'noTime'});   
+      setTimeout(function(){    
+        console.log("send show grafana 1");
+        setRowInactive();
+        socket.emit('syncProject', {send: 'show', project: 'grafana1', time: 'noTime', time2: 'noTime'});
+      }, LOADING_TIME);   
+
+      setTimeout(function(){
+        //load and show grafana 2
+        console.log("send load grafana 2");
+        socket.emit('syncProject', {send: 'load', project: 'grafana2', time: 'noTime', time2: 'noTime'});   
+        setTimeout(function(){    
+          console.log("send show grafana 2");
+          socket.emit('syncProject', {send: 'show', project: 'grafana2', time: 'noTime', time2: 'noTime'});
+          location.reload(true);
+        }, LOADING_TIME); 
+      }, SHOW_TIME);       
     } else {
       table = document.getElementById("fuzzjobTable");
       //first init 
@@ -74,7 +88,7 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
       }, INTERVAL_TIME);
     }
   }
- 
+  
   function loadAndShowProj(){
     //if tableSize is 1 we need to add one interval to show one project and then switch to grafana
     tableSize = tableSize == 1 ? tableSize+1 : tableSize;
@@ -86,18 +100,20 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
       socket.emit('syncProject', {send: 'load', project: 'grafana1', time: 'noTime', time2: 'noTime'});   
       setTimeout(function(){    
         console.log("send show grafana 1");
+        setRowInactive();
         socket.emit('syncProject', {send: 'show', project: 'grafana1', time: 'noTime', time2: 'noTime'});
       }, LOADING_TIME);   
 
-      //load and show grafana 2
-      console.log("send load grafana 2");
-      socket.emit('syncProject', {send: 'load', project: 'grafana2', time: 'noTime', time2: 'noTime'});   
-      setTimeout(function(){    
-        console.log("send show grafana 2");
-        socket.emit('syncProject', {send: 'show', project: 'grafana2', time: 'noTime', time2: 'noTime'});
-        location.reload(true);
-      }, LOADING_TIME); 
-
+      setTimeout(function(){
+        //load and show grafana 2
+        console.log("send load grafana 2");
+        socket.emit('syncProject', {send: 'load', project: 'grafana2', time: 'noTime', time2: 'noTime'});   
+        setTimeout(function(){    
+          console.log("send show grafana 2");
+          socket.emit('syncProject', {send: 'show', project: 'grafana2', time: 'noTime', time2: 'noTime'});
+          location.reload(true);
+        }, LOADING_TIME); 
+      }, SHOW_TIME);      
     } else {
       rowIndex = rowIndex > (table.rows.length-1) ? 1 : rowIndex;             
       previousRow = getPreviousRow();
@@ -130,6 +146,11 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
     }
     //change current row color to active
     row.style.backgroundColor = "#3498DB";
+  }
+
+  function setRowInactive(){
+    row.cells[TIME_RANGE_CELL_INDEX].innerHTML="";
+    row.style.backgroundColor = "#222";
   }
  
   function emitStatesForProj(myProjName){            

@@ -6,7 +6,7 @@
 # 
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # 
-# Author(s): Fabian Russwurm, Michael Kraus, Pascal Eckmann, Thomas Riedmaier, Junes Najah
+# Author(s): Fabian Russwurm, Michael Kraus, Thomas Riedmaier, Pascal Eckmann, Junes Najah
 
 import requests, json
 
@@ -70,6 +70,30 @@ class AnsibleRESTConnector:
 
         return system
 
+    def getSystemsOfGroup(self, group):
+        systems = []
+        url = self.ansibleURL + "group/"
+
+        try:
+            # Sending post request to execute playbook to add new system
+            response = requests.get(url, auth=self.auth)
+            jsonResult = json.loads(response.text)
+            for entry in jsonResult['results']:
+                if entry['name'] == group:
+                    print(entry['id'])
+                    url = self.ansibleURL + "group/" + str(entry['id']) + "/host/"
+                    print(url)
+                    response = requests.get(url, auth=self.auth)
+                    jsonResult = json.loads(response.text)
+                    print(jsonResult)
+                    for entry in jsonResult['results']:
+                        systems.append(entry['name'])
+
+        except Exception as e:
+            print("Exception: Cannot list hosts. Check group name.", str(e))
+        finally:
+            return systems
+
     # calls Polemarch REST API to add a new linked system to fluffi network
     # must assign to a group (linux or windows)
     def addNewSystem(self, hostname, group):
@@ -117,18 +141,17 @@ class AnsibleRESTConnector:
             return False
 
     def getHostAliveState(self):
-        #self.executePlaybook("checkHostAlive.yml", "all")
         url = self.ansibleURL + "history/?mode=checkHostAlive.yml"
         requests.session().close()
-        response = requests.get(url, auth=self.auth, headers={'Connection':'close'}) # Should already be sorted
+        response = requests.get(url, auth=self.auth, headers = {'User-Agent':'Python', 'Connection':'close'}) # Should already be sorted
         jsonResults = json.loads(response.text)
         lastHostCheckResultURL = ""
         for result in jsonResults['results']:
             if result['status'].lower() not in {"run", "running", "delay"}: # --> filter out some states, because no result available
-                lastHostCheckResultURL = self.ansibleURL + "history/" + str(result['id'])
+                lastHostCheckResultURL = self.ansibleURL + "history/" + str(result['id']) + "/"
                 break
 
-        response = requests.get(lastHostCheckResultURL, auth=self.auth)
+        response = requests.get(lastHostCheckResultURL, auth=self.auth, headers = {'User-Agent':'Python', 'Connection':'close'})
         jsonResults = json.loads(response.text)
         getResultURL = jsonResults['raw_stdout']# --> get result
         response = requests.get(getResultURL, auth = self.auth, headers = {'User-Agent':'Python', 'Connection':'close'})
@@ -162,7 +185,7 @@ class AnsibleRESTConnector:
                 hosts.append(host)
             
         url = self.ansibleURL + 'group/'
-        res = requests.get(url, auth = self.auth, headers = {'Connection':'close'})
+        res = requests.get(url, auth = self.auth, headers = {'User-Agent':'Python', 'Connection':'close'})
         groups = []
         if res.ok:
             data = res.json()
@@ -176,7 +199,7 @@ class AnsibleRESTConnector:
                     continue
                 groups.append(group)
                 url = group.URL
-                resHosts = requests.get(url, auth = self.auth, headers = {'Connection':'close'})
+                resHosts = requests.get(url, auth = self.auth, headers = {'User-Agent':'Python', 'Connection':'close'})
                 if resHosts.ok:
                     dataHosts = resHosts.json()
                     for h in dataHosts['results']:

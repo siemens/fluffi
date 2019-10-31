@@ -7,7 +7,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-Author(s): Thomas Riedmaier
+Author(s): Thomas Riedmaier, Roman Bendt
 -->
 
 ## Getting Started
@@ -65,13 +65,13 @@ To set it up you firstly need to set up the central server with docker installed
 Copy the FLUFFI repo to that machine (or clone it there).
 
 ```
-git clone  --depth 1 --branch master https://git.fluffi/team-fluffi/fluffi-private.git ./FLUFFIandFUN
+git clone  --depth 1 --branch master https://github.com/siemens/fluffi.git ./fluffigit
 ```
 
 Copy the server part to /srv/fluffi
 
 ```
-rsync -ai --delete --exclude={'data/ftp/files/archive','data/ftp/files/fluffi','data/ftp/files/initial','data/ftp/files/odroid','data/ftp/files/SUT','data/ftp/files/tftp-roots','data/ftp/files/ubuntu-mirror','data/ftp/files/deploy','data/tftp','data/smb/files/server2008','data/smb/files/server2016','data/dnsmasq/dnsmasq.leases','data/gitea/varlib','data/gitea/home','data/mon/grafana','data/mon/influxdb'} ./FLUFFIandFUN/public/srv/fluffi/ /srv/fluffi/
+rsync -ai --delete --exclude={'data/ftp/files/archive','data/ftp/files/fluffi','data/ftp/files/initial','data/ftp/files/odroid','data/ftp/files/SUT','data/ftp/files/tftp-roots','data/ftp/files/ubuntu-mirror','data/ftp/files/deploy','data/tftp','data/smb/files/server2008','data/smb/files/server2016','data/dnsmasq/dnsmasq.leases','data/mon/grafana','data/mon/influxdb'} ./fluffigit/srv/fluffi/ /srv/fluffi/
 ```
 
 Apply changes to the default configuration. We recommend you to:
@@ -117,4 +117,4 @@ You are now ready to use FLUFFI. See [the usage section](usage.md) for informati
 
 FLUFFI was never meant to be used in hostile environments, which is why FLUFFI's internal protocol is not hardened against attacks at all. It is therefore recommended, to operate FLUFFI in an isolated environment, to which you can restrict access.
 
-Furthermore, it is strongly recomended to change Polemarch's user credentials, which are initially admin:admin.
+Furthermore, it is strongly recommended to change Polemarch's user credentials, which are initially admin:admin.

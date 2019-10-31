@@ -6,7 +6,7 @@
 # 
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # 
-# Author(s): Junes Najah, Thomas Riedmaier, Pascal Eckmann, Abian Blome
+# Author(s): Junes Najah, Pascal Eckmann, Thomas Riedmaier, Abian Blome
 
 INSERT_SETTINGS = (
     "INSERT INTO settings(SettingName, SettingValue) VALUES(:SettingName, :SettingValue)")
@@ -38,8 +38,6 @@ GET_MAX_LOCALID = (
     "SELECT MAX(CreatorLocalID) FROM interesting_testcases WHERE CreatorServiceDescriptorGUID='initial'")
 UPDATE_SETTINGS = (
     "UPDATE settings SET SettingValue=:SettingValue WHERE ID=:Id")
-GET_RAWBYTES_FROM_IT_WITH_LOCALID = (
-    "SELECT RawBytes FROM interesting_testcases WHERE CreatorServiceDescriptorGUID=:guid AND CreatorLocalID=:localId")
 UPDATE_NICE_NAME_TESTCASE = (
     "UPDATE nice_names_testcase SET NiceName=:newName WHERE TestcaseID=:testcaseID")
 UPDATE_NICE_NAME_MANAGED_INSTANACE = (
@@ -88,8 +86,8 @@ NUM_UNIQUE_ACCESS_VIOLATION = (
     "(SELECT cd.CrashFootprint, it.TestCaseType "
     "FROM interesting_testcases AS it "
     "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
-    "WHERE it.TestCaseType=2 Group by cd.CrashFootprint) "
-    "violations")
+    "WHERE it.TestCaseType=2 GROUP BY cd.CrashFootprint) "
+    "violations;")
 
 UNIQUE_ACCESS_VIOLATION = (
     "SELECT av.CrashFootprint, av.TestCaseType, av.CreatorServiceDescriptorGUID, av.CreatorLocalID, av.Rating, "
@@ -100,7 +98,18 @@ UNIQUE_ACCESS_VIOLATION = (
     " FROM interesting_testcases AS it"
     " JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
     " WHERE it.TestCaseType=2 Group by cd.CrashFootprint) av "     
-    "LEFT JOIN nice_names_testcase AS nn ON av.ID = nn.TestcaseID")
+    "LEFT JOIN nice_names_testcase AS nn ON av.ID = nn.TestcaseID;")
+
+UNIQUE_ACCESS_VIOLATION_NO_RAW = (
+    "SELECT av.ID, av.TestCaseType, av.CreatorServiceDescriptorGUID, av.CreatorLocalID, av.Rating, "
+    "av.TimeOfInsertion, nn.NiceName "
+    "FROM "
+    "(SELECT cd.CrashFootprint, it.TestCaseType, it.CreatorServiceDescriptorGUID, it.CreatorLocalID, it.Rating, "
+    "it.TimeOfInsertion, it.ID, it.RawBytes"
+    " FROM interesting_testcases AS it"
+    " JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
+    " WHERE it.TestCaseType=2 Group by cd.CrashFootprint) av "     
+    "LEFT JOIN nice_names_testcase AS nn ON av.ID = nn.TestcaseID;")
 
 NUM_UNIQUE_CRASH = (
     "SELECT count(*) "
@@ -120,14 +129,20 @@ UNIQUE_CRASHES = (
     " ON it.ID = cd.CreatorTestcaseID "
     " GROUP BY cd.CrashFootprint) oc " 
     "LEFT JOIN nice_names_testcase AS nn ON oc.ID = nn.TestcaseID "
-    "WHERE TestCaseType=3")
+    "WHERE TestCaseType=3;")
 
-NUM_UNIQUE_ACCESS_VIOLATION_TYPE_2 = (
-    "SELECT count(*) "
-    "FROM (SELECT cd.CrashFootprint, it.TestCaseType FROM interesting_testcases AS it "
-    "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
-    "GROUP BY cd.CrashFootprint) "
-    "observedCrashes WHERE TestCaseType=2")
+UNIQUE_CRASHES_NO_RAW = (
+    "SELECT oc.ID, oc.TestCaseType, oc.CreatorServiceDescriptorGUID, "
+    "oc.CreatorLocalID, oc.Rating, oc.TimeOfInsertion, nn.NiceName "
+    "FROM "
+    "(SELECT cd.CrashFootprint, it.TestCaseType, it.CreatorServiceDescriptorGUID, it.CreatorLocalID, "
+    "it.Rating, it.TimeOfInsertion, it.ID, it.RawBytes"
+    " FROM interesting_testcases AS it"
+    " JOIN crash_descriptions AS cd"
+    " ON it.ID = cd.CreatorTestcaseID "
+    " GROUP BY cd.CrashFootprint) oc " 
+    "LEFT JOIN nice_names_testcase AS nn ON oc.ID = nn.TestcaseID "
+    "WHERE TestCaseType=3;")
 
 MANAGED_INSTANCES_HOST_AND_PORT_AGENT_TYPE = (
     "SELECT managed_instances.ServiceDescriptorHostAndPort "
@@ -213,10 +228,29 @@ def getCrashesOrViosOfFootprint(footprint):
         "WHERE cd.CrashFootprint='{}' AND (it.TestCaseType=2 OR it.TestCaseType=3);".format(footprint)
     )
 
+def getCrashesOrViosOfFootprintCount(footprint):
+    return (
+        "SELECT count(*) "
+        "FROM interesting_testcases AS it "
+        "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
+        "LEFT JOIN nice_names_testcase AS nn ON it.ID = nn.TestcaseID "
+        "WHERE cd.CrashFootprint='{}' AND (it.TestCaseType=2 OR it.TestCaseType=3);".format(footprint)
+    )
+
 
 def getCrashesQuery(footprint, testCaseType):
     return (
         "SELECT it.CreatorServiceDescriptorGUID, it.RawBytes, it.ID, nn.NiceName "
+        "FROM interesting_testcases AS it "
+        "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
+        "LEFT JOIN nice_names_testcase AS nn ON it.ID = nn.TestcaseID "
+        "WHERE cd.CrashFootprint='{}' AND it.TestCaseType={};".format(footprint, testCaseType)
+    )
+
+
+def getCrashesQueryCount(footprint, testCaseType):
+    return (
+        "SELECT COUNT(*)"
         "FROM interesting_testcases AS it "
         "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
         "LEFT JOIN nice_names_testcase AS nn ON it.ID = nn.TestcaseID "

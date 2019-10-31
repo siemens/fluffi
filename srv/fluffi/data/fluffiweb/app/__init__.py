@@ -29,12 +29,10 @@ from app import views, models, controllers
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from .health_check import healthCheck
-from .helpers import deleteZipAndTempFiles
 from config import LOCAL_DEV
 
 scheduler = BackgroundScheduler()
 scheduler.configure(timezone = utc)
-scheduler.add_job(deleteZipAndTempFiles, 'interval', minutes=3)
 
 if not LOCAL_DEV:
     scheduler.add_job(healthCheck, 'interval', minutes = 0.5)

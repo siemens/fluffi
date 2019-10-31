@@ -6,7 +6,7 @@
 # 
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # 
-# Author(s): Roman Bendt, Thomas Riedmaier, Fabian Russwurm
+# Author(s): Roman Bendt, Thomas Riedmaier, Fabian Russwurm, Junes Najah
 
 # -*- coding: utf-8 -*-
 # vim: ts=4 et sw=4 sts=4 expandtab
@@ -29,21 +29,6 @@ services:
             - ./data/dnsmasq/dnsmasq.conf:/etc/dnsmasq.conf
             - ./data/dnsmasq/dnsmasq.leases:/var/lib/misc/dnsmasq.leases
             - ./data/tftp:/srv/tftp
-              #    gitea:
-              #        build: ./gitea
-              #        #restart: always
-              #        environment:
-              #            - USER=git
-              #            - USER_UID=1000
-              #            - USER_GID=1000
-              #        ports:
-              #            - 3000:3000
-              #            - 2222:2222
-              #        user: git
-              #        volumes:
-              #            - /etc/localtime:/etc/localtime:ro
-              #            - ./data/gitea/varlib:/var/lib/gitea
-              #            - ./data/gitea/home:/home/git
     ntp:
         build: ./ntp
         restart: always
@@ -87,6 +72,7 @@ services:
         dns: 10.66.0.1
     mon:
         build: ./mon
+        restart: always
         ports:
             - 1883:1883
             - 8885:3000
@@ -107,7 +93,7 @@ services:
         dns: 10.66.0.1
     fluffiweb:
         build: ./fluffiweb
-        #restart: always
+        restart: always
         volumes:
             - /etc/localtime:/etc/localtime:ro
             - ./data/fluffiweb:/app
@@ -116,6 +102,7 @@ services:
         dns: 10.66.0.1
     dashsync:
         build: ./dashsync
+        restart: always
         volumes:
             - /etc/localtime:/etc/localtime:ro
             - ./data/dashsync:/app

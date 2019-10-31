@@ -7,26 +7,37 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-Author(s): Thomas Riedmaier, Roman Bendt
+Author(s): Thomas Riedmaier
 -->
 
-ln -s $(pwd) ~/go/src/CaRRoT
+# Overview
 
-# Concepts
+CaRRoT is a mutator that tries to guess how input is structured. Based on these guesses, it tries to generate (semi-) correct mutations.
 
-is this text?
-	-> jep, analyze the content
-	-> nope, does this contain text?
-		-> jep, find all strings
-		-> nope, done
+To do so it relies on a number of heuristics
 
--> is there bitfields in the non text part that can be interpreted as ints?
-small (negative) numbers 
-known magic values such as 80, 443, 
-everything smaller than file length (offs, len)
-	-> can we correlate some of these with known offsets and lengths?
 
-are there magic bytes at the beginning?
-	->jep
-	->nope, are there magic bytes inside, that are in non ascii places?
+# Implemented  heuristics
+
+#### Text
+
+Is this text?
+- yes -> analyze the content
+- no -> does this contain text?
+  - yes -> find all strings
+  - no -> done
+
+#### Bitfields
+
+Are there bitfields in the non text part that can be interpreted as ints?
+- small (negative) numbers 
+- known magic values such as 80, 443, 
+- everything smaller than file length (offs, len)
+  - can we correlate some of these with known offsets and lengths?
+
+#### Magic bytes
+
+Are there magic bytes at the beginning?
+- yes
+- no -> are there magic bytes inside, that are in non ascii places?
 

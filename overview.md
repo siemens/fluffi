@@ -23,4 +23,4 @@ This repository contains
 - a build environment to build the distributed system agents for Windows(x64/x86) and Linux(x64/x86/ARM/ARMarch64) ([here](build))
 - the central server infrastructure in the form of docker containers ([here](srv))
 - a monitoring plugin to monitor agent systems ([here](monitoring_client))
-- some IDA Pro scripts that help you analyse FLUFFI's fuzzing process ([here](ida_scripts))
+- some IDA Pro scripts that help you analyze FLUFFI's fuzzing process ([here](ida_scripts))
