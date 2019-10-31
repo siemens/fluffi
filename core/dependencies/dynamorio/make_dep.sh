@@ -46,7 +46,7 @@ rm -rf dynamorio
 
 git clone https://github.com/DynamoRIO/dynamorio.git
 cd dynamorio
-git checkout 610c9fba9b751ece722b688a83aa91c8bf1703c4
+git checkout bcc0eee9c171ca44ca5b2f92a6fff8e260852862
 
 # Copy files for the drcovMulti module
 mkdir -p clients/drcovMulti
