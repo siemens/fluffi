@@ -15,11 +15,18 @@ Author(s): Thomas Riedmaier
 #include "targetver.h"
 
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
+
+#if defined(_WIN32) || defined(_WIN64)
 // Windows Header Files:
 #include <windows.h>
-#include <stdio.h>
 #include <psapi.h>
+#else
+#define __cdecl __attribute__((__cdecl__))
+#include <sstream>
+#include <fstream>
+#include <climits>
+#endif
 
+#include <stdio.h>
 #include <vector>
 #include <tuple>
-

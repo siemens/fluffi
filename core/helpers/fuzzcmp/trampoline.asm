@@ -20,11 +20,11 @@ mystrcmp PROC
 	sub rsp, 32 ; create shadow space
 	mov r8, rdx ; parameter3 of mystrcmp_ 
 	mov rdx, rcx ; parameter2 of mystrcmp_
-    pop rcx ; parameter1 of mystrcmp_
+	pop rcx ; parameter1 of mystrcmp_
 	push rcx ; restore stack
 	call ?mystrcmp_@@YAH_KPEBD1@Z
 	add rsp, 32; cleanup shadow space
-    ret
+	ret
 mystrcmp ENDP
 
 mymemcmp PROC
@@ -32,11 +32,11 @@ mymemcmp PROC
 	mov r9, r8 ; parameter4 of mymemcmp_ 
 	mov r8, rdx ; parameter3 of mymemcmp_ 
 	mov rdx, rcx ; parameter2 of mymemcmp_
-    pop rcx ; parameter1 of mymemcmp_
+	pop rcx ; parameter1 of mymemcmp_
 	push rcx ; restore stack
 	call ?mymemcmp_@@YAH_KPEBX10@Z
 	add rsp, 32; cleanup shadow space
-    ret
+	ret
 mymemcmp ENDP
 
 
@@ -51,7 +51,7 @@ ELSE
 
 
 mystrcmp PROC
-    pop eax ; caller address
+	pop eax ; caller address
 	pop edx ; str1
 	pop ecx ; str2
 	push ecx ; restore stack 1/3
@@ -62,7 +62,7 @@ mystrcmp PROC
 	push eax ; parameter1 of mystrcmp_
 	call ?mystrcmp_@@YAHIPBD0@Z
 	add esp, 12
-    ret
+	ret
 mystrcmp ENDP
 
 mymemcmp PROC
@@ -77,7 +77,7 @@ mymemcmp PROC
 	mov [esp+12], eax ; parameter4 of mymemcmp_
 	call ?mymemcmp_@@YAHIPBX0I@Z
 	add esp, 16
-    ret
+	ret
 mymemcmp ENDP
 
 

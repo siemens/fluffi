@@ -12,4 +12,4 @@ Author(s): Thomas Riedmaier
 
 #pragma once
 
-__declspec(dllexport) int __cdecl  mymemcmp_(size_t caller, const void * ptr1, const void * ptr2, size_t num);
+int __cdecl  mymemcmp_(size_t caller, const void * ptr1, const void * ptr2, size_t num);

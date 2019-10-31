@@ -54,14 +54,14 @@ for (my $k=0; $k < $mymemcmpCopies; $k++){
 print $file "typedef int memcmpTYPE(const unsigned char * ptr1, const unsigned char * ptr2, size_t num);\n";
 
 
-print $file "memcmpTYPE *sl[".$mymemcmpCopies."] = { ";
+print $file "memcmpTYPE *ml[".$mymemcmpCopies."] = { ";
 for (my $k=0;$k < ($mymemcmpCopies-1);$k++){
 	print $file " mymemcmp".$k."left, ";
 }
 print $file " mymemcmp".($mymemcmpCopies-1)."left };\n";
 
 
-print $file "memcmpTYPE *sr[".$mymemcmpCopies."] = { ";
+print $file "memcmpTYPE *mr[".$mymemcmpCopies."] = { ";
 for (my $k=0;$k < ($mymemcmpCopies-1);$k++){
 	print $file " mymemcmp".$k."right, ";
 }
@@ -70,8 +70,8 @@ print $file " mymemcmp".($mymemcmpCopies-1)."right };\n";
 
 print $file "\nint __cdecl mymemcmp_(size_t caller, const void * ptr1, const void * ptr2, size_t num){\n";
 print $file "unsigned int rva = addrToRVA(caller);\n";
-print $file "int leftmatch = sl[rva % ".$mymemcmpCopies."](static_cast<const unsigned char *>(ptr1), static_cast<const unsigned char *>(ptr2), num);\n";
-print $file "int rightmatch = sr[rva % ".$mymemcmpCopies."](static_cast<const unsigned char *>(ptr1), static_cast<const unsigned char *>(ptr2), num);\n";
+print $file "int leftmatch = ml[rva % ".$mymemcmpCopies."](static_cast<const unsigned char *>(ptr1), static_cast<const unsigned char *>(ptr2), num);\n";
+print $file "int rightmatch = mr[rva % ".$mymemcmpCopies."](static_cast<const unsigned char *>(ptr1), static_cast<const unsigned char *>(ptr2), num);\n";
 print $file "return leftmatch | rightmatch;\n";
 print $file "}\n";
 

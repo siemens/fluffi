@@ -10,8 +10,14 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier
 */
 
+//perl generate_memcmp.pl && perl generate_strcmp.pl
+//g++ --std=c++11 -fPIC -shared trampoline.s fuzzcmp.cpp strcmp.cpp memcmp.cpp -o libfuzzcmp.so -Wl,--version-script=libfuzzcmp.version -Wa,--defsym,ARCH=$(file /bin/bash | awk -F',' '{print $2}' | tr -d ' ' | grep 64 > /dev/null && echo 64 || echo 32) -Wl,-z,defs
+
 #include "stdafx.h"
+#include "fuzzcmp.h"
 #include "trampoline.h"
+
+#if defined(_WIN32) || defined(_WIN64)
 
 void installIATHook(std::vector<std::tuple<std::string, size_t>> replacements) {
 	HMODULE hMods[1024];
@@ -115,3 +121,65 @@ unsigned int addrToRVA(size_t addr) {
 
 	return 0;
 }
+
+#else
+
+std::vector<std::string> splitString(std::string str, std::string token) {
+	if (str.empty())	return std::vector<std::string> { "" };
+
+	if (token.empty()) return std::vector<std::string> { str };
+
+	std::vector<std::string>result;
+	while (str.size()) {
+		size_t index = str.find(token);
+		if (index != std::string::npos) {
+			result.push_back(str.substr(0, index));
+			str = str.substr(index + token.size());
+			if (str.size() == 0)result.push_back(str);
+		}
+		else {
+			result.push_back(str);
+			str = "";
+		}
+	}
+	return result;
+}
+
+unsigned int addrToRVA(std::uintptr_t addr) {
+	std::stringstream fileNameSS;
+	fileNameSS << "/proc/self/maps";
+	std::ifstream mapsFile(fileNameSS.str(), std::ifstream::in);
+
+	unsigned int re = UINT_MAX;
+	std::string line;
+	while (std::getline(mapsFile, line))
+	{
+		std::vector<std::string>  lineElements = splitString(line, " ");
+		if (lineElements.size() < 2) {
+			printf("Splitting line %s failed", line.c_str());;
+			continue;
+		}
+		std::vector<std::string>  addresses = splitString(lineElements[0], "-");
+		if (addresses.size() < 2) {
+			printf("Splitting addresses %s failed", lineElements[0].c_str());
+			continue;
+		}
+		if (stoull(addresses[0], 0, 16) < addr && stoull(addresses[1], 0, 16) > addr)
+		{
+			re = addr - stoull(addresses[0], 0, 16);
+			break;
+		}
+	}
+
+	mapsFile.close();
+
+	if (re != UINT_MAX) {
+		return re;
+	}
+	else {
+		//apparently, the address is not part of any loaded module
+		return addr;
+	}
+}
+
+#endif

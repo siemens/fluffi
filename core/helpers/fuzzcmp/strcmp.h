@@ -12,4 +12,4 @@ Author(s): Thomas Riedmaier
 
 #pragma once
 
-__declspec(dllexport) int __cdecl  mystrcmp_(size_t caller, const char * str1, const char * str2);
+int __cdecl  mystrcmp_(size_t caller, const char * str1, const char * str2);
