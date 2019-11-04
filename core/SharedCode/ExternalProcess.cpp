@@ -610,6 +610,9 @@ bool ExternalProcess::run() {
 }
 
 void ExternalProcess::debug(unsigned long timeoutMilliseconds, std::shared_ptr<DebugExecutionOutput> exResult, bool doPostMortemAnalysis, bool treatAnyAccessViolationAsFatal) {
+	std::chrono::time_point<std::chrono::steady_clock> routineEntryTimeStamp = std::chrono::steady_clock::now();
+	std::chrono::time_point<std::chrono::steady_clock> latestRoutineExitTimeStamp = routineEntryTimeStamp + std::chrono::milliseconds(timeoutMilliseconds);
+
 	if (m_pi.hThread == NULL || m_pi.dwProcessId == NULL || m_hasBeenRun || !m_hasBeenInitialized) {
 		std::stringstream oss;
 		oss << "The process " << m_commandline << " cannot run, as it is not in a runnable state" << std::endl;
@@ -645,7 +648,8 @@ void ExternalProcess::debug(unsigned long timeoutMilliseconds, std::shared_ptr<D
 	DWORD dwContinueStatus = DBG_CONTINUE; // exception continuation
 	while (TRUE)
 	{
-		if (WaitForDebugEvent(&debug_event, timeoutMilliseconds))
+		long long timeToWait = std::chrono::duration_cast<std::chrono::milliseconds>(latestRoutineExitTimeStamp - std::chrono::steady_clock::now()).count();
+		if ((timeToWait > 0 || timeoutMilliseconds == INFINITE) && WaitForDebugEvent(&debug_event, static_cast<DWORD>(timeToWait)))
 		{
 			dwContinueStatus = DBG_CONTINUE;
 			switch (debug_event.dwDebugEventCode)
@@ -800,7 +804,7 @@ void ExternalProcess::debug(unsigned long timeoutMilliseconds, std::shared_ptr<D
 			// WaitForDebugEvent failed...
 			// Is it because of timeout ?
 			DWORD ErrCode = GetLastError();
-			if (ErrCode == ERROR_SEM_TIMEOUT)
+			if ((timeToWait <= 0 && timeoutMilliseconds != INFINITE) || ErrCode == ERROR_SEM_TIMEOUT)
 			{
 				// Yes, report hang
 				exResult->m_terminationDescription = "Process hang detected";
@@ -1561,6 +1565,9 @@ bool ExternalProcess::attachToProcess() {
 //For list of signals see https://de.wikipedia.org/wiki/Signal_(Unix)
 void ExternalProcess::debug(unsigned long timeoutMilliseconds, std::shared_ptr<DebugExecutionOutput> exResult, bool doPostMortemAnalysis, bool treatAnyAccessViolationAsFatal)
 {
+	std::chrono::time_point<std::chrono::steady_clock> routineEntryTimeStamp = std::chrono::steady_clock::now();
+	std::chrono::time_point<std::chrono::steady_clock> latestRoutineExitTimeStamp = routineEntryTimeStamp + std::chrono::milliseconds(timeoutMilliseconds);
+
 	if (m_hasBeenRun || !m_hasBeenInitialized) {
 		std::stringstream oss;
 		oss << "The process " << m_childPID << " cannot run, as it is not in a runnable state" << std::endl;
@@ -1578,8 +1585,6 @@ void ExternalProcess::debug(unsigned long timeoutMilliseconds, std::shared_ptr<D
 	exResult->m_terminationDescription = "The target executed without any exception";
 
 	struct timespec timeout;
-	timeout.tv_sec = timeoutMilliseconds / 1000;
-	timeout.tv_nsec = (timeoutMilliseconds % 1000) * 1000000;
 
 	int status = 0;
 	bool isfirstStop = true;
@@ -1599,6 +1604,18 @@ void ExternalProcess::debug(unsigned long timeoutMilliseconds, std::shared_ptr<D
 	m_isBeingDebugged = true;
 
 	do {
+		//Adjust timeout
+		long long timeToWait = std::chrono::duration_cast<std::chrono::milliseconds>(latestRoutineExitTimeStamp - std::chrono::steady_clock::now()).count();
+		if (timeoutMilliseconds != 0xFFFFFFFF && timeToWait <= 0) {
+			exResult->m_terminationDescription = "Process hang detected!";
+			exResult->m_terminationType = DebugExecutionOutput::PROCESS_TERMINATION_TYPE::TIMEOUT;
+			die();
+			m_hasBeenRun = true;
+			return;
+		}
+		timeout.tv_sec = static_cast<time_t>(timeToWait) / 1000;
+		timeout.tv_nsec = (static_cast<time_t>(timeToWait) % 1000) * 1000000;
+
 		//Wait for a SIGCHLD event
 		errno = 0;
 		int sig = sigtimedwait(&m_debugSignalMask, NULL, &timeout);

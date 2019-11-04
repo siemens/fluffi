@@ -9,7 +9,7 @@
 :: Author(s): Thomas Riedmaier
 
 If NOT exist "%~dp0\gdb.exe" (
-powershell -Command "Invoke-WebRequest https://datapacket.dl.sourceforge.net/project/mingw-w64/External%%20binary%%20packages%%20%%28Win64%%20hosted%%29/gdb/x86_64-w64-mingw32-gdb-7.1.90.20100730.zip -OutFile x86_64-w64-mingw32-gdb-7.1.90.20100730.zip -UserAgent 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101 Firefox/60.0'"
+powershell -Command "Invoke-WebRequest https://netcologne.dl.sourceforge.net/project/mingw-w64/External%%20binary%%20packages%%20%%28Win64%%20hosted%%29/gdb/x86_64-w64-mingw32-gdb-7.1.90.20100730.zip -OutFile x86_64-w64-mingw32-gdb-7.1.90.20100730.zip -UserAgent 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101 Firefox/60.0'"
 
 powershell -Command "Add-Type -Assembly System.IO.Compression.FileSystem; [IO.Compression.ZipFile]::OpenRead(\""$(resolve-path x86_64-w64-mingw32-gdb-7.1.90.20100730.zip)\"").Entries | where {$_.FullName -like 'mingw64/bin/gdb.exe'} | foreach {[System.IO.Compression.ZipFileExtensions]::ExtractToFile($_, \""$(resolve-path %~dp0)\gdb.exe\"", $true)}"
 
