@@ -9,4 +9,7 @@
 :: Author(s): Thomas Riedmaier, Fabian Russwurm
 
 imdisk -a -s {{RamDiskSize}} -m {{ramDiskMountpointLetter}}: -p "/fs:ntfs /q /y"
-robocopy {{deploymentPath}} {{ramDiskMountpointLetter}}:\ /E
+robocopy {{deploymentPath}}\x64 {{ramDiskMountpointLetter}}:\{{deploymentDirName}}\x64 /R:0
+robocopy {{deploymentPath}}\x64\dyndist64 {{ramDiskMountpointLetter}}:\{{deploymentDirName}}\x64\dyndist64 /E /R:0
+robocopy {{deploymentPath}}\x86 {{ramDiskMountpointLetter}}:\{{deploymentDirName}}\x86 /R:0
+robocopy {{deploymentPath}}\x86\dyndist32 {{ramDiskMountpointLetter}}:\{{deploymentDirName}}\x86\dyndist32 /E /R:0
