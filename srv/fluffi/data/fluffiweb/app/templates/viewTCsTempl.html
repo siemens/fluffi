@@ -25,6 +25,56 @@ function deleteTestcase(testcaseId, tcType) {
     var deleteUrl = "/projects/" + "{{ data.project.id }}" + "/delTestcase/" + testcaseId + "/" + tcType;
     window.location.replace(deleteUrl);
 }
+
+$( document ).ready(function() {
+    addPages({{actual_page}}, {{page_count}});
+});
+
+function addSinglePage(i, actualPage){
+    var link = ""
+    var singlePage = document.createElement('div');
+    $(singlePage).addClass('single_page');
+    $(singlePage).html(i);
+    if(i == actualPage){
+        $(singlePage).addClass('single_page_active');
+    }else if(i == "..."){
+        $(singlePage).addClass('single_page_dots');
+    }else{
+        link = "{{base_link}}" + i.toString()
+        $(singlePage).addClass('single_page_inactive');
+        $(singlePage).addClass("link_" + i.toString());
+    }
+    $(".pages").append(singlePage);
+    if($(".single_page").hasClass("link_" + i.toString())){
+        $(".link_" + i.toString()).wrap('<a href="' + link + '"></a>');
+    }
+}
+
+function addPages(actualPage, pageCount){
+    var margin = 3;
+    maxPages = actualPage + margin;
+    if(maxPages > pageCount){
+        maxPages = pageCount;
+    }
+    if(actualPage >= margin + 3){
+        addSinglePage(1, actualPage);
+        addSinglePage("...", actualPage);
+
+        for(var i = actualPage - margin; i <= maxPages; i++) {
+            addSinglePage(i, actualPage);
+        }
+    }else{
+        for(var i = 1; i <= maxPages; i++) {
+            addSinglePage(i, actualPage);
+        }
+    }
+    if(actualPage < pageCount - margin){
+        if(actualPage != pageCount - (margin + 1)){
+            addSinglePage("...", actualPage);
+        }
+        addSinglePage(pageCount, actualPage);
+    }
+}
 </script>
 
 <div class="container">
@@ -52,6 +102,9 @@ function deleteTestcase(testcaseId, tcType) {
         </div>
     </div>
     <hr>
+    <div class="pages_box">
+        <div class="pages"></div>
+    </div>
     <table class="table">
         <thead>
         <tr>
@@ -61,7 +114,9 @@ function deleteTestcase(testcaseId, tcType) {
                     ID / Nice Name
                 </div>
             </th>
+            {% if show_rating %}
             <th>Rating</th>
+            {% endif %}
             <th>Time Of Insertion</th>
             <th>Operations</th>
         </tr>
@@ -85,7 +140,9 @@ function deleteTestcase(testcaseId, tcType) {
                 <input class="form-control" id="tcInputNew{{loop.index}}" style="display: none;" type="text">
                 {% endif %}
             </td>
+            {% if show_rating %}
             <td>{{ testcase.rating }}</td>
+            {% endif %}
             <td>{{ testcase.timeOfInsertion | default('', True) }}</td>
             <td>
                 <button class="btn btn-default btn-desgin" onclick="deleteTestcase('{{ testcase.id }}', '{{ data.redirect }}')"
@@ -101,6 +158,10 @@ function deleteTestcase(testcaseId, tcType) {
         {% endfor %}
         </tbody>
     </table>
+    <hr>
+    <div class="pages_box">
+        <div class="pages"></div>
+    </div>
 </div>
 
 {% endblock %}
