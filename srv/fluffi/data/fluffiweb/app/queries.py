@@ -27,11 +27,9 @@ GET_TARGET_MODULES = (
 DELETE_TESTCASES = (
     "DELETE FROM interesting_testcases WHERE CreatorServiceDescriptorGUID <> 'initial'")
 RESET_RATING = (
-    "UPDATE interesting_testcases SET Rating = 10000")
+    "UPDATE interesting_testcases SET Rating = 10000 WHERE TestCaseType = 0")
 DELETE_TESTCASES_WITHOUT_POPULATION = (
     "DELETE FROM interesting_testcases WHERE TestCaseType <> 0")
-RESET_INITIAL_RATING = (
-    "UPDATE interesting_testcases SET Rating = 10000 WHERE CreatorServiceDescriptorGUID = 'initial'")
 GET_MI_HOST_AND_PORT = (
     "SELECT managed_instances.ServiceDescriptorHostAndPort FROM managed_instances;")
 GET_MAX_LOCALID = (
