@@ -433,7 +433,8 @@ def viewAccessVioUnique(projId):
 
     return renderTemplate("viewTCsTempl.html",
                           title="View Unique Access Violations",
-                          data=data)
+                          data=data,
+                          show_occurences=True)
 
 
 @app.route("/projects/<int:projId>/accessVioUnique/download")
@@ -486,7 +487,8 @@ def viewUniqueCrashes(projId):
 
     return renderTemplate("viewTCsTempl.html",
                           title="View Unique Crashes",
-                          data=data)
+                          data=data,
+                          show_occurences=True)
 
 
 @app.route("/projects/<int:projId>/uniqueCrashes/download")

@@ -84,21 +84,20 @@ function addPages(actualPage, pageCount){
 <hr>
 
 <div class="container">
-    <h2 style="margin-bottom: 30px">Testcases</h2>
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-6 tc_view_center">
             {% if data.name == "Population" %}
             <form action="{{ url_for('addTestcase', projId=data.project.id) }}" enctype="multipart/form-data"
                   method="POST">
                 <div class="form-group">
                     <input class="form-control-file" id="addTestcase" multiple name="addTestcase" type="file">
-                    <input class="btn btn-default" style="margin-top: 10px" type="submit" value="Add Testcase(s)"/>
+                    <input class="btn btn-default" style="margin-top: 10px; float: right;" type="submit" value="Add Testcase(s)"/>
                 </div>
             </form>
             {% endif %}
         </div>
-        <div class="col-md-6">
-            <a class="btn btn-primary" href="{{ url_for(data.downloadName, projId=data.project.id) }}" role="button">Download {{ data.name }}</a>
+        <div class="col-md-6 tc_view_center">
+            <a class="btn btn-primary tc_view_center_child" href="{{ url_for(data.downloadName, projId=data.project.id) }}" role="button">Download {{ data.name }}</a>
         </div>
     </div>
     <hr>
@@ -109,13 +108,20 @@ function addPages(actualPage, pageCount){
         <thead>
         <tr>
             <th>
+                {% if show_occurences %}
+                CrashFootprint
+                {% else %}
                 <div data-placement="left" data-toggle="tooltip"
                      title="To add or update a nice name just click on it, type and press enter">
                     ID / Nice Name
                 </div>
+                {% endif %}
             </th>
             {% if show_rating %}
             <th>Rating</th>
+            {% endif %}
+            {% if show_occurences %}
+            <th>Occurences</th>
             {% endif %}
             <th>Time Of Insertion</th>
             <th>Operations</th>
@@ -124,23 +130,27 @@ function addPages(actualPage, pageCount){
         <tbody>
         {% for testcase in data.testcases %}
         <tr>
-            <td>{% if testcase.niceName %}
-                <button id="tcBtn{{loop.index}}"
-                        onclick="addOrRenameNiceName({{ loop.index }}, {{ data.project.id }}, 'update', '{{ testcase.testcaseID }}', '')"
-                        class="btn-desgin">
-                    {{ testcase.niceName }}
-                </button>
-                <input class="form-control" id="tcInput{{loop.index}}" style="display: none;" type="text">
+            <td>{% if testcase.footprint %}
+                {{ testcase.footprint }}
                 {% else %}
-                <button id="tcBtnNew{{loop.index}}"
-                        onclick="addOrRenameNiceName({{ loop.index }}, {{ data.project.id }}, 'insert', '{{ testcase.testcaseID }}', '')"
-                        class="btn-desgin">
-                    {{ testcase.id }}
-                </button>
-                <input class="form-control" id="tcInputNew{{loop.index}}" style="display: none;" type="text">
+                    {% if testcase.niceName %}
+                    <button id="tcBtn{{loop.index}}"
+                            onclick="addOrRenameNiceName({{ loop.index }}, {{ data.project.id }}, 'update', '{{ testcase.testcaseID }}', '')"
+                            class="btn-desgin">
+                        {{ testcase.niceName }}
+                    </button>
+                    <input class="form-control" id="tcInput{{loop.index}}" style="display: none;" type="text">
+                    {% else %}
+                    <button id="tcBtnNew{{loop.index}}"
+                            onclick="addOrRenameNiceName({{ loop.index }}, {{ data.project.id }}, 'insert', '{{ testcase.testcaseID }}', '')"
+                            class="btn-desgin">
+                        {{ testcase.id }}
+                    </button>
+                    <input class="form-control" id="tcInputNew{{loop.index}}" style="display: none;" type="text">
+                    {% endif %}
                 {% endif %}
             </td>
-            {% if show_rating %}
+            {% if show_rating or show_occurences %}
             <td>{{ testcase.rating }}</td>
             {% endif %}
             <td>{{ testcase.timeOfInsertion | default('', True) }}</td>
