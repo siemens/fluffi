@@ -278,7 +278,7 @@ def getITQueryOfTypeNoRaw(n):
         "nn.NiceName "
         "FROM interesting_testcases AS it "
         "LEFT JOIN nice_names_testcase AS nn ON it.ID = nn.TestcaseID "
-        "WHERE TestCaseType={} LIMIT 1000;".format(n)
+        "WHERE TestCaseType={};".format(n)
     )
 
 

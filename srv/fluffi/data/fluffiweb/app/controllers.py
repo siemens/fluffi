@@ -337,6 +337,26 @@ def getGeneralInformationData(projId, stmt):
     return data
 
 
+def getRowCount(projId, stmt):
+    project = models.Fuzzjob.query.filter_by(id = projId).first()
+    data = 0
+
+    engine = create_engine(
+        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
+    connection = engine.connect()
+    try:
+        result = connection.execute(stmt)
+        data = result.fetchone()[0]
+    except Exception as e:
+        print(e)
+        pass
+    finally:
+        connection.close()
+        engine.dispose()
+
+    return data
+
+
 def insertOrUpdateNiceName(projId, myId, newName, command, elemType):
     project = models.Fuzzjob.query.filter_by(id = projId).first()
 
