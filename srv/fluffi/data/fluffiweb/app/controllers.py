@@ -634,7 +634,7 @@ def executeResetFuzzjobStmts(projId, deletePopulation):
             connection.execute(RESET_RATING)
         else:
             connection.execute(DELETE_TESTCASES_WITHOUT_POPULATION)
-            connection.execute(RESET_INITIAL_RATING)
+            connection.execute(RESET_RATING)
 
         return "Reset Fuzzjob was successful", "success"
     except Exception as e:
