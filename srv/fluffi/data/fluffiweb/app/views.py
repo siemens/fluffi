@@ -726,10 +726,10 @@ def addTestcase(projId):
     if 'addTestcase' in request.files:
         msg, category = insertTestcases(projId, request.files.getlist('addTestcase'))
         flash(msg, category)
-        return redirect("/projects/{}/population".format(projId))
+        return redirect("/projects/{}/population/1".format(projId))
     else:
         flash("Please select files to add ...", "error")
-        return redirect("/projects/{}/population".format(projId))
+        return redirect("/projects/{}/population/1".format(projId))
 
 
 @app.route("/locations/assignWorker/<string:workerID>", methods=["POST"])
