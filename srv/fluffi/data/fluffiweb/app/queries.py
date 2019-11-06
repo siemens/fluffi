@@ -101,15 +101,17 @@ UNIQUE_ACCESS_VIOLATION = (
     "LEFT JOIN nice_names_testcase AS nn ON av.ID = nn.TestcaseID;")
 
 UNIQUE_ACCESS_VIOLATION_NO_RAW = (
-    "SELECT av.ID, av.TestCaseType, av.CreatorServiceDescriptorGUID, av.CreatorLocalID, av.Rating, "
-    "av.TimeOfInsertion, nn.NiceName "
-    "FROM "
-    "(SELECT cd.CrashFootprint, it.TestCaseType, it.CreatorServiceDescriptorGUID, it.CreatorLocalID, it.Rating, "
-    "it.TimeOfInsertion, it.ID, it.RawBytes"
-    " FROM interesting_testcases AS it"
-    " JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
-    " WHERE it.TestCaseType=2 Group by cd.CrashFootprint) av "     
-    "LEFT JOIN nice_names_testcase AS nn ON av.ID = nn.TestcaseID;")
+    "SELECT av.ID, av.CrashFootprint, av.TestCaseType, av.CreatorServiceDescriptorGUID, av.CreatorLocalID, av.Rating, "
+	"av.TimeOfInsertion, nn.NiceName "
+    "FROM (SELECT cd.CrashFootprint, it.TestCaseType, it.CreatorServiceDescriptorGUID, it.CreatorLocalID, "
+	"MIN(it.TimeOfInsertion) as TimeOfInsertion, it.ID, count(cd.CrashFootprint) as Rating "
+	"FROM interesting_testcases AS it "
+	"JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
+	"WHERE it.TestCaseType=2 "
+	"Group by cd.CrashFootprint) as av "
+    "LEFT JOIN nice_names_testcase AS nn "
+    "ON av.ID = nn.TestcaseID "
+    "ORDER BY av.TimeOfInsertion asc;")
 
 NUM_UNIQUE_CRASH = (
     "SELECT count(*) "
@@ -132,17 +134,18 @@ UNIQUE_CRASHES = (
     "WHERE TestCaseType=3;")
 
 UNIQUE_CRASHES_NO_RAW = (
-    "SELECT oc.ID, oc.TestCaseType, oc.CreatorServiceDescriptorGUID, "
-    "oc.CreatorLocalID, oc.Rating, oc.TimeOfInsertion, nn.NiceName "
-    "FROM "
-    "(SELECT cd.CrashFootprint, it.TestCaseType, it.CreatorServiceDescriptorGUID, it.CreatorLocalID, "
-    "it.Rating, it.TimeOfInsertion, it.ID, it.RawBytes"
-    " FROM interesting_testcases AS it"
-    " JOIN crash_descriptions AS cd"
-    " ON it.ID = cd.CreatorTestcaseID "
-    " GROUP BY cd.CrashFootprint) oc " 
-    "LEFT JOIN nice_names_testcase AS nn ON oc.ID = nn.TestcaseID "
-    "WHERE TestCaseType=3;")
+    "SELECT oc.ID, oc.CrashFootprint, oc.TestCaseType, oc.CreatorServiceDescriptorGUID, oc.CreatorLocalID, oc.Rating, "
+    "oc.TimeOfInsertion, nn.NiceName "
+    "FROM (SELECT cd.CrashFootprint, it.TestCaseType, it.CreatorServiceDescriptorGUID, it.CreatorLocalID, "
+    "MIN(it.TimeOfInsertion) as TimeOfInsertion, it.ID, count(cd.CrashFootprint) as Rating "
+    "FROM interesting_testcases AS it "
+    "JOIN crash_descriptions AS cd "
+    "ON it.ID = cd.CreatorTestcaseID "
+    "WHERE TestCaseType=3 "
+    "GROUP BY cd.CrashFootprint) as oc "
+    "LEFT JOIN nice_names_testcase AS nn "
+    "ON oc.ID = nn.TestcaseID "
+    "ORDER BY oc.TimeOfInsertion asc;")
 
 MANAGED_INSTANCES_HOST_AND_PORT_AGENT_TYPE = (
     "SELECT managed_instances.ServiceDescriptorHostAndPort "
