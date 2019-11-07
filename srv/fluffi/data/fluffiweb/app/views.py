@@ -1269,6 +1269,16 @@ def removeConfiguredInstances(system, fuzzjob, type):
     return json.dumps({"status": status})
 
 
+@app.route("/systems/reboot/<string:hostname>", methods=["GET"])
+def rebootSystem(hostname):
+    historyURL = ANSIBLE_REST_CONNECTOR.executePlaybook('rebootSystems.yml', hostname)
+
+    if historyURL is not None:
+        return redirect(historyURL, code=302)
+    else:
+        return redirect(url_for("systems"))
+
+
 @app.route("/systems/view/<string:hostname>/initialSetup", methods=["POST"])
 def viewSystemInitialSetup(hostname):
     # validate and execute playbook
