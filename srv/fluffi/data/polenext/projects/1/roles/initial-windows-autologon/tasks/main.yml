@@ -6,37 +6,12 @@
 # 
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # 
-# Author(s): Fabian Russwurm, Thomas Riedmaier, Michael Kraus, Pascal Eckmann
+# Author(s): Pascal Eckmann
 
-# Mountpoint letter of the ramdisk
-ramDiskMountpointLetter: F
+- name: Fetch autologon from "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{autologonFile}}"
+  win_get_url: 
+    url: "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{autologonFile}}"
+    dest: "{{remoteUtilitiesFilePath}}{{autologonFile}}"
 
-# FLUFFI directory name
-deploymentDirName: "FLUFFI"
-
-# SUT directory name
-SUTBaseDirName: "SUT"
-
-# RestStarter directory name
-RestStarterDirName: "restStarter"
-
-# Path where FLUFFI will be deployed
-deploymentPath: "C:\\{{deploymentDirName}}"
-
-# File path where initial install files are located on the FTP server
-initialInstallPackages: "initial/windows/activePackages"
-
-# File path where initial ansible files are located on the FTP server
-initialAnsibleFTPPath: "initial/windows/ansible"
-
-# Autologon.exe file location on FTP server
-autologonFile: "autologon.exe"
-
-# Path where SUT will be deployed
-SUTPath: C:\\{{deploymentDirName}}\{{SUTBaseDirName}}
-
-# Remote path to store the necessary utilities
-remoteUtilitiesFilePath: c:\utils\
-
-# Remote path to store the Rest-Instance-Starter python script
-restStarterdeploymentPath: "C:\\{{deploymentDirName}}\\{{RestStarterDirName}}"
+- name: Run autologon
+  win_command: "{{remoteUtilitiesFilePath}}{{autologonFile}} -accepteula {{ ansible_user }} {{ inventory_hostname }} {{ ansible_password }}"
