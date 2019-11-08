@@ -25,7 +25,7 @@ deploymentPath: "C:\\{{deploymentDirName}}"
 
 # File path where initial install files are located on the FTP server
 initialInstallPackages: "initial/windows/activePackages"
- 
+
 # File path where initial ansible files are located on the FTP server
 initialAnsibleFTPPath: "initial/windows/ansible"
 
