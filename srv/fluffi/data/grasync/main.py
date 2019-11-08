@@ -71,17 +71,19 @@ while True:
             # System CPU Utilization & Combined Queue Size & Executions per second
             result = connection.execute(INSTANCE_PERFORMANCE_STATS)
             for row in result:
+                time_of_status = row['TimeOfStatus']
+
                 status_dict = dict((k.strip(), float(v.strip())) for k,v in (item.split(' ') for item in [s.strip() for s in row['Status'].split('|')] if item))
                 host_and_port = row['ServiceDescriptorHostAndPort']
                 server = host_and_port.split('.')[0] if '.' in host_and_port else ''
                 if 'SysCPUUtil' in status_dict:
-                    json_bodies.append(create_json_body(fuzzjob+'_sys_cpu_util', {'server': server}, NOW, status_dict['SysCPUUtil']))
+                    json_bodies.append(create_json_body(fuzzjob+'_sys_cpu_util', {'server': server}, time_of_status, status_dict['SysCPUUtil']))
                 if 'TestCasesQueueSize' in status_dict:
-                    json_bodies.append(create_json_body(fuzzjob+'_queue_size', {'hostAndPort': host_and_port}, NOW, status_dict['TestCasesQueueSize']))
+                    json_bodies.append(create_json_body(fuzzjob+'_queue_size', {'hostAndPort': host_and_port}, time_of_status, status_dict['TestCasesQueueSize']))
                 if 'TestEvaluationsQueueSize' in status_dict:
-                    json_bodies.append(create_json_body(fuzzjob+'_evaluations_queue_size', {'hostAndPort': host_and_port}, NOW, status_dict['TestEvaluationsQueueSize']))
+                    json_bodies.append(create_json_body(fuzzjob+'_evaluations_queue_size', {'hostAndPort': host_and_port}, time_of_status, status_dict['TestEvaluationsQueueSize']))
                 if 'TestcasesPerSecond' in status_dict:
-                    json_bodies.append(create_json_body(fuzzjob+'_tc_per_second', {'hostAndPort': host_and_port}, NOW, status_dict['TestcasesPerSecond']))
+                    json_bodies.append(create_json_body(fuzzjob+'_tc_per_second', {'hostAndPort': host_and_port}, time_of_status, status_dict['TestcasesPerSecond']))
 
             # Accumulated Crashes
             result = connection.execute(text(COUNT_TCTYPE), {'tcType': 1})
