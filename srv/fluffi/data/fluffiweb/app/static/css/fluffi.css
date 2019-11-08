@@ -110,7 +110,8 @@ Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
 
 .remove {
     text-align: left; 
-    width: 12%;
+    min-width: 30px;
+    text-align: right;
 }
 
 .kill {

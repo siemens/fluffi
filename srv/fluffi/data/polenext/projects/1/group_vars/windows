@@ -6,7 +6,7 @@
 # 
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # 
-# Author(s): Fabian Russwurm, Thomas Riedmaier, Michael Kraus, Pascal Eckmann
+# Author(s): Fabian Russwurm, Thomas Riedmaier, Michael Kraus, Pascal Eckmann, Junes Najah
 
 # Mountpoint letter of the ramdisk
 ramDiskMountpointLetter: F
@@ -28,6 +28,12 @@ initialInstallPackages: "initial/windows/activePackages"
 
 # File path where initial ansible files are located on the FTP server
 initialAnsibleFTPPath: "initial/windows/ansible"
+
+# Folder name where autologon file is located
+autologonFolderName: "autologon"
+
+# Autologon.exe file location on FTP server
+autologonFile: "autologon.exe"
 
 # Path where SUT will be deployed
 SUTPath: C:\\{{deploymentDirName}}\{{SUTBaseDirName}}
