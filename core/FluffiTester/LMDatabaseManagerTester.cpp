@@ -553,11 +553,21 @@ namespace FluffiTester
 			std::ifstream f(testfile);
 			Assert::IsFalse(f.good());
 
-			//duplicate insert should result in an update of type an rating but keep the id! (to keep the id)
+			//duplicate insert should result in an update of type and delete dependants such as worst case scenarios and coverage
+			Assert::IsTrue(dbman->addEntryToCrashDescriptionsTable(ftid2, "here a crash fp"));
+			Assert::IsTrue(stoi(dbman->EXECUTE_TEST_STATEMENT("SELECT Count(*) from crash_descriptions")) == 1);
+			std::set<FluffiBasicBlock> blocks;
+			blocks.insert(FluffiBasicBlock(22, 11));
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO target_modules (ID, ModuleName) VALUES (11, 'test1.dll')");
+			Assert::IsTrue(dbman->addBlocksToCoveredBlocks(ftid2, &blocks));
+			Assert::IsTrue(stoi(dbman->EXECUTE_TEST_STATEMENT("SELECT Count(*) from covered_blocks")) == 1);
+			Assert::IsTrue(stoi(dbman->EXECUTE_TEST_STATEMENT("SELECT Count(*) from interesting_testcases WHERE CreatorServiceDescriptorGUID = \"" + guid2 + "\"")) == 1);
 			Assert::IsTrue(dbman->addEntryToInterestingTestcasesTable(ftid2, ftid1, 200, "", LMDatabaseManager::TestCaseType::Exception_AccessViolation));
-			Assert::IsTrue(stoi(dbman->EXECUTE_TEST_STATEMENT("SELECT ID from interesting_testcases WHERE CreatorServiceDescriptorGUID = \"" + guid2 + "\"")) == 2);
+			Assert::IsTrue(stoi(dbman->EXECUTE_TEST_STATEMENT("SELECT Count(*) from interesting_testcases WHERE CreatorServiceDescriptorGUID = \"" + guid2 + "\"")) == 1);
 			Assert::IsTrue(stoi(dbman->EXECUTE_TEST_STATEMENT("SELECT Rating from interesting_testcases WHERE CreatorServiceDescriptorGUID = \"" + guid2 + "\"")) == 200);
 			Assert::IsTrue(stoi(dbman->EXECUTE_TEST_STATEMENT("SELECT TestCaseType from interesting_testcases WHERE CreatorServiceDescriptorGUID = \"" + guid2 + "\"")) == LMDatabaseManager::TestCaseType::Exception_AccessViolation);
+			Assert::IsTrue(stoi(dbman->EXECUTE_TEST_STATEMENT("SELECT Count(*) from crash_descriptions")) == 0);
+			Assert::IsTrue(stoi(dbman->EXECUTE_TEST_STATEMENT("SELECT Count(*) from covered_blocks")) == 0);
 		}
 
 		TEST_METHOD(LMDatabaseManager_generateGetCurrentBlockCoverageResponse)

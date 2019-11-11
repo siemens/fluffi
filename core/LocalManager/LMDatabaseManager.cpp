@@ -991,7 +991,7 @@ bool LMDatabaseManager::addEntryToInterestingTestcasesTable(const FluffiTestcase
 	//// prepared Statement
 	MYSQL_STMT* sql_stmt = mysql_stmt_init(getDBConnection());
 
-	const char* stmt = "INSERT IGNORE interesting_testcases (CreatorServiceDescriptorGUID, CreatorLocalID, ParentServiceDescriptorGUID, ParentLocalID, Rating, RawBytes, TestCaseType, TimeOfInsertion) values (?, ?, ?, ?, ?, ?, ?,CURRENT_TIMESTAMP()) ON DUPLICATE KEY UPDATE Rating = ?, TestCaseType = ? ";
+	const char* stmt = "REPLACE INTO interesting_testcases (CreatorServiceDescriptorGUID, CreatorLocalID, ParentServiceDescriptorGUID, ParentLocalID, Rating, RawBytes, TestCaseType, TimeOfInsertion) values (?, ?, ?, ?, ?, ?, ?,CURRENT_TIMESTAMP())";
 	mysql_stmt_prepare(sql_stmt, stmt, static_cast<unsigned long>(strlen(stmt)));
 
 	//params

@@ -12,12 +12,6 @@ COUNT_COVERED_BLOCKS="SELECT COUNT(DISTINCT ModuleID, Offset) FROM covered_block
 
 COUNT_TCTYPE="SELECT COUNT(*) FROM interesting_testcases WHERE TestCaseType=:tcType;"
 
-CRASHES=(
-    "SELECT interesting_testcases.ID, interesting_testcases.CreatorServiceDescriptorGUID, interesting_testcases.CreatorLocalID, "
-    "interesting_testcases.TestCaseType, interesting_testcases.TimeOfInsertion "
-    "FROM interesting_testcases;"
-)
-
 UNIQUE_TESTCASES=(
     "SELECT COUNT(*) FROM "
         "(SELECT cd.CrashFootprint, it.TestCaseType FROM interesting_testcases AS it "
