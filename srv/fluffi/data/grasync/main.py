@@ -47,7 +47,7 @@ while True:
     print(active_fuzzjobs)
     try:
         for fuzzjob in active_fuzzjobs:        
-            fuzzjob_engine = create_engine(SQLALCHEMY_DATABASE_URI_WITHOUT_DB + 'fluffi_' + fuzzjob)
+            fuzzjob_engine = create_engine(SQLALCHEMY_DATABASE_URI_WITHOUT_DB + 'fluffi_' + fuzzjob, connect_args={"init_command":"SET SESSION time_zone='+00:00'"})
             connection = fuzzjob_engine.connect()
 
             # Covered Blocks and Population Size            
