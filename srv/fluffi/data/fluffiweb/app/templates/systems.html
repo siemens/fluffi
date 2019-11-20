@@ -198,6 +198,10 @@ Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
                 <th style="text-align: left; width: 15%;">Conf. Instances</th>
                 <th style="text-align: left; width: 15%;">Run. Instances</th>
                 <th style="text-align: left; width: 23%;">Location</th>
+                <th class="remove"><a class="btn btn-secondary"
+                                                             href="/systems/reboot/{{ group.Name }}"
+                                                             role="button"><span
+                        class="glyphicon glyphicon-repeat"></span></a></th>
                 <th class="remove"><span class="glyphicon glyphicon-trash"></span></th>
             </tr>
             </thead>
@@ -234,12 +238,18 @@ Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
                         {% endfor %}
                     </select>
                 </td>
-                {% if host.isNotPersistentDevSys == True %}
                 <td class="remove"><a class="btn btn-secondary"
+                                                             href="/systems/reboot/{{ host.Name }}"
+                                                             role="button"><span
+                        class="glyphicon glyphicon-repeat"></span></a></td>
+                <td class="remove">
+                {% if host.isNotPersistentDevSys == True %}
+                <a class="btn btn-secondary"
                                                              href="/systems/removeDevSystem/{{ host.Name }}/{{ host.Id }}"
                                                              role="button"><span
-                        class="glyphicon glyphicon-remove"></span></a></td>
+                        class="glyphicon glyphicon-remove"></span></a>
                 {% endif %}
+                </td>
             </tr>
             {% endfor %}
             </tbody>

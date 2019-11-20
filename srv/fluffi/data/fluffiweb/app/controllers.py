@@ -322,11 +322,36 @@ def getGeneralInformationData(projId, stmt):
         for row in result:
             testcase = type('', (), {})()
             testcase.testcaseID = row["ID"]
+            try:
+                if row["CrashFootprint"] is not None:
+                    testcase.footprint = row["CrashFootprint"]
+            except Exception as e:
+                print(e)
             testcase.id = "{}:{}".format(row["CreatorServiceDescriptorGUID"], row["CreatorLocalID"])
             testcase.rating = row["Rating"]
             testcase.niceName = row["NiceName"]
             testcase.timeOfInsertion = row["TimeOfInsertion"]
             data.testcases.append(testcase)
+    except Exception as e:
+        print(e)
+        pass
+    finally:
+        connection.close()
+        engine.dispose()
+
+    return data
+
+
+def getRowCount(projId, stmt):
+    project = models.Fuzzjob.query.filter_by(id = projId).first()
+    data = 0
+
+    engine = create_engine(
+        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
+    connection = engine.connect()
+    try:
+        result = connection.execute(stmt)
+        data = result.fetchone()[0]
     except Exception as e:
         print(e)
         pass
@@ -609,7 +634,7 @@ def executeResetFuzzjobStmts(projId, deletePopulation):
             connection.execute(RESET_RATING)
         else:
             connection.execute(DELETE_TESTCASES_WITHOUT_POPULATION)
-            connection.execute(RESET_INITIAL_RATING)
+            connection.execute(RESET_RATING)
 
         return "Reset Fuzzjob was successful", "success"
     except Exception as e:
