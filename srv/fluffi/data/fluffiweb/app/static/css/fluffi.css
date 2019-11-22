@@ -366,3 +366,9 @@ Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
     padding: 5px;
     border-radius: 5px;
 }
+
+.stickyBtn {
+    position: fixed; 
+    bottom: 50px; 
+    right: 50px;
+}
