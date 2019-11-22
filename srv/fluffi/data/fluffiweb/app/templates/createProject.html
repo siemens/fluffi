@@ -63,12 +63,12 @@ Author(s): Junes Najah, Pascal Eckmann, Thomas Riedmaier, Michael Kraus, Abian B
                 <div class="create-project-code" id="chosenGeneratorTypes">{{ defaultSubTypesOfGenerator }}</div>
             </div>
             <div style="padding-top: 5px">
-                <button class="btn btn-default" data-target="#addGeneratorTypes" data-toggle="modal" type="button">Set
+                <button class="btn btn-default" data-target="#setGeneratorTypes" data-toggle="modal" type="button">Set
                     Generator Types
                 </button>
             </div>
             <!-- Modal -->
-            <div class="modal fade" id="addGeneratorTypes" role="dialog">
+            <div class="modal fade" id="setGeneratorTypes" role="dialog">
                 <div class="modal-dialog">
                     <!-- Modal content-->
                     <div class="modal-content">
@@ -87,10 +87,10 @@ Author(s): Junes Najah, Pascal Eckmann, Thomas Riedmaier, Michael Kraus, Abian B
                             </div>
                             {% endfor %}
                             <div>
-                                <input class="btn btn-primary" data-dismiss="modal" id="addGeneratorTypesButton"
+                                <input class="btn btn-primary" data-dismiss="modal" id="setGeneratorTypesButton"
                                        onclick="addTypeSetting({{subTypesMutator}}, 'generator')"
                                        type="button"
-                                       value="Add"/>
+                                       value="Set"/>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -110,12 +110,12 @@ Author(s): Junes Najah, Pascal Eckmann, Thomas Riedmaier, Michael Kraus, Abian B
                 <div class="create-project-code" id="chosenEvaluatorTypes">{{ defaultSubTypesOfEvaluator }}</div>
             </div>
             <div style="padding-top: 5px">
-                <button class="btn btn-default" data-target="#addEvaluatorTypes" data-toggle="modal" type="button">Set
+                <button class="btn btn-default" data-target="#setEvaluatorTypes" data-toggle="modal" type="button">Set
                     Evaluator Types
                 </button>
             </div>
             <!-- Modal -->
-            <div class="modal fade" id="addEvaluatorTypes" role="dialog">
+            <div class="modal fade" id="setEvaluatorTypes" role="dialog">
                 <div class="modal-dialog">
                     <!-- Modal content-->
                     <div class="modal-content">
@@ -134,10 +134,10 @@ Author(s): Junes Najah, Pascal Eckmann, Thomas Riedmaier, Michael Kraus, Abian B
                             </div>
                             {% endfor %}
                             <div>
-                                <input class="btn btn-primary" data-dismiss="modal" id="addEvaluatorTypesButton"
+                                <input class="btn btn-primary" data-dismiss="modal" id="setEvaluatorTypesButton"
                                        onclick="addTypeSetting({{subTypesEvaluator}}, 'evaluator')"
                                        type="button"
-                                       value="Add"/>
+                                       value="Set"/>
                             </div>
                         </div>
                         <div class="modal-footer">
