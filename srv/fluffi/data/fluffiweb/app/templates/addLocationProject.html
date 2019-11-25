@@ -14,14 +14,16 @@ Author(s): Thomas Riedmaier, Abian Blome, Junes Najah
 {% block title %}FLUFFI - Locations - Add Project{% endblock %}
 
 {% block content %}
-    <h1>Add project to location</h1>
-    <form action="" method="POST" name="addLocationProject">
-        {{ form.hidden_tag() }}
-        <p>
-             Name:<br>
-            {{ form.project }}<br>
-        </p>
-        <p><input type="submit" value="Add Project"/></p>
-    </form>
+    <div class="container">
+        <h1>Add project to location</h1>
+        <form action="" method="POST" name="addLocationProject">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                <label for="name">Name:</label>
+                {{ form.project(class_="form-control") }}
+            </div>
+            <input class="btn btn-primary" type="submit" value="Add Project"/>
+        </form>
+    </div>
 
 {% endblock %}

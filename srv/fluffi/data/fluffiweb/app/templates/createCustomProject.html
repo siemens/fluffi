@@ -14,30 +14,33 @@ Author(s): Junes Najah, Thomas Riedmaier, Abian Blome
 {% block title %}FLUFFI - Fuzzjobs - Overview - Register Fuzzjob{% endblock %}
 
 {% block content %}
-<h1>Connect to already existing Fuzzjob database</h1>
-<form action="" method="POST" name="createCustomProject">
-    {{ form.hidden_tag() }}
-    <p>
-        Fuzzjob name:<br>
-        {{ form.name }}<br>
-    </p>
-    <p>
-        DB Host:<br>
-        {{ form.DBHost }}<br>
-    </p>
-    <p>
-        DB Username:<br>
-        {{ form.DBUser }}<br>
-    </p>
-    <p>
-        DB Password:<br>
-        {{ form.DBPass }}<br>
-    </p>
-    <p>
-        DB Name:<br>
-        {{ form.DBName }}<br>
-    </p>
-    <p><input type="submit" value="Connect to Fuzzjob"/></p>
-</form>
+<div class="container">
+    <h1>Connect to already existing Fuzzjob database</h1>
+    <form action="" method="POST" name="createCustomProject">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            <label for="name">Fuzzjob name:</label>
+            {{ form.name(class_="form-control") }}
+        </div>
+        <div class="form-group">
+            <label for="host">DB Host:</label>
+            {{ form.DBHost(class_="form-control") }}
+        </div>
+        <div class="form-group">
+            <label for="username">DB Username:</label>
+            {{ form.DBUser(class_="form-control") }}
+        </div>
+        <div class="form-group">
+            <label for="password">DB Password:</label>
+            {{ form.DBPass(class_="form-control") }}
+        </div>
+        <div class="form-group">
+            <label for="dbname">DB Name:</label>
+            {{ form.DBName(class_="form-control") }}
+        </div>        
+        <input type="submit" class="btn btn-primary" value="Connect to Fuzzjob"/>
+    </form>
+</div>
+
 
 {% endblock %}
