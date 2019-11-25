@@ -1756,6 +1756,8 @@ void ExternalProcess::debug(unsigned long timeoutMilliseconds, std::shared_ptr<D
 					}
 					LOG(DEBUG) << "The application received a SIGSEGV and we treat any access violation as fatal";
 					die();
+					m_hasBeenRun = true;
+					return;
 				}
 				else {
 					//Option 2) Forward the exception and see if the application can handle it. Kill it if not
@@ -1771,6 +1773,8 @@ void ExternalProcess::debug(unsigned long timeoutMilliseconds, std::shared_ptr<D
 						//The application was unable to handle this exception
 						LOG(DEBUG) << "The application was unable to handle this exception - killing it";
 						die();
+						m_hasBeenRun = true;
+						return;
 					}
 				}
 			}
