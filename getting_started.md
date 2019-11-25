@@ -71,7 +71,7 @@ git clone  --depth 1 --branch master https://github.com/siemens/fluffi.git ./flu
 Copy the server part to /srv/fluffi
 
 ```
-rsync -ai --delete --exclude={'data/ftp/files/archive','data/ftp/files/fluffi','data/ftp/files/initial','data/ftp/files/odroid','data/ftp/files/SUT','data/ftp/files/tftp-roots','data/ftp/files/ubuntu-mirror','data/ftp/files/deploy','data/tftp','data/smb/files/server2008','data/smb/files/server2016','data/dnsmasq/dnsmasq.leases','data/mon/grafana','data/mon/influxdb'} ./fluffigit/srv/fluffi/ /srv/fluffi/
+rsync -ai --delete --exclude={'data/ftp/files/archive','data/ftp/files/deploy','data/ftp/files/fluffi','data/ftp/files/initial/linux/activePackages','data/ftp/files/initial/linux/inactivePackages','data/ftp/files/initial/windows/activePackages','data/ftp/files/initial/windows/inactivePackages','data/ftp/files/initial/windows/ansible/Driver','data/ftp/files/initial/windows/ansible/VCRedistributables','data/ftp/files/odroid','data/ftp/files/SUT','data/ftp/files/tftp-roots','data/ftp/files/ubuntu-mirror','data/tftp','data/smb/files/server2008','data/smb/files/server2016','data/dnsmasq/dnsmasq.leases','data/mon/grafana','data/mon/influxdb'} ./fluffigit/srv/fluffi/ /srv/fluffi/
 ```
 
 Apply changes to the default configuration. We recommend you to:
@@ -82,7 +82,7 @@ Apply changes to the default configuration. We recommend you to:
 - change /srv/fluffi/data/smb/files/initial/odroid_username to contain the actual odroid username for your odroid executor machines
 - change /srv/fluffi/data/smb/files/initial/odroid_userpasswd to contain the actual odroid password for your odroid executor machines
 - change /srv/fluffi/data/smb/files/initial/MAC2Host.csv to contain the mac addresses and hosts of your executor machines (if you want to set host names according to mac addresses)
-- replace the files in /srv/fluffi/data/smb/files/initial/updatesWS2008 with the actual files. The files stored there in the git are just text files with links to where you can download the actual files.
+- replace the files in /srv/fluffi/data/smb/files/initial/updatesWS2008 and /srv/fluffi/data/ftp/files/initial/windows/ansible with the actual files. The files stored there in the git are just text files with links to where you can download the actual files.
 
 Copy the GlobalManager to /srv/fluffi/data/fluffigm
 

@@ -359,16 +359,28 @@ def downloadArchive(archive):
     return send_file(getDownloadPath() + archive, as_attachment=True, cache_timeout=0)
 
 
-@app.route("/projects/<int:projId>/population")
-def viewPopulation(projId):
-    data = getGeneralInformationData(projId, getITQueryOfTypeNoRaw(TESTCASE_TYPES["population"]))
+@app.route("/projects/<int:projId>/population/<int:page>")
+def viewPopulation(projId, page):
+    count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["population"]))
+    if count % 1000 == 0:
+        count = count // 1000
+    else:
+        count = (count // 1000) + 1
+    if page > count:
+        page = 1
+    statement = getITQueryOfTypeNoRaw(TESTCASE_TYPES["population"])[:-1] + " LIMIT " + str((page - 1) * 1000) + ", 1000;"
+    data = getGeneralInformationData(projId, statement)
     data.name = "Population"
     data.redirect = "population"
     data.downloadName = "downloadPopulation"
 
     return renderTemplate("viewTCsTempl.html",
                           title="View Population",
-                          data=data)
+                          data=data,
+                          show_rating=True,
+                          actual_page=page,
+                          page_count=count,
+                          base_link="/projects/" + str(projId) + "/population/")
 
 
 @app.route("/projects/<int:projId>/population/download")
@@ -380,16 +392,27 @@ def downloadPopulation(projId):
     return createZipArchive(projId, nice_name, type)
 
 
-@app.route("/projects/<int:projId>/accessVioTotal")
-def viewAccessVioTotal(projId):
-    data = getGeneralInformationData(projId, getITQueryOfTypeNoRaw(TESTCASE_TYPES["accessViolations"]))
+@app.route("/projects/<int:projId>/accessVioTotal/<int:page>")
+def viewAccessVioTotal(projId, page):
+    count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["accessViolations"]))
+    if count % 1000 == 0:
+        count = count // 1000
+    else:
+        count = (count // 1000) + 1
+    if page > count:
+        page = 1
+    statement = getITQueryOfTypeNoRaw(TESTCASE_TYPES["accessViolations"])[:-1] + " LIMIT " + str((page - 1) * 1000) + ", 1000;"
+    data = getGeneralInformationData(projId, statement)
     data.name = "Access Violations"
     data.redirect = "accessVioTotal"
     data.downloadName = "downloadAccessVioTotal"
 
     return renderTemplate("viewTCsTempl.html",
                           title="View Access Violations",
-                          data=data)
+                          data=data,
+                          actual_page=page,
+                          page_count=count,
+                          base_link="/projects/" + str(projId) + "/accessVioTotal/")
 
 
 @app.route("/projects/<int:projId>/accessVioTotal/download")
@@ -410,7 +433,8 @@ def viewAccessVioUnique(projId):
 
     return renderTemplate("viewTCsTempl.html",
                           title="View Unique Access Violations",
-                          data=data)
+                          data=data,
+                          show_occurences=True)
 
 
 @app.route("/projects/<int:projId>/accessVioUnique/download")
@@ -422,16 +446,27 @@ def downloadAccessVioUnique(projId):
     return createZipArchive(projId, nice_name, type)
 
 
-@app.route("/projects/<int:projId>/totalCrashes")
-def viewTotalCrashes(projId):
-    data = getGeneralInformationData(projId, getITQueryOfTypeNoRaw(TESTCASE_TYPES["crashes"]))
+@app.route("/projects/<int:projId>/totalCrashes/<int:page>")
+def viewTotalCrashes(projId, page):
+    count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["crashes"]))
+    if count % 1000 == 0:
+        count = count // 1000
+    else:
+        count = (count // 1000) + 1
+    if page > count:
+        page = 1
+    statement = getITQueryOfTypeNoRaw(TESTCASE_TYPES["crashes"])[:-1] + " LIMIT " + str((page - 1) * 1000) + ", 1000;"
+    data = getGeneralInformationData(projId, statement)
     data.name = "Crashes"
     data.redirect = "totalCrashes"
     data.downloadName = "downloadTotalCrashes"
 
     return renderTemplate("viewTCsTempl.html",
                           title="View Total Crashes",
-                          data=data)
+                          data=data,
+                          actual_page = page,
+                          page_count = count,
+                          base_link = "/projects/" + str(projId) + "/totalCrashes/")
 
 
 @app.route("/projects/<int:projId>/totalCrashes/download")
@@ -452,7 +487,8 @@ def viewUniqueCrashes(projId):
 
     return renderTemplate("viewTCsTempl.html",
                           title="View Unique Crashes",
-                          data=data)
+                          data=data,
+                          show_occurences=True)
 
 
 @app.route("/projects/<int:projId>/uniqueCrashes/download")
@@ -464,16 +500,27 @@ def downloadUniqueCrashes(projId):
     return createZipArchive(projId, nice_name, type)
 
 
-@app.route("/projects/<int:projId>/hangs")
-def viewHangs(projId):
-    data = getGeneralInformationData(projId, getITQueryOfTypeNoRaw(TESTCASE_TYPES["hangs"]))
+@app.route("/projects/<int:projId>/hangs/<int:page>")
+def viewHangs(projId, page):
+    count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["hangs"]))
+    if count % 1000 == 0:
+        count = count // 1000
+    else:
+        count = (count // 1000) + 1
+    if page > count:
+        page = 1
+    statement = getITQueryOfTypeNoRaw(TESTCASE_TYPES["hangs"])[:-1] + " LIMIT " + str((page - 1) * 1000) + ", 1000;"
+    data = getGeneralInformationData(projId, statement)
     data.name = "Hangs"
     data.redirect = "hangs"
     data.downloadName = "downloadHangs"
 
     return renderTemplate("viewTCsTempl.html",
                           title="View Hangs",
-                          data=data)
+                          data=data,
+                          actual_page = page,
+                          page_count = count,
+                          base_link = "/projects/" + str(projId) + "/hangs/")
 
 
 @app.route("/projects/<int:projId>/hangs/download")
@@ -485,16 +532,27 @@ def downloadHangs(projId):
     return createZipArchive(projId, nice_name, type)
 
 
-@app.route("/projects/<int:projId>/noResponse")
-def viewNoResponses(projId):
-    data = getGeneralInformationData(projId, getITQueryOfTypeNoRaw(TESTCASE_TYPES["noResponses"]))
+@app.route("/projects/<int:projId>/noResponse/<int:page>")
+def viewNoResponses(projId, page):
+    count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["noResponses"]))
+    if count % 1000 == 0:
+        count = count // 1000
+    else:
+        count = (count // 1000) + 1
+    if page > count:
+        page = 1
+    statement = getITQueryOfTypeNoRaw(TESTCASE_TYPES["noResponses"])[:-1] + " LIMIT " + str((page - 1) * 1000) + ", 1000;"
+    data = getGeneralInformationData(projId, statement)
     data.name = "No Responses"
     data.redirect = "noResponse"
     data.downloadName = "downloadNoResponses"
 
     return renderTemplate("viewTCsTempl.html",
                           title="View No Responses",
-                          data=data)
+                          data=data,
+                          actual_page=page,
+                          page_count=count,
+                          base_link="/projects/" + str(projId) + "/noResponse/")
 
 
 @app.route("/projects/<int:projId>/noResponse/download")
@@ -670,10 +728,10 @@ def addTestcase(projId):
     if 'addTestcase' in request.files:
         msg, category = insertTestcases(projId, request.files.getlist('addTestcase'))
         flash(msg, category)
-        return redirect("/projects/{}/population".format(projId))
+        return redirect("/projects/{}/population/1".format(projId))
     else:
         flash("Please select files to add ...", "error")
-        return redirect("/projects/{}/population".format(projId))
+        return redirect("/projects/{}/population/1".format(projId))
 
 
 @app.route("/locations/assignWorker/<string:workerID>", methods=["POST"])
@@ -1209,6 +1267,16 @@ def removeConfiguredInstances(system, fuzzjob, type):
         status = 'error'
 
     return json.dumps({"status": status})
+
+
+@app.route("/systems/reboot/<string:hostname>", methods=["GET"])
+def rebootSystem(hostname):
+    historyURL = ANSIBLE_REST_CONNECTOR.executePlaybook('rebootSystems.yml', hostname)
+
+    if historyURL is not None:
+        return redirect(historyURL, code=302)
+    else:
+        return redirect(url_for("systems"))
 
 
 @app.route("/systems/view/<string:hostname>/initialSetup", methods=["POST"])

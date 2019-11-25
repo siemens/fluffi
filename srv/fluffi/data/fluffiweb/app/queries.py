@@ -27,11 +27,9 @@ GET_TARGET_MODULES = (
 DELETE_TESTCASES = (
     "DELETE FROM interesting_testcases WHERE CreatorServiceDescriptorGUID <> 'initial'")
 RESET_RATING = (
-    "UPDATE interesting_testcases SET Rating = 10000")
+    "UPDATE interesting_testcases SET Rating = 10000 WHERE TestCaseType = 0")
 DELETE_TESTCASES_WITHOUT_POPULATION = (
     "DELETE FROM interesting_testcases WHERE TestCaseType <> 0")
-RESET_INITIAL_RATING = (
-    "UPDATE interesting_testcases SET Rating = 10000 WHERE CreatorServiceDescriptorGUID = 'initial'")
 GET_MI_HOST_AND_PORT = (
     "SELECT managed_instances.ServiceDescriptorHostAndPort FROM managed_instances;")
 GET_MAX_LOCALID = (
@@ -101,15 +99,17 @@ UNIQUE_ACCESS_VIOLATION = (
     "LEFT JOIN nice_names_testcase AS nn ON av.ID = nn.TestcaseID;")
 
 UNIQUE_ACCESS_VIOLATION_NO_RAW = (
-    "SELECT av.ID, av.TestCaseType, av.CreatorServiceDescriptorGUID, av.CreatorLocalID, av.Rating, "
-    "av.TimeOfInsertion, nn.NiceName "
-    "FROM "
-    "(SELECT cd.CrashFootprint, it.TestCaseType, it.CreatorServiceDescriptorGUID, it.CreatorLocalID, it.Rating, "
-    "it.TimeOfInsertion, it.ID, it.RawBytes"
-    " FROM interesting_testcases AS it"
-    " JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
-    " WHERE it.TestCaseType=2 Group by cd.CrashFootprint) av "     
-    "LEFT JOIN nice_names_testcase AS nn ON av.ID = nn.TestcaseID;")
+    "SELECT av.ID, av.CrashFootprint, av.TestCaseType, av.CreatorServiceDescriptorGUID, av.CreatorLocalID, av.Rating, "
+	"av.TimeOfInsertion, nn.NiceName "
+    "FROM (SELECT cd.CrashFootprint, it.TestCaseType, it.CreatorServiceDescriptorGUID, it.CreatorLocalID, "
+	"MIN(it.TimeOfInsertion) as TimeOfInsertion, it.ID, count(cd.CrashFootprint) as Rating "
+	"FROM interesting_testcases AS it "
+	"JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
+	"WHERE it.TestCaseType=2 "
+	"Group by cd.CrashFootprint) as av "
+    "LEFT JOIN nice_names_testcase AS nn "
+    "ON av.ID = nn.TestcaseID "
+    "ORDER BY av.TimeOfInsertion asc;")
 
 NUM_UNIQUE_CRASH = (
     "SELECT count(*) "
@@ -132,17 +132,18 @@ UNIQUE_CRASHES = (
     "WHERE TestCaseType=3;")
 
 UNIQUE_CRASHES_NO_RAW = (
-    "SELECT oc.ID, oc.TestCaseType, oc.CreatorServiceDescriptorGUID, "
-    "oc.CreatorLocalID, oc.Rating, oc.TimeOfInsertion, nn.NiceName "
-    "FROM "
-    "(SELECT cd.CrashFootprint, it.TestCaseType, it.CreatorServiceDescriptorGUID, it.CreatorLocalID, "
-    "it.Rating, it.TimeOfInsertion, it.ID, it.RawBytes"
-    " FROM interesting_testcases AS it"
-    " JOIN crash_descriptions AS cd"
-    " ON it.ID = cd.CreatorTestcaseID "
-    " GROUP BY cd.CrashFootprint) oc " 
-    "LEFT JOIN nice_names_testcase AS nn ON oc.ID = nn.TestcaseID "
-    "WHERE TestCaseType=3;")
+    "SELECT oc.ID, oc.CrashFootprint, oc.TestCaseType, oc.CreatorServiceDescriptorGUID, oc.CreatorLocalID, oc.Rating, "
+    "oc.TimeOfInsertion, nn.NiceName "
+    "FROM (SELECT cd.CrashFootprint, it.TestCaseType, it.CreatorServiceDescriptorGUID, it.CreatorLocalID, "
+    "MIN(it.TimeOfInsertion) as TimeOfInsertion, it.ID, count(cd.CrashFootprint) as Rating "
+    "FROM interesting_testcases AS it "
+    "JOIN crash_descriptions AS cd "
+    "ON it.ID = cd.CreatorTestcaseID "
+    "WHERE TestCaseType=3 "
+    "GROUP BY cd.CrashFootprint) as oc "
+    "LEFT JOIN nice_names_testcase AS nn "
+    "ON oc.ID = nn.TestcaseID "
+    "ORDER BY oc.TimeOfInsertion asc;")
 
 MANAGED_INSTANCES_HOST_AND_PORT_AGENT_TYPE = (
     "SELECT managed_instances.ServiceDescriptorHostAndPort "
@@ -278,7 +279,7 @@ def getITQueryOfTypeNoRaw(n):
         "nn.NiceName "
         "FROM interesting_testcases AS it "
         "LEFT JOIN nice_names_testcase AS nn ON it.ID = nn.TestcaseID "
-        "WHERE TestCaseType={} LIMIT 1000;".format(n)
+        "WHERE TestCaseType={};".format(n)
     )
 
 
