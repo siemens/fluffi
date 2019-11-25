@@ -461,7 +461,7 @@ dashboard.rows.push({
               },
               {
                 "params": [
-                  "none"
+                  "0"
                 ],
                 "type": "fill"
               }
