@@ -47,13 +47,13 @@ class TestURLs(unittest.TestCase):
     def test_hangs_redirect(self):
         """ Tests if the hangs URL gives a 200 """
 
-        result = self.client.get("/projects/{}/hangs".format(self.projId))
+        result = self.client.get("/projects/{}/hangs/1".format(self.projId))
         self.assertEqual(result.status_code, 200)  
 
     def test_population_redirect(self):
         """ Tests if the population URL gives a 200 """
 
-        result = self.client.get("/projects/{}/population".format(self.projId))
+        result = self.client.get("/projects/{}/population/1".format(self.projId))
         self.assertEqual(result.status_code, 200)  
 
     def test_violations_redirect(self):
@@ -71,7 +71,7 @@ class TestURLs(unittest.TestCase):
     def test_accessVioTotal_redirect(self):
         """ Tests if the accessVioTotal view URL gives a 200 """
 
-        result = self.client.get("/projects/{}/accessVioTotal".format(self.projId))
+        result = self.client.get("/projects/{}/accessVioTotal/1".format(self.projId))
         self.assertEqual(result.status_code, 200)
 
     def test_accessVioUnique_redirect(self):
@@ -83,13 +83,13 @@ class TestURLs(unittest.TestCase):
     def test_totalCrashes_redirect(self):
         """ Tests if the totalCrashes view URL gives a 200 """
 
-        result = self.client.get("/projects/{}/totalCrashes".format(self.projId))
+        result = self.client.get("/projects/{}/totalCrashes/1".format(self.projId))
         self.assertEqual(result.status_code, 200) 
 
     def test_noResponse_redirect(self):
         """ Tests if the noResponse view URL gives a 200 """
 
-        result = self.client.get("/projects/{}/noResponse".format(self.projId))
+        result = self.client.get("/projects/{}/noResponse/1".format(self.projId))
         self.assertEqual(result.status_code, 200) 
 
 

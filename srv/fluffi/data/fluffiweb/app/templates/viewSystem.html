@@ -11,6 +11,7 @@ Author(s): Pascal Eckmann, Fabian Russwurm, Junes Najah, Michael Kraus, Thomas R
 -->
 
 {% extends "base.html" %}
+{% block title %}FLUFFI - System {{system.Name}}{% endblock %}
 {% block scripts %}
 <script src="{{ url_for('static', filename = 'javascript/instanceConfiguration.js') }}" type="text/javascript"></script>
 
