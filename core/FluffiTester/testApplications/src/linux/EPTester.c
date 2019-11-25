@@ -32,13 +32,15 @@ Author(s): Thomas Riedmaier, Pascal Eckmann
 #define CONSOLEREFLECTOR std::string("./ConsoleReflector")
 
 
-//g++ -std=c++11 mytester.c -I ../../../../SharedCode -I ../../../../dependencies/easylogging/include -I ../../../../dependencies/libprotoc/include/siemens/cpp -I ../../../../dependencies/libprotoc/include -I ../../../../dependencies/libuuid/include -L ../../../../bin  -o mytester ../../../../lib/sharedcode.a ../../../../dependencies/libprotoc/lib/x86-64/libprotobuf.a  ../../../../dependencies/easylogging/lib/x86-64/libeasyloggingpp.a ../../../../dependencies/libuuid/lib/x86-64/libuuid.a  -pthread -lstdc++fs  -ldl -l:libzmq.so.5
+//g++ -std=c++11 EPTester.c -I ../../../../SharedCode -I ../../../../dependencies/easylogging/include -I ../../../../dependencies/libprotoc/include/siemens/cpp -I ../../../../dependencies/libprotoc/include -I ../../../../dependencies/libuuid/include -L ../../../../x86-64/bin  -o EPTester ../../../../x86-64/lib/sharedcode.a ../../../../dependencies/libprotoc/lib/x86-64/libprotobuf.a  ../../../../dependencies/easylogging/lib/x86-64/libeasyloggingpp.a ../../../../dependencies/libuuid/lib/x86-64/libuuid.a  -pthread -lstdc++fs  -ldl -l:libzmq.so.5 -Wl,-rpath,../../../../x86-64/bin
 
 INITIALIZE_EASYLOGGINGPP
 
 int main() {
 
 	Util::setDefaultLogOptions("mytest.log");
+
+	Util::enableDebugPrivilege();
 
 	LOG(INFO) << "Starting RUN tests!";
 
