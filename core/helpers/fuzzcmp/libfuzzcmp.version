@@ -1,4 +1,4 @@
-FOO {
-  global: mystrcmp; mymemcmp; strcmp; memcmp; _Z9mymemcmp_mPKvS0_m; _Z9mystrcmp_mPKcS0_ ;# explicitly list symbols to be exported
+GLIBC_2.2.5 {
+  global: mystrcmp; mymemcmp; strcmp; memcmp; _Z9mymemcmp_mPKvS0_m; _Z9mystrcmp_mPKcS0_; _Z9mymemcmp_jPKvS0_j; _Z9mystrcmp_jPKcS0_; # explicitly list symbols to be exported
   local: *;         # hide everything else
 };

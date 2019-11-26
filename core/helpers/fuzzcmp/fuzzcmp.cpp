@@ -124,17 +124,15 @@ unsigned int addrToRVA(size_t addr) {
 
 #else
 
-std::vector<std::string> splitString(std::string str, std::string token) {
-	if (str.empty())	return std::vector<std::string> { "" };
-
-	if (token.empty()) return std::vector<std::string> { str };
+std::vector<std::string> splitString(std::string str, const char token) {
+	if (str.empty())        return std::vector<std::string> { "" };
 
 	std::vector<std::string>result;
 	while (str.size()) {
 		size_t index = str.find(token);
 		if (index != std::string::npos) {
 			result.push_back(str.substr(0, index));
-			str = str.substr(index + token.size());
+			str = str.substr(index + 1);
 			if (str.size() == 0)result.push_back(str);
 		}
 		else {
@@ -146,20 +144,25 @@ std::vector<std::string> splitString(std::string str, std::string token) {
 }
 
 unsigned int addrToRVA(std::uintptr_t addr) {
-	std::stringstream fileNameSS;
-	fileNameSS << "/proc/self/maps";
-	std::ifstream mapsFile(fileNameSS.str(), std::ifstream::in);
-
 	unsigned int re = UINT_MAX;
-	std::string line;
-	while (std::getline(mapsFile, line))
+	FILE * fp;
+	char * line = NULL;
+	size_t len = 0;
+	ssize_t read;
+
+	fp = fopen("/proc/self/maps", "r");
+	if (fp == NULL) {
+		printf("Failed opening /proc/self/maps for reading");
+	}
+
+	while ((read = getline(&line, &len, fp)) != -1)
 	{
-		std::vector<std::string>  lineElements = splitString(line, " ");
+		std::vector<std::string>  lineElements = splitString(line, ' ');
 		if (lineElements.size() < 2) {
-			printf("Splitting line %s failed", line.c_str());;
+			printf("Splitting line %s failed", line);;
 			continue;
 		}
-		std::vector<std::string>  addresses = splitString(lineElements[0], "-");
+		std::vector<std::string>  addresses = splitString(lineElements[0], '-');
 		if (addresses.size() < 2) {
 			printf("Splitting addresses %s failed", lineElements[0].c_str());
 			continue;
@@ -171,7 +174,10 @@ unsigned int addrToRVA(std::uintptr_t addr) {
 		}
 	}
 
-	mapsFile.close();
+	fclose(fp);
+	if (line != NULL) {
+		free(line);
+	}
 
 	if (re != UINT_MAX) {
 		return re;
