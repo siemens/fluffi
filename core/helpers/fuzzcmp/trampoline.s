@@ -10,31 +10,39 @@
 
 .global mystrcmp
 .global mymemcmp
+.global memcmp
+.global strcmp
 
 .text
+
+strcmp:
+	jmp mystrcmp
+
+memcmp:
+	jmp mymemcmp
 
 .if ARCH == 64
 
 
 mystrcmp:
-	sub $32,%rsp # create shadow space
-	mov %rdx, %r8 # parameter3 of mystrcmp_ 
-	mov %rcx, %rdx  # parameter2 of mystrcmp_
-	pop %rcx # parameter1 of mystrcmp_
-	push %rcx # restore stack
+	push %rbp
+	mov %rsp,%rbp
+	mov %rsi, %rdx # parameter3 of mystrcmp_ 
+	mov %rdi, %rsi  # parameter2 of mystrcmp_
+	mov 8(%rbp), %rdi # parameter1 of mystrcmp_
 	call _Z9mystrcmp_mPKcS0_@plt 
-	add $32, %rsp # cleanup shadow space
+	leave # restore stack
 	ret
 
 mymemcmp:
-	sub $32, %rsp # create shadow space
-	mov %r8, %r9  # parameter4 of mymemcmp_ 
-	mov %rdx, %r8  # parameter3 of mymemcmp_ 
-	mov %rcx, %rdx # parameter2 of mymemcmp_
-	pop %rcx # parameter1 of mymemcmp_
-	push %rcx # restore stack
+	push %rbp
+	mov %rsp,%rbp
+	mov %rdx, %rcx  # parameter4 of mymemcmp_ 
+	mov %rsi, %rdx  # parameter3 of mymemcmp_ 
+	mov %rdi, %rsi # parameter2 of mymemcmp_
+	mov 8(%rbp), %rdi # parameter1 of mymemcmp_
 	call _Z9mymemcmp_mPKvS0_m@plt 
-	add $32,%rsp# cleanup shadow space
+	leave # restore stack
 	ret
 
 
