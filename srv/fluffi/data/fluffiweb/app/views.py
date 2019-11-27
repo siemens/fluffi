@@ -621,14 +621,14 @@ def viewManagedInstances(projId):
                           localManagers=localManagers
                           )
 
-
+ 
 @app.route("/projects/<int:projId>/configSystemInstances")
 def viewConfigSystemInstances(projId):
     # initialize forms
     systemInstanceConfigForm = SystemInstanceConfigForm()
     fuzzjob = db.session.query(models.Fuzzjob).filter_by(id=projId).first()
     sysList = []
-    systems = db.session.query(models.Systems).all()
+    systems = db.session.query(models.Systems).all()    
 
     for sys in systems:
         sysList.append(sys)
@@ -642,6 +642,7 @@ def viewConfigSystemInstances(projId):
                                                     models.SystemFuzzjobInstances.InstanceCount,
                                                     models.SystemFuzzjobInstances.Architecture).filter_by(
         Fuzzjob=projId).all()
+    
     for system in sysList:
         s = {'name': system.Name, 'tg': 0, 'tr': 0, 'te': 0, 'tgarch': "", 'trarch': "", 'tearch': ""}
         if 'lemming' not in system.Name:
@@ -659,14 +660,13 @@ def viewConfigSystemInstances(projId):
                 if conf.AgentType == 2:
                     s['te'] = conf.InstanceCount
                     s['tearch'] = "(" + conf.Architecture + ")"
-
+    
     for conf in dbconfiguredFuzzjobInstances:
         if conf.AgentType == 4:
             lmCount = lmCount + conf.InstanceCount
 
     return renderTemplate("viewConfigSystemInstances.html",
                           title="View Instance Configuration",
-                          system=system,
                           systemInstanceConfigForm=systemInstanceConfigForm,
                           configSystems=sysInstanceList,
                           lemmingSystems=lemmingInstanceList,
