@@ -126,3 +126,4 @@ core/helpers/fuzzcmp/x64/
 core/helpers/fuzzcmp/memcmp.cpp
 core/helpers/fuzzcmp/strcmp.cpp
 core/helpers/fuzzcmp/Release/
+core/helpers/fuzzcmp/Win32/
