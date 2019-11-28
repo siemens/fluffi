@@ -217,7 +217,7 @@ int main(int argc, char* argv[])
 				break;
 			}
 			if (!m_getStatusRequestHandler->isManagerActive(maxAllowedTimeOfManagerInactivityMS)) {
-				LOG(INFO) << "Could not reach manager -> Shutting down ...";
+				LOG(ERROR) << "My manager did not contact me (Maybe I am overloaded!) -> Shutting down ...";
 				break;
 			}
 			std::this_thread::sleep_for(std::chrono::milliseconds(checkAgainMS));

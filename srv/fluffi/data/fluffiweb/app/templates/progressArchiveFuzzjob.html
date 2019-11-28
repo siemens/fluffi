@@ -11,8 +11,9 @@ Author(s): Pascal Eckmann
 -->
 
 {% extends "base.html" %}
-{% block content %}
+{% block title %}FLUFFI - Archive Fuzzjob {{ nice_name }}{% endblock %}
 
+{% block content %}
 <script>
 $( document ).ready(function() {
     check_progress();
