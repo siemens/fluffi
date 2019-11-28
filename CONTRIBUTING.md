@@ -10,16 +10,15 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Abian Blome, Thomas Riedmaier
 -->
 
-Contributing to FLUFFI
-=========================
+# Contributing to FLUFFI
 
 Contributions to FLUFFI are always welcome. This document explains the
 general requirements on contributions and the recommended preparation steps. It
 also sketches the typical integration process of patches.
 
 
-Contribution Checklist
-----------------------
+## 1) Contribution Checklist
+
 
 - use git to manage your changes [*recomended*]
 
@@ -53,8 +52,8 @@ Contribution Checklist
 - send reminder if nothing happened after about a week
 
 
-Developer's Certificate of Origin 1.1
--------------------------------------
+## 2) Developer's Certificate of Origin 1.1
+
 
 When signing-off a patch for this project like this
 

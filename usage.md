@@ -10,9 +10,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Abian Blome, Roman Bendt
 -->
 
-## Usage
+# Usage
 
-### 1) Adding runner systems to FUN
+## 1) Adding runner systems to FUN
 All FuzzJobs are run on dedicated Runner systems in the FLUFFI Utility Network (FUN). To add new systems:
 
 * Physically plug in your system into FUN
@@ -26,23 +26,25 @@ All FuzzJobs are run on dedicated Runner systems in the FLUFFI Utility Network (
   * `net use y: /Delete /yes`
 * Finally, you need to tell FLUFFI about the system. To do so you have two options: Either you add it to ansible's [hosts](srv/fluffi/data/polenext/projects/1/hosts) file. Alternatively, you can use the `Add System` button in FLUFFI's web gui.
 
-### 2) Preparing your target
+## 2) Preparing your target
+
+### 2.1) Getting the input into your target
 
 Currently, FLUFFI supports the following types of targets:
 
-#### a) File-parsing binaries that run natively
+#### 2.1.1) File-parsing binaries that run natively
 FUN supports x64/x86 (Linux/Windows) systems and ARM/ARMarch64 systems (Linux). If your binary parses files and runs on one of these systems, you don't need to do anything more.
 
 **PLEASE NOTE**, that many targets can be converted to this type. Either by changing the source code, or by patching the binary.
 
-#### b) File-parsing binaries that need to be emulated
+#### 2.1.2) File-parsing binaries that need to be emulated
 
 If your binary parses files and you know how to emulate it with QEMU user-mode emulation, you don't need to do anything more.
 
 **PLEASE NOTE**, that many targets can be converted to this type. Either by changing the source code, or by patching the binary.
 
 
-#### c) Server binaries that run natively
+#### 2.1.3) Server binaries that run natively
 
 You need to write a so-called Feeder that allows FLUFFI to feed testcases to your target. This feeder can be written in any language you like. The interface towards FLUFFI that you need to call is implemented by the `SharedMemIPC.dll`/`libsharedmemipc.so`.
 
@@ -55,15 +57,24 @@ There are already some feeders pre-implemented [here](core/helpers/Feeder):
 
 If you want to test your feeder you can use the feeder tester implemented at [Tester](core/helpers/Feeder/Tester).
 
-#### d) GDB Targets
+#### 2.1.4) GDB Targets
 
 You need a Feeder just as with type c) targets. Furthermore, you need a GDB client that speaks the same protocol version as your GDB server.
 
-#### e) Everything else
+#### 2.1.5) Everything else
 
 Contact us if you need anything else. FLUFFI can be extended to a lot of different targets types, if needed.
 
-### 3) Create a FLUFFI Fuzz Job
+### 2.2) Replacing compare functions with fuzzable versions
+
+Fuzzing of compare functions such as memcmp and strcmp is generally a very difficult task for a black-box coverage-based fuzzer such as FLUFFI.
+
+To help FLUFFI handle this we added the [fuzzcmp](core/helpers/fuzzcmp) helper. What this helper does is - in one sentence - replacing standard compare functions with something that FLUFFI can nicely handle.
+
+We recommend using it always!
+
+
+## 3) Create a FLUFFI Fuzz Job
 
 All FuzzJobs are run on dedicated Runner systems in the FLUFFI Utility Network (FUN), to which you need to deploy your test target, which itself you should prepare as a *package*.
 
@@ -136,7 +147,7 @@ The location(s) in which you want to run your FuzzJob (can be changed later)
 
 Options for the FuzzJob. 
 
-#### TestcaseRunner
+### TestcaseRunner
 
 Which runner is used is set by the runnerType parameter. For possible values see `myAgentSubTypes` in [TestcaseRunner.cpp](core/TestcaseRunner/TestcaseRunner.cpp).
 
@@ -217,20 +228,20 @@ helper.dll/.text,0x100
 
 If you want, you can alternatively insert the blocks in the database table `blocks_to_cover` yourself (e.g. by using an IDA python script).
 
-#### TestcaseGenerator
+### TestcaseGenerator
 
 Which generator types should be used is set by the generatorTypes parameter. It is a string of all types to use followed by their percentage. If you want to use only one generator of type A set `A=100`. If you want to use two with the same probability set `A=50|B=50`. For possible type values see `myAgentSubTypes` in [TestcaseGenerator.cpp](core/TestcaseGenerator/TestcaseGenerator.cpp).
 
 **PLEASE NOTE** that the LocalManagers will try to stick as close to your setting as possible. If, however, only generators register that have e.g. only type A implemented, the ratio might not be as desired.
 
-#### TestcaseEvaluator
+### TestcaseEvaluator
 
 Which evaluator types should be used is set by the evaluatorTypes parameter. It is a string of all types to use followed by their percentage. If you want to use only one evaluator of type A set `A=100`. If you want to use two with the same probability set `A=50|B=50`. For possible type values see `myAgentSubTypes` in [TestcaseEvaluator.cpp](core/TestcaseEvaluator/TestcaseEvaluator.cpp).
 
 **PLEASE NOTE** that the LocalManagers will try to stick as close to your setting as possible. If, however, only evaluators register that have e.g. only type A implemented, the ratio might not be as desired.
 
 
-### 4) Start the FLUFFI Agents
+## 4) Start the FLUFFI Agents
 You can control the number of running FLUFFI Agents (LM, TR, TE, TG) via the web gui.
 
 To do so, you can click on 

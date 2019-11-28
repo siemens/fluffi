@@ -10,17 +10,17 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier
 -->
 
-## Vision
+# Vision
 Technological: `Build a fuzzer that can be used for security assessments / pentests of typical Siemens targets`
 
 Business: `Every Siemens parser (embedded or binary) leaving the company has been fuzzed with our fuzzer`
 
-## Mission
+# Mission
 Native binaries parsing attacker-controlled input are potentially vulnerable to memory corruption attacks. This class of attack may give remote attackers full control over a system.
 
 The mission of this project is to provide a solution that allows experts to test said binaries for this class of vulnerabilities. As our solution is meant to be optimized for security assessments of typical Siemens targets, it is designed for minimal setup effort and maximal target diversity (see also "Project summary").
 
-## Target group / customers
+# Target group / customers
 Intended users of our system: 
 - Pentesters
 
@@ -34,13 +34,13 @@ Intended interface to FLUFFI
 a) Customer provides binaries that users turn into fuzzable binaries
 b) Customer provides fuzzable version of binary (e.g. developers that implement parsers)
 
-## Strategy
+# Strategy
 Our project is meant to provide both:
 - A platform for research on cutting-edge fuzzing technologies
 - A system that allows us to offer fuzzing-as-a-service
 
 
-## Project Summary
+# Project Summary
 
 
 FLUFFI (Fully Localized Utility For Fuzzing Instantaneously) is a distributed feedback-based evolutionary fuzzer developed by Siemens STT (formerly CSA) designed specifically for the SIEMENS environment.
@@ -68,9 +68,9 @@ Popular other feedback-based evolutionary fuzzers are AFL, WinAFL, and honggfuzz
 
 - Needs a feedback loop (e.g. debugger, tracer)
 
-#### Further core design decisions:
+### Further core design decisions:
 
-#####  Do not try to maximize testcases / sec. Instead try to generate inputs that are as good as possible.
+####  Do not try to maximize testcases / sec. Instead try to generate inputs that are as good as possible.
 
 As fuzzing binaries is slow, and fuzzing embedded system binaries is even slower, FLUFFI's principle design decision is:
 
@@ -82,7 +82,7 @@ As fuzzing binaries is slow, and fuzzing embedded system binaries is even slower
 - Much less testcases / sec than e.g. AFL
 
 
-#####  Make FLUFFI a modular system that communicates over network
+####  Make FLUFFI a modular system that communicates over network
 
 + Testcase generation is not done on the same system that runs them. A crash in a (kernel) runner does not lead to a loss of a crashing testcase
 + Binary fuzzing tends to mess up Runner systems badly. Those should be restarted / reinitialized frequently while a fuzz job is running
@@ -98,7 +98,7 @@ As fuzzing binaries is slow, and fuzzing embedded system binaries is even slower
 - IO is high. All in one process would be much faster. However, due to the first design decision "Quality>Quantity", this is "okay".
 
 
-#####  FLUFFI agents are stateless - Persistent Info is stored in DB to which only LM and GM connect
+####  FLUFFI agents are stateless - Persistent Info is stored in DB to which only LM and GM connect
 
 + Agents may crash or disconnect - the system keeps working
 + Runner systems can be power-cycled / reinstalled without losing data
