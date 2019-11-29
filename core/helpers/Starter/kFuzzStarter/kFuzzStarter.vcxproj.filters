@@ -37,7 +37,7 @@ Author(s): Thomas Riedmaier
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GDBStarter.cpp">
+    <ClCompile Include="kFuzzStarter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
