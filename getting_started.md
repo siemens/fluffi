@@ -17,50 +17,50 @@ This section will guide you through the process of setting up your own FLUFFI in
 ## 1) Prerequisites
 You need to have at least two machines to run FLUFFI: A machine that will be the central server, and another machine that runs the agents.
 
-For performance reasons it is recommended to use more than one server machine (at least use a dedicated database server), plus as many as possible executor machines.
+For performance reasons, it is recommended to use more than one server machine (or at least a dedicated database server), plus as many executor machines as possible.
 
-Furthermore, you need to have a subnet that is entirely under your control: No other DNS/DHCP server must interfere.
+Furthermore, you need to have a subnet that is entirely under your control, no other DNS/DHCP server may interfere.
 
 ## 2) Compiling FLUFFI core
 
 ### Windows
-On Windows use  [the windows build file](build/windows/buildAll.bat). If you compile FLUFFI for the first time call 
+On Windows use  [the windows build file](build/windows/buildAll.bat). When you compile FLUFFI for the first time, call 
 ```
 buildAll.bat -WITH_DEPS TRUE
 ```
-Please keep in mind that this will take a long time as it will compile all FLUFFI dependencies from sources.
+Please keep in mind that this will take a long time, as it will compile all FLUFFI dependencies from sources.
 
 For all future compiles you can use 
 ```
 buildAll.bat -WITH_DEPS FALSE
 ```
 
-If you already set up the FUN (see next section), you can directly upload your binaries to FUN by calling
+If you have already set up the FUN (see next section), you can directly upload your binaries to FUN by calling
 ```
 buildAll.bat -DEPLOY_TO_FTP TRUE
 ```
 
 ### Linux
-On Linux use  [the linux build file](build/ubuntu_based/buildAll.sh). If you compile FLUFFI for the first time call 
+On Linux use  [the linux build file](build/ubuntu_based/buildAll.sh). When you compile FLUFFI for the first time, call 
 ```
 ./buildAll.sh PREPARE_ENV=TRUE WITH_DEPS=TRUE
 ```
-Please keep in mind that this will take a long time as it will compile all FLUFFI dependencies from sources.
+Please keep in mind that this will take a long time, as it will compile all FLUFFI dependencies from sources.
 
 For all future compiles you can use 
 ```
 ./buildAll.sh PREPARE_ENV=FALSE WITH_DEPS=FALSE
 ```
 
-If you already set up the FUN (see next section), you can directly upload your binaries to FUN by calling
+If you have already set up the FUN (see next section), you can directly upload your binaries to FUN by calling
 ```
 ./buildAll.sh PREPARE_ENV=FALSE WITH_DEPS=FALSE DEPLOY_TO_FTP=TRUE
 ```
 
 ## 3) Setting up the FUN
-The FLUFFI Utility Network (FUN) contains all the infrastructure for fuzzing.
+The FLUFFI Utility Network (FUN) contains all the infrastructure needed for fuzzing.
 
-To set it up you firstly need to set up the central server with docker installed. Give that server the static IP address 10.66.0.1.
+To set it up, you first need to set up the central server with docker installed. Give that server the static IP address 10.66.0.1.
 
 Copy the FLUFFI repo to that machine (or clone it there).
 
@@ -75,13 +75,13 @@ rsync -ai --delete --exclude={'data/ftp/files/archive','data/ftp/files/deploy','
 ```
 
 Apply changes to the default configuration. We recommend you to:
-- change /srv/fluffi/data/dnsmasq/ethers if you want to give some systems host names based on their mac addresses
-- change /srv/fluffi/data/dnsmasq/hosts e.g., if you want to give some systems static ip addresses or if you want to move services to different machines
+- change /srv/fluffi/data/dnsmasq/ethers if you want to give some systems host names based on their MAC addresses
+- change /srv/fluffi/data/dnsmasq/hosts e.g., if you want to give some systems static IP addresses or if you want to move services to different machines
 - change /srv/fluffi/data/polenext/projects/1/hosts to contain login information to your executor machines
 - change /srv/fluffi/data/smb/files/initial/odroid_rootpasswd to contain the actual root password for your odroid executor machines
 - change /srv/fluffi/data/smb/files/initial/odroid_username to contain the actual odroid username for your odroid executor machines
 - change /srv/fluffi/data/smb/files/initial/odroid_userpasswd to contain the actual odroid password for your odroid executor machines
-- change /srv/fluffi/data/smb/files/initial/MAC2Host.csv to contain the mac addresses and hosts of your executor machines (if you want to set host names according to mac addresses)
+- change /srv/fluffi/data/smb/files/initial/MAC2Host.csv to contain the MAC addresses and hosts of your executor machines (if you want to set host names according to MAC addresses)
 - replace the files in /srv/fluffi/data/smb/files/initial/updatesWS2008 and /srv/fluffi/data/ftp/files/initial/windows/ansible with the actual files. The files stored there in the git are just text files with links to where you can download the actual files.
 
 Copy the GlobalManager to /srv/fluffi/data/fluffigm
@@ -104,7 +104,7 @@ cd srv/fluffi/data/fluffiweb/app
 ./get_static_dependencies.sh
 ```
 
-Finally start all server services
+Finally, start all server services
 
 ```
 cd /srv/fluffi
@@ -115,6 +115,6 @@ You are now ready to use FLUFFI. See [the usage section](usage.md) for informati
 
 ## 4) Operational Security
 
-FLUFFI was never meant to be used in hostile environments, which is why FLUFFI's internal protocol is not hardened against attacks at all. It is therefore recommended, to operate FLUFFI in an isolated environment, to which you can restrict access.
+FLUFFI was never meant to be used in hostile environments, which is why FLUFFI's internal protocol is not hardened against attacks at all. It is therefore recommended to operate FLUFFI in an isolated environment, to which you can restrict access.
 
 Furthermore, it is strongly recommended to change Polemarch's user credentials, which are initially admin:admin.
