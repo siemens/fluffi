@@ -13,13 +13,25 @@ Author(s): Michael Kraus, Thomas Riedmaier, Pascal Eckmann
 #pragma once
 
 #include "targetver.h"
-#include <stdio.h>
+
+#if defined(_WIN32) || defined(_WIN64)
 #include <winsock.h>
+#define SOCKETTYPE SOCKET
+#else
+#include <unistd.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#define __cdecl __attribute__((__cdecl__))
+#define SOCKETTYPE int
+#define closesocket close
+#define INVALID_SOCKET -1
+#define SOCKET_ERROR -1
+#endif
 
 #include <stdio.h>
 #include <string>
-#include <tchar.h>
-#include <winsock.h>
+
 #include <iostream>
 
 #include <openssl/ssl.h>
@@ -27,5 +39,3 @@ Author(s): Michael Kraus, Thomas Riedmaier, Pascal Eckmann
 #include <openssl/pem.h>
 #include <openssl/x509.h>
 #include <openssl/x509_vfy.h>
-
-extern "C" FILE* __cdecl __iob_func(void);

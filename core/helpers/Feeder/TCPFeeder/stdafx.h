@@ -21,14 +21,12 @@ Author(s): Thomas Riedmaier, Abian Blome, Pascal Eckmann
 
 #include "SharedMemIPC.h"
 
-
-
 //#define USE_SSL
 #ifdef USE_SSL
 #include <applink.c>
 
 #pragma comment(lib, "sslwrap.lib")
 
-extern "C" __declspec(dllimport) int sendByteBufOnce(char* dstIP, int port, char* msg, int msgSize);
-extern "C" __declspec(dllimport) int sendByteBufWithResponse(char* dstIP, int port, char* msg, int msgSize, char* response, int responseSize);
+int __cdecl sendByteBufOnce(char* dstIP, int port, char* msg, int msgSize);
+int __cdecl sendByteBufWithResponse(char* dstIP, int port, char* msg, int msgSize, char* response, int responseSize);
 #endif

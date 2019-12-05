@@ -47,4 +47,9 @@ Author(s): Michael Kraus, Thomas Riedmaier
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="sslwrap.def">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>
