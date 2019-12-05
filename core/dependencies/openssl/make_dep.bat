@@ -39,34 +39,66 @@ mkdir build64
 mkdir build86
 mkdir build64d
 mkdir build86d
-SETLOCAL
-cd build64
-call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64
-set CL=/MP
-set __CNF_LDLIBS=-static
-perl ..\Configure VC-WIN64A --release no-tests no-unit-test no-asm enable-static-engine no-shared
-"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\nmake.exe"
-cd ..
-cd build64d
-perl ..\Configure VC-WIN64A --debug no-tests no-unit-test no-asm enable-static-engine no-shared
-"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\nmake.exe"
-cd ..
-ENDLOCAL
+IF [%1]==[2017] (
+	SETLOCAL
+	cd build64
+	call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
+	set CL=/MP
+	set __CNF_LDLIBS=-static
+	perl ..\Configure VC-WIN64A --release no-tests no-unit-test no-asm enable-static-engine no-shared
+	"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\bin\Hostx64\x64\nmake.exe"
+	cd ..
+	cd build64d
+	perl ..\Configure VC-WIN64A --debug no-tests no-unit-test no-asm enable-static-engine no-shared
+	"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\bin\Hostx64\x64\nmake.exe"
+	cd ..
+	ENDLOCAL
 
 
-SETLOCAL
-cd build86
-call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86
-set CL=/MP
-set __CNF_LDLIBS=-static
-perl ..\Configure VC-WIN32 --release no-tests no-unit-test no-asm enable-static-engine no-shared
-"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\nmake.exe"
-cd ..
-cd build86d
-perl ..\Configure VC-WIN32 --debug no-tests no-unit-test no-asm enable-static-engine no-shared
-"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\nmake.exe"
-cd ..
-ENDLOCAL
+	SETLOCAL
+	cd build86
+	call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" x86
+	set CL=/MP
+	set __CNF_LDLIBS=-static
+	perl ..\Configure VC-WIN32 --release no-tests no-unit-test no-asm enable-static-engine no-shared
+	"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\bin\Hostx86\x86\nmake.exe"
+	cd ..
+	cd build86d
+	perl ..\Configure VC-WIN32 --debug no-tests no-unit-test no-asm enable-static-engine no-shared
+	"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\bin\Hostx86\x86\nmake.exe"
+	cd ..
+	ENDLOCAL
+) ELSE (
+	SETLOCAL
+	cd build64
+	call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64
+	set CL=/MP
+	set __CNF_LDLIBS=-static
+	perl ..\Configure VC-WIN64A --release no-tests no-unit-test no-asm enable-static-engine no-shared
+	"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\nmake.exe"
+	cd ..
+	cd build64d
+	perl ..\Configure VC-WIN64A --debug no-tests no-unit-test no-asm enable-static-engine no-shared
+	"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\nmake.exe"
+	cd ..
+	ENDLOCAL
+
+
+	SETLOCAL
+	cd build86
+	call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86
+	set CL=/MP
+	set __CNF_LDLIBS=-static
+	perl ..\Configure VC-WIN32 --release no-tests no-unit-test no-asm enable-static-engine no-shared
+	"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\nmake.exe"
+	cd ..
+	cd build86d
+	perl ..\Configure VC-WIN32 --debug no-tests no-unit-test no-asm enable-static-engine no-shared
+	"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\nmake.exe"
+	cd ..
+	ENDLOCAL
+)
+
 cd ..
 
 

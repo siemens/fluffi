@@ -38,7 +38,14 @@ mkdir build64
 mkdir build86
 SETLOCAL
 cd build64
-call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64
+
+IF [%1]==[2017] (
+	ECHO Build for vs2017 
+	call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
+) ELSE (
+	ECHO Build for vs2015
+	call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64
+)
 
 cl.exe /MT /c /TP /EHsc ..\afl-fuzz.c
 LIB.EXE /OUT:afl-fuzz.LIB afl-fuzz.obj
@@ -49,7 +56,12 @@ ENDLOCAL
 
 SETLOCAL
 cd build86
-call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86
+
+IF [%1]==[2017] (
+	call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" x86
+) ELSE (
+	call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86
+)
 
 cl.exe /MT /c /TP /EHsc ..\afl-fuzz.c
 LIB.EXE /OUT:afl-fuzz.LIB afl-fuzz.obj

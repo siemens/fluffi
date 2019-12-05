@@ -16,51 +16,51 @@
 :: - Network access to github and gitlab
 
 cd zeromq
-call make_dep.bat
+call make_dep.bat %1
 IF errorlevel 1 goto :err
 cd ..
 
 cd libprotoc
-call make_dep.bat
+call make_dep.bat %1
 IF errorlevel 1 goto :err
 cd ..
 
 cd dynamorio
-call make_dep.bat
+call make_dep.bat %1
 IF errorlevel 1 goto :err
 cd ..
 
 cd mariadb
-call make_dep.bat
-IF errorlevel 1 goto :err
-cd ..
-
-cd radamsa
-call make_dep.bat
+call make_dep.bat %1
 IF errorlevel 1 goto :err
 cd ..
 
 cd easylogging
-call make_dep.bat
+call make_dep.bat %1
 IF errorlevel 1 goto :err
 cd ..
 
 cd openssl
-call make_dep.bat
+call make_dep.bat %1
 IF errorlevel 1 goto :err
 cd ..
 
 cd base64
-call make_dep.bat
+call make_dep.bat %1
 IF errorlevel 1 goto :err
 cd ..
 
 cd afl
-call make_dep.bat
+call make_dep.bat %1
 IF errorlevel 1 goto :err
 cd ..
 
 cd honggfuzz
+call make_dep.bat %1
+IF errorlevel 1 goto :err
+cd ..
+
+cd radamsa
 call make_dep.bat
 IF errorlevel 1 goto :err
 cd ..

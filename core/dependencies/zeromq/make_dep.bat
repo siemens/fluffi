@@ -37,38 +37,69 @@ git checkout 2cb1240db64ce1ea299e00474c646a2453a8435b
 mkdir build64
 mkdir build86
 cd build64
-cmake -G "Visual Studio 14 2015 Win64" -DBUILD_TESTS=OFF ..
-powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDebugDll', 'MultiThreadedDebug' } | sc $f.PSPath }"
-powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDll', 'MultiThreaded' } | sc $f.PSPath }"
-"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" ZeroMQ.sln /m /t:Build /p:Configuration=Release /p:Platform=x64 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
-"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" ZeroMQ.sln /m /t:Build /p:Configuration=Debug /p:Platform=x64 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
+
+IF [%1]==[2017] (
+	ECHO Build for vs2017
+	cmake -G "Visual Studio 15 2017 Win64" -DBUILD_TESTS=OFF ..
+	powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDebugDll', 'MultiThreadedDebug' } | sc $f.PSPath }"
+	powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDll', 'MultiThreaded' } | sc $f.PSPath }"
+	powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'libzmq-v141-mt-gd-4_3_1', 'libzmq-mt-gd' } | sc $f.PSPath }"
+	powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'libzmq-v141-mt-4_3_1', 'libzmq-mt' } | sc $f.PSPath }"
+	"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe" ZeroMQ.sln /m /t:Build /p:Configuration=Release /p:Platform=x64 /property:VCTargetsPath="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets"
+	"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe" ZeroMQ.sln /m /t:Build /p:Configuration=Debug /p:Platform=x64 /property:VCTargetsPath="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets"
+
+	cd ..
+	cd build86
+	cmake -G "Visual Studio 15 2017" -DBUILD_TESTS=OFF ..
+	powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDebugDll', 'MultiThreadedDebug' } | sc $f.PSPath }"
+	powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDll', 'MultiThreaded' } | sc $f.PSPath }"
+	powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'libzmq-v141-mt-gd-4_3_1', 'libzmq-mt-gd' } | sc $f.PSPath }"
+	powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'libzmq-v141-mt-4_3_1', 'libzmq-mt' } | sc $f.PSPath }"
+	"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe" ZeroMQ.sln /m /t:Build /p:Configuration=Release /p:Platform=Win32 /property:VCTargetsPath="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets"
+	"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe" ZeroMQ.sln /m /t:Build /p:Configuration=Debug /p:Platform=Win32 /property:VCTargetsPath="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets"
+	
+ ) ELSE (
+	ECHO Build for vs2015
+	cmake -G "Visual Studio 14 2015 Win64" -DBUILD_TESTS=OFF ..
+	powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDebugDll', 'MultiThreadedDebug' } | sc $f.PSPath }"
+	powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDll', 'MultiThreaded' } | sc $f.PSPath }"
+	powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'libzmq-v140-mt-gd-4_3_1', 'libzmq-mt-gd' } | sc $f.PSPath }"
+	powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'libzmq-v140-mt-4_3_1', 'libzmq-mt' } | sc $f.PSPath }"
+	"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" ZeroMQ.sln /m /t:Build /p:Configuration=Release /p:Platform=x64 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
+	"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" ZeroMQ.sln /m /t:Build /p:Configuration=Debug /p:Platform=x64 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
+	
+	cd ..
+	cd build86
+	cmake -G "Visual Studio 14 2015" -DBUILD_TESTS=OFF ..
+	powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDebugDll', 'MultiThreadedDebug' } | sc $f.PSPath }"
+	powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDll', 'MultiThreaded' } | sc $f.PSPath }"
+	powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'libzmq-v140-mt-gd-4_3_1', 'libzmq-mt-gd' } | sc $f.PSPath }"
+	powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'libzmq-v140-mt-4_3_1', 'libzmq-mt' } | sc $f.PSPath }"
+	"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" ZeroMQ.sln /m /t:Build /p:Configuration=Release /p:Platform=Win32 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
+	"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" ZeroMQ.sln /m /t:Build /p:Configuration=Debug /p:Platform=Win32 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
+	
+)
+
 cd ..
-cd build86
-cmake -G "Visual Studio 14 2015" -DBUILD_TESTS=OFF ..
-powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDebugDll', 'MultiThreadedDebug' } | sc $f.PSPath }"
-powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDll', 'MultiThreaded' } | sc $f.PSPath }"
-"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" ZeroMQ.sln /m /t:Build /p:Configuration=Release /p:Platform=Win32 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
-"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" ZeroMQ.sln /m /t:Build /p:Configuration=Debug /p:Platform=Win32 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
-cd ..
 cd ..
 
-copy libzmq\build64\bin\Release\libzmq-v140-mt-4_3_1.dll bin\x64
-copy libzmq\build64\lib\Release\libzmq-v140-mt-4_3_1.lib lib\x64
-copy libzmq\build64\lib\Release\libzmq-v140-mt-4_3_1.exp lib\x64
+copy libzmq\build64\bin\Release\libzmq-mt.dll bin\x64
+copy libzmq\build64\lib\Release\libzmq-mt.lib lib\x64
+copy libzmq\build64\lib\Release\libzmq-mt.exp lib\x64
 
-copy libzmq\build64\bin\Debug\libzmq-v140-mt-gd-4_3_1.dll bin\x64
-copy libzmq\build64\bin\Debug\libzmq-v140-mt-gd-4_3_1.pdb bin\x64
-copy libzmq\build64\lib\Debug\libzmq-v140-mt-gd-4_3_1.lib lib\x64
-copy libzmq\build64\lib\Debug\libzmq-v140-mt-gd-4_3_1.exp lib\x64
+copy libzmq\build64\bin\Debug\libzmq-mt-gd.dll bin\x64
+copy libzmq\build64\bin\Debug\libzmq-mt-gd.pdb bin\x64
+copy libzmq\build64\lib\Debug\libzmq-mt-gd.lib lib\x64
+copy libzmq\build64\lib\Debug\libzmq-mt-gd.exp lib\x64
 
-copy libzmq\build86\bin\Release\libzmq-v140-mt-4_3_1.dll bin\x86
-copy libzmq\build86\lib\Release\libzmq-v140-mt-4_3_1.lib lib\x86
-copy libzmq\build86\lib\Release\libzmq-v140-mt-4_3_1.exp lib\x86
+copy libzmq\build86\bin\Release\libzmq-mt.dll bin\x86
+copy libzmq\build86\lib\Release\libzmq-mt.lib lib\x86
+copy libzmq\build86\lib\Release\libzmq-mt.exp lib\x86
 
-copy libzmq\build86\bin\Debug\libzmq-v140-mt-gd-4_3_1.dll bin\x86
-copy libzmq\build86\bin\Debug\libzmq-v140-mt-gd-4_3_1.pdb bin\x86
-copy libzmq\build86\lib\Debug\libzmq-v140-mt-gd-4_3_1.lib lib\x86
-copy libzmq\build86\lib\Debug\libzmq-v140-mt-gd-4_3_1.exp lib\x86
+copy libzmq\build86\bin\Debug\libzmq-mt-gd.dll bin\x86
+copy libzmq\build86\bin\Debug\libzmq-mt-gd.pdb bin\x86
+copy libzmq\build86\lib\Debug\libzmq-mt-gd.lib lib\x86
+copy libzmq\build86\lib\Debug\libzmq-mt-gd.exp lib\x86
 
 copy libzmq\include\zmq.h include
 

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
 Copyright 2017-2019 Siemens AG
 
@@ -184,7 +184,7 @@ Author(s): Abian Blome, Thomas Riedmaier, Michael Kraus, Fabian Russwurm
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libprotobufd.lib;libzmq-v140-mt-gd-4_3_1.lib;SharedCoded.lib;Ws2_32.lib;Iphlpapi.lib;Pdh.lib;Rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libprotobufd.lib;libzmq-mt-gd.lib;SharedCoded.lib;Ws2_32.lib;Iphlpapi.lib;Pdh.lib;Rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'">
@@ -202,7 +202,7 @@ Author(s): Abian Blome, Thomas Riedmaier, Michael Kraus, Fabian Russwurm
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>honggfuzzd.lib;afl-fuzzd.lib;easyloggingppd.lib;libprotobufd.lib;libzmq-v140-mt-gd-4_3_1.lib;libmariadbd.lib;SharedCoded.lib;SharedMemIPC.lib;GlobalManager.lib;LocalManager.lib;TestcaseGenerator.lib;TestcaseRunner.lib;TestcaseEvaluator.lib;Ws2_32.lib;Iphlpapi.lib;Pdh.lib;Rpcrt4.lib;Shlwapi.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>honggfuzzd.lib;afl-fuzzd.lib;easyloggingppd.lib;libprotobufd.lib;libzmq-mt-gd.lib;libmariadbd.lib;SharedCoded.lib;SharedMemIPC.lib;GlobalManager.lib;LocalManager.lib;TestcaseGenerator.lib;TestcaseRunner.lib;TestcaseEvaluator.lib;Ws2_32.lib;Iphlpapi.lib;Pdh.lib;Rpcrt4.lib;Shlwapi.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <UACExecutionLevel>AsInvoker</UACExecutionLevel>
     </Link>
     <PostBuildEvent>

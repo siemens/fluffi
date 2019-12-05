@@ -39,27 +39,53 @@ REM Building honggfuzz
 
 mkdir build64
 mkdir build86
-SETLOCAL
-cd build64
-call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64
 
-cl.exe /MT /c /TP /EHsc ..\mangle.c ..\libhfcommon\util.c ..\input.c
-LIB.EXE /OUT:honggfuzz.LIB mangle.obj util.obj input.obj
-cl.exe /MTd /Debug /c /TP /EHsc ..\mangle.c ..\libhfcommon\util.c ..\input.c
-LIB.EXE /OUT:honggfuzzd.LIB mangle.obj util.obj input.obj
-cd ..
-ENDLOCAL
+IF [%1]==[2017] (
+	SETLOCAL
+	cd build64
+	call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
 
-SETLOCAL
-cd build86
-call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86
+	cl.exe /MT /c /TP /EHsc ..\mangle.c ..\libhfcommon\util.c ..\input.c
+	LIB.EXE /OUT:honggfuzz.LIB mangle.obj util.obj input.obj
+	cl.exe /MTd /Debug /c /TP /EHsc ..\mangle.c ..\libhfcommon\util.c ..\input.c
+	LIB.EXE /OUT:honggfuzzd.LIB mangle.obj util.obj input.obj
+	cd ..
+	ENDLOCAL
 
-cl.exe /MT /c /TP /EHsc ..\mangle.c ..\libhfcommon\util.c ..\input.c
-LIB.EXE /OUT:honggfuzz.LIB mangle.obj util.obj input.obj
-cl.exe /MTd /Debug /c /TP /EHsc ..\mangle.c ..\libhfcommon\util.c ..\input.c
-LIB.EXE /OUT:honggfuzzd.LIB mangle.obj util.obj input.obj
-cd ..
-ENDLOCAL
+	SETLOCAL
+	cd build86
+	call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" x86
+
+	cl.exe /MT /c /TP /EHsc ..\mangle.c ..\libhfcommon\util.c ..\input.c
+	LIB.EXE /OUT:honggfuzz.LIB mangle.obj util.obj input.obj
+	cl.exe /MTd /Debug /c /TP /EHsc ..\mangle.c ..\libhfcommon\util.c ..\input.c
+	LIB.EXE /OUT:honggfuzzd.LIB mangle.obj util.obj input.obj
+	cd ..
+	ENDLOCAL
+) ELSE (
+	SETLOCAL
+	cd build64
+	call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64
+
+	cl.exe /MT /c /TP /EHsc ..\mangle.c ..\libhfcommon\util.c ..\input.c
+	LIB.EXE /OUT:honggfuzz.LIB mangle.obj util.obj input.obj
+	cl.exe /MTd /Debug /c /TP /EHsc ..\mangle.c ..\libhfcommon\util.c ..\input.c
+	LIB.EXE /OUT:honggfuzzd.LIB mangle.obj util.obj input.obj
+	cd ..
+	ENDLOCAL
+
+	SETLOCAL
+	cd build86
+	call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86
+
+	cl.exe /MT /c /TP /EHsc ..\mangle.c ..\libhfcommon\util.c ..\input.c
+	LIB.EXE /OUT:honggfuzz.LIB mangle.obj util.obj input.obj
+	cl.exe /MTd /Debug /c /TP /EHsc ..\mangle.c ..\libhfcommon\util.c ..\input.c
+	LIB.EXE /OUT:honggfuzzd.LIB mangle.obj util.obj input.obj
+	cd ..
+	ENDLOCAL
+)
+
 cd ..
 
 

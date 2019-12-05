@@ -59,23 +59,41 @@ REM Building dynamorio
 mkdir build64
 mkdir build86
 cd build64
-SETLOCAL
-set PATH=C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin;%PATH%
-call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x64
-cmake -G "Visual Studio 12 2013 Win64" -DBUILD_CORE=ON -DBUILD_DOCS=OFF -DBUILD_DRSTATS=OFF -DBUILD_TOOLS=ON -DBUILD_SAMPLES=OFF -DBUILD_TESTS=OFF -DDEBUG=OFF -DCMAKE_WARN_DEPRECATED=OFF  ..
-powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDebugDll', 'MultiThreadedDebug' } | sc $f.PSPath }"
-powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDll', 'MultiThreaded' } | sc $f.PSPath }"
-"C:\Program Files (x86)\MSBuild\12.0\Bin\MSBuild.exe" DynamoRIO.sln /m /t:Build /p:Configuration=RelWithDebInfo /p:Platform=x64 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v120"
-ENDLOCAL
-cd ..
-cd build86
-SETLOCAL
-call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x86
-cmake -G "Visual Studio 12 2013"  -DBUILD_CORE=ON -DBUILD_DOCS=OFF -DBUILD_DRSTATS=OFF -DBUILD_TOOLS=ON -DBUILD_SAMPLES=OFF -DBUILD_TESTS=OFF -DDEBUG=OFF -DCMAKE_WARN_DEPRECATED=OFF  ..
-powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDebugDll', 'MultiThreadedDebug' } | sc $f.PSPath }"
-powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDll', 'MultiThreaded' } | sc $f.PSPath }"
-"C:\Program Files (x86)\MSBuild\12.0\Bin\MSBuild.exe" DynamoRIO.sln /m /t:Build /p:Configuration=RelWithDebInfo /p:Platform=Win32 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v120"
-ENDLOCAL
+IF [%1]==[2017] (
+	SETLOCAL
+	call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
+	cmake -G "Visual Studio 15 2017 Win64" -DBUILD_CORE=ON -DBUILD_DOCS=OFF -DBUILD_DRSTATS=OFF -DBUILD_TOOLS=ON -DBUILD_SAMPLES=OFF -DBUILD_TESTS=OFF -DDEBUG=OFF -DCMAKE_WARN_DEPRECATED=OFF  ..
+	powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDebugDll', 'MultiThreadedDebug' } | sc $f.PSPath }"
+	powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDll', 'MultiThreaded' } | sc $f.PSPath }"
+	"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe" DynamoRIO.sln /m /t:Build /p:Configuration=RelWithDebInfo /p:Platform=x64 /property:VCTargetsPath="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets"
+	cd ..
+	cd build86
+	call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" x86
+	cmake -G "Visual Studio 15 2017"  -DBUILD_CORE=ON -DBUILD_DOCS=OFF -DBUILD_DRSTATS=OFF -DBUILD_TOOLS=ON -DBUILD_SAMPLES=OFF -DBUILD_TESTS=OFF -DDEBUG=OFF -DCMAKE_WARN_DEPRECATED=OFF  ..
+	powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDebugDll', 'MultiThreadedDebug' } | sc $f.PSPath }"
+	powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDll', 'MultiThreaded' } | sc $f.PSPath }"
+	"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe" DynamoRIO.sln /m /t:Build /p:Configuration=RelWithDebInfo /p:Platform=Win32 /property:VCTargetsPath="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets"
+	ENDLOCAL
+) ELSE (
+	SETLOCAL
+	call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x64
+	cmake -G "Visual Studio 12 2013 Win64" -DBUILD_CORE=ON -DBUILD_DOCS=OFF -DBUILD_DRSTATS=OFF -DBUILD_TOOLS=ON -DBUILD_SAMPLES=OFF -DBUILD_TESTS=OFF -DDEBUG=OFF -DCMAKE_WARN_DEPRECATED=OFF  ..
+	powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDebugDll', 'MultiThreadedDebug' } | sc $f.PSPath }"
+	powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDll', 'MultiThreaded' } | sc $f.PSPath }"
+	"C:\Program Files (x86)\MSBuild\12.0\Bin\MSBuild.exe" DynamoRIO.sln /m /t:Build /p:Configuration=RelWithDebInfo /p:Platform=x64 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v120"
+	ENDLOCAL
+	cd ..
+	cd build86
+	SETLOCAL
+	call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x86
+	cmake -G "Visual Studio 12 2013"  -DBUILD_CORE=ON -DBUILD_DOCS=OFF -DBUILD_DRSTATS=OFF -DBUILD_TOOLS=ON -DBUILD_SAMPLES=OFF -DBUILD_TESTS=OFF -DDEBUG=OFF -DCMAKE_WARN_DEPRECATED=OFF  ..
+	powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDebugDll', 'MultiThreadedDebug' } | sc $f.PSPath }"
+	powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDll', 'MultiThreaded' } | sc $f.PSPath }"
+	"C:\Program Files (x86)\MSBuild\12.0\Bin\MSBuild.exe" DynamoRIO.sln /m /t:Build /p:Configuration=RelWithDebInfo /p:Platform=Win32 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v120"
+	ENDLOCAL
+)
+
+
 cd ..
 cd ..
 

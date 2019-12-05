@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
 Copyright 2017-2019 Siemens AG
 
@@ -155,7 +155,7 @@ Author(s): Roman Bendt, Thomas Riedmaier
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>easyloggingppd.lib;libprotobufd.lib;libzmq-v140-mt-gd-4_3_1.lib;SharedCoded.lib;Ws2_32.lib;Iphlpapi.lib;libmariadbd.lib;Pdh.lib;Rpcrt4.lib;Shlwapi.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>easyloggingppd.lib;libprotobufd.lib;libzmq-mt-gd.lib;SharedCoded.lib;Ws2_32.lib;Iphlpapi.lib;libmariadbd.lib;Pdh.lib;Rpcrt4.lib;Shlwapi.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">
@@ -171,7 +171,7 @@ Author(s): Roman Bendt, Thomas Riedmaier
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>easyloggingppd.lib;libprotobufd.lib;libzmq-v140-mt-gd-4_3_1.lib;SharedCoded.lib;Ws2_32.lib;Iphlpapi.lib;libmariadbd.lib;Pdh.lib;Rpcrt4.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>easyloggingppd.lib;libprotobufd.lib;libzmq-mt-gd.lib;SharedCoded.lib;Ws2_32.lib;Iphlpapi.lib;libmariadbd.lib;Pdh.lib;Rpcrt4.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -187,7 +187,7 @@ Author(s): Roman Bendt, Thomas Riedmaier
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>easyloggingppd.lib;libprotobufd.lib;libzmq-v140-mt-gd-4_3_1.lib;SharedCoded.lib;Ws2_32.lib;Iphlpapi.lib;libmariadbd.lib;Pdh.lib;Rpcrt4.lib;Shlwapi.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>easyloggingppd.lib;libprotobufd.lib;libzmq-mt-gd.lib;SharedCoded.lib;Ws2_32.lib;Iphlpapi.lib;libmariadbd.lib;Pdh.lib;Rpcrt4.lib;Shlwapi.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'">
@@ -203,7 +203,7 @@ Author(s): Roman Bendt, Thomas Riedmaier
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>easyloggingppd.lib;libprotobufd.lib;libzmq-v140-mt-gd-4_3_1.lib;SharedCoded.lib;Ws2_32.lib;Iphlpapi.lib;libmariadbd.lib;Pdh.lib;Rpcrt4.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>easyloggingppd.lib;libprotobufd.lib;libzmq-mt-gd.lib;SharedCoded.lib;Ws2_32.lib;Iphlpapi.lib;libmariadbd.lib;Pdh.lib;Rpcrt4.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -223,7 +223,7 @@ Author(s): Roman Bendt, Thomas Riedmaier
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>No</GenerateDebugInformation>
-      <AdditionalDependencies>easyloggingpp.lib;libprotobuf.lib;libzmq-v140-mt-4_3_1.lib;SharedCode.lib;Ws2_32.lib;Iphlpapi.lib;libmariadb.lib;Pdh.lib;Rpcrt4.lib;Shlwapi.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>easyloggingpp.lib;libprotobuf.lib;libzmq-mt.lib;SharedCode.lib;Ws2_32.lib;Iphlpapi.lib;libmariadb.lib;Pdh.lib;Rpcrt4.lib;Shlwapi.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -243,7 +243,7 @@ Author(s): Roman Bendt, Thomas Riedmaier
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>No</GenerateDebugInformation>
-      <AdditionalDependencies>easyloggingpp.lib;libprotobuf.lib;libzmq-v140-mt-4_3_1.lib;SharedCode.lib;Ws2_32.lib;Iphlpapi.lib;libmariadb.lib;Pdh.lib;Rpcrt4.lib;Shlwapi.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>easyloggingpp.lib;libprotobuf.lib;libzmq-mt.lib;SharedCode.lib;Ws2_32.lib;Iphlpapi.lib;libmariadb.lib;Pdh.lib;Rpcrt4.lib;Shlwapi.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

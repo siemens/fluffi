@@ -17,12 +17,16 @@ call:getArgWithValue "-WITH_DEPS" "WITH_DEPS" "%~1" "%~2" && SHIFT && SHIFT && g
 :: asks for the -DEPLOY_TO_FTP argument and store the value in the variable DEPLOY_TO_FTP
 call:getArgWithValue "-DEPLOY_TO_FTP" "DEPLOY_TO_FTP" "%~1" "%~2" && SHIFT && SHIFT && goto :parseArgs
 
+:: asks for the -VSVER argument and store the value in the variable VSVER
+call:getArgWithValue "-VSVER" "VSVER" "%~1" "%~2" && SHIFT && SHIFT && goto :parseArgs
+
 :: resetting %ERRORLEVEL%
 ver > nul
 
 ECHO About to build FLUFFI with the following options:
 ECHO WITH_DEPS: %WITH_DEPS%
 ECHO DEPLOY_TO_FTP: %DEPLOY_TO_FTP%
+ECHO VSVER: %VSVER%
 ECHO.
 
 :: =====================================================================
@@ -35,18 +39,28 @@ IF "%WITH_DEPS%" == "TRUE" (
 				ECHO git wasn't found 
 				goto :err
 				)
-		IF NOT EXIST "C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" (
-				ECHO Build tools for Visual Studio 2015 C++ weren't found 
-				goto :err
-				)
+		IF [%VSVER%] == [2017] (
+			IF NOT EXIST "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe" (
+			ECHO Build tools for Visual Studio 2017 C++ weren't found 
+			goto :err
+			)
+		) ELSE (
+			IF NOT EXIST "C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" (
+					ECHO Build tools for Visual Studio 2015 C++ weren't found 
+					goto :err
+					)
+			IF NOT EXIST "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" (
+					ECHO Build tools for Visual Studio 2013 C++ weren't found 
+					goto :err
+					)
+		)
+		
+				
 		IF NOT EXIST "C:\Program Files\Git\usr\bin\patch.exe" (
 				ECHO patch.exe wasn't found 
 				goto :err
 				)
-		IF NOT EXIST "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" (
-				ECHO Build tools for Visual Studio 2013 C++ weren't found 
-				goto :err
-				)
+
 		WHERE cmake >nul 2>nul
 		IF %ERRORLEVEL% NEQ 0 (
 				ECHO cmake wasn't found 
@@ -81,7 +95,7 @@ IF "%WITH_DEPS%" == "TRUE" (
 
 		ECHO Building Fluffi dependencies
 		CD ..\..\core\dependencies
-		call make_all_dep.bat
+		call make_all_dep.bat %VSVER%
 		IF errorlevel 1 goto :err
 		CD ..\..\build\windows
 		)
@@ -92,10 +106,17 @@ IF "%WITH_DEPS%" == "TRUE" (
 :: Building FLUFFI Core
 
 ECHO Checking IF all tools needed to build FLUFFI are installed
-IF NOT EXIST "C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" (
-		ECHO Build tools for Visual Studio 2015 C++ weren't found 
-		goto :err
-		)
+IF [%VSVER%] == [2017] (
+	IF NOT EXIST "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe" (
+	ECHO Build tools for Visual Studio 2017 C++ weren't found 
+	goto :err
+	)
+) ELSE (
+	IF NOT EXIST "C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" (
+			ECHO Build tools for Visual Studio 2015 C++ weren't found 
+			goto :err
+			)
+)
 WHERE go >nul 2>nul
 IF %ERRORLEVEL% NEQ 0 (
 		ECHO go wasn't found 
@@ -104,7 +125,7 @@ IF %ERRORLEVEL% NEQ 0 (
 
 ECHO Building Fluffi core
 CD ..\..\core
-call build.bat
+call build.bat %VSVER%
 IF errorlevel 1 goto :err
 CD ..\build\windows
 

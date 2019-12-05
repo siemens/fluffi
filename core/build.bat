@@ -8,39 +8,115 @@
 :: 
 :: Author(s): Thomas Riedmaier, Roman Bendt
 
-:: Requires Visual CPP Build Tools 2015 Update 3
 
-:: Fluffi x64
-"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" FluffiV1.sln /m  /t:Build /p:Configuration=Release /p:Platform=x64 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
-if errorlevel 1 goto errorDone
+IF [%1]==[2017] (
 
-:: Fluffi x86
-"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" FluffiV1.sln /m  /t:Build /p:Configuration=Release /p:Platform=x86 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
-if errorlevel 1 goto errorDone
+	REM Requires Visual STUD 2017 Update 3	
+	cd FluffiTester
+	powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace '<PlatformToolset>v140</PlatformToolset>', '<PlatformToolset>v141</PlatformToolset>' } | sc $f.PSPath }"
+	cd ..
 
-:: Starter x64
-"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" helpers\Starter\Starter.sln /m  /t:Build /p:Configuration=Release /p:Platform=x64 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
-if errorlevel 1 goto errorDone
+	cd GlobalManager
+	powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace '<PlatformToolset>v140</PlatformToolset>', '<PlatformToolset>v141</PlatformToolset>' } | sc $f.PSPath }"
+	cd ..
 
-:: Starter x86
-"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" helpers\Starter\Starter.sln /m  /t:Build /p:Configuration=Release /p:Platform=x86 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
-if errorlevel 1 goto errorDone
+	cd LocalManager
+	powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace '<PlatformToolset>v140</PlatformToolset>', '<PlatformToolset>v141</PlatformToolset>' } | sc $f.PSPath }"
+	cd ..
+	
+	cd SharedCode
+	powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace '<PlatformToolset>v140</PlatformToolset>', '<PlatformToolset>v141</PlatformToolset>' } | sc $f.PSPath }"
+	cd ..
+	
+	cd SharedMemIPC
+	powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace '<PlatformToolset>v140</PlatformToolset>', '<PlatformToolset>v141</PlatformToolset>' } | sc $f.PSPath }"
+	cd ..
 
-:: Feeder x64
-"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" helpers\Feeder\Feeder.sln /m  /t:Build /p:Configuration=Release /p:Platform=x64 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
-if errorlevel 1 goto errorDone
+	cd TestcaseEvaluator
+	powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace '<PlatformToolset>v140</PlatformToolset>', '<PlatformToolset>v141</PlatformToolset>' } | sc $f.PSPath }"
+	cd ..
 
-:: Feeder x86
-"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" helpers\Feeder\Feeder.sln /m  /t:Build /p:Configuration=Release /p:Platform=x86 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
-if errorlevel 1 goto errorDone
+	cd TestcaseGenerator
+	powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace '<PlatformToolset>v140</PlatformToolset>', '<PlatformToolset>v141</PlatformToolset>' } | sc $f.PSPath }"
+	cd ..
 
-:: Fuzzcmp x64
-"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" helpers\fuzzcmp\fuzzcmp.sln /m  /t:Build /p:Configuration=Release /p:Platform=x64 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
-if errorlevel 1 goto errorDone
+	cd TestcaseRunner
+	powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace '<PlatformToolset>v140</PlatformToolset>', '<PlatformToolset>v141</PlatformToolset>' } | sc $f.PSPath }"
+	cd ..
 
-:: Fuzzcmp x86
-"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" helpers\fuzzcmp\fuzzcmp.sln /m  /t:Build /p:Configuration=Release /p:Platform=x86 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
-if errorlevel 1 goto errorDone
+	cd Helpers
+	powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace '<PlatformToolset>v140</PlatformToolset>', '<PlatformToolset>v141</PlatformToolset>' } | sc $f.PSPath }"
+	cd ..
+
+	:: Fluffi x64
+	"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe" FluffiV1.sln /m  /t:Build /p:Configuration=Release /p:Platform=x64 /property:VCTargetsPath="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets"
+	if errorlevel 1 goto errorDone
+
+	:: Fluffi x86
+	"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe" FluffiV1.sln /m  /t:Build /p:Configuration=Release /p:Platform=x86 /property:VCTargetsPath="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets"
+	if errorlevel 1 goto errorDone
+
+	:: Starter x64
+	"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe" helpers\Starter\Starter.sln /m  /t:Build /p:Configuration=Release /p:Platform=x64 /property:VCTargetsPath="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets"
+	if errorlevel 1 goto errorDone
+
+	:: Starter x86
+	"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe" helpers\Starter\Starter.sln /m  /t:Build /p:Configuration=Release /p:Platform=x86 /property:VCTargetsPath="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets"
+	if errorlevel 1 goto errorDone
+
+	:: Feeder x64
+	"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe" helpers\Feeder\Feeder.sln /m  /t:Build /p:Configuration=Release /p:Platform=x64 /property:VCTargetsPath="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets"
+	if errorlevel 1 goto errorDone
+
+	:: Feeder x86
+	"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe" helpers\Feeder\Feeder.sln /m  /t:Build /p:Configuration=Release /p:Platform=x86 /property:VCTargetsPath="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets"
+	if errorlevel 1 goto errorDone
+	
+	:: Fuzzcmp x64
+	"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe" helpers\fuzzcmp\fuzzcmp.sln /m  /t:Build /p:Configuration=Release /p:Platform=x64 /property:VCTargetsPath="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets"
+	if errorlevel 1 goto errorDone
+
+	:: Fuzzcmp x86
+	"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe" helpers\fuzzcmp\fuzzcmp.sln /m  /t:Build /p:Configuration=Release /p:Platform=x86 /property:VCTargetsPath="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets"
+	if errorlevel 1 goto errorDone
+	
+) ELSE (
+
+	REM Requires Visual CPP Build Tools 2015 Update 3
+
+	:: Fluffi x64
+	"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" FluffiV1.sln /m  /t:Build /p:Configuration=Release /p:Platform=x64 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
+	if errorlevel 1 goto errorDone
+
+	:: Fluffi x86
+	"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" FluffiV1.sln /m  /t:Build /p:Configuration=Release /p:Platform=x86 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
+	if errorlevel 1 goto errorDone
+
+	:: Starter x64
+	"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" helpers\Starter\Starter.sln /m  /t:Build /p:Configuration=Release /p:Platform=x64 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
+	if errorlevel 1 goto errorDone
+
+	:: Starter x86
+	"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" helpers\Starter\Starter.sln /m  /t:Build /p:Configuration=Release /p:Platform=x86 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
+	if errorlevel 1 goto errorDone
+
+	:: Feeder x64
+	"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" helpers\Feeder\Feeder.sln /m  /t:Build /p:Configuration=Release /p:Platform=x64 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
+	if errorlevel 1 goto errorDone
+
+	:: Feeder x86
+	"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" helpers\Feeder\Feeder.sln /m  /t:Build /p:Configuration=Release /p:Platform=x86 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
+	if errorlevel 1 goto errorDone
+	
+	:: Fuzzcmp x64
+	"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" helpers\fuzzcmp\fuzzcmp.sln /m  /t:Build /p:Configuration=Release /p:Platform=x64 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
+	if errorlevel 1 goto errorDone
+
+	:: Fuzzcmp x86
+	"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" helpers\fuzzcmp\fuzzcmp.sln /m  /t:Build /p:Configuration=Release /p:Platform=x86 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
+	if errorlevel 1 goto errorDone
+	
+)
 
 :: Requires at least go 1.12
 
