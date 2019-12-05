@@ -30,6 +30,7 @@ public:
 
 	bool isManagerActive(unsigned long maxAllowedTimeOfInactivityMS);
 	bool wasManagerReplaced();
+	void resetManagerActiveDetector();
 
 #ifndef _VSTEST
 protected:

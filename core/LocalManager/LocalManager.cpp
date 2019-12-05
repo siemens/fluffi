@@ -206,6 +206,7 @@ int main(int argc, char* argv[])
 
 		// Wait for a keypress or a kill message
 		int checkAgainMS = 250;
+		m_getStatusRequestHandler->resetManagerActiveDetector();
 		while (true)
 		{
 			if (Util::kbhit() != 0) {
