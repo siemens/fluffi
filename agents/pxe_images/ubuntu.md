@@ -12,12 +12,12 @@ Author(s): Pascal Eckmann
 
 # Ubuntu
 
-This instruction is tested with [Ubuntu 18.04 LTS (Bionic Beaver)](http://archive.ubuntu.com/ubuntu/dists/bionic-updates/main/installer-amd64/current/images/netboot/).
+This instruction is tested with [Ubuntu 18.04 LTS (Bionic Beaver)](http://archive.ubuntu.com/ubuntu/dists/bionic/main/installer-amd64/current/images/netboot/).
 
 ## Prepare Ubuntu image
 
-1. Download netinstall version of Ubuntu, e.g. [Bionic Beaver](http://archive.ubuntu.com/ubuntu/dists/bionic-updates/main/installer-amd64/current/images/netboot/)
-    - e.g. `wget -r -np -R "index.html*" -P ./ http://archive.ubuntu.com/ubuntu/dists/bionic-updates/main/installer-amd64/current/images/netboot/`
+1. Download netinstall version of Ubuntu, e.g. [Bionic Beaver](http://archive.ubuntu.com/ubuntu/dists/bionic/main/installer-amd64/current/images/netboot/)
+    - e.g. `wget -r -np -R "index.html*" -P ./ http://archive.ubuntu.com/ubuntu/dists/bionic/main/installer-amd64/current/images/netboot/`
 2. Modify the file `\pxelinux.cfg\default` to boot the installer with a preseeding file
     ```
     prompt 0
