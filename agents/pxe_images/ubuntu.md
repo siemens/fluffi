@@ -36,20 +36,22 @@ After that, delete the old `initrd.gz` and rename the new ramdisk to `ìnitrd.gz
 A example preseeding file for Ubuntu 18.04 is located in this [repository](ubuntu/preseed.cfg). You have only to change [username] to the same which you defined for _ansible_ssh_user_ and [password] to the same as _ansible_ssh_pass_ in the section _[linux:vars]_ in your [hosts](../../srv/fluffi/data/polenext/projects/1/hosts) file for Polemarch. If you want to create a new one, copy all necessary data from the provided example.    
 
 ## Copy files to infrastructure
-    - Create a folder in `ftp.fluffi/tftp-root/`, e.g. `ftp.fluffi/tftp-root/ubuntu` and copy all Ubuntu files in the new folder:
-    .    
-    +_--_ __tftp-root__    
-    |&emsp;+_--_ __ubuntu__    
-    |&emsp;|&emsp;+_-- __pxelinux.cfg__    
-    |&emsp;|&emsp;|&emsp;+_-- default    
-    |&emsp;|&emsp;+_-- __ubuntu-installer__    
-    |&emsp;|&emsp;|&emsp;+_-- ...    
-    |&emsp;|&emsp;+_-- boot.img.gz    
-    |&emsp;|&emsp;+_-- ldlinux.c32    
-    |&emsp;|&emsp;+_-- ...    
-    |&emsp;|&emsp;+_-- pxelinux.0    
-    |&emsp;+_-- __another_os__    
-    |&emsp;|&emsp;+_-- ...    
-    |&emsp;+_-- ...    
-    - Rename `pxelinux.0` to `pxeboot.n12`
+- Create a folder in `ftp.fluffi/tftp-root/`, e.g. `ftp.fluffi/tftp-root/ubuntu` and copy all Ubuntu files in the new folder:
+.    
++_--_ __tftp-root__    
+|&emsp;+_--_ __ubuntu__    
+|&emsp;|&emsp;+_-- __pxelinux.cfg__    
+|&emsp;|&emsp;|&emsp;+_-- default    
+|&emsp;|&emsp;+_-- __ubuntu-installer__    
+|&emsp;|&emsp;|&emsp;+_-- ...    
+|&emsp;|&emsp;+_-- boot.img.gz    
+|&emsp;|&emsp;+_-- ldlinux.c32    
+|&emsp;|&emsp;+_-- ...    
+|&emsp;|&emsp;+_-- pxelinux.0    
+|&emsp;+_-- __another_os__    
+|&emsp;|&emsp;+_-- ...    
+|&emsp;+_-- ...    
+- Rename `pxelinux.0` to `pxeboot.n12`
+
+
 
