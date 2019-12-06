@@ -15,13 +15,13 @@ Author(s): Thomas Riedmaier, Michael Kraus
 #define NOCRYPT
 
 //public
-int __cdecl sendByteBufOnce(char* dstIP, int port, char* msg, int msgSize);
-int __cdecl sendByteBufWithResponse(char* dstIP, int port, char* msg, int msgSize, char* response, int responseSize);
+int __cdecl sendByteBufOnce(char* dstIP, int port, char* msg, int msgSize, int clientCertSize, const unsigned char * clientCert, int clientPrivateKeySize, const unsigned char * clientPrivateKey);
+int __cdecl sendByteBufWithResponse(char* dstIP, int port, char* msg, int msgSize, char* response, int responseSize, int clientCertSize, const unsigned char * clientCert, int clientPrivateKeySize, const unsigned char * clientPrivateKey);
 
 //private
-SSL* getConnection(const char* ip, const int conPort, BIO* outbio, BIO* inbio, SOCKETTYPE server, SSL_CTX* ctx);
-SOCKETTYPE createSocket(char* dstIP, int port, BIO* outbio);
-SOCKETTYPE create_socket(const char ip[], const int port, BIO* out);
-SSL_CTX* createSSLContext(BIO* outbio);
+SSL* establishConnection(const char* dstIP, const int dstPort, SOCKETTYPE server, SSL_CTX* ctx, int clientCertSize, const unsigned char * clientCert, int clientPrivateKeySize, const unsigned char * clientPrivateKey);
+SOCKETTYPE createSocket(char* dstIP, int port);
+SOCKETTYPE create_socket(const char ip[], const int port);
+SSL_CTX* createSSLContext();
 int freeStructures(SSL* ssl, SOCKETTYPE server, SSL_CTX* ctx);
 BIO* setUpBufIO(SSL* ssl);
