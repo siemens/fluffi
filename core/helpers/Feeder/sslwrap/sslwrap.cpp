@@ -99,13 +99,13 @@ int sendByteBufWithResponse(char* dstIP, int dstPort, char* msg, int msgSize, ch
 	* initialize SSL library and register algorithms             *
 	* ---------------------------------------------------------- */
 	if (SSL_library_init() < 0) {
-		std::cout << ">sslwrap.dll< - Could not initialize the OpenSSL library !" << std::endl;
+		std::cout << ">sslwrap.dll< - Could not initialize the OpenSSL library!" << std::endl;
 		return -1;
 	}
 
 	ctx = createSSLContext();
 	if (ctx == nullptr) {
-		std::cout << ">sslwrap.dll< - Error creating SSL context" << std::endl;
+		std::cout << ">sslwrap.dll< - Error creating SSL context!" << std::endl;
 		freeStructures(ssl, server, ctx, buf_io);
 		return -1;
 	}
@@ -117,7 +117,7 @@ int sendByteBufWithResponse(char* dstIP, int dstPort, char* msg, int msgSize, ch
 		return -1;
 	}
 
-	establishConnection(dstIP, dstPort, server, ctx, clientCertSize, clientCert, clientPrivateKeySize, clientPrivateKey);
+	ssl = establishConnection(dstIP, dstPort, server, ctx, clientCertSize, clientCert, clientPrivateKeySize, clientPrivateKey);
 	if (ssl == nullptr) {
 		std::cout << ">sslwrap.dll< - SSL connection Error!" << std::endl;
 		freeStructures(ssl, server, ctx, buf_io);
