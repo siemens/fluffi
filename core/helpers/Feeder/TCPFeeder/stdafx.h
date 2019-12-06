@@ -23,7 +23,11 @@ Author(s): Thomas Riedmaier, Abian Blome
 
 //#define USE_SSL
 #ifdef USE_SSL
+#if defined(_WIN32) || defined(_WIN64)
 #include <applink.c>
+#else
+#define __cdecl __attribute__((__cdecl__))
+#endif
 
 #pragma comment(lib, "sslwrap.lib")
 
