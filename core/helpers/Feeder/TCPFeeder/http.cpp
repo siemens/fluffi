@@ -12,9 +12,14 @@ Author(s): Abian Blome, Thomas Riedmaier, Pascal Eckmann
 
 #include "stdafx.h"
 #include "http.h"
+#include "utils.h"
+void performHTTPAuthAndManageSession(std::vector<char>* bytes) {
+	std::cout << "TCPFeeder: called performHTTPAuthAndManageSession" << std::endl;
+	if (bytes->size() == 0) {
+		std::cout << "TCPFeeder: performHTTPAuthAndManageSession wont do anything, as an empty input was passed!" << std::endl;
+		return;
+	}
 
-void performHTTPAuthAndManageSession() {
-	//TODO
 	return;
 }
 
@@ -69,7 +74,6 @@ void fixHTTPContentLength(std::vector<char>* bytes) {
 	memcpy_s(&(*bytes)[contentLengthPos + 16], fullrequest.length() - (contentLengthPos + 16), buff, strlength);
 
 	std::cout << "TCPFeeder: fixHTTPContentLength fixed the content length to :" << realContentLength << std::endl;
-	//std::cout << std::string(bytes->begin(), bytes->begin() + bytes->size()) << std::endl;
 
 	return;
 }

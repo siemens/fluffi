@@ -27,12 +27,12 @@ Author(s): Thomas Riedmaier, Abian Blome, Roman Bendt, Pascal Eckmann
 
 //Without SSLWrap
 //cp ../../../$( file /bin/bash | awk -F',' '{print $2}' | tr -d ' ')/bin/libsharedmemipc.so .
-//g++ --std=c++11 -I../../../SharedMemIPC/ -o TCPFeeder stdafx.cpp TCPFeeder.cpp utils.cpp libsharedmemipc.so -Wl,-rpath='${ORIGIN}'
+//g++ --std=c++11 -I../../../SharedMemIPC/ -o TCPFeeder stdafx.cpp http.cpp TCPFeeder.cpp utils.cpp libsharedmemipc.so -Wl,-rpath='${ORIGIN}'
 
 //With SSLWrap
 //cp ../../../$( file /bin/bash | awk -F',' '{print $2}' | tr -d ' ')/bin/libsharedmemipc.so .
 //cp .. / sslwrap / libsslwrap.so .
-//g++ --std=c++11 -DUSE_SSL -I../../../SharedMemIPC/ -o TCPFeeder stdafx.cpp TCPFeeder.cpp utils.cpp libsharedmemipc.so libsslwrap.so -Wl,-rpath='${ORIGIN}'
+//g++ --std=c++11 -DUSE_SSL -I../../../SharedMemIPC/ -o TCPFeeder stdafx.cpp http.cpp  TCPFeeder.cpp utils.cpp libsharedmemipc.so libsslwrap.so -Wl,-rpath='${ORIGIN}'
 
 void preprocess(std::vector<char> bytes) {
 	// Add preprocession steps here as needed, e.g. for HTTP:
@@ -66,7 +66,7 @@ bool sendBytesToHostAndPort(std::vector<char> fuzzBytes, std::string targethost,
 #else
 		if (inet_aton(targethost.c_str(), &saServer.sin_addr) == 0) {
 #endif
-			std::cout << "Error using inet_aton" << std::endl;
+			std::cout << "TCPFeeder: Error using inet_aton" << std::endl;
 			closesocket(connectSocket);
 			return false;
 		}
