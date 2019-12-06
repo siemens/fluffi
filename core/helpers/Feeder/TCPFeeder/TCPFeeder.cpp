@@ -31,7 +31,7 @@ Author(s): Thomas Riedmaier, Abian Blome, Roman Bendt, Pascal Eckmann
 
 //With SSLWrap
 //cp ../../../$( file /bin/bash | awk -F',' '{print $2}' | tr -d ' ')/bin/libsharedmemipc.so .
-//cp .. / sslwrap / libsslwrap.so .
+//cp ../sslwrap/libsslwrap.so .
 //g++ --std=c++11 -DUSE_SSL -I../../../SharedMemIPC/ -o TCPFeeder stdafx.cpp http.cpp  TCPFeeder.cpp utils.cpp libsharedmemipc.so libsslwrap.so -Wl,-rpath='${ORIGIN}'
 
 void preprocess(std::vector<char> bytes) {

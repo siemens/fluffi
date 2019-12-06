@@ -151,6 +151,7 @@ int sendByteBufWithResponse(char* dstIP, int dstPort, char* msg, int msgSize, ch
 	int lenRead = 0;
 	int currentLen = 0;
 	int retCode = 0;
+	memset(response, 0, responseSize);
 	do
 	{
 		if (!(lenRead + 1 >= responseSize))
@@ -174,7 +175,7 @@ int sendByteBufWithResponse(char* dstIP, int dstPort, char* msg, int msgSize, ch
 			retCode = -2;
 			break;
 		}
-	} while ((currentLen > 0) && (BIO_pending(buf_io) > 0));
+	} while ((currentLen > 0));
 
 	msgSize = lenRead;
 

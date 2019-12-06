@@ -16,3 +16,5 @@ Author(s): Thomas Riedmaier, Abian Blome, Pascal Eckmann
 void performHTTPAuthAndManageSession(std::vector<char>* bytes);
 void dropNoDoubleLinebreak(std::vector<char>* bytes);
 void fixHTTPContentLength(std::vector<char>* bytes);
+
+std::string getAuthToken();

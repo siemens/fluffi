@@ -31,6 +31,7 @@ Author(s): Thomas Riedmaier, Michael Kraus
 
 #include <stdio.h>
 #include <string>
+#include <string.h>
 
 #include <iostream>
 

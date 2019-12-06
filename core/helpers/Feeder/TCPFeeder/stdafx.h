@@ -18,6 +18,7 @@ Author(s): Thomas Riedmaier, Abian Blome
 #include <vector>
 #include <iostream>
 #include <chrono>
+#include <iterator>
 
 #include "SharedMemIPC.h"
 
