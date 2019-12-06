@@ -23,5 +23,5 @@ SSL* establishConnection(const char* dstIP, const int dstPort, SOCKETTYPE server
 SOCKETTYPE createSocket(char* dstIP, int port);
 SOCKETTYPE create_socket(const char ip[], const int port);
 SSL_CTX* createSSLContext();
-int freeStructures(SSL* ssl, SOCKETTYPE server, SSL_CTX* ctx);
+int freeStructures(SSL* ssl, SOCKETTYPE server, SSL_CTX* ctx, BIO* buf_io);
 BIO* setUpBufIO(SSL* ssl);

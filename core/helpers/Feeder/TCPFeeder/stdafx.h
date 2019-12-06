@@ -27,6 +27,7 @@ Author(s): Thomas Riedmaier, Abian Blome
 
 #pragma comment(lib, "sslwrap.lib")
 
-int __cdecl sendByteBufOnce(char* dstIP, int port, char* msg, int msgSize);
-int __cdecl sendByteBufWithResponse(char* dstIP, int port, char* msg, int msgSize, char* response, int responseSize);
+int __cdecl sendByteBufOnce(char* dstIP, int port, char* msg, int msgSize, int clientCertSize, const unsigned char * clientCert, int clientPrivateKeySize, const unsigned char * clientPrivateKey);
+int __cdecl sendByteBufWithResponse(char* dstIP, int port, char* msg, int msgSize, char* response, int responseSize, int clientCertSize, const unsigned char * clientCert, int clientPrivateKeySize, const unsigned char * clientPrivateKey);
+
 #endif

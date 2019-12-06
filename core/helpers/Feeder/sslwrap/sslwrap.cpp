@@ -20,6 +20,7 @@ int sendByteBufOnce(char* dstIP, int port, char* msg, int msgSize, int clientCer
 	SSL_CTX* ctx = nullptr;
 	SOCKETTYPE server = INVALID_SOCKET;
 	SSL* ssl = nullptr;
+	BIO* buf_io = nullptr;
 
 	/* ---------------------------------------------------------- *
 	* initialize SSL library and register algorithms             *
@@ -30,32 +31,32 @@ int sendByteBufOnce(char* dstIP, int port, char* msg, int msgSize, int clientCer
 	}
 
 	ctx = createSSLContext();
-	if (ctx == NULL) {
+	if (ctx == nullptr) {
 		std::cout << ">sslwrap.dll< - Error creating SSL context!" << std::endl;
-		freeStructures(ssl, server, ctx);
+		freeStructures(ssl, server, ctx, buf_io);
 		return -1;
 	}
 
 	server = createSocket(dstIP, port);
 	if (server == INVALID_SOCKET) {
 		std::cout << ">sslwrap.dll< - Error creating SSL socket!" << std::endl;
-		freeStructures(ssl, server, ctx);
+		freeStructures(ssl, server, ctx, buf_io);
 		return -1;
 	}
 
 	ssl = establishConnection(dstIP, port, server, ctx, clientCertSize, clientCert, clientPrivateKeySize, clientPrivateKey);
-	if (ssl == NULL) {
+	if (ssl == nullptr) {
 		std::cout << ">sslwrap.dll< - SSL connection Error!" << std::endl;
-		freeStructures(ssl, server, ctx);
+		freeStructures(ssl, server, ctx, buf_io);
 		return -1;
 	}
 
 	SSL_set_mode(ssl, SSL_MODE_AUTO_RETRY);
 
-	BIO* buf_io = setUpBufIO(ssl);
-	if (buf_io == NULL) {
+	buf_io = setUpBufIO(ssl);
+	if (buf_io == nullptr) {
 		std::cout << ">sslwrap.dll< - Error setting up BIO!" << std::endl;
-		freeStructures(ssl, server, ctx);
+		freeStructures(ssl, server, ctx, buf_io);
 		return -1;
 	}
 
@@ -63,21 +64,18 @@ int sendByteBufOnce(char* dstIP, int port, char* msg, int msgSize, int clientCer
 	int n = BIO_puts(buf_io, msg);
 	if (n < 0) {
 		std::cout << ">sslwrap.dll< - Error writing bytes OR no data available, try again!" << std::endl;
-		BIO_free_all(buf_io);
-		freeStructures(ssl, server, ctx);
+		freeStructures(ssl, server, ctx, buf_io);
 		return -1;
 	}
 
 	int success = BIO_flush(buf_io);
 	if (success < 1) {
 		std::cout << ">sslwrap.dll< - Error flushing Message!" << std::endl;
-		BIO_free_all(buf_io);
-		freeStructures(ssl, server, ctx);
+		freeStructures(ssl, server, ctx, buf_io);
 		return -1;
 	}
 
-	BIO_free_all(buf_io);
-	int free = freeStructures(ssl, server, ctx);
+	int free = freeStructures(ssl, server, ctx, buf_io);
 	if (free < 0) {
 		std::cout << ">sslwrap.dll< - Error freeing structures!" << std::endl;
 		return -1;
@@ -95,6 +93,7 @@ int sendByteBufWithResponse(char* dstIP, int dstPort, char* msg, int msgSize, ch
 	SSL_CTX* ctx = nullptr;
 	SOCKETTYPE server = INVALID_SOCKET;
 	SSL* ssl = nullptr;
+	BIO* buf_io = nullptr;
 
 	/* ---------------------------------------------------------- *
 	* initialize SSL library and register algorithms             *
@@ -105,32 +104,32 @@ int sendByteBufWithResponse(char* dstIP, int dstPort, char* msg, int msgSize, ch
 	}
 
 	ctx = createSSLContext();
-	if (ctx == NULL) {
+	if (ctx == nullptr) {
 		std::cout << ">sslwrap.dll< - Error creating SSL context" << std::endl;
-		freeStructures(ssl, server, ctx);
+		freeStructures(ssl, server, ctx, buf_io);
 		return -1;
 	}
 
 	server = createSocket(dstIP, dstPort);
 	if (server == INVALID_SOCKET) {
 		std::cout << ">sslwrap.dll< - Error creating SSL socket!" << std::endl;
-		freeStructures(ssl, server, ctx);
+		freeStructures(ssl, server, ctx, buf_io);
 		return -1;
 	}
 
 	establishConnection(dstIP, dstPort, server, ctx, clientCertSize, clientCert, clientPrivateKeySize, clientPrivateKey);
-	if (ssl == NULL) {
+	if (ssl == nullptr) {
 		std::cout << ">sslwrap.dll< - SSL connection Error!" << std::endl;
-		freeStructures(ssl, server, ctx);
+		freeStructures(ssl, server, ctx, buf_io);
 		return -1;
 	}
 
 	SSL_set_mode(ssl, SSL_MODE_AUTO_RETRY);
 
-	BIO* buf_io = setUpBufIO(ssl);
-	if (buf_io == NULL) {
+	buf_io = setUpBufIO(ssl);
+	if (buf_io == nullptr) {
 		std::cout << ">sslwrap.dll< - Error setting up BIO!" << std::endl;
-		freeStructures(ssl, server, ctx);
+		freeStructures(ssl, server, ctx, buf_io);
 		return -1;
 	}
 
@@ -138,16 +137,14 @@ int sendByteBufWithResponse(char* dstIP, int dstPort, char* msg, int msgSize, ch
 	int n = BIO_puts(buf_io, msg);
 	if (n < 0) {
 		std::cout << ">sslwrap.dll< - Error writing bytes OR no data available, try again!" << std::endl;
-		BIO_free_all(buf_io);
-		freeStructures(ssl, server, ctx);
+		freeStructures(ssl, server, ctx, buf_io);
 		return -1;
 	}
 
 	int success = BIO_flush(buf_io);
 	if (success < 1) {
 		std::cout << ">sslwrap.dll< - Error flushing Message!" << std::endl;
-		BIO_free_all(buf_io);
-		freeStructures(ssl, server, ctx);
+		freeStructures(ssl, server, ctx, buf_io);
 		return -1;
 	}
 
@@ -181,8 +178,7 @@ int sendByteBufWithResponse(char* dstIP, int dstPort, char* msg, int msgSize, ch
 
 	msgSize = lenRead;
 
-	BIO_free_all(buf_io);
-	int free = freeStructures(ssl, server, ctx);
+	int free = freeStructures(ssl, server, ctx, buf_io);
 	if (free < 0) {
 		std::cout << ">sslwrap.dll< - Error freeing structures!" << std::endl;
 		return -1;
@@ -249,12 +245,18 @@ SSL_CTX* createSSLContext()
 	return ctx;
 }
 
-int freeStructures(SSL* ssl, SOCKETTYPE server, SSL_CTX* ctx)
+int freeStructures(SSL* ssl, SOCKETTYPE server, SSL_CTX* ctx, BIO* buf_io)
 {
 	int re = 0;
 	/* ---------------------------------------------------------- *
 	* Free the structures we don't need anymore                  *
 	* -----------------------------------------------------------*/
+
+	if (buf_io != nullptr) {
+		BIO_free_all(buf_io);
+		ssl = nullptr;
+	}
+
 	if (ssl != nullptr) {
 		SSL_free(ssl);
 	}
