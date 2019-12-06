@@ -255,9 +255,11 @@ Furthermore, you can stop running agents by clicking the `Managed Instances` but
 
 Alternatively, you can connect to the system directly (SSH, RDP), and start the agents there.
 
-The credentials to do so can be looked up in polemarch's [hosts](srv/fluffi/data/polenext/projects/1/hosts) file. On Windows, start one LM (if there is not already one for your FuzzJob, such as on another machine in the same location) and as many TRs / TGs / TEs as you like, e.g. by clicking on the icons on the Desktop. On Linux, just start the appropriate agent binary from the command line, ensuring that you add the location name as the argument for the agent.
+The credentials to do so can be looked up in polemarch's [hosts](srv/fluffi/data/polenext/projects/1/hosts) file. Make sure that you are not using any underscores in your hostname, 
+as mentioned in this [issue](https://github.com/ansible/ansible/issues/56930).
+On Windows, start one LM (if there is not already one for your FuzzJob, such as on another machine in the same location) and as many TRs / TGs / TEs as you like, e.g. by clicking on the icons on the Desktop. On Linux, just start the appropriate agent binary from the command line, ensuring that you add the location name as the argument for the agent.
 
 You should always monitor your FuzzJob in the `Managed Instances` view in order to make sure that:
 1. The system is not overloaded (e.g. CPU>90%),
 2. The TG queues are not close to 0, and
-3. The TE queues are not growing and growing. 
+3. The TE queues are not growing and growing.
