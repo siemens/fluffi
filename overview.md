@@ -12,9 +12,9 @@ Author(s): Thomas Riedmaier
 
 # High level overview
 
-FLUFFI is a distributed system. Within this system, so called agents (e.g. TestcaseRunners, TestcaseGenerators) are distributed to executor machines. On these machines, the target to fuzz needs to be installed.
+FLUFFI is a distributed system. Within this system, so-called agents (e.g., TestcaseRunners, TestcaseGenerators) are distributed to executor machines. The fuzzing target needs to be installed on these machines.
 
-The agents are coordinated by a GlobalManager running on a central server. On the same central server runs a DHCP/DNS server, a solution to deploy software to executor machines (consisting of a polemarch installation, an ftp and an smb server), a monitoring solution and some helper services.
+The agents are coordinated by a GlobalManager running on a central server. A DHCP/DNS server, a solution to deploy software to executor machines (consisting of a polemarch installation, an ftp and an smb server), a monitoring solution, and some helper services all run on the same central server.
 
 FLUFFI is supposed to be set up in its own subnet with the central server having the static IP address 10.66.0.1.
 

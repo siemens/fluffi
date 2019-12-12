@@ -1,0 +1,53 @@
+#!/bin/bash
+# Copyright 2017-2019 Siemens AG. All Rights Reserved.
+#
+# Licensed under the Apache License 2.0 (the "License").  You may not use
+# this file except in compliance with the License.  You can obtain a copy
+# in the file LICENSE in the source distribution or at
+# https://www.openssl.org/source/license.html
+#
+# Author(s): Thomas Riedmaier
+
+THREADS=$(cat /proc/cpuinfo | grep processor | wc -l)
+ARCH=$(file /bin/bash | awk -F',' '{print $2}' | tr -d ' ')
+
+rm -rf include
+rm -rf include$ARCH
+rm -rf lib/$ARCH
+
+mkdir -p include
+mkdir -p include$ARCH/openssl
+mkdir -p lib/$ARCH
+
+# Getting Openssl
+
+rm -rf openssl
+
+git clone https://github.com/openssl/openssl.git
+cd openssl
+git checkout 97ace46e11dba4c4c2b7cb67140b6ec152cfaaf4
+
+
+# Actually build openssl
+mkdir -p build$ARCH
+cd build$ARCH
+perl ../config --release no-tests no-unit-test no-asm enable-static-engine no-shared
+make -j$THREADS
+cd ../..
+
+
+cp openssl/build${ARCH}/libcrypto.a lib/${ARCH}/libcrypto.a
+cp openssl/build${ARCH}/libssl.a lib/${ARCH}/libssl.a
+
+cp openssl/build${ARCH}/include/openssl/opensslconf.h include$ARCH/openssl
+cd openssl/include/
+find . -name '*.h' -exec cp --parents \{\} ../../include/ \;
+cd ../..
+
+cp openssl/ms/applink.c include
+
+
+
+rm -rf openssl
+
+

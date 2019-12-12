@@ -10,29 +10,23 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Abian Blome, Thomas Riedmaier
 -->
 
-Contributing to FLUFFI
-=========================
+# Contributing to FLUFFI
+Contributions to FLUFFI are always welcome. This document explains the general requirements for contributions and the recommended preparation steps. 
+It also sketches the typical integration process of patches.
 
-Contributions to FLUFFI are always welcome. This document explains the
-general requirements on contributions and the recommended preparation steps. It
-also sketches the typical integration process of patches.
+## 1) Contribution Checklist
 
 
-Contribution Checklist
-----------------------
-
-- use git to manage your changes [*recomended*]
+- use git to manage your changes [*recommended*]
 
 - add the required copyright header to each new file introduced, see
   [licensing information](LICENSING.md) [**required**]
 
 - structure patches logically, in small steps [**required**]
     - one separable functionality/fix/refactoring = one patch
-    - do not mix those three into a single patch (e.g. first refactor, then
-      add a new functionality that builds onto the refactoring)
-    - after each patch, the tree still has to build and work, i.e. do not add
-      even temporary breakages inside a patch series (helps when tracking down
-      bugs)
+    - do not mix those three into a single patch (e.g., first refactor, then add a new functionality that builds onto the refactoring)
+    - after each patch, the tree still has to build and work. Do not add
+      even temporary breakages inside a patch series (helps when tracking down bugs)
     - use `git rebase -i` to restructure a patch series
 
 - base patches on top of latest master or - if there are dependencies - on next
@@ -42,19 +36,17 @@ Contribution Checklist
     - to certify the "Developer's Certificate of Origin", see below
     - check with your employer when not working on your own!
 
-- add Fixes: to all bug-fix commits [*recommended*]
-    - the Fixes: tag format shall be:
+- add fixes: to all bug-fix commits [*recommended*]
+    - the fixes: tag format shall be:
         Fixes: 12-byte-hash ("subject of bug-introducting commit")
-    - if you are unsure of the bug-introducting commit do *not* add a
-      Fixes: tag - no Fixes: tag is better than a wrong Fixes: tag.
+    - if you are unsure of the bug-introducing commit do *not* add a
+      fixes: tag - no fixes: tag is better than a wrong fixes: tag.
 
 - post follow-up version(s) if feedback requires this
 
-- send reminder if nothing happened after about a week
+- send reminder if nothing happens after about a week
 
-
-Developer's Certificate of Origin 1.1
--------------------------------------
+## 2) Developer's Certificate of Origin 1.1
 
 When signing-off a patch for this project like this
 

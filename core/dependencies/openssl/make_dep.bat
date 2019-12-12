@@ -84,7 +84,7 @@ copy openssl\build86d\libcryptoMTd.lib lib\x86
 copy openssl\build86d\libsslMTd.lib lib\x86
 
 copy openssl\build64\include\openssl\opensslconf.h include64\openssl
-copy openssl\build64\include\openssl\opensslconf.h include86\openssl
+copy openssl\build86\include\openssl\opensslconf.h include86\openssl
 xcopy openssl\include\*.h include /sy
 
 copy openssl\ms\applink.c include
