@@ -122,3 +122,8 @@ core/x86-64/
 srv/fluffi/data/fluffiweb/app/static/3rdParty/
 srv/fluffi/data/fluffiweb/app/static/bootstrap/
 core/FluffiTester/Release/FluffiTester.vcxprojResolveAssemblyReference.cache
+core/helpers/fuzzcmp/x64/
+core/helpers/fuzzcmp/memcmp.cpp
+core/helpers/fuzzcmp/strcmp.cpp
+core/helpers/fuzzcmp/Release/
+core/helpers/fuzzcmp/Win32/

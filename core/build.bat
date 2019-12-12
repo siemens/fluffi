@@ -34,6 +34,14 @@ if errorlevel 1 goto errorDone
 "C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" helpers\Feeder\Feeder.sln /m  /t:Build /p:Configuration=Release /p:Platform=x86 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
 if errorlevel 1 goto errorDone
 
+:: Fuzzcmp x64
+"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" helpers\fuzzcmp\fuzzcmp.sln /m  /t:Build /p:Configuration=Release /p:Platform=x64 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
+if errorlevel 1 goto errorDone
+
+:: Fuzzcmp x86
+"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" helpers\fuzzcmp\fuzzcmp.sln /m  /t:Build /p:Configuration=Release /p:Platform=x86 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
+if errorlevel 1 goto errorDone
+
 :: Requires at least go 1.12
 
 set CGO_ENABLED=0

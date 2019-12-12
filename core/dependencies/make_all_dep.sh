@@ -74,3 +74,9 @@ cd base64
 ./make_dep.sh
 rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
 )
+
+(
+cd openssl
+./make_dep.sh
+rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
+)

@@ -11,6 +11,7 @@ Author(s): Junes Najah, Thomas Riedmaier, Pascal Eckmann
 -->
 
 {% extends "base.html" %}
+{% block title %}FLUFFI - Fuzzjobs - {{ data.project.name }} - {{ data.name }}{% endblock %}
 
 {% block scripts  %}
 <script src="{{ url_for('static', filename = 'javascript/tooltip.js') }}" type="text/javascript"></script>
