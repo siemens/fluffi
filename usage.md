@@ -20,10 +20,17 @@ All FuzzJobs are run on dedicated Runner systems in the FLUFFI Utility Network (
 * Check connectivity to `gm.fluffi`
 * For problems: check the firewall
 * Create a user for ansible. To do so you need to create a user that matches whatever username and password you specified in ansible's [hosts](srv/fluffi/data/polenext/projects/1/hosts) file (see [the getting started section](getting_started.md)). On Linux, this user needs to be a sudoer. On Windows, this user needs to be local administrator.
-* Prepare the system for ansible. Linux should already be prepared. On Windows you can use FLUFFI's initialization script: 
-  * `net use y: \\smb.fluffi\install\initial /user:nobody pass`
-  * `y:\initialConfiguration.bat`
-  * `net use y: /Delete /yes`
+* Prepare the system for ansible: 
+  * Windows:
+    * `net use y: \\smb.fluffi\install\initial /user:nobody pass`
+    * `y:\initialConfiguration.bat`
+    * `net use y: /Delete /yes`
+  * Linux:
+    * `smbclient '//smb.fluffi/install' -c 'cd initial; get MAC2Host.csv; get initialConfiguration.sh' -U anonymous%pass;`
+    * `chmod 777 /initialConfiguration.sh`
+    * `/bin/bash /initialConfiguration.sh`
+    * `rm MAC2Host.csv`
+    * `rm initialConfiguration.sh `
 * Finally, you need to tell FLUFFI about the system. To do so you have two options: either add it to ansible's [hosts](srv/fluffi/data/polenext/projects/1/hosts) file, or use the `Add System` button in FLUFFI's web GUI.
 
 ## 2) Preparing your target
@@ -255,8 +262,7 @@ Furthermore, you can stop running agents by clicking the `Managed Instances` but
 
 Alternatively, you can connect to the system directly (SSH, RDP), and start the agents there.
 
-The credentials to do so can be looked up in polemarch's [hosts](srv/fluffi/data/polenext/projects/1/hosts) file. Make sure that you are not using any underscores in your hostname, 
-as mentioned in this [issue](https://github.com/ansible/ansible/issues/56930).
+The credentials to do so can be looked up in polemarch's [hosts](srv/fluffi/data/polenext/projects/1/hosts) file.
 On Windows, start one LM (if there is not already one for your FuzzJob, such as on another machine in the same location) and as many TRs / TGs / TEs as you like, e.g. by clicking on the icons on the Desktop. On Linux, just start the appropriate agent binary from the command line, ensuring that you add the location name as the argument for the agent.
 
 You should always monitor your FuzzJob in the `Managed Instances` view in order to make sure that:
