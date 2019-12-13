@@ -968,7 +968,7 @@ std::shared_ptr<DebugExecutionOutput> TestExecutorDynRioMulti::execute(const Flu
 			if (m_exOutput_FROM_TARGET_DEBUGGING->m_terminationType == DebugExecutionOutput::CLEAN && m_debuggeeProcess->getExitStatus() != -1) {
 				//Case "Target terminated without an Exception"
 				std::shared_ptr<DebugExecutionOutput> exResult = std::make_shared<DebugExecutionOutput>();
-				exResult->m_terminationType = originalCrashType;
+				exResult->m_terminationType = DebugExecutionOutput::PROCESS_TERMINATION_TYPE::EXCEPTION_OTHER;
 				exResult->m_terminationDescription = "The request reproducibly causes the target to terminate!";
 				exResult->m_firstCrash = "TARGET_TERMINATED";
 				exResult->m_lastCrash = "TARGET_TERMINATED";

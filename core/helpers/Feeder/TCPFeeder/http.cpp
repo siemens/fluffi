@@ -12,12 +12,42 @@ Author(s): Abian Blome, Thomas Riedmaier, Pascal Eckmann
 
 #include "stdafx.h"
 #include "http.h"
-
-void performHTTPAuthAndManageSession() {
-	//TODO
-	return;
+#include "utils.h"
+std::string getAuthToken() {
+	return "implementme!";
 }
 
+void performHTTPAuthAndManageSession(std::vector<char>* bytes) {
+	std::cout << "TCPFeeder: called performHTTPAuthAndManageSession" << std::endl;
+	if (bytes->size() == 0) {
+		std::cout << "TCPFeeder: performHTTPAuthAndManageSession wont do anything, as an empty input was passed!" << std::endl;
+		return;
+	}
+
+	//See if there is an Authorization token to replace
+	std::string authorization = "Authorization: ";
+	std::string fullrequest(bytes->begin(), bytes->begin() + bytes->size());
+	std::size_t authorizationStartPos = fullrequest.find(authorization);
+	if (authorizationStartPos == std::string::npos) {
+		std::cout << "TCPFeeder: performHTTPAuthAndManageSession could not find Authorization header (1)!" << std::endl;
+		return;
+	}
+	authorizationStartPos += 15;
+	std::size_t authorizationEndPos = fullrequest.find("\r\n", authorizationStartPos);
+	if (authorizationEndPos == std::string::npos) {
+		std::cout << "TCPFeeder: performHTTPAuthAndManageSession could not find Authorization header (2)!" << std::endl;
+		return;
+	}
+
+	//Getting Authorization token
+	std::string authToken = getAuthToken();
+
+	std::string fullrequestWithAuth = fullrequest.substr(0, authorizationStartPos) + authToken + fullrequest.substr(authorizationEndPos);
+	bytes->clear();
+	std::copy(fullrequestWithAuth.c_str(), fullrequestWithAuth.c_str() + fullrequestWithAuth.length(), std::back_inserter(*bytes));
+
+	return;
+}
 
 void fixHTTPContentLength(std::vector<char>* bytes) {
 	std::cout << "TCPFeeder: called fixHTTPContentLength" << std::endl;
@@ -69,7 +99,6 @@ void fixHTTPContentLength(std::vector<char>* bytes) {
 	memcpy_s(&(*bytes)[contentLengthPos + 16], fullrequest.length() - (contentLengthPos + 16), buff, strlength);
 
 	std::cout << "TCPFeeder: fixHTTPContentLength fixed the content length to :" << realContentLength << std::endl;
-	//std::cout << std::string(bytes->begin(), bytes->begin() + bytes->size()) << std::endl;
 
 	return;
 }

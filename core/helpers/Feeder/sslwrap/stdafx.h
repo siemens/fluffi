@@ -7,19 +7,32 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-Author(s): Michael Kraus, Thomas Riedmaier, Pascal Eckmann
+Author(s): Thomas Riedmaier, Michael Kraus
 */
 
 #pragma once
 
 #include "targetver.h"
-#include <stdio.h>
+
+#if defined(_WIN32) || defined(_WIN64)
 #include <winsock.h>
+#define SOCKETTYPE SOCKET
+#else
+#include <unistd.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#define __cdecl __attribute__((__cdecl__))
+#define SOCKETTYPE int
+#define closesocket close
+#define INVALID_SOCKET -1
+#define SOCKET_ERROR -1
+#endif
 
 #include <stdio.h>
 #include <string>
-#include <tchar.h>
-#include <winsock.h>
+#include <string.h>
+
 #include <iostream>
 
 #include <openssl/ssl.h>
@@ -27,5 +40,3 @@ Author(s): Michael Kraus, Thomas Riedmaier, Pascal Eckmann
 #include <openssl/pem.h>
 #include <openssl/x509.h>
 #include <openssl/x509_vfy.h>
-
-extern "C" FILE* __cdecl __iob_func(void);
