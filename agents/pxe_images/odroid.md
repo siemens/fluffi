@@ -13,7 +13,7 @@ Author(s): Pascal Eckmann
 # [Odroid XU4](https://magazine.odroid.com/odroid-xu4)
 
 1. Flash [Armbian](https://www.armbian.com/odroid-xu4/) on a Micro-SD card
-2. Turn black switch on Odroid-XU4 to _mSD_
+2. Turn white switch on Odroid-XU4 to _&#181;SD_
 3. Boot Odroid-XU4 with inserted Micro-SD card, attached eMMC flash and connected to the internet
 4. Login    
     user: _root_    
@@ -21,7 +21,7 @@ Author(s): Pascal Eckmann
 ## Configurate U-Boot on Odroid-XU4
 1. Execute following command to create new partitions on eMMC
     - `sudo fdisk /dev/mmcblk0` and press/type following values:    
-    `d`, `n`, `p`, `1`, `2048`, `264191`, `(y)`, `n`, `p`, `2`, `264191`, `30535679`, `(y)`, `w`  
+    `d`, `n`, `p`, `1`, `2048`, `264191`, `(y)`, `n`, `p`, `2`, `264192`, `30535679`, `(y)`, `w`   ----reboot
 2. The result should now be two partitions:
     - 128 MB: 2048 - 264191  
     - Remaining space: 264192 - default (30535679)  
@@ -37,14 +37,32 @@ Author(s): Pascal Eckmann
         ```
         #Boot the board   
         #bootz 0x40008000 0x42000000 0x44000000   
-        setenv serverip [server_ip]  
+        setenv serverip [server_ip]   
         setenv bootfile default-arm-exynos   
         run bootcmd_pxe   
         ```
-5. Clone U-Boot and run the configuration script
+6. Clone U-Boot and run the configuration script
     - `git clone --depth 1 https://github.com/hardkernel/u-boot.git -b odroidxu4-v2017.05`   
     - `cd ../u-boot/sd_fuse`   
     - `sudo ./sd_fusing.sh /dev/mmcblk0` 
+    
+## Prepare [Armbian](./armbian.md) and then continue here
+    - Turn white switch on Odroid-XU4 to _eMMC_
+    - Remove Micro-SD card 
+    - Connect Odroid-XU4 to you Fluffi network
+    - Turn it on, it should now boot with PXE and get it's image over TFTP and FTP
 
-## Copy files to infrastructure
-__! work in progress !__
+## Good to know
+    - Every time you restart your Odroid-XU4, it will reinstall it's OS
+    - UART on Odroid-XU4 for debugging
+        ```
+        ___________
+       |           |
+       |Pin 4 - GND|
+       |Pin 3 - RXD|
+       |Pin 2 - TXD|
+       |Pin 1 - VCC|
+        |          |
+         |_________|
+         
+        ```

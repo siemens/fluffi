@@ -16,10 +16,10 @@ This instruction is tested with [Armbian_5.94_Odroidxu4_Ubuntu_bionic_default_4.
 
 1. Download and extract [Armbian](https://www.armbian.com/odroid-xu4/)
 2. Mount/open downloaded image
-    - `fdisk -l [image]`
+    - `sudo fdisk -l [image]`
     - Calculate Offset between sector size * start: e.g. 512 * 8192 = 4194304
     - `sudo mount -o loop,offset=[offset] [Image] /mnt/tmp`
-3. Navigate to `/mnt/tmp` and copy following files to a new location, we will need them later
+3. Navigate to `/mnt/tmp` and copy following files to another location, we will need them later
     - `/boot/initrd.img-X.XX.XX-odroidxu4` (Ramdisk)   
     - `/boot/vmlinuz-X.XX.XX-odroidxu4` (Kernel)   
     - `/boot/dtb--X.XX.XX-odroidxu4/exynos5422-odroidxu4.dtb` (Device Tree Blob)
@@ -32,7 +32,7 @@ This instruction is tested with [Armbian_5.94_Odroidxu4_Ubuntu_bionic_default_4.
     - Navigate to `initrd` 
     - Execute: `zcat ../initrd.gz | fakeroot -s ../initrd.fakeroot cpio -i`
 5. If everything worked, you should now see the typical unix folders in `initrd` and in the directory above `initrd.fakeroot`
-6. Insert missing text `# format eMMC ...` and `# load Armbian` in `/initrd/init`
+6. Insert missing text `# format eMMC ...` and `# load Armbian ...` in `/initrd/init`
     ```
     [...]
     
@@ -85,24 +85,26 @@ This instruction is tested with [Armbian_5.94_Odroidxu4_Ubuntu_bionic_default_4.
     - Execute: `find | fakeroot -i ../initrd.fakeroot cpio -o -H newc | gzip -c > ../initrd.gz`
 9. Rename kernel `vmlinuz-X.XX.XX-odroidxu4` to `zImage`
 10. Navigate into mounted Armbian image `/mnt/tmp` and copy following *.deb files to `/usr/local` of the image (Links of these files for Debian Buster)
-    - [cifs-utils_XX.deb](https://packages.debian.org/buster/armhf/cifs-utils/download)
-        - Rename the file to `cifs-utils.deb`
     - [libtalloc2_XX.deb](https://packages.debian.org/buster/armhf/libtalloc2/download)
         - Rename the file to `libtalloc2.deb`
     - [libwbclient0_XX.deb](https://packages.debian.org/buster/armhf/libwbclient0/download)
         - Rename the file to `libwbclient0.deb`
+    - [cifs-utils_XX.deb](https://packages.debian.org/buster/armhf/cifs-utils/download)
+        - Rename the file to `cifs-utils.deb`
     - [samba-common_XX.deb](https://packages.debian.org/buster/armhf/samba-common/download)
         - Rename the file to `samba-common.deb`
+    - Good to know: You can download these packages also with `sudo apt-get install --download-only <package_name>`
 11. Change `/etc/rc.local`
     ```
     #!/bin/sh -e
     [...]
     # By default this script does nothing.
     
-    dpkg -i /usr/local/samba-common.deb
+    echo "nameserver 10.66.0.1" >> /etc/resolv.conf
     dpkg -i /usr/local/libtalloc2.deb
     dpkg -i /usr/local/libwbclient0.deb
-    dpkg -i /usr/local/cifs.deb
+    dpkg -i /usr/local/samba-common.deb
+    dpkg -i /usr/local/cifs-utils.deb
     apt-get install -f
     mkdir -p /mnt/smb
     mount -t cifs //smb.fluffi/install -o username=anonymous,password=pass /mnt/smb
@@ -138,9 +140,37 @@ This instruction is tested with [Armbian_5.94_Odroidxu4_Ubuntu_bionic_default_4.
         #deb http://apt.armbian.com bionic main bionic-utils bionic-desktop
         ```
 13. Archive mounted image
-    - Execute: `sudo tar --owner=root --group=root -p -cvf /home/armbian.tar */` (at / of the mounted image)
+    - Execute: `sudo tar --owner=root --group=root -p -cvf /home/armbian.tar */` (at / of mounted image)
     
-## Copy files to infrastructure
-__! work in progress !__
+## Copy/Configure files to infrastructure
+- Create file `default-arm-exynos` with following content
+    ```
+    DEFAULT odroidxu4_default
+
+    LABEL odroidxu4_default
+    kernel odroidxu4/zImage
+    fdt odroidxu4/exynos5422-odroidxu4.dtb
+    append initrd=odroidxu4/initrd.gz console=ttySAC2,115200n8 consoleblank=0 panic=10 root=/dev/mmcblk0p2 rootwait rw
+
+    PROMPT 1
+    TIMEOUT 0
+    ```
+- Create a folder in `ftp.fluffi/tftp-root/`, e.g. `ftp.fluffi/tftp-root/armbian` and copy all Armbian files (including the files from the image) in the new folder:
+    >&gt; __tftp-root__    
+    >|&emsp;&gt; __armbian__    
+    >|&emsp;|&emsp;&gt; __pxelinux.cfg__    
+    >|&emsp;|&emsp;|&emsp;&gt; default-arm-exynos    
+    >|&emsp;|&emsp;&gt; __odroidxu4__    
+    >|&emsp;|&emsp;|&emsp;&gt; exynos5422-odroidxu4.dtb    
+    >|&emsp;|&emsp;|&emsp;&gt; initrd.gz    
+    >|&emsp;|&emsp;|&emsp;&gt; zImage    
+    >|&emsp;&gt;	 __another_os__    
+    >|&emsp;|&emsp;&gt; ...    
+    >|&emsp;&gt; ...    
+- Copy your generated `armbian.tar` to `ftp.fluffi/odroid/`
+    >&gt; __odroid__    
+    >|&emsp;&gt; armbian.tar     
+    >|&emsp;&gt; ...    
+
 
 

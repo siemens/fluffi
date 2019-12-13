@@ -17,10 +17,12 @@ Author(s): Pascal Eckmann
 
 ## Infrastructure
 
-All required systems are executed when _docker-compose_ is started with the specified [configuration](../../srv/fluffi/docker-compose.yaml).    
+All required systems (FTP, TFTP, SMB) are available if _docker-compose_ has been started with the specified [configuration](../../srv/fluffi/docker-compose.yaml).    
 __On _web.fluffi_ you can select the OS, which should be loaded over PXE.__    
 
 - ##### FTP
+    - USE `Binary` as transfer type for copying files to FTP
+        - If you use _Filezilla_, open _Settings \> Transfers \> File Types_ and set the _Default transfer type_ to _Binary_
     - `ftp.fluffi/tftp-roots/...`    
         - e.g. `ubuntuRoot/...`   
         -> copy your systems here, detailed steps are in the instructions for each operating system
@@ -36,6 +38,11 @@ __On _web.fluffi_ you can select the OS, which should be loaded over PXE.__
     - [Create and configure Windows image for PXE](windows.md)
 - ##### Ubuntu
     - [Create and configure Ubuntu image for PXE](ubuntu.md)
-- ##### Armbian/Odroid-XU4 __! work in progress !__
+- ##### Armbian/Odroid-XU4
     - [Install and configure Odroid-XU4 for PXE](odroid.md)
     - [Create and configure Armbian image for PXE](armbian.md)
+    
+## Add MAC address and hostname for autmatic configuration
+- Add the MAC address with the associated hostname to the [MAC2Host.csv](../../srv/fluffi/data/smb/files/initial/MAC2Host.csv) file on SMB share
+    - _Attention: Only use upper case letters in MAC address_
+    - __Odroid__: Additional add your MAC adress and your hostname to the [ethers](../../srv/fluffi/data/dnsmasq/ethers) file from _dnsmasq_ with following style: `00:11:22:33:44:55 odroidHostname`

@@ -37,20 +37,19 @@ A example preseeding file for Ubuntu 18.04 is located in this [repository](ubunt
 
 ## Copy files to infrastructure
 - Create a folder in `ftp.fluffi/tftp-root/`, e.g. `ftp.fluffi/tftp-root/ubuntu` and copy all Ubuntu files in the new folder:
-.    
-+_--_ __tftp-root__    
-|&emsp;+_--_ __ubuntu__    
-|&emsp;|&emsp;+_-- __pxelinux.cfg__    
-|&emsp;|&emsp;|&emsp;+_-- default    
-|&emsp;|&emsp;+_-- __ubuntu-installer__    
-|&emsp;|&emsp;|&emsp;+_-- ...    
-|&emsp;|&emsp;+_-- boot.img.gz    
-|&emsp;|&emsp;+_-- ldlinux.c32    
-|&emsp;|&emsp;+_-- ...    
-|&emsp;|&emsp;+_-- pxelinux.0    
-|&emsp;+_-- __another_os__    
-|&emsp;|&emsp;+_-- ...    
-|&emsp;+_-- ...    
+    >&gt; __tftp-root__    
+    >|&emsp;&gt; __ubuntu__    
+    >|&emsp;|&emsp;&gt; __pxelinux.cfg__    
+    >|&emsp;|&emsp;|&emsp;&gt; default    
+    >|&emsp;|&emsp;&gt; __ubuntu-installer__    
+    >|&emsp;|&emsp;|&emsp;&gt; ...    
+    >|&emsp;|&emsp;&gt; boot.img.gz    
+    >|&emsp;|&emsp;&gt; ldlinux.c32    
+    >|&emsp;|&emsp;&gt; ...    
+    >|&emsp;|&emsp;&gt; pxelinux.0    
+    >|&emsp;&gt;	 __another_os__    
+    >|&emsp;|&emsp;&gt; ...    
+    >|&emsp;&gt; ...   
 - Rename `pxelinux.0` to `pxeboot.n12`
 
 
