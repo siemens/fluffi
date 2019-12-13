@@ -45,7 +45,8 @@ On Linux use  [the linux build file](build/ubuntu_based/buildAll.sh). When you c
 ```
 ./buildAll.sh PREPARE_ENV=TRUE WITH_DEPS=TRUE
 ```
-Please keep in mind that this will take a long time, as it will compile all FLUFFI dependencies from sources.
+PREPARE_ENV=TRUE will build the docker continers.  This needs to be done only once.
+WITH_DEPS=TRUEP will build all of FLUFFI's dependencies from sources. Please keep in mind that this will take a long time.
 
 For all future compiles you can use 
 ```
@@ -60,15 +61,22 @@ If you have already set up the FUN (see next section), you can directly upload y
 ## 3) Setting up the FUN
 The FLUFFI Utility Network (FUN) contains all the infrastructure needed for fuzzing.
 
-To set it up, you first need to set up the central server with docker installed. Give that server the static IP address 10.66.0.1.
+To set it up, you first need to set up the central server with docker and docker-compose installed. Give that server the static IP address 10.66.0.1.
 
-Copy the FLUFFI repo to that machine (or clone it there).
+To install docker and docker-compose see [here](https://docs.docker.com/install/linux/docker-ce/ubuntu/), and [here](https://docs.docker.com/compose/install/).
+
+Having done so, copy the FLUFFI repo to that machine (or clone it there). For git clone, make sure to have [git lfs](https://git-lfs.github.com/) installed and properly configured(run `git lfs install`).
 
 ```
-git clone  --depth 1 --branch master https://github.com/siemens/fluffi.git ./fluffigit
+git clone --depth 1 --branch master https://github.com/siemens/fluffi.git ./fluffigit
 ```
 
-Copy the server part to /srv/fluffi
+If you are doing this for the very first time, create an empty dnsmasq.leases file (Do not do this if you just update FLUFFI): 
+``` 
+touch /srv/fluffi/data/dnsmasq/dnsmasq.leases
+```
+
+Copy the server part to /srv/fluffi (You can execute this command even after you set up FLUFFI,e.g., to update server components):
 
 ```
 rsync -ai --delete --exclude={'data/ftp/files/archive','data/ftp/files/deploy','data/ftp/files/fluffi','data/ftp/files/initial/linux/activePackages','data/ftp/files/initial/linux/inactivePackages','data/ftp/files/initial/windows/activePackages','data/ftp/files/initial/windows/inactivePackages','data/ftp/files/initial/windows/ansible/Driver','data/ftp/files/initial/windows/ansible/VCRedistributables','data/ftp/files/odroid','data/ftp/files/SUT','data/ftp/files/tftp-roots','data/ftp/files/ubuntu-mirror','data/tftp','data/smb/files/server2008','data/smb/files/server2016','data/dnsmasq/dnsmasq.leases','data/mon/grafana','data/mon/influxdb'} ./fluffigit/srv/fluffi/ /srv/fluffi/
@@ -77,14 +85,15 @@ rsync -ai --delete --exclude={'data/ftp/files/archive','data/ftp/files/deploy','
 Apply changes to the default configuration. We recommend you to:
 - change /srv/fluffi/data/dnsmasq/ethers if you want to give some systems host names based on their MAC addresses
 - change /srv/fluffi/data/dnsmasq/hosts e.g., if you want to give some systems static IP addresses or if you want to move services to different machines
-- change /srv/fluffi/data/polenext/projects/1/hosts to contain login information to your executor machines
+- change /srv/fluffi/data/polenext/projects/1/hosts to contain the names of and login information to your executor machines. Make sure that you are not using any underscores in your hostname, 
+as mentioned in this [issue](https://github.com/ansible/ansible/issues/56930).
 - change /srv/fluffi/data/smb/files/initial/odroid_rootpasswd to contain the actual root password for your odroid executor machines
 - change /srv/fluffi/data/smb/files/initial/odroid_username to contain the actual odroid username for your odroid executor machines
 - change /srv/fluffi/data/smb/files/initial/odroid_userpasswd to contain the actual odroid password for your odroid executor machines
 - change /srv/fluffi/data/smb/files/initial/MAC2Host.csv to contain the MAC addresses and hosts of your executor machines (if you want to set host names according to MAC addresses)
 - replace the files in /srv/fluffi/data/smb/files/initial/updatesWS2008 and /srv/fluffi/data/ftp/files/initial/windows/ansible with the actual files. The files stored there in the git are just text files with links to where you can download the actual files.
 
-Copy the GlobalManager to /srv/fluffi/data/fluffigm
+Copy the GlobalManager to /srv/fluffi/data/fluffigm. To be precise, you need to copy `core/{{arch}}/bin/{GlobalManager,lib*.so*}`.
 
 Set file permissions correctly:
 
@@ -96,18 +105,33 @@ find /srv/fluffi/data/smb/files -type d -exec chmod 777 {} \;
 find /srv/fluffi/data/ftp/files -type d -exec chmod 777 {} \;
 find /srv/fluffi/data/tftp -type d -exec chmod 777 {} \;
 chmod 555 /srv/fluffi/data/ftp/files
+chmod -R +x /srv/fluffi/data/fluffigm
 ```
 
+For the following two steps, an internet connection is necessary at the first time.
 Get FLUFFI's web dependencies:
 ```
-cd srv/fluffi/data/fluffiweb/app
+cd /srv/fluffi/data/fluffiweb/app
 ./get_static_dependencies.sh
 ```
 
-Finally, start all server services
+Now switch your environment form Internet-connected to offline:
+```
+systemctl stop systemd-resolved.service
+rm -f /etc/resolv.conf
+echo "search fluffi" > /etc/resolv.conf
+echo "nameserver 10.66.0.1" >> /etc/resolv.conf
+```
+
+Finally, build all server services:
 
 ```
 cd /srv/fluffi
+docker-compose build
+```
+
+Now you don't need an internet connection anymore. To start the containers and keep them running, run:
+```
 docker-compose up -d --force-recreate
 ```
 
