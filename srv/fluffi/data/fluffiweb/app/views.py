@@ -6,7 +6,7 @@
 # 
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # 
-# Author(s): Junes Najah, Michael Kraus, Abian Blome, Pascal Eckmann, Fabian Russwurm, Thomas Riedmaier
+# Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Abian Blome, Fabian Russwurm, Thomas Riedmaier
 
 from flask import flash, redirect, url_for, request, send_file, Markup
 from werkzeug.exceptions import HTTPException
