@@ -1029,77 +1029,114 @@ bool LMDatabaseManager::addEntryToInterestingTestcasesTable(const FluffiTestcase
 
 	int preparedType = tcType;
 
-	//// prepared Statement
-	MYSQL_STMT* sql_stmt = mysql_stmt_init(getDBConnection());
+	// First step: Delete interesting testcaes if it already exists
+	{
+		MYSQL_STMT* sql_stmt = mysql_stmt_init(getDBConnection());
 
-	const char* stmt = "REPLACE INTO interesting_testcases (CreatorServiceDescriptorGUID, CreatorLocalID, ParentServiceDescriptorGUID, ParentLocalID, Rating, RawBytes, TestCaseType, TimeOfInsertion) values (?, ?, ?, ?, ?, ?, ?,CURRENT_TIMESTAMP())";
-	mysql_stmt_prepare(sql_stmt, stmt, static_cast<unsigned long>(strlen(stmt)));
+		const char* stmt = "DELETE FROM interesting_testcases WHERE CreatorServiceDescriptorGUID = ? AND CreatorLocalID = ?";
+		mysql_stmt_prepare(sql_stmt, stmt, static_cast<unsigned long>(strlen(stmt)));
 
-	//params
-	MYSQL_BIND bind[9];
-	memset(bind, 0, sizeof(bind));
+		//params
+		MYSQL_BIND bind[2];
+		memset(bind, 0, sizeof(bind));
 
-	bind[0].buffer_type = MYSQL_TYPE_VAR_STRING;
-	bind[0].buffer = const_cast<char*>(cStrCreatorServiceDescriptorGUID);
-	bind[0].buffer_length = creatorGUIDLength;
-	bind[0].length = &creatorGUIDLength;
+		bind[0].buffer_type = MYSQL_TYPE_VAR_STRING;
+		bind[0].buffer = const_cast<char*>(cStrCreatorServiceDescriptorGUID);
+		bind[0].buffer_length = creatorGUIDLength;
+		bind[0].length = &creatorGUIDLength;
 
-	bind[1].buffer_type = MYSQL_TYPE_LONGLONG;
-	bind[1].buffer = &preparedCreatorLocalID;
-	bind[1].is_null = 0;
-	bind[1].is_unsigned = true;
-	bind[1].length = NULL;
+		bind[1].buffer_type = MYSQL_TYPE_LONGLONG;
+		bind[1].buffer = &preparedCreatorLocalID;
+		bind[1].is_null = 0;
+		bind[1].is_unsigned = true;
+		bind[1].length = NULL;
 
-	bind[2].buffer_type = MYSQL_TYPE_VAR_STRING;
-	bind[2].buffer = const_cast<char*>(cStrParentServiceDescriptorGUID);
-	bind[2].buffer_length = parentGUIDLength;
-	bind[2].length = &parentGUIDLength;
+		mysql_stmt_bind_param(sql_stmt, bind);
+		bool re = mysql_stmt_execute(sql_stmt) == 0;
+		if (!re) {
+			LOG(ERROR) << "addEntryToInterestingTestcasesTable encountered the following error: " << mysql_stmt_error(sql_stmt);
+		}
 
-	bind[3].buffer_type = MYSQL_TYPE_LONGLONG;
-	bind[3].buffer = &preparedParentLocalID;
-	bind[3].is_null = 0;
-	bind[3].is_unsigned = true;
-	bind[3].length = NULL;
+		mysql_stmt_close(sql_stmt);
 
-	bind[4].buffer_type = MYSQL_TYPE_LONG;
-	bind[4].buffer = &preparedRating;
-	bind[4].is_null = 0;
-	bind[4].is_unsigned = false;
-	bind[4].length = NULL;
-
-	bind[5].buffer_type = MYSQL_TYPE_LONG_BLOB;
-	bind[5].buffer = const_cast<char*>(cStrRawBytes);
-	bind[5].buffer_length = rawBytesLength;
-	bind[5].length = &rawBytesLength;
-
-	bind[6].buffer_type = MYSQL_TYPE_LONG;
-	bind[6].buffer = &preparedType;
-	bind[6].is_null = 0;
-	bind[6].is_unsigned = true;
-	bind[6].length = NULL;
-
-	bind[7].buffer_type = MYSQL_TYPE_LONG;
-	bind[7].buffer = &preparedRating;
-	bind[7].is_null = 0;
-	bind[7].is_unsigned = false;
-	bind[7].length = NULL;
-
-	bind[8].buffer_type = MYSQL_TYPE_LONG;
-	bind[8].buffer = &preparedType;
-	bind[8].is_null = 0;
-	bind[8].is_unsigned = true;
-	bind[8].length = NULL;
-
-	mysql_stmt_bind_param(sql_stmt, bind);
-	//if problems with big files arise, mysql_stmt_send_long_data might be the solution
-	bool re = mysql_stmt_execute(sql_stmt) == 0;
-	if (!re) {
-		LOG(ERROR) << "addEntryToInterestingTestcasesTable encountered the following error: " << mysql_stmt_error(sql_stmt);
+		if (!re) {
+			return re;
+		}
 	}
 
-	mysql_stmt_close(sql_stmt);
+	// Second step: Actually insert the interesting testcase
+	{
+		MYSQL_STMT* sql_stmt = mysql_stmt_init(getDBConnection());
+
+		const char* stmt = "INSERT INTO interesting_testcases (CreatorServiceDescriptorGUID, CreatorLocalID, ParentServiceDescriptorGUID, ParentLocalID, Rating, RawBytes, TestCaseType, TimeOfInsertion) values (?, ?, ?, ?, ?, ?, ?,CURRENT_TIMESTAMP())";
+		mysql_stmt_prepare(sql_stmt, stmt, static_cast<unsigned long>(strlen(stmt)));
+
+		//params
+		MYSQL_BIND bind[9];
+		memset(bind, 0, sizeof(bind));
+
+		bind[0].buffer_type = MYSQL_TYPE_VAR_STRING;
+		bind[0].buffer = const_cast<char*>(cStrCreatorServiceDescriptorGUID);
+		bind[0].buffer_length = creatorGUIDLength;
+		bind[0].length = &creatorGUIDLength;
+
+		bind[1].buffer_type = MYSQL_TYPE_LONGLONG;
+		bind[1].buffer = &preparedCreatorLocalID;
+		bind[1].is_null = 0;
+		bind[1].is_unsigned = true;
+		bind[1].length = NULL;
+
+		bind[2].buffer_type = MYSQL_TYPE_VAR_STRING;
+		bind[2].buffer = const_cast<char*>(cStrParentServiceDescriptorGUID);
+		bind[2].buffer_length = parentGUIDLength;
+		bind[2].length = &parentGUIDLength;
+
+		bind[3].buffer_type = MYSQL_TYPE_LONGLONG;
+		bind[3].buffer = &preparedParentLocalID;
+		bind[3].is_null = 0;
+		bind[3].is_unsigned = true;
+		bind[3].length = NULL;
+
+		bind[4].buffer_type = MYSQL_TYPE_LONG;
+		bind[4].buffer = &preparedRating;
+		bind[4].is_null = 0;
+		bind[4].is_unsigned = false;
+		bind[4].length = NULL;
+
+		bind[5].buffer_type = MYSQL_TYPE_LONG_BLOB;
+		bind[5].buffer = const_cast<char*>(cStrRawBytes);
+		bind[5].buffer_length = rawBytesLength;
+		bind[5].length = &rawBytesLength;
+
+		bind[6].buffer_type = MYSQL_TYPE_LONG;
+		bind[6].buffer = &preparedType;
+		bind[6].is_null = 0;
+		bind[6].is_unsigned = true;
+		bind[6].length = NULL;
+
+		bind[7].buffer_type = MYSQL_TYPE_LONG;
+		bind[7].buffer = &preparedRating;
+		bind[7].is_null = 0;
+		bind[7].is_unsigned = false;
+		bind[7].length = NULL;
+
+		bind[8].buffer_type = MYSQL_TYPE_LONG;
+		bind[8].buffer = &preparedType;
+		bind[8].is_null = 0;
+		bind[8].is_unsigned = true;
+		bind[8].length = NULL;
+
+		mysql_stmt_bind_param(sql_stmt, bind);
+		//if problems with big files arise, mysql_stmt_send_long_data might be the solution
+		bool re = mysql_stmt_execute(sql_stmt) == 0;
+		if (!re) {
+			LOG(ERROR) << "addEntryToInterestingTestcasesTable encountered the following error: " << mysql_stmt_error(sql_stmt);
+		}
+
+		mysql_stmt_close(sql_stmt);
+	}
 	PERFORMANCE_WATCH_FUNCTION_EXIT("addEntryToInterestingTestcasesTable")
-		return re;
+		return true;
 }
 
 bool LMDatabaseManager::setSessionParameters(MYSQL* conn) {
