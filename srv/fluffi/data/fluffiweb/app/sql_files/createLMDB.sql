@@ -124,6 +124,7 @@ CREATE TABLE IF NOT EXISTS fluffi.nice_names_testcase (
 		REFERENCES fluffi.interesting_testcases(`ID`)
 		ON UPDATE RESTRICT ON DELETE CASCADE,
 	UNIQUE (`TestcaseID`),
+	UNIQUE (`NiceName`),
 	PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -132,6 +133,7 @@ CREATE TABLE IF NOT EXISTS fluffi.nice_names_managed_instance (
 	`NiceName` VARCHAR(100) NOT NULL,
 	`ServiceDescriptorGUID` VARCHAR(50) NOT NULL,	
 	UNIQUE (`ServiceDescriptorGUID`),	
+	UNIQUE (`NiceName`),
 	PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

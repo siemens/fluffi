@@ -206,11 +206,46 @@ bool LMDatabaseManager::writeManagedInstance(const FluffiServiceDescriptor servi
 		}
 	}
 
+	//Try to set a nice nime (for gui and evaluation purposes)
+	for (int i = 0; i < 10; i++)
 	{
-		//// prepared Statement to insert to store the nice name of the instance (for gui and evaluation purposes)
-		MYSQL_STMT* sql_stmt = mysql_stmt_init(getDBConnection());
+		if (i == 9) {
+			LOG(WARNING) << "writeManagedInstance failed to insert a nice name for 10 times. Giving up";
+			PERFORMANCE_WATCH_FUNCTION_EXIT("writeManagedInstance")
+				return false;
+		}
 
-		const char* stmt = "INSERT IGNORE INTO nice_names_managed_instance (ServiceDescriptorGUID,NiceName ) SELECT ?, CONCAT(?, COUNT(*)) FROM nice_names_managed_instance FOR UPDATE";
+		//Find out how many nice names there are already
+		if (mysql_query(getDBConnection(), "SELECT COUNT(*) FROM nice_names_managed_instance") != 0) {
+			LOG(ERROR) << "LMDatabaseManager::writeManagedInstance failed to figure out how many entries there are already in the nice_names_managed_instance table (1)";
+			PERFORMANCE_WATCH_FUNCTION_EXIT("writeManagedInstance")
+				return false;
+		}
+
+		MYSQL_RES* result = mysql_store_result(getDBConnection());
+		if (result == NULL) {
+			LOG(ERROR) << "LMDatabaseManager::writeManagedInstance failed to figure out how many entries there are already in the nice_names_managed_instance table (2)";
+			PERFORMANCE_WATCH_FUNCTION_EXIT("writeManagedInstance")
+				return false;
+		}
+
+		MYSQL_ROW row = mysql_fetch_row(result);
+		if (row == NULL) {
+			mysql_free_result(result);
+			LOG(ERROR) << "LMDatabaseManager::writeManagedInstance failed to figure out how many entries there are already in the nice_names_managed_instance table (3)";
+			PERFORMANCE_WATCH_FUNCTION_EXIT("writeManagedInstance")
+				return false;
+		}
+
+		std::string niceName = subtype + row[0];
+		const char* cNiceName = niceName.c_str();
+		unsigned long cNiceNameLength = static_cast<unsigned long>(niceName.length());
+
+		mysql_free_result(result);
+
+		// Try setting the nice name
+		MYSQL_STMT* sql_stmt = mysql_stmt_init(getDBConnection());
+		const char* stmt = "INSERT INTO nice_names_managed_instance (ServiceDescriptorGUID,NiceName ) values (?, ?)";
 		mysql_stmt_prepare(sql_stmt, stmt, static_cast<unsigned long>(strlen(stmt)));
 
 		//params
@@ -223,20 +258,26 @@ bool LMDatabaseManager::writeManagedInstance(const FluffiServiceDescriptor servi
 		bind[0].length = &GUIDLength;
 
 		bind[1].buffer_type = MYSQL_TYPE_VAR_STRING;
-		bind[1].buffer = const_cast<char*>(cSubtype);
-		bind[1].buffer_length = subtypeLength;
-		bind[1].length = &subtypeLength;
+		bind[1].buffer = const_cast<char*>(cNiceName);
+		bind[1].buffer_length = cNiceNameLength;
+		bind[1].length = &cNiceNameLength;
 
 		mysql_stmt_bind_param(sql_stmt, bind);
 		bool re = mysql_stmt_execute(sql_stmt) == 0;
 		if (!re) {
-			LOG(ERROR) << "writeManagedInstance encountered the following error (2): " << mysql_stmt_error(sql_stmt);
+			std::string theError = mysql_stmt_error(sql_stmt);
+			if (theError.find("for key 'ServiceDescriptorGUID'") != std::string::npos) {
+				//there already is a nice name for this ServiceDescriptorGUID - nothing to do here
+				break;
+			}
+			LOG(WARNING) << "writeManagedInstance encountered the following error (2): " << theError << ". We will try again!";
 		}
 
 		mysql_stmt_close(sql_stmt);
 
-		if (!re) {
-			return false;
+		if (re) {
+			//Successfully inserted nice name
+			break;
 		}
 	}
 
