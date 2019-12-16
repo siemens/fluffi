@@ -43,7 +43,7 @@ mkdir build64
 mkdir build86
 SETLOCAL
 cd build64
-call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64
+call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvarsall.bat" x64
 
 cl.exe /MT /c /EHsc ..\base64.cpp
 LIB.EXE /OUT:base64.LIB base64.obj
@@ -54,7 +54,7 @@ ENDLOCAL
 
 SETLOCAL
 cd build86
-call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86
+call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvarsall.bat" x86
 
 cl.exe /MT /c /EHsc ..\base64.cpp
 LIB.EXE /OUT:base64.LIB base64.obj

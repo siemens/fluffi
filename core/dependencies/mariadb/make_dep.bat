@@ -39,24 +39,30 @@ git checkout bce6c8013805f203b38e52c979b22b3141334f3c
 mkdir build64
 mkdir build86
 cd build64
-cmake -G "Visual Studio 14 2015 Win64" ..
+SETLOCAL
+call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvarsall.bat" x64
+cmake -G "Visual Studio 15 2017 Win64" ..
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDebugDll', 'MultiThreadedDebug' } | sc $f.PSPath }"
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDll', 'MultiThreaded' } | sc $f.PSPath }"
-"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" mariadb-connector-c.sln /m /t:Build /p:Configuration=Release /p:Platform=x64 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
+MSBuild.exe mariadb-connector-c.sln /m /t:Build /p:Configuration=Release /p:Platform=x64
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'libmariadb</TargetName>', 'libmariadbd</TargetName>' } | sc $f.PSPath }"
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'libmariadb.pdb', 'libmariadbd.pdb' } | sc $f.PSPath }"
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'libmariadb.lib', 'libmariadbd.lib' } | sc $f.PSPath }"
-"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" mariadb-connector-c.sln /m /t:Build /p:Configuration=Debug /p:Platform=x64 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
+MSBuild.exe mariadb-connector-c.sln /m /t:Build /p:Configuration=Debug /p:Platform=x64
+ENDLOCAL
 cd ..
 cd build86
-cmake -G "Visual Studio 14 2015" ..
+SETLOCAL
+call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvarsall.bat" x86
+cmake -G "Visual Studio 15 2017" ..
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDebugDll', 'MultiThreadedDebug' } | sc $f.PSPath }"
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDll', 'MultiThreaded' } | sc $f.PSPath }"
-"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" mariadb-connector-c.sln /m /t:Build /p:Configuration=Release /p:Platform=Win32 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
+MSBuild.exe mariadb-connector-c.sln /m /t:Build /p:Configuration=Release /p:Platform=Win32
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'libmariadb</TargetName>', 'libmariadbd</TargetName>' } | sc $f.PSPath }"
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'libmariadb.pdb', 'libmariadbd.pdb' } | sc $f.PSPath }"
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'libmariadb.lib', 'libmariadbd.lib' } | sc $f.PSPath }"
-"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" mariadb-connector-c.sln /m /t:Build /p:Configuration=Debug /p:Platform=Win32 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
+MSBuild.exe mariadb-connector-c.sln /m /t:Build /p:Configuration=Debug /p:Platform=Win32
+ENDLOCAL
 cd ..
 cd ..
 

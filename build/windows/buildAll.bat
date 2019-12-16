@@ -35,16 +35,12 @@ IF "%WITH_DEPS%" == "TRUE" (
 				ECHO git wasn't found 
 				goto :err
 				)
-		IF NOT EXIST "C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" (
-				ECHO Build tools for Visual Studio 2015 C++ weren't found 
+		IF NOT EXIST "C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvarsall.bat" (
+				ECHO Build tools for Visual Studio 2017 C++ weren't found 
 				goto :err
 				)
 		IF NOT EXIST "C:\Program Files\Git\usr\bin\patch.exe" (
 				ECHO patch.exe wasn't found 
-				goto :err
-				)
-		IF NOT EXIST "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" (
-				ECHO Build tools for Visual Studio 2013 C++ weren't found 
 				goto :err
 				)
 		WHERE cmake >nul 2>nul
@@ -92,8 +88,8 @@ IF "%WITH_DEPS%" == "TRUE" (
 :: Building FLUFFI Core
 
 ECHO Checking IF all tools needed to build FLUFFI are installed
-IF NOT EXIST "C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" (
-		ECHO Build tools for Visual Studio 2015 C++ weren't found 
+IF NOT EXIST "C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvarsall.bat" (
+		ECHO Build tools for Visual Studio 2017 C++ weren't found 
 		goto :err
 		)
 WHERE go >nul 2>nul
