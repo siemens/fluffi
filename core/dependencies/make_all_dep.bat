@@ -9,66 +9,65 @@
 :: Author(s): Thomas Riedmaier
 
 :: Requirements for building these dependencies:
-:: - Visual Studio 2015 compile chain (needed for almost everything)
-:: - Visual Studio 2013 compile chain (needed for dynamorio)
+:: - Visual Studio 2017 compile chain (needed for almost everything)
 :: - Strawberry Perl (needed for dynamorio and openssl)
 :: - Cygwin64 with 32 and 64 bit gcc and make (radamsa)
 :: - Network access to github and gitlab
 
 cd zeromq
 call make_dep.bat
-IF errorlevel 1 goto :err
+IF errorlevel 1 goto errorDone
 cd ..
 
 cd libprotoc
 call make_dep.bat
-IF errorlevel 1 goto :err
+IF errorlevel 1 goto errorDone
 cd ..
 
 cd dynamorio
 call make_dep.bat
-IF errorlevel 1 goto :err
+IF errorlevel 1 goto errorDone
 cd ..
 
 cd mariadb
 call make_dep.bat
-IF errorlevel 1 goto :err
+IF errorlevel 1 goto errorDone
 cd ..
 
 cd radamsa
 call make_dep.bat
-IF errorlevel 1 goto :err
+IF errorlevel 1 goto errorDone
 cd ..
 
 cd easylogging
 call make_dep.bat
-IF errorlevel 1 goto :err
+IF errorlevel 1 goto errorDone
 cd ..
 
 cd openssl
 call make_dep.bat
-IF errorlevel 1 goto :err
+IF errorlevel 1 goto errorDone
 cd ..
 
 cd base64
 call make_dep.bat
-IF errorlevel 1 goto :err
+IF errorlevel 1 goto errorDone
 cd ..
 
 cd afl
 call make_dep.bat
-IF errorlevel 1 goto :err
+IF errorlevel 1 goto errorDone
 cd ..
 
 cd honggfuzz
 call make_dep.bat
-IF errorlevel 1 goto :err
+IF errorlevel 1 goto errorDone
 cd ..
 
-goto :eof
+goto done
 
-:err
+:errorDone
 exit /B 1
 
-:eof
+:done
 exit /B 0

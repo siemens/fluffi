@@ -28,7 +28,9 @@ On Windows use  [the windows build file](build/windows/buildAll.bat). When you c
 ```
 buildAll.bat -WITH_DEPS TRUE
 ```
-Please keep in mind that this will take a long time, as it will compile all FLUFFI dependencies from sources.
+PREPARE_ENV=TRUE will build the docker continers.  This needs to be done only once.
+
+WITH_DEPS=TRUE will build all of FLUFFI's dependencies from sources. Please keep in mind that this will take a long time.
 
 For all future compiles you can use 
 ```
@@ -46,7 +48,8 @@ On Linux use  [the linux build file](build/ubuntu_based/buildAll.sh). When you c
 ./buildAll.sh PREPARE_ENV=TRUE WITH_DEPS=TRUE
 ```
 PREPARE_ENV=TRUE will build the docker continers.  This needs to be done only once.
-WITH_DEPS=TRUEP will build all of FLUFFI's dependencies from sources. Please keep in mind that this will take a long time.
+
+WITH_DEPS=TRUE will build all of FLUFFI's dependencies from sources. Please keep in mind that this will take a long time.
 
 For all future compiles you can use 
 ```

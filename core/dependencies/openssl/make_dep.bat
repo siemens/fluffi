@@ -7,6 +7,11 @@
 ::
 :: Author(s): Thomas Riedmaier, Pascal Eckmann
 
+IF NOT DEFINED VCVARSALL (
+		ECHO Environment Variable VCVARSALL needs to be set!
+		goto errorDone
+)
+
 RMDIR /Q/S include
 RMDIR /Q/S include64
 RMDIR /Q/S include86
@@ -39,34 +44,32 @@ mkdir build64
 mkdir build86
 mkdir build64d
 mkdir build86d
-SETLOCAL
 cd build64
-call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64
+SETLOCAL
+call %VCVARSALL% x64
 set CL=/MP
 set __CNF_LDLIBS=-static
 perl ..\Configure VC-WIN64A --release no-tests no-unit-test no-asm enable-static-engine no-shared
-"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\nmake.exe"
+nmake.exe
 cd ..
 cd build64d
 perl ..\Configure VC-WIN64A --debug no-tests no-unit-test no-asm enable-static-engine no-shared
-"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\nmake.exe"
-cd ..
+nmake.exe
 ENDLOCAL
-
-
-SETLOCAL
+cd ..
 cd build86
-call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86
+SETLOCAL
+call %VCVARSALL% x86
 set CL=/MP
 set __CNF_LDLIBS=-static
 perl ..\Configure VC-WIN32 --release no-tests no-unit-test no-asm enable-static-engine no-shared
-"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\nmake.exe"
+nmake.exe
 cd ..
 cd build86d
 perl ..\Configure VC-WIN32 --debug no-tests no-unit-test no-asm enable-static-engine no-shared
-"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\nmake.exe"
-cd ..
+nmake.exe
 ENDLOCAL
+cd ..
 cd ..
 
 
@@ -95,10 +98,10 @@ ver > nul
 
 RMDIR /Q/S openssl
 
-goto :eof
+goto done
 
-:err
+:errorDone
 exit /B 1
 
-:eof
+:done
 exit /B 0

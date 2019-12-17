@@ -27,6 +27,11 @@
 :: 
 :: Author(s): Thomas Riedmaier, Pascal Eckmann
 
+IF NOT DEFINED VCVARSALL (
+		ECHO Environment Variable VCVARSALL needs to be set!
+		goto errorDone
+)
+
 RMDIR /Q/S include
 RMDIR /Q/S bin
 RMDIR /Q/S lib
@@ -54,18 +59,28 @@ git checkout 106ffc04be1abf3ff3399f54ccf149815b287dd9
 mkdir build64
 mkdir build86
 cd build64
-cmake -G "Visual Studio 14 2015 Win64" -Dprotobuf_BUILD_TESTS=OFF ../cmake
+SETLOCAL
+call %VCVARSALL% x64
+cmake -G "Visual Studio 15 2017 Win64" -Dprotobuf_BUILD_TESTS=OFF ../cmake
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDebugDll', 'MultiThreadedDebug' } | sc $f.PSPath }"
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDll', 'MultiThreaded' } | sc $f.PSPath }"
-"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" protobuf.sln /m /t:Build /p:Configuration=Release /p:Platform=x64 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
-"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" protobuf.sln /m /t:Build /p:Configuration=Debug /p:Platform=x64 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
+MSBuild.exe protobuf.sln /m /t:Build /p:Configuration=Release /p:Platform=x64
+if errorlevel 1 goto errorDone
+MSBuild.exe protobuf.sln /m /t:Build /p:Configuration=Debug /p:Platform=x64
+if errorlevel 1 goto errorDone
+ENDLOCAL
 cd ..
 cd build86
-cmake -G "Visual Studio 14 2015" -Dprotobuf_BUILD_TESTS=OFF ../cmake
+SETLOCAL
+call %VCVARSALL% x86
+cmake -G "Visual Studio 15 2017" -Dprotobuf_BUILD_TESTS=OFF ../cmake
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDebugDll', 'MultiThreadedDebug' } | sc $f.PSPath }"
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDll', 'MultiThreaded' } | sc $f.PSPath }"
-"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" protobuf.sln /m /t:Build /p:Configuration=Release /p:Platform=Win32 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
-"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" protobuf.sln /m /t:Build /p:Configuration=Debug /p:Platform=Win32 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
+MSBuild.exe protobuf.sln /m /t:Build /p:Configuration=Release /p:Platform=Win32
+if errorlevel 1 goto errorDone
+MSBuild.exe protobuf.sln /m /t:Build /p:Configuration=Debug /p:Platform=Win32
+if errorlevel 1 goto errorDone
+ENDLOCAL
 cd ..
 cd ..
 
@@ -92,10 +107,10 @@ RMDIR /Q/S protobuf
 
 bin\x64\protoc.exe --cpp_out="include\siemens\cpp" --csharp_out="include\siemens\csharp" FLUFFI.proto
 
-goto :eof
+goto done
 
-:err
+:errorDone
 exit /B 1
 
-:eof
+:done
 exit /B 0
