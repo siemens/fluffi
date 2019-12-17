@@ -15,6 +15,12 @@
 ::    along with this script.  If not, see <https://www.gnu.org/licenses/>.
 ::
 :: Author(s): Thomas Riedmaier, Pascal Eckmann
+
+IF NOT DEFINED VCVARSALL (
+		ECHO Environment Variable VCVARSALL needs to be set!
+		goto errorDone
+)
+
 RMDIR /Q/S include
 RMDIR /Q/S bin
 RMDIR /Q/S lib
@@ -37,38 +43,48 @@ git checkout 2cb1240db64ce1ea299e00474c646a2453a8435b
 mkdir build64
 mkdir build86
 cd build64
-cmake -G "Visual Studio 14 2015 Win64" -DBUILD_TESTS=OFF ..
+SETLOCAL
+call %VCVARSALL% x64
+cmake -G "Visual Studio 15 2017 Win64" -DBUILD_TESTS=OFF ..
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDebugDll', 'MultiThreadedDebug' } | sc $f.PSPath }"
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDll', 'MultiThreaded' } | sc $f.PSPath }"
-"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" ZeroMQ.sln /m /t:Build /p:Configuration=Release /p:Platform=x64 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
-"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" ZeroMQ.sln /m /t:Build /p:Configuration=Debug /p:Platform=x64 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
+MSBuild.exe ZeroMQ.sln /m /t:Build /p:Configuration=Release /p:Platform=x64
+if errorlevel 1 goto errorDone
+MSBuild.exe ZeroMQ.sln /m /t:Build /p:Configuration=Debug /p:Platform=x64
+if errorlevel 1 goto errorDone
+ENDLOCAL
 cd ..
 cd build86
-cmake -G "Visual Studio 14 2015" -DBUILD_TESTS=OFF ..
+SETLOCAL
+call %VCVARSALL% x86
+cmake -G "Visual Studio 15 2017" -DBUILD_TESTS=OFF ..
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDebugDll', 'MultiThreadedDebug' } | sc $f.PSPath }"
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDll', 'MultiThreaded' } | sc $f.PSPath }"
-"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" ZeroMQ.sln /m /t:Build /p:Configuration=Release /p:Platform=Win32 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
-"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" ZeroMQ.sln /m /t:Build /p:Configuration=Debug /p:Platform=Win32 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
+MSBuild.exe ZeroMQ.sln /m /t:Build /p:Configuration=Release /p:Platform=Win32
+if errorlevel 1 goto errorDone
+MSBuild.exe ZeroMQ.sln /m /t:Build /p:Configuration=Debug /p:Platform=Win32
+if errorlevel 1 goto errorDone
+ENDLOCAL
 cd ..
 cd ..
 
-copy libzmq\build64\bin\Release\libzmq-v140-mt-4_3_1.dll bin\x64
-copy libzmq\build64\lib\Release\libzmq-v140-mt-4_3_1.lib lib\x64
-copy libzmq\build64\lib\Release\libzmq-v140-mt-4_3_1.exp lib\x64
+copy libzmq\build64\bin\Release\libzmq-v141-mt-4_3_1.dll bin\x64
+copy libzmq\build64\lib\Release\libzmq-v141-mt-4_3_1.lib lib\x64
+copy libzmq\build64\lib\Release\libzmq-v141-mt-4_3_1.exp lib\x64
 
-copy libzmq\build64\bin\Debug\libzmq-v140-mt-gd-4_3_1.dll bin\x64
-copy libzmq\build64\bin\Debug\libzmq-v140-mt-gd-4_3_1.pdb bin\x64
-copy libzmq\build64\lib\Debug\libzmq-v140-mt-gd-4_3_1.lib lib\x64
-copy libzmq\build64\lib\Debug\libzmq-v140-mt-gd-4_3_1.exp lib\x64
+copy libzmq\build64\bin\Debug\libzmq-v141-mt-gd-4_3_1.dll bin\x64
+copy libzmq\build64\bin\Debug\libzmq-v141-mt-gd-4_3_1.pdb bin\x64
+copy libzmq\build64\lib\Debug\libzmq-v141-mt-gd-4_3_1.lib lib\x64
+copy libzmq\build64\lib\Debug\libzmq-v141-mt-gd-4_3_1.exp lib\x64
 
-copy libzmq\build86\bin\Release\libzmq-v140-mt-4_3_1.dll bin\x86
-copy libzmq\build86\lib\Release\libzmq-v140-mt-4_3_1.lib lib\x86
-copy libzmq\build86\lib\Release\libzmq-v140-mt-4_3_1.exp lib\x86
+copy libzmq\build86\bin\Release\libzmq-v141-mt-4_3_1.dll bin\x86
+copy libzmq\build86\lib\Release\libzmq-v141-mt-4_3_1.lib lib\x86
+copy libzmq\build86\lib\Release\libzmq-v141-mt-4_3_1.exp lib\x86
 
-copy libzmq\build86\bin\Debug\libzmq-v140-mt-gd-4_3_1.dll bin\x86
-copy libzmq\build86\bin\Debug\libzmq-v140-mt-gd-4_3_1.pdb bin\x86
-copy libzmq\build86\lib\Debug\libzmq-v140-mt-gd-4_3_1.lib lib\x86
-copy libzmq\build86\lib\Debug\libzmq-v140-mt-gd-4_3_1.exp lib\x86
+copy libzmq\build86\bin\Debug\libzmq-v141-mt-gd-4_3_1.dll bin\x86
+copy libzmq\build86\bin\Debug\libzmq-v141-mt-gd-4_3_1.pdb bin\x86
+copy libzmq\build86\lib\Debug\libzmq-v141-mt-gd-4_3_1.lib lib\x86
+copy libzmq\build86\lib\Debug\libzmq-v141-mt-gd-4_3_1.exp lib\x86
 
 copy libzmq\include\zmq.h include
 
@@ -96,10 +112,10 @@ ver > nul
 
 RMDIR /Q/S cppzmq
 
-goto :eof
+goto done
 
-:err
+:errorDone
 exit /B 1
 
-:eof
+:done
 exit /B 0

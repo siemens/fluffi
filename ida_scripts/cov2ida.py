@@ -8,15 +8,17 @@
 # 
 # Author(s): Abian Blome, Thomas Riedmaier
 
-import idaapi
+import ida_kernwin
 import ida_nalt
+import ida_funcs
+import ida_gdl
 import idc
 
 from sqlalchemy import create_engine
 
-class SelectBox(idaapi.Choose2):
+class SelectBox(ida_kernwin.Choose):
     def __init__(self, title, elements):
-        idaapi.Choose2.__init__(self, title, [
+        ida_kernwin.Choose.__init__(self, title, [
             ['ID', 8],
             ['Name', 64],
         ])
@@ -93,7 +95,7 @@ if moduleList[selected_module-1][1] == 'NULL':
     rawModule = True
 
 # Step Nr. 5: Let user change offset (optional)
-offset = idaapi.asklong(0, "Add offset")
+offset = ida_kernwin.ask_long(0, "Add offset")
 
 # Step Nr. 6: Retrieve covered blocks
 engine = create_engine(database_string)
@@ -109,14 +111,14 @@ for (bb,) in blocksDistinctDB:
         absPos += ida_nalt.get_imagebase()
     print absPos
         
-    f = idaapi.get_func(absPos)
+    f = ida_funcs.get_func(absPos)
     if f is None:
         continue
-    fc = idaapi.FlowChart(f)
+    fc = ida_gdl.FlowChart(f)
     # Highlight the complete function
-    idc.SetColor(absPos, idc.CIC_FUNC, 0xFFF000)
+    idc.set_color(absPos, idc.CIC_FUNC, 0xFFF000)
     for block in fc:
-        if block.startEA <= absPos and block.endEA > absPos:
+        if block.start_ea <= absPos and block.end_ea > absPos:
             #print "Setting colour for %x" % absPos
-            for i in Heads(block.startEA, block.endEA):
+            for i in Heads(block.start_ea, block.end_ea):
                 idc.set_color(i, CIC_ITEM, 0xFFAA00)

@@ -48,17 +48,17 @@ del ..\..\core\Oedipus\Oedipus.exe
 :: Pushing zips to ftp server
 
 "C:\Program Files (x86)\WinSCP\winscp.com" /script=pushFluffiBinsToFluffiFTP.ftp
-IF %ERRORLEVEL% NEQ 0  goto :err
+IF %ERRORLEVEL% NEQ 0  goto errorDone
 
 del ..\..\core\x64\Release\x64.zip
 del ..\..\core\Win32\Release\x86.zip
 
 ECHO Pushing to FTP succeeded
-goto :eof
+goto done
 
-:err
+:errorDone
 ECHO Pushing to FTP failed
 exit /B 1
 
-:eof
+:done
 exit /B 0

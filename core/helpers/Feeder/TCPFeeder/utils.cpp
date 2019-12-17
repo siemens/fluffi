@@ -102,7 +102,6 @@ std::string execCommandAndGetOutput(std::string command) {
 }
 #endif
 
-
 bool isPortOpen(std::string target, uint16_t port)
 {
 	int iResult = 0;
@@ -123,7 +122,7 @@ bool isPortOpen(std::string target, uint16_t port)
 #else
 	if (inet_aton(target.c_str(), &saServer.sin_addr) == 0) {
 #endif
-		std::cout << "Error using inet_aton" << std::endl;
+		std::cout << "TCPFeeder: Error using inet_aton" << std::endl;
 		closesocket(connectSocket);
 		throw std::runtime_error("Error using inet_aton");
 	}
@@ -139,7 +138,7 @@ bool isPortOpen(std::string target, uint16_t port)
 	closesocket(connectSocket);
 	connectSocket = INVALID_SOCKET;
 	return true;
-	}
+}
 
 std::vector<std::string> splitString(std::string str, std::string token) {
 	if (str.empty())	return std::vector<std::string> { "" };
@@ -272,8 +271,6 @@ void initializeIPC(SharedMemIPC& sharedMemIPC_ToRunner)
 	}
 }
 
-
-
 void initFromArgs(int argc, char* argv[], int& targetport, std::string& ipcName)
 {
 	if (argc < 2) {
@@ -302,7 +299,6 @@ uint16_t getTargetPID(SharedMemIPC& sharedMemIPC_ToRunner, int feederTimeoutMS)
 {
 	std::string targetPIDAsString;
 	SharedMemMessage message_FromRunner;
-	std::cout << message_FromRunner.getMessageType() << std::endl;
 	sharedMemIPC_ToRunner.waitForNewMessageToClient(&message_FromRunner, feederTimeoutMS);
 	if (message_FromRunner.getMessageType() == SHARED_MEM_MESSAGE_TRANSMISSION_TIMEOUT) {
 		std::cout << "TCPFeeder: Received a SHARED_MEM_MESSAGE_TRANSMISSION_TIMEOUT message in getTargetPID, terminating!" << std::endl;

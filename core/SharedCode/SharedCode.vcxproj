@@ -10,7 +10,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 Author(s): Thomas Riedmaier, Abian Blome, Michael Kraus
 -->
-<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -41,44 +41,44 @@ Author(s): Thomas Riedmaier, Abian Blome, Michael Kraus
     <ProjectGuid>{1EA38259-AE82-4D2D-ADDB-919DE63C3824}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>SharedCode</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -161,7 +161,7 @@ Author(s): Thomas Riedmaier, Abian Blome, Michael Kraus
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>robocopy "$(SolutionDir)dependencies\zeromq\bin\x86" "$(TargetDir)." libzmq-v140-mt-gd-4*
+      <Command>robocopy "$(SolutionDir)dependencies\zeromq\bin\x86" "$(TargetDir)." libzmq-v141-mt-gd-4*
 if errorlevel 4 goto BuildEventFailed
 if errorlevel 0 goto end
 :BuildEventFailed echo FILECOPY for $(ProjectName) FAILED
@@ -185,7 +185,7 @@ exit 0</Command>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>robocopy "$(SolutionDir)dependencies\zeromq\bin\x86" "$(TargetDir)." libzmq-v140-mt-gd-4*
+      <Command>robocopy "$(SolutionDir)dependencies\zeromq\bin\x86" "$(TargetDir)." libzmq-v141-mt-gd-4*
 if errorlevel 4 goto BuildEventFailed
 if errorlevel 0 goto end
 :BuildEventFailed echo FILECOPY for $(ProjectName) FAILED
@@ -209,7 +209,7 @@ exit 0</Command>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>robocopy "$(SolutionDir)dependencies\zeromq\bin\x64" "$(TargetDir)." libzmq-v140-mt-gd-4*
+      <Command>robocopy "$(SolutionDir)dependencies\zeromq\bin\x64" "$(TargetDir)." libzmq-v141-mt-gd-4*
 if errorlevel 4 goto BuildEventFailed
 if errorlevel 0 goto end
 :BuildEventFailed echo FILECOPY for $(ProjectName) FAILED
@@ -233,7 +233,7 @@ exit 0</Command>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>robocopy "$(SolutionDir)dependencies\zeromq\bin\x64" "$(TargetDir)." libzmq-v140-mt-gd-4*
+      <Command>robocopy "$(SolutionDir)dependencies\zeromq\bin\x64" "$(TargetDir)." libzmq-v141-mt-gd-4*
 if errorlevel 4 goto BuildEventFailed
 if errorlevel 0 goto end
 :BuildEventFailed echo FILECOPY for $(ProjectName) FAILED
@@ -261,7 +261,7 @@ exit 0</Command>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>robocopy "$(SolutionDir)dependencies\zeromq\bin\x86" "$(TargetDir)." libzmq-v140-mt-4*
+      <Command>robocopy "$(SolutionDir)dependencies\zeromq\bin\x86" "$(TargetDir)." libzmq-v141-mt-4*
 if errorlevel 4 goto BuildEventFailed
 if errorlevel 0 goto end
 :BuildEventFailed echo FILECOPY for $(ProjectName) FAILED
@@ -289,7 +289,7 @@ exit 0</Command>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>robocopy "$(SolutionDir)dependencies\zeromq\bin\x64" "$(TargetDir)." libzmq-v140-mt-4*
+      <Command>robocopy "$(SolutionDir)dependencies\zeromq\bin\x64" "$(TargetDir)." libzmq-v141-mt-4*
 if errorlevel 4 goto BuildEventFailed
 if errorlevel 0 goto end
 :BuildEventFailed echo FILECOPY for $(ProjectName) FAILED
