@@ -17,7 +17,7 @@
 
 IF NOT DEFINED VCVARSALL (
 		ECHO Environment Variable VCVARSALL needs to be set!
-		goto :err
+		goto errorDone
 )
 
 
@@ -81,10 +81,10 @@ ver > nul
 
 RMDIR /Q/S afl
 
-goto :eof
+goto done
 
-:err
+:errorDone
 exit /B 1
 
-:eof
+:done
 exit /B 0

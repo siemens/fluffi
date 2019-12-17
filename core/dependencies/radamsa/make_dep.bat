@@ -74,10 +74,10 @@ ver > nul
 RMDIR /Q/S radamsa
 RMDIR /Q/S owl
 
-goto :eof
+goto done
 
-:err
+:errorDone
 exit /B 1
 
-:eof
+:done
 exit /B 0

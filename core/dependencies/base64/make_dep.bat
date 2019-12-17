@@ -22,7 +22,7 @@
 
 IF NOT DEFINED VCVARSALL (
 		ECHO Environment Variable VCVARSALL needs to be set!
-		goto :err
+		goto errorDone
 )
 
 RMDIR /Q/S include
@@ -87,10 +87,10 @@ ver > nul
 
 RMDIR /Q/S cpp-base64
 
-goto :eof
+goto done
 
-:err
+:errorDone
 exit /B 1
 
-:eof
+:done
 exit /B 0

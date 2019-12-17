@@ -16,58 +16,58 @@
 
 cd zeromq
 call make_dep.bat
-IF errorlevel 1 goto :err
+IF errorlevel 1 goto errorDone
 cd ..
 
 cd libprotoc
 call make_dep.bat
-IF errorlevel 1 goto :err
+IF errorlevel 1 goto errorDone
 cd ..
 
 cd dynamorio
 call make_dep.bat
-IF errorlevel 1 goto :err
+IF errorlevel 1 goto errorDone
 cd ..
 
 cd mariadb
 call make_dep.bat
-IF errorlevel 1 goto :err
+IF errorlevel 1 goto errorDone
 cd ..
 
 cd radamsa
 call make_dep.bat
-IF errorlevel 1 goto :err
+IF errorlevel 1 goto errorDone
 cd ..
 
 cd easylogging
 call make_dep.bat
-IF errorlevel 1 goto :err
+IF errorlevel 1 goto errorDone
 cd ..
 
 cd openssl
 call make_dep.bat
-IF errorlevel 1 goto :err
+IF errorlevel 1 goto errorDone
 cd ..
 
 cd base64
 call make_dep.bat
-IF errorlevel 1 goto :err
+IF errorlevel 1 goto errorDone
 cd ..
 
 cd afl
 call make_dep.bat
-IF errorlevel 1 goto :err
+IF errorlevel 1 goto errorDone
 cd ..
 
 cd honggfuzz
 call make_dep.bat
-IF errorlevel 1 goto :err
+IF errorlevel 1 goto errorDone
 cd ..
 
-goto :eof
+goto done
 
-:err
+:errorDone
 exit /B 1
 
-:eof
+:done
 exit /B 0

@@ -18,7 +18,7 @@
 
 IF NOT DEFINED VCVARSALL (
 		ECHO Environment Variable VCVARSALL needs to be set!
-		goto :err
+		goto errorDone
 )
 
 RMDIR /Q/S include
@@ -49,7 +49,9 @@ cmake -G "Visual Studio 15 2017 Win64" -DBUILD_TESTS=OFF ..
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDebugDll', 'MultiThreadedDebug' } | sc $f.PSPath }"
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDll', 'MultiThreaded' } | sc $f.PSPath }"
 MSBuild.exe ZeroMQ.sln /m /t:Build /p:Configuration=Release /p:Platform=x64
+if errorlevel 1 goto errorDone
 MSBuild.exe ZeroMQ.sln /m /t:Build /p:Configuration=Debug /p:Platform=x64
+if errorlevel 1 goto errorDone
 ENDLOCAL
 cd ..
 cd build86
@@ -59,7 +61,9 @@ cmake -G "Visual Studio 15 2017" -DBUILD_TESTS=OFF ..
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDebugDll', 'MultiThreadedDebug' } | sc $f.PSPath }"
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDll', 'MultiThreaded' } | sc $f.PSPath }"
 MSBuild.exe ZeroMQ.sln /m /t:Build /p:Configuration=Release /p:Platform=Win32
+if errorlevel 1 goto errorDone
 MSBuild.exe ZeroMQ.sln /m /t:Build /p:Configuration=Debug /p:Platform=Win32
+if errorlevel 1 goto errorDone
 ENDLOCAL
 cd ..
 cd ..
@@ -108,10 +112,10 @@ ver > nul
 
 RMDIR /Q/S cppzmq
 
-goto :eof
+goto done
 
-:err
+:errorDone
 exit /B 1
 
-:eof
+:done
 exit /B 0

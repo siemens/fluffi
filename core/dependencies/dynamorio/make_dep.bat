@@ -29,7 +29,7 @@
 
 IF NOT DEFINED VCVARSALL (
 		ECHO Environment Variable VCVARSALL needs to be set!
-		goto :err
+		goto errorDone
 )
 
 RMDIR /Q/S include
@@ -67,19 +67,23 @@ mkdir build86
 cd build64
 SETLOCAL
 call %VCVARSALL% x64
+SET PATH=%VCToolsInstallDir%bin\Hostx86\x86;%PATH%
 cmake -G "Visual Studio 15 2017 Win64" -DBUILD_CORE=ON -DBUILD_DOCS=OFF -DBUILD_DRSTATS=OFF -DBUILD_TOOLS=ON -DBUILD_SAMPLES=OFF -DBUILD_TESTS=OFF -DDEBUG=OFF -DCMAKE_WARN_DEPRECATED=OFF  ..
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDebugDll', 'MultiThreadedDebug' } | sc $f.PSPath }"
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDll', 'MultiThreaded' } | sc $f.PSPath }"
 MSBuild.exe DynamoRIO.sln /m /t:Build /p:Configuration=RelWithDebInfo /p:Platform=x64
+if errorlevel 1 goto errorDone
 ENDLOCAL
 cd ..
 cd build86
 SETLOCAL
 call %VCVARSALL% x86
+SET PATH=%VCToolsInstallDir%bin\Hostx86\x86;%PATH%
 cmake -G "Visual Studio 15 2017"  -DBUILD_CORE=ON -DBUILD_DOCS=OFF -DBUILD_DRSTATS=OFF -DBUILD_TOOLS=ON -DBUILD_SAMPLES=OFF -DBUILD_TESTS=OFF -DDEBUG=OFF -DCMAKE_WARN_DEPRECATED=OFF  ..
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDebugDll', 'MultiThreadedDebug' } | sc $f.PSPath }"
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDll', 'MultiThreaded' } | sc $f.PSPath }"
 MSBuild.exe DynamoRIO.sln /m /t:Build /p:Configuration=RelWithDebInfo /p:Platform=Win32
+if errorlevel 1 goto errorDone
 ENDLOCAL
 cd ..
 cd ..
@@ -103,10 +107,10 @@ RMDIR /Q/S dynamorio
 REM create a minimal drcovlib.h, that is easy to include
 powershell -Command "([string]::Join(\"`n\", $(cat include\ext\drcovlib\drcovlib.h)) -replace '(?ms)^.*typedef struct _bb_entry_t', 'typedef struct _bb_entry_t') -replace '(?ms)} bb_entry_t;.*', '} bb_entry_t;' | Out-file -encoding ASCII include\ext\drcovlib\drcovlib_min.h"
 
-goto :eof
+goto done
 
-:err
+:errorDone
 exit /B 1
 
-:eof
+:done
 exit /B 0
