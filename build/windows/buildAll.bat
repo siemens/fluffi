@@ -25,17 +25,30 @@ ECHO WITH_DEPS: %WITH_DEPS%
 ECHO DEPLOY_TO_FTP: %DEPLOY_TO_FTP%
 ECHO.
 
+:: Figuring out Visual Studio Build path
+
+SET VCVARSALL="NOT FOUND"
+IF EXIST "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" (
+		SET VCVARSALL="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat"
+		)
+IF EXIST "C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvarsall.bat" (
+		SET VCVARSALL="C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvarsall.bat"
+		)
+IF EXIST "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvarsall.bat" (
+		SET VCVARSALL="C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvarsall.bat"
+		)
+
 :: =====================================================================
 :: Building FLUFFI dependencies
 
 IF "%WITH_DEPS%" == "TRUE" (
-		ECHO Checking IF all build requirements for FLUFFI dependencies are installed
+		ECHO Checking IF all build requirements for FLUFFI dependencies are installed ...
 		WHERE git >nul 2>nul
 		IF %ERRORLEVEL% NEQ 0 (
 				ECHO git wasn't found 
 				goto :err
 				)
-		IF NOT EXIST "C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvarsall.bat" (
+		IF %VCVARSALL% == "NOT FOUND" (
 				ECHO Build tools for Visual Studio 2017 C++ weren't found 
 				goto :err
 				)
@@ -75,6 +88,7 @@ IF "%WITH_DEPS%" == "TRUE" (
 				goto :err
 				)
 
+		ECHO ... success. Ready to build FLUFFI dependencies!
 		ECHO Building Fluffi dependencies
 		CD ..\..\core\dependencies
 		call make_all_dep.bat
@@ -87,8 +101,8 @@ IF "%WITH_DEPS%" == "TRUE" (
 :: =====================================================================
 :: Building FLUFFI Core
 
-ECHO Checking IF all tools needed to build FLUFFI are installed
-IF NOT EXIST "C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvarsall.bat" (
+ECHO Checking IF all tools needed to build FLUFFI are installed ...
+IF %VCVARSALL% == "NOT FOUND" (
 		ECHO Build tools for Visual Studio 2017 C++ weren't found 
 		goto :err
 		)
@@ -97,7 +111,7 @@ IF %ERRORLEVEL% NEQ 0 (
 		ECHO go wasn't found 
 		goto :err
 		)
-
+ECHO ... success. Ready to build FLUFFI core!
 ECHO Building Fluffi core
 CD ..\..\core
 call build.bat

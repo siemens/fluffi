@@ -14,6 +14,14 @@
 :: 
 :: Author(s): Thomas Riedmaier, Pascal Eckmann
 
+
+IF NOT DEFINED VCVARSALL (
+		ECHO Environment Variable VCVARSALL needs to be set!
+		goto :err
+)
+
+
+
 RMDIR /Q/S lib
 
 MKDIR lib
@@ -38,7 +46,7 @@ mkdir build64
 mkdir build86
 SETLOCAL
 cd build64
-call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvarsall.bat" x64
+call %VCVARSALL% x64
 cl.exe /MT /c /TP /EHsc ..\afl-fuzz.c
 LIB.EXE /OUT:afl-fuzz.LIB afl-fuzz.obj
 cl.exe /MTd /Debug /c /TP /EHsc ..\afl-fuzz.c
@@ -48,7 +56,7 @@ ENDLOCAL
 
 SETLOCAL
 cd build86
-call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvarsall.bat" x86
+call %VCVARSALL% x86
 cl.exe /MT /c /TP /EHsc ..\afl-fuzz.c
 LIB.EXE /OUT:afl-fuzz.LIB afl-fuzz.obj
 cl.exe /MTd /Debug /c /TP /EHsc ..\afl-fuzz.c

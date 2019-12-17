@@ -11,7 +11,14 @@
 :: Requires Visual Studio 2017 build tools
 
 SETLOCAL
-call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvarsall.bat" x64
+IF NOT DEFINED VCVARSALL (
+		ECHO Environment Variable VCVARSALL needs to be set!
+		goto errorDone
+)
+ENDLOCAL
+
+SETLOCAL
+call %VCVARSALL% x64
 
 :: Fluffi x64
 MSBuild.exe FluffiV1.sln /m  /t:Build /p:Configuration=Release /p:Platform=x64
@@ -32,7 +39,7 @@ if errorlevel 1 goto errorDone
 ENDLOCAL
 
 SETLOCAL
-call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvarsall.bat" x86
+call %VCVARSALL% x86
 
 :: Fluffi x86
 MSBuild.exe FluffiV1.sln /m  /t:Build /p:Configuration=Release /p:Platform=x86

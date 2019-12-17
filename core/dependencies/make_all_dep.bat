@@ -9,8 +9,7 @@
 :: Author(s): Thomas Riedmaier
 
 :: Requirements for building these dependencies:
-:: - Visual Studio 2015 compile chain (needed for almost everything)
-:: - Visual Studio 2013 compile chain (needed for dynamorio)
+:: - Visual Studio 2017 compile chain (needed for almost everything)
 :: - Strawberry Perl (needed for dynamorio and openssl)
 :: - Cygwin64 with 32 and 64 bit gcc and make (radamsa)
 :: - Network access to github and gitlab

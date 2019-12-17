@@ -7,6 +7,11 @@
 ::
 :: Author(s): Thomas Riedmaier, Pascal Eckmann
 
+IF NOT DEFINED VCVARSALL (
+		ECHO Environment Variable VCVARSALL needs to be set!
+		goto :err
+)
+
 RMDIR /Q/S include
 RMDIR /Q/S include64
 RMDIR /Q/S include86
@@ -41,7 +46,7 @@ mkdir build64d
 mkdir build86d
 cd build64
 SETLOCAL
-call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvarsall.bat" x64
+call %VCVARSALL% x64
 set CL=/MP
 set __CNF_LDLIBS=-static
 perl ..\Configure VC-WIN64A --release no-tests no-unit-test no-asm enable-static-engine no-shared
@@ -54,7 +59,7 @@ ENDLOCAL
 cd ..
 cd build86
 SETLOCAL
-call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvarsall.bat" x86
+call %VCVARSALL% x86
 set CL=/MP
 set __CNF_LDLIBS=-static
 perl ..\Configure VC-WIN32 --release no-tests no-unit-test no-asm enable-static-engine no-shared

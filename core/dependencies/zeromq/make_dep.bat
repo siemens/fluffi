@@ -15,6 +15,12 @@
 ::    along with this script.  If not, see <https://www.gnu.org/licenses/>.
 ::
 :: Author(s): Thomas Riedmaier, Pascal Eckmann
+
+IF NOT DEFINED VCVARSALL (
+		ECHO Environment Variable VCVARSALL needs to be set!
+		goto :err
+)
+
 RMDIR /Q/S include
 RMDIR /Q/S bin
 RMDIR /Q/S lib
@@ -38,7 +44,7 @@ mkdir build64
 mkdir build86
 cd build64
 SETLOCAL
-call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvarsall.bat" x64
+call %VCVARSALL% x64
 cmake -G "Visual Studio 15 2017 Win64" -DBUILD_TESTS=OFF ..
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDebugDll', 'MultiThreadedDebug' } | sc $f.PSPath }"
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDll', 'MultiThreaded' } | sc $f.PSPath }"
@@ -48,7 +54,7 @@ ENDLOCAL
 cd ..
 cd build86
 SETLOCAL
-call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvarsall.bat" x86
+call %VCVARSALL% x86
 cmake -G "Visual Studio 15 2017" -DBUILD_TESTS=OFF ..
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDebugDll', 'MultiThreadedDebug' } | sc $f.PSPath }"
 powershell -Command "ls *.vcxproj -rec | %%{ $f=$_; (gc $f.PSPath) | %%{ $_ -replace 'MultiThreadedDll', 'MultiThreaded' } | sc $f.PSPath }"
