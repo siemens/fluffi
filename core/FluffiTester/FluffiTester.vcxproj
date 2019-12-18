@@ -272,6 +272,7 @@ exit 0</Command>
     <ClCompile Include="CommPartnerManagerTester.cpp" />
     <ClCompile Include="ExternalMutatorTester.cpp" />
     <ClCompile Include="ExternalProcessTester.cpp" />
+    <ClCompile Include="FLUFFILogTester.cpp" />
     <ClCompile Include="GarbageCollectorWorkerTester.cpp" />
     <ClCompile Include="GetStatusRequestHandlerTester.cpp" />
     <ClCompile Include="HonggfuzzMutatorTester.cpp" />

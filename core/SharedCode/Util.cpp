@@ -17,6 +17,7 @@ Author(s): Roman Bendt, Thomas Riedmaier, Abian Blome
 #include "FluffiTestcaseID.h"
 #include "WorkerThreadState.h"
 #include "GarbageCollectorWorker.h"
+#include "FLUFFILogHandler.h"
 
 Util::Util() {
 }
@@ -444,6 +445,9 @@ void Util::setDefaultLogOptions(std::string filename) {
 		defaultConf.setGlobally(el::ConfigurationType::Filename, filename);
 	}
 	el::Loggers::reconfigureLogger("default", defaultConf);
+
+	//Also use the FLUFFILogHandler
+	el::Helpers::installLogDispatchCallback<FLUFFILogHandler>("FLUFFILog");
 }
 
 std::vector<char> Util::readAllBytesFromFile(const std::string filename)

@@ -63,4 +63,6 @@ public:
 	//Code taken from https://stackoverflow.com/questions/63166/how-to-determine-cpu-and-memory-consumption-from-inside-a-process
 	void initSystemCPUUtilization();
 	void initProcessCPUUtilization();
+
+	void setLogMessages(GetStatusResponse* statusResponse);
 };
