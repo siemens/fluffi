@@ -19,7 +19,7 @@ Author(s): Michael Kraus, Thomas Riedmaier, Abian Blome, Roman Bendt
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace FluffiTester
+namespace GMDatabaseManagerTester
 {
 	TEST_CLASS(GMDatabaseManagerTest)
 	{

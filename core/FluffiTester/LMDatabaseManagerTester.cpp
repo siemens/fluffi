@@ -25,7 +25,7 @@ Author(s): Thomas Riedmaier, Abian Blome, Pascal Eckmann
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace FluffiTester
+namespace LMDatabaseManagerTester
 {
 	TEST_CLASS(LMDatabaseManagerTest)
 	{

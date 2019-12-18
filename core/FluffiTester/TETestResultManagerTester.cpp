@@ -22,7 +22,7 @@ Author(s): Michael Kraus, Thomas Riedmaier, Abian Blome, Pascal Eckmann
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace FluffiTester
+namespace TETestResultManagerTester
 {
 	TEST_CLASS(TETestResultManagerTest)
 	{

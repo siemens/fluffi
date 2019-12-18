@@ -19,7 +19,7 @@ Author(s): Thomas Riedmaier, Pascal Eckmann
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace FluffiTester
+namespace TestExecutorDynRioSingleTester
 {
 	TEST_CLASS(TestExecutorDynRioSingleTest)
 	{

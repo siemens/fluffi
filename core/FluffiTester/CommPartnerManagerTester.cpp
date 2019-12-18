@@ -17,7 +17,7 @@ Author(s): Michael Kraus, Thomas Riedmaier, Pascal Eckmann
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace FluffiTester
+namespace CommPartnerManagerTester
 {
 	TEST_CLASS(CommPartnerManagerTest)
 	{
