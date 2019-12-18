@@ -19,6 +19,9 @@ RELEASE = $(WARNINGS) -s -g0 -O2
 AFLAGS = $(RELEASE)
 CC = g++ -std=c++11
 
-withsslwrap:
+all:
 	perl generate_memcmp.pl && perl generate_strcmp.pl
 	$(CC) $(AFLAGS) -fPIC -shared trampoline.s fuzzcmp.cpp strcmp.cpp memcmp.cpp -o libfuzzcmp.so -Wl,--version-script=libfuzzcmp.version -Wa,--defsym,ARCH=$(ARCH) -Wl,-z,defs
+
+clean:
+	rm -f memcmp.cpp strcmp.cpp libfuzzcmp.so

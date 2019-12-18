@@ -16,3 +16,11 @@ all:
 	$(MAKE) -C Tester
 	$(MAKE) -C UDPFeeder
 
+clean:
+	cd EthernetFeeder && $(MAKE) clean
+	cd SharedMemFeeder && $(MAKE) clean
+	cd sslwrap && $(MAKE) clean
+	cd TCPFeeder && $(MAKE) clean
+	cd Tester && $(MAKE) clean
+	cd UDPFeeder && $(MAKE) clean
+

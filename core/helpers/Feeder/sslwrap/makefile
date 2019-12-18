@@ -21,3 +21,6 @@ CC = g++ -std=c++11
 
 all:
 	$(CC) $(AFLAGS) -fPIC -shared sslwrap.cpp  -lssl -lcrypto -lpthread -ldl -L../../../dependencies/openssl/lib/$(ARCH)/ -o libsslwrap.so -Wl,-z,defs  -Wl,--version-script=libsslwrap.version -I../../../dependencies/openssl/include -I../../../dependencies/openssl/include$(ARCH)
+
+clean:
+	rm -f libsslwrap.so

@@ -11,3 +11,7 @@
 all:
 	$(MAKE) -C GDBStarter
 	$(MAKE) -C ProcessStarter
+
+clean:
+	cd GDBStarter && $(MAKE) clean
+	cd ProcessStarter && $(MAKE) clean

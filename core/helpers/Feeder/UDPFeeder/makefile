@@ -23,3 +23,6 @@ all:
 	cp ../../../$(ARCH)/bin/libsharedmemipc.so .
 	cp ../../../$(ARCH)/bin/libzmq.so.5 .
 	$(CC) $(AFLAGS) -I../../../SharedMemIPC/ -o UDPFeeder stdafx.cpp UDPFeeder.cpp libsharedmemipc.so -Wl,-rpath='$${ORIGIN}'
+
+clean:
+	rm -f libsharedmemipc.so libzmq.so.5 UDPFeeder

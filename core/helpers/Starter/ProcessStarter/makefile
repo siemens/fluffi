@@ -19,3 +19,6 @@ CC = g++ -std=c++11
 
 all:
 	$(CC) $(AFLAGS) -o ProcessStarter  ProcessStarter.cpp
+
+clean:
+	rm -f ProcessStarter

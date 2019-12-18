@@ -23,3 +23,6 @@ all:
 	cp ../../../$(ARCH)/bin/libsharedmemipc.so .
 	cp ../../../$(ARCH)/bin/libzmq.so.5 .
 	$(CC) $(AFLAGS) -o Tester -L . -I../../../SharedCode -I../../../dependencies/libprotoc/include/siemens/cpp -I../../../dependencies/libprotoc/include -I../../../SharedMemIPC  -I ../../../dependencies/easylogging/include -I ../../../dependencies/libuuid/include Tester.cpp ../../../$(ARCH)/lib/sharedcode.a  ../../../dependencies/libprotoc/lib/$(ARCH)/libprotobuf.a  ../../../dependencies/easylogging/lib/x86-64/libeasyloggingpp.a -pthread -lstdc++fs -ldl -l:libzmq.so.5 -lsharedmemipc  -Wl,-rpath='$${ORIGIN}'
+
+clean:
+	rm -f libsharedmemipc.so libzmq.so.5 Tester

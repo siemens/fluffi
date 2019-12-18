@@ -27,3 +27,6 @@ withsslwrap:
 withoutsslwrap:
 	cp ../../../$(ARCH)/bin/libsharedmemipc.so .
 	$(CC) $(AFLAGS) -I../../../SharedMemIPC/ -o TCPFeeder stdafx.cpp http.cpp TCPFeeder.cpp utils.cpp libsharedmemipc.so -Wl,-rpath='$${ORIGIN}'
+
+clean:
+	rm -f libsharedmemipc.so libsslwrap.so TCPFeeder

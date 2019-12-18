@@ -21,3 +21,6 @@ CC = g++ -std=c++11
 
 all:
 	$(CC) $(AFLAGS) -I ../../../dependencies/base64/include -o GDBStarter GDBStarter.cpp ../../../dependencies/base64/lib/$(ARCH)/base64.a -lstdc++fs
+
+clean:
+	rm -f GDBStarter

@@ -22,3 +22,6 @@ CC = g++ -std=c++11
 all:
 	cp ../../../$(ARCH)/bin/libsharedmemipc.so .
 	$(CC) $(AFLAGS) -I ../../../SharedMemIPC/ -o SharedMemFeeder stdafx.cpp SharedMemFeeder.cpp libsharedmemipc.so -Wl,-rpath='$${ORIGIN}'
+
+clean:
+	rm -f SharedMemFeeder libsharedmemipc.so
