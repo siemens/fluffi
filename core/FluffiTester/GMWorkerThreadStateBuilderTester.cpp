@@ -19,7 +19,7 @@ Author(s): Thomas Riedmaier, Abian Blome, Pascal Eckmann
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace FluffiTester
+namespace GMWorkerThreadStateBuilderTester
 {
 	TEST_CLASS(GMWorkerThreadStateBuilderTest)
 	{

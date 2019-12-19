@@ -139,5 +139,8 @@ Author(s): Thomas Riedmaier, Abian Blome, Michael Kraus
     <ClCompile Include="GetStatusRequestHandlerTester.cpp">
       <Filter>Source Files\SharedCode</Filter>
     </ClCompile>
+    <ClCompile Include="FLUFFILogTester.cpp">
+      <Filter>Source Files\SharedCode</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -19,7 +19,7 @@ Author(s): Thomas Riedmaier, Pascal Eckmann, Abian Blome
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace FluffiTester
+namespace RegisterAtLMRequestHandlerTester
 {
 	TEST_CLASS(RegisterAtLMRequestHandlerTest)
 	{

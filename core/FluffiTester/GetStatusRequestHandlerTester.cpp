@@ -20,7 +20,7 @@ Author(s): Thomas Riedmaier
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace FluffiTester
+namespace GetStatusRequestHandlerTester
 {
 	TEST_CLASS(GetStatusRequestHandlerTest)
 	{

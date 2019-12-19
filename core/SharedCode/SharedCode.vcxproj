@@ -306,6 +306,7 @@ exit 0</Command>
     <ClInclude Include="DebugExecutionOutput.h" />
     <ClInclude Include="ExternalProcess.h" />
     <ClInclude Include="FluffiBasicBlock.h" />
+    <ClInclude Include="FLUFFILogHandler.h" />
     <ClInclude Include="FluffiModuleNameToID.h" />
     <ClInclude Include="FluffiServiceDescriptor.h" />
     <ClInclude Include="FluffiServiceAndWeight.h" />
@@ -341,6 +342,7 @@ exit 0</Command>
     <ClCompile Include="ExternalProcess.cpp" />
     <ClCompile Include="FluffiBasicBlock.cpp" />
     <ClCompile Include="FluffiLMConfiguration.cpp" />
+    <ClCompile Include="FLUFFILogHandler.cpp" />
     <ClCompile Include="FluffiModuleNameToID.cpp" />
     <ClCompile Include="FluffiServiceAndWeight.cpp" />
     <ClCompile Include="FluffiServiceDescriptor.cpp" />

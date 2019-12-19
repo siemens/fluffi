@@ -37,7 +37,7 @@ class CreateTestcaseArchive:
         self.type = "download"
 
     def set_values(self):
-        project = models.Fuzzjob.query.filter_by(id=self.projId).first()
+        project = models.Fuzzjob.query.filter_by(ID=self.projId).first()
         engine = create_engine(
             'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
         connection = engine.connect()
@@ -66,7 +66,7 @@ class CreateTestcaseArchive:
             engine.dispose()
 
     def run(self):
-        project = models.Fuzzjob.query.filter_by(id=self.projId).first()
+        project = models.Fuzzjob.query.filter_by(ID=self.projId).first()
         engine = create_engine(
             'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
         connection = engine.connect()
@@ -152,7 +152,7 @@ class ArchiveProject:
             lock_change_file_entry("END", "1")
 
     def run(self):
-        fuzzjob = models.Fuzzjob.query.filter_by(id=self.projId).first()
+        fuzzjob = models.Fuzzjob.query.filter_by(ID=self.projId).first()
 
         if fuzzjob or (lock_read_file_entry("END") == "0"):
             try:
@@ -193,8 +193,8 @@ class ArchiveProject:
 
                 if self.status[0] == 1 or (lock_read_file_entry("END") == "0"):
                     try:
-                        if models.Fuzzjob.query.filter_by(id=self.projId).first() is not None:
-                            fuzzjob = models.Fuzzjob.query.filter_by(id=self.projId).first()
+                        if models.Fuzzjob.query.filter_by(ID=self.projId).first() is not None:
+                            fuzzjob = models.Fuzzjob.query.filter_by(ID=self.projId).first()
                             db.session.delete(fuzzjob)
                             db.session.commit()
                             lock_change_file_entry("STATUS", "1")

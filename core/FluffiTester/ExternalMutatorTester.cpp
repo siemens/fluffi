@@ -21,7 +21,7 @@ Author(s): Abian Blome, Thomas Riedmaier
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace FluffiTester
+namespace ExternalMutatorTester
 {
 	TEST_CLASS(ExternalMutatorTest)
 	{

@@ -21,7 +21,7 @@ Author(s): Michael Kraus, Thomas Riedmaier, Pascal Eckmann, Abian Blome
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace FluffiTester
+namespace WorkerWeightCalculatorTester
 {
 	TEST_CLASS(WorkerWeightCalculatorTest)
 	{

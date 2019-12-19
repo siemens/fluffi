@@ -7,34 +7,23 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-Author(s): Thomas Riedmaier, Abian Blome, Pascal Eckmann
+Author(s): Thomas Riedmaier
 */
 
 #pragma once
+#include "easylogging++.h"
 
-class CommInt;
-class LMWorkerThreadStateBuilder;
-class IWorkerThreadStateBuilder;
-class LMWorkerThreadState;
-class FluffiServiceDescriptor;
-class InstanceMonitorWorker
+class FLUFFILogHandler :
+	public el::LogDispatchCallback
 {
 public:
-	InstanceMonitorWorker(CommInt* commInt, LMWorkerThreadStateBuilder* workerThreadStateBuilder, int loopIntervalMS, std::string location);
-	virtual ~InstanceMonitorWorker();
-
-	void workerMain();
-	void stop();
-
-	std::thread* m_thread = nullptr;
-
+	FLUFFILogHandler();
+	std::deque<std::string> getAllMessages();
+protected:
+	void handle(const el::LogDispatchData* data);
 private:
-	void storeStatus(const std::pair<FluffiServiceDescriptor, AgentType>& managedInstance, std::string statusToStore);
-	void storeLogMessages(const std::pair<FluffiServiceDescriptor, AgentType>& managedInstance, const google::protobuf::RepeatedPtrField<std::string> & logMessages);
+	void addToMessageQueue(el::base::type::string_t&& logLine);
 
-	CommInt* m_commInt = nullptr;
-	IWorkerThreadStateBuilder* m_workerThreadStateBuilder = nullptr;
-	LMWorkerThreadState* m_workerThreadState = nullptr;
-	int m_loopIntervalMS;
-	std::string m_location;
+	std::mutex m_mutex_;
+	std::deque<std::string> errorMessages;
 };

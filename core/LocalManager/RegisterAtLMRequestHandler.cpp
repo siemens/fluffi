@@ -107,7 +107,7 @@ void RegisterAtLMRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerTh
 	resp->set_allocated_registeratlmresponse(registerResponse);
 }
 
-std::string RegisterAtLMRequestHandler::decideSubAgentType(LMDatabaseManager* dbManager, AgentType type, const google::protobuf::RepeatedPtrField<std::string> implementedSubtypes) {
+std::string RegisterAtLMRequestHandler::decideSubAgentType(LMDatabaseManager* dbManager, AgentType type, const google::protobuf::RepeatedPtrField<std::string>& implementedSubtypes) {
 	std::vector<std::pair<std::string, int>> desiredSubTypes;
 	std::deque<FluffiSetting> settings = dbManager->getAllSettings();
 	switch (type) {

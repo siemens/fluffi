@@ -19,7 +19,7 @@ Author(s): Michael Kraus, Thomas Riedmaier, Abian Blome, Roman Bendt
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace FluffiTester
+namespace GMDatabaseManagerTester
 {
 	TEST_CLASS(GMDatabaseManagerTest)
 	{
@@ -48,19 +48,19 @@ namespace FluffiTester
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from localmanagers") == "0");
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from locations") == "0");
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from workers") == "0");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO fuzzjob (id, name, DBHost,DBUser,DBPass,DBName) VALUES ( 21, '21','','','','');");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO fuzzjob (id, name, DBHost,DBUser,DBPass,DBName) VALUES ( 22, '22','','','','');");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO fuzzjob (ID, name, DBHost,DBUser,DBPass,DBName) VALUES ( 21, '21','','','','');");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO fuzzjob (ID, name, DBHost,DBUser,DBPass,DBName) VALUES ( 22, '22','','','','');");
 			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO locations (Name) VALUES ('Mittelerde');");
 			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO locations (Name) VALUES ('Auenland');");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO location_fuzzjobs (Location, Fuzzjob) VALUES ((SELECT locations.id FROM locations WHERE locations.Name = 'Mittelerde'), 21);");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO location_fuzzjobs (Location, Fuzzjob) VALUES ((SELECT locations.id FROM locations WHERE locations.Name = 'Auenland'), 22);");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO localmanagers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, Location, FuzzJob) VALUES ('1111-2222', '127.0.0.1:4444', (SELECT locations.id FROM locations WHERE locations.Name = 'Mittelerde'), 21);");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO localmanagers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, Location, FuzzJob) VALUES ('3333-4444', '127.0.0.1:5555', (SELECT locations.id FROM locations WHERE locations.Name = 'Auenland'), 22);");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO location_fuzzjobs (Location, Fuzzjob) VALUES ((SELECT locations.ID FROM locations WHERE locations.Name = 'Mittelerde'), 21);");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO location_fuzzjobs (Location, Fuzzjob) VALUES ((SELECT locations.ID FROM locations WHERE locations.Name = 'Auenland'), 22);");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO localmanagers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, Location, FuzzJob) VALUES ('1111-2222', '127.0.0.1:4444', (SELECT locations.ID FROM locations WHERE locations.Name = 'Mittelerde'), 21);");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO localmanagers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, Location, FuzzJob) VALUES ('3333-4444', '127.0.0.1:5555', (SELECT locations.ID FROM locations WHERE locations.Name = 'Auenland'), 22);");
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from localmanagers") == "2");
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from locations") == "2");
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from location_fuzzjobs") == "2");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO workers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, FuzzJob, Location, AgentType, AgentSubTypes) VALUES ('9999-9999', 'System9', 21, (SELECT locations.id FROM locations WHERE locations.Name = 'Mittelerde'), 1, 'DefaultRunner');");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO workers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, FuzzJob, Location, AgentType, AgentSubTypes) VALUES ('8888-8888', 'System8',22, (SELECT locations.id FROM locations WHERE locations.Name = 'Mittelerde'), 2, 'DefaultEvaluator');");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO workers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, FuzzJob, Location, AgentType, AgentSubTypes) VALUES ('9999-9999', 'System9', 21, (SELECT locations.ID FROM locations WHERE locations.Name = 'Mittelerde'), 1, 'DefaultRunner');");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO workers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, FuzzJob, Location, AgentType, AgentSubTypes) VALUES ('8888-8888', 'System8',22, (SELECT locations.ID FROM locations WHERE locations.Name = 'Mittelerde'), 2, 'DefaultEvaluator');");
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from workers") == "2");
 
 			std::string testGUID1 = "9999-9999";
@@ -94,8 +94,8 @@ namespace FluffiTester
 		{
 			// Fill DB
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from fuzzjob") == "0");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO fuzzjob (id, name, DBHost, DBUser, DBPass, DBName) VALUES (888, 'Default1', 'fluffiLMDBHost1', 'root1', 'toor1', 'fluffi_gm1');");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO fuzzjob (id, name, DBHost, DBUser, DBPass, DBName) VALUES (999, 'Default2', 'fluffiLMDBHost2', 'root2', 'toor2', 'fluffi_gm2');");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO fuzzjob (ID, name, DBHost, DBUser, DBPass, DBName) VALUES (888, 'Default1', 'fluffiLMDBHost1', 'root1', 'toor1', 'fluffi_gm1');");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO fuzzjob (ID, name, DBHost, DBUser, DBPass, DBName) VALUES (999, 'Default2', 'fluffiLMDBHost2', 'root2', 'toor2', 'fluffi_gm2');");
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from fuzzjob") == "2");
 
 			// Exists
@@ -126,8 +126,8 @@ namespace FluffiTester
 			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO locations (Name) VALUES ('Auenland');");
 			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO locations (Name) VALUES ('Mordor');");
 			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO locations (Name) VALUES ('CheeseCakeFactory');");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO workers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, FuzzJob, Location, AgentType, AgentSubTypes) VALUES ('9999-9999', 'System9', 21, (SELECT locations.id FROM locations WHERE locations.Name = 'Mittelerde'), 1, 'DefaultRunner');");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO workers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, FuzzJob, Location, AgentType, AgentSubTypes) VALUES ('8888-8888', 'System8',22, (SELECT locations.id FROM locations WHERE locations.Name = 'Auenland'), 2, 'DefaultEvaluator');");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO workers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, FuzzJob, Location, AgentType, AgentSubTypes) VALUES ('9999-9999', 'System9', 21, (SELECT locations.ID FROM locations WHERE locations.Name = 'Mittelerde'), 1, 'DefaultRunner');");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO workers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, FuzzJob, Location, AgentType, AgentSubTypes) VALUES ('8888-8888', 'System8',22, (SELECT locations.ID FROM locations WHERE locations.Name = 'Auenland'), 2, 'DefaultEvaluator');");
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from workers") == "2");
 
 			std::string testGUID2 = "7777-7777";
@@ -148,7 +148,7 @@ namespace FluffiTester
 			// new worker with same GUID but other data   -> Overwrite
 			Assert::AreEqual(dbman->addWorkerToDatabase(sd2, AgentType::TestcaseEvaluator, "DefaultEvaluator", std::string("CheeseCakeFactory")), true, L"Error Adding new Worker to Database: (addWorkerToDatabase)");
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from workers") == "3");
-			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT Location from workers WHERE ServiceDescriptorGUID = '7777-7777'") == dbman->EXECUTE_TEST_STATEMENT("SELECT locations.id FROM locations WHERE locations.Name = 'CheeseCakeFactory'"));
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT Location from workers WHERE ServiceDescriptorGUID = '7777-7777'") == dbman->EXECUTE_TEST_STATEMENT("SELECT locations.ID FROM locations WHERE locations.Name = 'CheeseCakeFactory'"));
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT AgentType from workers WHERE ServiceDescriptorGUID = '7777-7777'") == "2");
 
 			std::string testGUID4 = "6666-6666";
@@ -158,7 +158,7 @@ namespace FluffiTester
 			// new worker with new GUID but same data  -> Insert
 			Assert::AreEqual(dbman->addWorkerToDatabase(sd3, AgentType::TestcaseEvaluator, "DefaultEvaluator", std::string("CheeseCakeFactory")), true, L"Error Adding new Worker to Database: (addWorkerToDatabase)");
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from workers") == "4");
-			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT Location from workers WHERE ServiceDescriptorGUID = '6666-6666'") == dbman->EXECUTE_TEST_STATEMENT("SELECT locations.id FROM locations WHERE locations.Name = 'CheeseCakeFactory'"));
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT Location from workers WHERE ServiceDescriptorGUID = '6666-6666'") == dbman->EXECUTE_TEST_STATEMENT("SELECT locations.ID FROM locations WHERE locations.Name = 'CheeseCakeFactory'"));
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT AgentType from workers WHERE ServiceDescriptorGUID = '6666-6666'") == "2");
 		}
 
@@ -169,8 +169,8 @@ namespace FluffiTester
 			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO locations (Name) VALUES ('Auenland');");
 			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO locations (Name) VALUES ('Mordor');");
 			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO locations (Name) VALUES ('CheeseCakeFactory');");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO workers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, FuzzJob, Location, AgentType, AgentSubTypes) VALUES ('9999-9999', 'System9', 21, (SELECT locations.id FROM locations WHERE locations.Name = 'Mittelerde'), 1, 'DefaultRunner');");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO workers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, FuzzJob, Location, AgentType, AgentSubTypes) VALUES ('8888-8888', 'System8',22, (SELECT locations.id FROM locations WHERE locations.Name = 'Auenland'), 2, 'DefaultEvaluator');");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO workers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, FuzzJob, Location, AgentType, AgentSubTypes) VALUES ('9999-9999', 'System9', 21, (SELECT locations.ID FROM locations WHERE locations.Name = 'Mittelerde'), 1, 'DefaultRunner');");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO workers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, FuzzJob, Location, AgentType, AgentSubTypes) VALUES ('8888-8888', 'System8',22, (SELECT locations.ID FROM locations WHERE locations.Name = 'Auenland'), 2, 'DefaultEvaluator');");
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from workers") == "2");
 
 			std::string testGUID1 = "9999-9999";
@@ -188,16 +188,16 @@ namespace FluffiTester
 
 		TEST_METHOD(GMDatabaseManager_setLMForLocation)
 		{
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO fuzzjob (id, name, DBHost,DBUser,DBPass,DBName) VALUES ( 21, '21','','','','');");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO fuzzjob (id, name, DBHost,DBUser,DBPass,DBName) VALUES ( 22, '22','','','','');");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO fuzzjob (id, name, DBHost,DBUser,DBPass,DBName) VALUES ( 23, '23','','','','');");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO fuzzjob (ID, name, DBHost,DBUser,DBPass,DBName) VALUES ( 21, '21','','','','');");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO fuzzjob (ID, name, DBHost,DBUser,DBPass,DBName) VALUES ( 22, '22','','','','');");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO fuzzjob (ID, name, DBHost,DBUser,DBPass,DBName) VALUES ( 23, '23','','','','');");
 			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO locations (Name) VALUES ('Mittelerde');");
 			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO locations (Name) VALUES ('Auenland');");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO location_fuzzjobs (Location, Fuzzjob) VALUES ((SELECT locations.id FROM locations WHERE locations.Name = 'Mittelerde'), 21);");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO location_fuzzjobs (Location, Fuzzjob) VALUES ((SELECT locations.id FROM locations WHERE locations.Name = 'Auenland'), 22);");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO location_fuzzjobs (Location, Fuzzjob) VALUES ((SELECT locations.ID FROM locations WHERE locations.Name = 'Mittelerde'), 21);");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO location_fuzzjobs (Location, Fuzzjob) VALUES ((SELECT locations.ID FROM locations WHERE locations.Name = 'Auenland'), 22);");
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from localmanagers") == "0");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO localmanagers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, Location, FuzzJob) VALUES ('1111-2222', '127.0.0.1:4444', (SELECT locations.id FROM locations WHERE locations.Name = 'Mittelerde'), 21);");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO localmanagers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, Location, FuzzJob) VALUES ('3333-4444', '127.0.0.1:5555', (SELECT locations.id FROM locations WHERE locations.Name = 'Auenland'), 22);");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO localmanagers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, Location, FuzzJob) VALUES ('1111-2222', '127.0.0.1:4444', (SELECT locations.ID FROM locations WHERE locations.Name = 'Mittelerde'), 21);");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO localmanagers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, Location, FuzzJob) VALUES ('3333-4444', '127.0.0.1:5555', (SELECT locations.ID FROM locations WHERE locations.Name = 'Auenland'), 22);");
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from localmanagers") == "2");
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from location_fuzzjobs") == "2");
 
@@ -219,7 +219,7 @@ namespace FluffiTester
 
 			// Update new LM for new Job
 			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO locations (Name) VALUES ('Auenland');");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO location_fuzzjobs (Location, Fuzzjob) VALUES ((SELECT locations.id FROM locations WHERE locations.Name = 'Auenland'), 23);");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO location_fuzzjobs (Location, Fuzzjob) VALUES ((SELECT locations.ID FROM locations WHERE locations.Name = 'Auenland'), 23);");
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from location_fuzzjobs") == "3");
 
 			std::string testGUID2 = "2222-2222";
@@ -272,8 +272,8 @@ namespace FluffiTester
 			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO locations (Name) VALUES ('Auenland');");
 
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from workers") == "0");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO workers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, FuzzJob, Location, AgentType, AgentSubTypes) VALUES ('1111-2222','System-1-2', 21, (SELECT locations.id FROM locations WHERE locations.Name = 'Mittelerde'), 1, 'DefaultRunner');");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO workers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, FuzzJob, Location, AgentType, AgentSubTypes) VALUES ('3333-4444','System-3-4', 22, (SELECT locations.id FROM locations WHERE locations.Name = 'Auenland'), 2, 'DefaultEvaluator');");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO workers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, FuzzJob, Location, AgentType, AgentSubTypes) VALUES ('1111-2222','System-1-2', 21, (SELECT locations.ID FROM locations WHERE locations.Name = 'Mittelerde'), 1, 'DefaultRunner');");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO workers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, FuzzJob, Location, AgentType, AgentSubTypes) VALUES ('3333-4444','System-3-4', 22, (SELECT locations.ID FROM locations WHERE locations.Name = 'Auenland'), 2, 'DefaultEvaluator');");
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from workers") == "2");
 
 			// Test Method
@@ -283,9 +283,9 @@ namespace FluffiTester
 			// Test Method
 			Assert::AreEqual(dbman->deleteWorkersNotSeenSinceXSec(0), true, L"Error deleting old worker status: (deleteWorkersNotSeenSinceXSec)");
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from workers") == "0");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO workers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, FuzzJob, Location, AgentType, AgentSubTypes) VALUES ('1111-2222','System-1-2', 21, (SELECT locations.id FROM locations WHERE locations.Name = 'Mittelerde'), 1, 'DefaultRunner');");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO workers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, FuzzJob, Location, AgentType, AgentSubTypes) VALUES ('1111-2222','System-1-2', 21, (SELECT locations.ID FROM locations WHERE locations.Name = 'Mittelerde'), 1, 'DefaultRunner');");
 			Sleep(2000);
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO workers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, FuzzJob, Location, AgentType, AgentSubTypes) VALUES ('3333-4444','System-3-4', 22, (SELECT locations.id FROM locations WHERE locations.Name = 'Auenland'), 2, 'DefaultEvaluator');");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO workers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, FuzzJob, Location, AgentType, AgentSubTypes) VALUES ('3333-4444','System-3-4', 22, (SELECT locations.ID FROM locations WHERE locations.Name = 'Auenland'), 2, 'DefaultEvaluator');");
 			// Test Method
 			Assert::AreEqual(dbman->deleteWorkersNotSeenSinceXSec(1), true, L"Error deleting old worker status: (deleteWorkersNotSeenSinceXSec)");
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from workers") == "1");
@@ -303,19 +303,19 @@ namespace FluffiTester
 			Assert::AreEqual(lmSet.size(), (size_t)0, L"Error getting all registered LMs: (getAllRegisteredLMs)");
 
 			// Build DB
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO fuzzjob (id, name, DBHost,DBUser,DBPass,DBName) VALUES ( 21, '21','','','','');");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO fuzzjob (id, name, DBHost,DBUser,DBPass,DBName) VALUES ( 22, '22','','','','');");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO fuzzjob (id, name, DBHost,DBUser,DBPass,DBName) VALUES ( 24, '24','','','','');");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO fuzzjob (ID, name, DBHost,DBUser,DBPass,DBName) VALUES ( 21, '21','','','','');");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO fuzzjob (ID, name, DBHost,DBUser,DBPass,DBName) VALUES ( 22, '22','','','','');");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO fuzzjob (ID, name, DBHost,DBUser,DBPass,DBName) VALUES ( 24, '24','','','','');");
 
 			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO locations (Name) VALUES ('Mittelerde');");
 			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO locations (Name) VALUES ('Auenland');");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO location_fuzzjobs (Location, Fuzzjob) VALUES ((SELECT locations.id FROM locations WHERE locations.Name = 'Mittelerde'), 24);");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO location_fuzzjobs (Location, Fuzzjob) VALUES ((SELECT locations.id FROM locations WHERE locations.Name = 'Mittelerde'), 21);");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO location_fuzzjobs (Location, Fuzzjob) VALUES ((SELECT locations.id FROM locations WHERE locations.Name = 'Auenland'), 22);");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO location_fuzzjobs (Location, Fuzzjob) VALUES ((SELECT locations.ID FROM locations WHERE locations.Name = 'Mittelerde'), 24);");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO location_fuzzjobs (Location, Fuzzjob) VALUES ((SELECT locations.ID FROM locations WHERE locations.Name = 'Mittelerde'), 21);");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO location_fuzzjobs (Location, Fuzzjob) VALUES ((SELECT locations.ID FROM locations WHERE locations.Name = 'Auenland'), 22);");
 
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from localmanagers") == "0");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO localmanagers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, Location, FuzzJob) VALUES ('1111-2222', '127.0.0.1:4444', (SELECT locations.id FROM locations WHERE locations.Name = 'Mittelerde'), 21);");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO localmanagers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, Location, FuzzJob) VALUES ('3333-4444', '127.0.0.1:5555', (SELECT locations.id FROM locations WHERE locations.Name = 'Auenland'), 22);");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO localmanagers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, Location, FuzzJob) VALUES ('1111-2222', '127.0.0.1:4444', (SELECT locations.ID FROM locations WHERE locations.Name = 'Mittelerde'), 21);");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO localmanagers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, Location, FuzzJob) VALUES ('3333-4444', '127.0.0.1:5555', (SELECT locations.ID FROM locations WHERE locations.Name = 'Auenland'), 22);");
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from localmanagers") == "2");
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from location_fuzzjobs") == "3");
 
@@ -323,7 +323,7 @@ namespace FluffiTester
 			lmSet = dbman->getAllRegisteredLMs();
 			Assert::AreEqual(lmSet.size(), (size_t)2, L"Error getting all registered LMs: (getAllRegisteredLMs)");
 
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO localmanagers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, Location, FuzzJob) VALUES ('5555-6666', '127.0.0.1:4444', (SELECT locations.id FROM locations WHERE locations.Name = 'Mittelerde'), 24);");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO localmanagers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, Location, FuzzJob) VALUES ('5555-6666', '127.0.0.1:4444', (SELECT locations.ID FROM locations WHERE locations.Name = 'Mittelerde'), 24);");
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from localmanagers") == "3");
 
 			// Test Method
@@ -346,19 +346,19 @@ namespace FluffiTester
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from localmanagers") == "0");
 
 			// Build DB
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO fuzzjob (id, name, DBHost,DBUser,DBPass,DBName) VALUES ( 21, '21','','','','');");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO fuzzjob (id, name, DBHost,DBUser,DBPass,DBName) VALUES ( 22, '22','','','','');");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO fuzzjob (id, name, DBHost,DBUser,DBPass,DBName) VALUES ( 24, '24','','','','');");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO fuzzjob (ID, name, DBHost,DBUser,DBPass,DBName) VALUES ( 21, '21','','','','');");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO fuzzjob (ID, name, DBHost,DBUser,DBPass,DBName) VALUES ( 22, '22','','','','');");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO fuzzjob (ID, name, DBHost,DBUser,DBPass,DBName) VALUES ( 24, '24','','','','');");
 
 			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO locations (Name) VALUES ('Mittelerde');");
 			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO locations (Name) VALUES ('Auenland');");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO location_fuzzjobs (Location, Fuzzjob) VALUES ((SELECT locations.id FROM locations WHERE locations.Name = 'Mittelerde'), 24);");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO location_fuzzjobs (Location, Fuzzjob) VALUES ((SELECT locations.id FROM locations WHERE locations.Name = 'Mittelerde'), 21);");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO location_fuzzjobs (Location, Fuzzjob) VALUES ((SELECT locations.id FROM locations WHERE locations.Name = 'Auenland'), 22);");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO location_fuzzjobs (Location, Fuzzjob) VALUES ((SELECT locations.ID FROM locations WHERE locations.Name = 'Mittelerde'), 24);");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO location_fuzzjobs (Location, Fuzzjob) VALUES ((SELECT locations.ID FROM locations WHERE locations.Name = 'Mittelerde'), 21);");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO location_fuzzjobs (Location, Fuzzjob) VALUES ((SELECT locations.ID FROM locations WHERE locations.Name = 'Auenland'), 22);");
 
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from localmanagers") == "0");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO localmanagers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, Location, FuzzJob) VALUES ('1111-2222', '127.0.0.1:4444', (SELECT locations.id FROM locations WHERE locations.Name = 'Mittelerde'), 21);");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO localmanagers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, Location, FuzzJob) VALUES ('3333-4444', '127.0.0.1:5555', (SELECT locations.id FROM locations WHERE locations.Name = 'Auenland'), 22);");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO localmanagers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, Location, FuzzJob) VALUES ('1111-2222', '127.0.0.1:4444', (SELECT locations.ID FROM locations WHERE locations.Name = 'Mittelerde'), 21);");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO localmanagers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, Location, FuzzJob) VALUES ('3333-4444', '127.0.0.1:5555', (SELECT locations.ID FROM locations WHERE locations.Name = 'Auenland'), 22);");
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from localmanagers") == "2");
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from location_fuzzjobs") == "3");
 
@@ -407,17 +407,17 @@ namespace FluffiTester
 			// Build DB
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from localmanagers") == "0");
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from locations") == "0");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO fuzzjob (id, name, DBHost,DBUser,DBPass,DBName) VALUES ( 21, '21','','','','');");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO fuzzjob (id, name, DBHost,DBUser,DBPass,DBName) VALUES ( 22, '22','','','','');");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO fuzzjob (ID, name, DBHost,DBUser,DBPass,DBName) VALUES ( 21, '21','','','','');");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO fuzzjob (ID, name, DBHost,DBUser,DBPass,DBName) VALUES ( 22, '22','','','','');");
 
 			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO locations (Name) VALUES ('Mittelerde');");
 			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO locations (Name) VALUES ('Auenland');");
 
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO location_fuzzjobs (Location, Fuzzjob) VALUES ((SELECT locations.id FROM locations WHERE locations.Name = 'Mittelerde'), 21);");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO location_fuzzjobs (Location, Fuzzjob) VALUES ((SELECT locations.id FROM locations WHERE locations.Name = 'Auenland'), 22);");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO location_fuzzjobs (Location, Fuzzjob) VALUES ((SELECT locations.ID FROM locations WHERE locations.Name = 'Mittelerde'), 21);");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO location_fuzzjobs (Location, Fuzzjob) VALUES ((SELECT locations.ID FROM locations WHERE locations.Name = 'Auenland'), 22);");
 
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO localmanagers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, Location, FuzzJob) VALUES ('1111-2222', '127.0.0.1:4444', (SELECT locations.id FROM locations WHERE locations.Name = 'Mittelerde'), 21);");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO localmanagers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, Location, FuzzJob) VALUES ('3333-4444', '127.0.0.1:5555', (SELECT locations.id FROM locations WHERE locations.Name = 'Auenland'), 22);");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO localmanagers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, Location, FuzzJob) VALUES ('1111-2222', '127.0.0.1:4444', (SELECT locations.ID FROM locations WHERE locations.Name = 'Mittelerde'), 21);");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO localmanagers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, Location, FuzzJob) VALUES ('3333-4444', '127.0.0.1:5555', (SELECT locations.ID FROM locations WHERE locations.Name = 'Auenland'), 22);");
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from localmanagers") == "2");
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from locations") == "2");
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from fuzzjob") == "2");
@@ -431,9 +431,9 @@ namespace FluffiTester
 			Assert::AreEqual(fuzzJob, (long)-1, L"Error getting FuzzJob that has no LM in Database: (getFuzzJobWithoutLM)");
 
 			// Insert FuzzJob without LM
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO fuzzjob (id, name, DBHost,DBUser,DBPass,DBName) VALUES ( 24, '24','','','','');");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO fuzzjob (ID, name, DBHost,DBUser,DBPass,DBName) VALUES ( 24, '24','','','','');");
 			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO locations (Name) VALUES ('Mordor');");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO location_fuzzjobs (Location, Fuzzjob) VALUES ((SELECT locations.id FROM locations WHERE locations.Name = 'Mordor'), 24);");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO location_fuzzjobs (Location, Fuzzjob) VALUES ((SELECT locations.ID FROM locations WHERE locations.Name = 'Mordor'), 24);");
 
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from locations") == "3");
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from location_fuzzjobs") == "3");
@@ -444,8 +444,8 @@ namespace FluffiTester
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from locations") == "3");
 
 			// Insert another FuzzJob without LM
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO fuzzjob (id, name, DBHost,DBUser,DBPass,DBName) VALUES ( 25, '25','','','','');");
-			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO location_fuzzjobs (Location, Fuzzjob) VALUES ((SELECT locations.id FROM locations WHERE locations.Name = 'Mordor'), 25);");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO fuzzjob (ID, name, DBHost,DBUser,DBPass,DBName) VALUES ( 25, '25','','','','');");
+			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO location_fuzzjobs (Location, Fuzzjob) VALUES ((SELECT locations.ID FROM locations WHERE locations.Name = 'Mordor'), 25);");
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from locations") == "3");
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from location_fuzzjobs") == "4");
 
@@ -564,6 +564,94 @@ namespace FluffiTester
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from command_queue") == "0");
 
 			dbman->EXECUTE_TEST_STATEMENT("TRUNCATE TABLE command_queue;");
+		}
+
+		TEST_METHOD(GMDatabaseManager_addNewManagedLMLogMessages)
+		{
+			dbman->EXECUTE_TEST_STATEMENT("TRUNCATE TABLE localmanagers_logmessages;");
+
+			std::string tooLongGUID(60, 'a');
+			Assert::IsFalse(dbman->addNewManagedLMLogMessages(tooLongGUID, {}), L"Inserting a log message with a too long guid succeeded for some reason");
+
+			std::string validGUID = "testguid";
+			std::vector<std::string> invalidLogMessages;
+			invalidLogMessages.push_back(std::string(2000, 'b'));
+			Assert::IsFalse(dbman->addNewManagedLMLogMessages(validGUID, invalidLogMessages), L"Inserting a log message with a too long content succeeded for some reason");
+
+			std::vector<std::string> validLogMessages;
+			validLogMessages.push_back("a");
+			validLogMessages.push_back("b");
+			validLogMessages.push_back("c");
+			Assert::IsTrue(dbman->addNewManagedLMLogMessages(validGUID, validLogMessages), L"Inserting new valid log messages failed");
+
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from localmanagers_logmessages") == "3", L"We got more or less log messages than expected");
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT ServiceDescriptorGUID from localmanagers_logmessages WHERE ID=1") == "testguid", L"Invalid guid stored (1)");
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT ServiceDescriptorGUID from localmanagers_logmessages WHERE ID=2") == "testguid", L"Invalid guid stored (2)");
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT ServiceDescriptorGUID from localmanagers_logmessages WHERE ID=3") == "testguid", L"Invalid guid stored (3)");
+
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT LogMessage from localmanagers_logmessages WHERE ID=1") == "a", L"Invalid log message stored (1)");
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT LogMessage from localmanagers_logmessages WHERE ID=2") == "b", L"Invalid log message stored (2)");
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT LogMessage from localmanagers_logmessages WHERE ID=3") == "c", L"Invalid log message stored (3)");
+
+			dbman->EXECUTE_TEST_STATEMENT("TRUNCATE TABLE localmanagers_logmessages;");
+		}
+		TEST_METHOD(GMDatabaseManager_deleteManagedLMLogMessagesIfMoreThan)
+		{
+			dbman->EXECUTE_TEST_STATEMENT("TRUNCATE TABLE localmanagers_logmessages;");
+
+			std::string validGUID = "testguid";
+			std::vector<std::string> validLogMessages;
+			validLogMessages.push_back("a");
+			validLogMessages.push_back("b");
+			validLogMessages.push_back("c");
+			Assert::IsTrue(dbman->addNewManagedLMLogMessages(validGUID, validLogMessages), L"Inserting new valid log messages failed");
+
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from localmanagers_logmessages") == "3", L"We got more or less log messages than expected (1)");
+
+			Assert::IsTrue(dbman->deleteManagedLMLogMessagesIfMoreThan(3), L"Calling deleteManagedLMLogMessagesIfMoreThan failed (1)");
+
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from localmanagers_logmessages") == "3", L"We got more or less log messages than expected (2)");
+
+			Assert::IsTrue(dbman->deleteManagedLMLogMessagesIfMoreThan(2), L"Calling deleteManagedLMLogMessagesIfMoreThan failed (2)");
+
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from localmanagers_logmessages") == "2", L"We got more or less log messages than expected (3)");
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT LogMessage from localmanagers_logmessages WHERE ID=2") == "b", L"Invalid log message stored (2)");
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT LogMessage from localmanagers_logmessages WHERE ID=3") == "c", L"Invalid log message stored (3)");
+
+			dbman->EXECUTE_TEST_STATEMENT("TRUNCATE TABLE localmanagers_logmessages;");
+		}
+		TEST_METHOD(GMDatabaseManager_deleteManagedLMLogMessagesOlderThanXSec)
+		{
+			dbman->EXECUTE_TEST_STATEMENT("TRUNCATE TABLE localmanagers_logmessages;");
+
+			std::string validGUID = "testguid";
+			std::vector<std::string> validLogMessages;
+			validLogMessages.push_back("a");
+			validLogMessages.push_back("b");
+			validLogMessages.push_back("c");
+			Assert::IsTrue(dbman->addNewManagedLMLogMessages(validGUID, validLogMessages), L"Inserting new valid log messages failed (1)");
+
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from localmanagers_logmessages") == "3", L"We got more or less log messages than expected (1)");
+
+			Assert::IsTrue(dbman->deleteManagedLMLogMessagesOlderThanXSec(5), L"Calling deleteManagedLMLogMessagesOlderThanXSec failed (1)");
+
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from localmanagers_logmessages") == "3", L"We got more or less log messages than expected (2)");
+
+			Sleep(2000);
+
+			Assert::IsTrue(dbman->addNewManagedLMLogMessages(validGUID, validLogMessages), L"Inserting new valid log messages failed (2)");
+
+			Assert::IsTrue(dbman->deleteManagedLMLogMessagesOlderThanXSec(5), L"Calling deleteManagedLMLogMessagesOlderThanXSec failed (2)");
+
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from localmanagers_logmessages") == "6", L"We got more or less log messages than expected (3)");
+
+			Sleep(4000);
+
+			Assert::IsTrue(dbman->deleteManagedLMLogMessagesOlderThanXSec(5), L"Calling deleteManagedLMLogMessagesOlderThanXSec failed (3)");
+
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from localmanagers_logmessages") == "3", L"We got more or less log messages than expected (4)");
+
+			dbman->EXECUTE_TEST_STATEMENT("TRUNCATE TABLE localmanagers_logmessages;");
 		}
 
 	private:
