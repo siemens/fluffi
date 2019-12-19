@@ -62,7 +62,7 @@ void InstanceMonitorWorker::workerMain() {
 		m_workerThreadState->dbManager->deleteManagedInstanceStatusOlderThanXSec(60);
 
 		// call get Status to all registered instances
-		for (auto& managedInstance : m_workerThreadState->dbManager->getAllRegisteredInstances(m_location)) {
+		for (std::pair<FluffiServiceDescriptor, AgentType>& managedInstance : m_workerThreadState->dbManager->getAllRegisteredInstances(m_location)) {
 			//Allow termination
 			if (m_workerThreadState->m_stopRequested) {
 				break;
@@ -92,39 +92,45 @@ void InstanceMonitorWorker::workerMain() {
 				continue;
 			}
 
-			std::string statusToStore = resp.getstatusresponse().status();
-
-			//Transform total executions into exections / sec
-			if (managedInstance.second == AgentType::TestcaseRunner) {
-				std::vector<std::string> statusElements = Util::splitString(statusToStore, "|");
-
-				statusToStore = "";
-				for (size_t i = 0; i < statusElements.size(); i++) {
-					if (i != 0) {
-						statusToStore = statusToStore + "|";
-					}
-					if (statusElements[i].substr(0, 32) == " TestcasesSinceLastStatusRequest") {
-						std::vector<std::string> testcasesSinceLastRequestElements = Util::splitString(statusElements[i], " ");
-						int testcasesSinceLastRequestElementsAsInt;
-						try {
-							testcasesSinceLastRequestElementsAsInt = std::stoi(testcasesSinceLastRequestElements[2]);
-						}
-						catch (...) {
-							LOG(ERROR) << "std::stoi failed";
-							google::protobuf::ShutdownProtobufLibrary();
-							_exit(EXIT_FAILURE); //make compiler happy
-						}
-						statusToStore = statusToStore + " TestcasesPerSecond " + std::to_string(static_cast<double>(testcasesSinceLastRequestElementsAsInt * 1000) / static_cast<double>(m_loopIntervalMS)) + " ";
-					}
-					else {
-						statusToStore = statusToStore + statusElements[i];
-					}
-				}
-			}
-
-			m_workerThreadState->dbManager->addNewManagedInstanceStatus(managedInstance.first.m_guid, statusToStore);
+			storeLogMessages(managedInstance, resp.getstatusresponse().logmessages());
+			storeStatus(managedInstance, resp.getstatusresponse().status());
 		}
 	}
 
 	m_workerThreadStateBuilder->destructState(m_workerThreadState);
+}
+
+void InstanceMonitorWorker::storeStatus(const std::pair<FluffiServiceDescriptor, AgentType>& managedInstance, std::string statusToStore) {
+	//Transform total executions into exections / sec
+	if (managedInstance.second == AgentType::TestcaseRunner) {
+		std::vector<std::string> statusElements = Util::splitString(statusToStore, "|");
+
+		statusToStore = "";
+		for (size_t i = 0; i < statusElements.size(); i++) {
+			if (i != 0) {
+				statusToStore = statusToStore + "|";
+			}
+			if (statusElements[i].substr(0, 32) == " TestcasesSinceLastStatusRequest") {
+				std::vector<std::string> testcasesSinceLastRequestElements = Util::splitString(statusElements[i], " ");
+				int testcasesSinceLastRequestElementsAsInt;
+				try {
+					testcasesSinceLastRequestElementsAsInt = std::stoi(testcasesSinceLastRequestElements[2]);
+				}
+				catch (...) {
+					LOG(ERROR) << "std::stoi failed";
+					google::protobuf::ShutdownProtobufLibrary();
+					_exit(EXIT_FAILURE); //make compiler happy
+				}
+				statusToStore = statusToStore + " TestcasesPerSecond " + std::to_string(static_cast<double>(testcasesSinceLastRequestElementsAsInt * 1000) / static_cast<double>(m_loopIntervalMS)) + " ";
+			}
+			else {
+				statusToStore = statusToStore + statusElements[i];
+			}
+		}
+	}
+
+	m_workerThreadState->dbManager->addNewManagedInstanceStatus(managedInstance.first.m_guid, statusToStore);
+}
+
+void InstanceMonitorWorker::storeLogMessages(const std::pair<FluffiServiceDescriptor, AgentType>& managedInstance, const google::protobuf::RepeatedPtrField<std::string> & logMessages) {
 }

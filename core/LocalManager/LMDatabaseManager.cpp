@@ -1213,11 +1213,11 @@ bool LMDatabaseManager::addEntryToCompletedTestcasesTable(const FluffiTestcaseID
 		return success;
 }
 
-bool LMDatabaseManager::addEntriesToCompletedTestcasesTable(const std::set<FluffiTestcaseID>* testcaseIDs) {
+bool LMDatabaseManager::addEntriesToCompletedTestcasesTable(const std::set<FluffiTestcaseID>& testcaseIDs) {
 	PERFORMANCE_WATCH_FUNCTION_ENTRY
 
 		const int maxGUIDLength = 50;
-	for (std::set<FluffiTestcaseID>::const_iterator it = testcaseIDs->begin(); it != testcaseIDs->end(); ++it) {
+	for (std::set<FluffiTestcaseID>::const_iterator it = testcaseIDs.begin(); it != testcaseIDs.end(); ++it) {
 		//As we use bulk insert, we need to assume a maximum string length. We assume it to be 50. Longer guids  will cause an error. Please note: this value can be adjusted
 		if ((*it).m_serviceDescriptor.m_guid.length() >= maxGUIDLength) {
 			return false;
@@ -1233,7 +1233,7 @@ bool LMDatabaseManager::addEntriesToCompletedTestcasesTable(const std::set<Fluff
 		char localid_ind;
 	};
 
-	size_t array_size = testcaseIDs->size();
+	size_t array_size = testcaseIDs.size();
 
 	if (array_size == 0) {
 		//Nothing to do here
@@ -1243,7 +1243,7 @@ bool LMDatabaseManager::addEntriesToCompletedTestcasesTable(const std::set<Fluff
 	size_t row_size = sizeof(struct st_data);
 	struct st_data* data = new struct st_data[array_size];
 	unsigned int i = 0;
-	for (std::set<FluffiTestcaseID>::iterator it = testcaseIDs->begin(); it != testcaseIDs->end(); i++, ++it) {
+	for (std::set<FluffiTestcaseID>::iterator it = testcaseIDs.begin(); it != testcaseIDs.end(); i++, ++it) {
 		strcpy_s(data[i].guid, maxGUIDLength, (*it).m_serviceDescriptor.m_guid.c_str()); //check above ensures that tcID->servicedescriptor().guid().length() < maxGUIDLength (which is the size of the target buffer)
 
 		data[i].guid_ind = STMT_INDICATOR_NTS;
@@ -1341,7 +1341,7 @@ bool LMDatabaseManager::addDeltaToTestcaseRating(const FluffiTestcaseID tcID, in
 		return re;
 }
 
-bool LMDatabaseManager::addBlocksToCoveredBlocks(const FluffiTestcaseID tcID, const std::set<FluffiBasicBlock>* basicBlocks) { //in order to prevent deadlocks, the basic blocks need to be inserted in a sorted order. Therefore a set (which is soted) is used to pass the basicBlocks
+bool LMDatabaseManager::addBlocksToCoveredBlocks(const FluffiTestcaseID tcID, const std::set<FluffiBasicBlock>& basicBlocks) { //in order to prevent deadlocks, the basic blocks need to be inserted in a sorted order. Therefore a set (which is soted) is used to pass the basicBlocks
 	PERFORMANCE_WATCH_FUNCTION_ENTRY
 
 		//#################### First part: get testcase ID ####################
@@ -1420,7 +1420,7 @@ bool LMDatabaseManager::addBlocksToCoveredBlocks(const FluffiTestcaseID tcID, co
 			char offset_ind;
 		};
 
-		unsigned int array_size = static_cast<unsigned int>(basicBlocks->size());
+		unsigned int array_size = static_cast<unsigned int>(basicBlocks.size());
 
 		if (array_size == 0) {
 			//Nothing to do here
@@ -1430,7 +1430,7 @@ bool LMDatabaseManager::addBlocksToCoveredBlocks(const FluffiTestcaseID tcID, co
 		size_t row_size = sizeof(struct st_data);
 		struct st_data* data = new struct st_data[array_size];
 		unsigned int i = 0;
-		for (auto& basicBlock : *basicBlocks) {
+		for (auto& basicBlock : basicBlocks) {
 			data[i].testcaseid = testcaseID;
 			data[i].testcaseid_ind = STMT_INDICATOR_NONE;
 			data[i].moduleid = static_cast<unsigned char>(basicBlock.m_moduleID);

@@ -28,6 +28,7 @@ void FLUFFILogHandler::addToMessageQueue(el::base::type::string_t&& logLine)
 {
 	std::unique_lock<std::mutex> mlock(m_mutex_);
 
+	//Prevent overflow in case nobady collects the error messages
 	if (errorMessages.size() > 1000) {
 		errorMessages.pop_front();
 	}

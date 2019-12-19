@@ -59,9 +59,9 @@ public:
 	};
 	static const int defaultInitialPopulationRating = 10000;
 
-	bool addBlocksToCoveredBlocks(const FluffiTestcaseID tcID, const std::set<FluffiBasicBlock>* basicBlocks); //in order to prevent deadlocks, the basic blocks need to be inserted in a sorted order. Therefore a set (which is soted) is used to pass the basicBlocks
+	bool addBlocksToCoveredBlocks(const FluffiTestcaseID tcID, const std::set<FluffiBasicBlock>& basicBlocks); //in order to prevent deadlocks, the basic blocks need to be inserted in a sorted order. Therefore a set (which is soted) is used to pass the basicBlocks
 	bool addDeltaToTestcaseRating(const FluffiTestcaseID tcID, int ratingDelta);
-	bool addEntriesToCompletedTestcasesTable(const std::set<FluffiTestcaseID>* testcaseIDs);
+	bool addEntriesToCompletedTestcasesTable(const std::set<FluffiTestcaseID>& testcaseIDs);
 	bool addEntryToCompletedTestcasesTable(const FluffiTestcaseID tcID);
 	bool addEntryToCrashDescriptionsTable(const FluffiTestcaseID tcID, const std::string crashFootprint);
 	bool addEntryToInterestingTestcasesTable(const FluffiTestcaseID tcID, const FluffiTestcaseID tcparentID, int rating, const std::string testcaseDir, TestCaseType tcType);

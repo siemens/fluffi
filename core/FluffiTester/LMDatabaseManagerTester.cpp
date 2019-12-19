@@ -349,29 +349,29 @@ namespace LMDatabaseManagerTester
 			blocks.insert(FluffiBasicBlock(44, 33));
 
 			//must fail before testcase is inserted into interesting testcases table
-			Assert::IsFalse(dbman->addBlocksToCoveredBlocks(ftid1, &blocks));
+			Assert::IsFalse(dbman->addBlocksToCoveredBlocks(ftid1, blocks));
 
 			dbman->addEntryToInterestingTestcasesTable(ftid1, ftid1, 0, "", LMDatabaseManager::TestCaseType::Population);
 			dbman->addEntryToInterestingTestcasesTable(ftid2, ftid2, 0, "", LMDatabaseManager::TestCaseType::Population);
 
 			//Must fail as target module are not set it
-			Assert::IsFalse(dbman->addBlocksToCoveredBlocks(ftid1, &blocks));
+			Assert::IsFalse(dbman->addBlocksToCoveredBlocks(ftid1, blocks));
 
 			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO target_modules (ID, ModuleName) VALUES (11, 'test1.dll')");
 			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO target_modules (ID, ModuleName) VALUES (33, 'test2.dll')");
 			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO target_modules (ID, ModuleName) VALUES (55, 'test3.dll')");
 
 			//Now it should work
-			Assert::IsTrue(dbman->addBlocksToCoveredBlocks(ftid1, &blocks));
+			Assert::IsTrue(dbman->addBlocksToCoveredBlocks(ftid1, blocks));
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from covered_blocks") == "2");
 
 			//Duplicate insert should merely overwrite the timestamp
-			Assert::IsTrue(dbman->addBlocksToCoveredBlocks(ftid1, &blocks));
+			Assert::IsTrue(dbman->addBlocksToCoveredBlocks(ftid1, blocks));
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from covered_blocks") == "2");
 
 			blocks.insert(FluffiBasicBlock(66, 55));
 
-			Assert::IsTrue(dbman->addBlocksToCoveredBlocks(ftid2, &blocks));
+			Assert::IsTrue(dbman->addBlocksToCoveredBlocks(ftid2, blocks));
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from covered_blocks") == "5");
 
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT CreatorTestcaseID from covered_blocks WHERE Offset = 66") == dbman->EXECUTE_TEST_STATEMENT("SELECT ID from interesting_testcases WHERE CreatorServiceDescriptorGUID = '" + guid2 + "'"));
@@ -386,7 +386,7 @@ namespace LMDatabaseManagerTester
 
 			//Transaction isolation should not change
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT @@TX_ISOLATION;") == "REPEATABLE-READ");
-			Assert::IsTrue(dbman->addBlocksToCoveredBlocks(ftid1, &blocks));
+			Assert::IsTrue(dbman->addBlocksToCoveredBlocks(ftid1, blocks));
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT @@TX_ISOLATION;") == "REPEATABLE-READ");
 
 			//64 bit rvas should be possible
@@ -401,7 +401,7 @@ namespace LMDatabaseManagerTester
 			std::set<FluffiBasicBlock> blocks2;
 			blocks2.insert(FluffiBasicBlock(0x12345678ab, 11));
 
-			Assert::IsTrue(dbman->addBlocksToCoveredBlocks(ftid3, &blocks2));
+			Assert::IsTrue(dbman->addBlocksToCoveredBlocks(ftid3, blocks2));
 			Assert::IsTrue(stoull(dbman->EXECUTE_TEST_STATEMENT("SELECT Offset from covered_blocks WHERE CreatorTestcaseID = (SELECT ID from interesting_testcases WHERE CreatorServiceDescriptorGUID ='guid3') LIMIT 1")) == 0x12345678ab);
 		}
 
@@ -559,7 +559,7 @@ namespace LMDatabaseManagerTester
 			std::set<FluffiBasicBlock> blocks;
 			blocks.insert(FluffiBasicBlock(22, 11));
 			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO target_modules (ID, ModuleName) VALUES (11, 'test1.dll')");
-			Assert::IsTrue(dbman->addBlocksToCoveredBlocks(ftid2, &blocks));
+			Assert::IsTrue(dbman->addBlocksToCoveredBlocks(ftid2, blocks));
 			Assert::IsTrue(stoi(dbman->EXECUTE_TEST_STATEMENT("SELECT Count(*) from covered_blocks")) == 1);
 			Assert::IsTrue(stoi(dbman->EXECUTE_TEST_STATEMENT("SELECT Count(*) from interesting_testcases WHERE CreatorServiceDescriptorGUID = \"" + guid2 + "\"")) == 1);
 			Assert::IsTrue(dbman->addEntryToInterestingTestcasesTable(ftid2, ftid1, 200, "", LMDatabaseManager::TestCaseType::Exception_AccessViolation));
@@ -598,7 +598,7 @@ namespace LMDatabaseManagerTester
 			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO target_modules (ID, ModuleName) VALUES (33, 'test2.dll')");
 			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO target_modules (ID, ModuleName) VALUES (55, 'test3.dll')");
 
-			dbman->addBlocksToCoveredBlocks(ftid1, &blocks);
+			dbman->addBlocksToCoveredBlocks(ftid1, blocks);
 
 			GetCurrentBlockCoverageResponse* resp = dbman->generateGetCurrentBlockCoverageResponse();
 
@@ -626,7 +626,7 @@ namespace LMDatabaseManagerTester
 			delete resp;
 
 			//Assert nothing changes if we reinsert the blocks for a different testcase
-			dbman->addBlocksToCoveredBlocks(ftid2, &blocks);
+			dbman->addBlocksToCoveredBlocks(ftid2, blocks);
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) FROM covered_blocks") == "6");
 			resp = dbman->generateGetCurrentBlockCoverageResponse();
 			Assert::IsTrue(blocks.size() == 3);
@@ -882,7 +882,7 @@ namespace LMDatabaseManagerTester
 		{
 			std::set<FluffiTestcaseID> ids;
 
-			bool success = dbman->addEntriesToCompletedTestcasesTable(&ids);
+			bool success = dbman->addEntriesToCompletedTestcasesTable(ids);
 			Assert::IsTrue(success, L"failed adding an empty vector");
 			Assert::IsTrue("0" == dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) FROM completed_testcases"), L"Expected 0 elements in completed_testcases but that was not the case");
 
@@ -895,7 +895,7 @@ namespace LMDatabaseManagerTester
 			FluffiServiceDescriptor sd3{ "hap3", "guid3" };
 			FluffiTestcaseID tid3{ sd3, 3 };
 			ids.insert(tid3);
-			success = dbman->addEntriesToCompletedTestcasesTable(&ids);
+			success = dbman->addEntriesToCompletedTestcasesTable(ids);
 			Assert::IsTrue(success, L"failed adding an vector of three elements");
 			Assert::IsTrue("3" == dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) FROM completed_testcases"), L"Expected 3 elements in completed_testcases but that was not the case (1)");
 
@@ -907,7 +907,7 @@ namespace LMDatabaseManagerTester
 			FluffiTestcaseID tid4{ sd4, 4 };
 			ids.insert(tid4);
 
-			success = dbman->addEntriesToCompletedTestcasesTable(&ids);
+			success = dbman->addEntriesToCompletedTestcasesTable(ids);
 			Assert::IsTrue(success, L"failed adding the vector a second time");
 			Assert::IsTrue("7" == dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) FROM completed_testcases"), L"Expected 7 elements in completed_testcases but that was not the case");
 

@@ -143,10 +143,7 @@ void RegisterAtGMRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerTh
 	resp->set_allocated_registeratgmresponse(registerResponse);
 }
 
-bool RegisterAtGMRequestHandler::agentIsWelcomedAt(WorkerThreadState* workerThreadState,
-	AgentType type,
-	const google::protobuf::RepeatedPtrField<std::string> sts,
-	const FluffiServiceDescriptor lmServiceDescriptor
+bool RegisterAtGMRequestHandler::agentIsWelcomedAt(WorkerThreadState* workerThreadState, AgentType type, const google::protobuf::RepeatedPtrField<std::string>& sts, const FluffiServiceDescriptor lmServiceDescriptor
 ) {
 	FLUFFIMessage req;
 	FLUFFIMessage resp;

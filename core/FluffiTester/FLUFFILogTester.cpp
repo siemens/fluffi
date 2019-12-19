@@ -46,11 +46,13 @@ namespace FLUFFILogTester
 			GetStatusResponse resp;
 			rh.setLogMessages(&resp);
 
+			//Check if the logs are stored correctly
 			google::protobuf::RepeatedPtrField< std::string > messagesField = resp.logmessages();
 			Assert::IsTrue(messagesField.size() == 2, L"An unexpected number of messages was stored by FLUFFILog");
 			Assert::IsTrue(ends_with(messagesField.Get(0), "TestError1"), L"The first stored message was not the expected one");
 			Assert::IsTrue(ends_with(messagesField.Get(1), "TestError2"), L"The second stored message was not the expected one");
 
+			//Check if normal logging is still operational
 			HANDLE hLogFile = CreateFileA(std::string("." + Util::pathSeperator + "logs" + Util::pathSeperator + "Test.log").c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 			Assert::IsFalse(hLogFile == NULL, L"Could not open log file");
 
