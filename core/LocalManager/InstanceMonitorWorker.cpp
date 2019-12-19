@@ -60,6 +60,8 @@ void InstanceMonitorWorker::workerMain() {
 		}
 
 		m_workerThreadState->dbManager->deleteManagedInstanceStatusOlderThanXSec(60);
+		m_workerThreadState->dbManager->deleteManagedInstanceLogMessagesIfMoreThan(1000);
+		m_workerThreadState->dbManager->deleteManagedInstanceLogMessagesOlderThanXSec(60 * 60 * 24 * 7);
 
 		// call get Status to all registered instances
 		for (std::pair<FluffiServiceDescriptor, AgentType>& managedInstance : m_workerThreadState->dbManager->getAllRegisteredInstances(m_location)) {
@@ -133,4 +135,9 @@ void InstanceMonitorWorker::storeStatus(const std::pair<FluffiServiceDescriptor,
 }
 
 void InstanceMonitorWorker::storeLogMessages(const std::pair<FluffiServiceDescriptor, AgentType>& managedInstance, const google::protobuf::RepeatedPtrField<std::string> & logMessages) {
+	std::vector<std::string> MessagesAsVector;
+	for (int i = 0; i < logMessages.size(); i++) {
+		MessagesAsVector.push_back(logMessages.Get(i));
+	}
+	m_workerThreadState->dbManager->addNewManagedInstanceLogMessages(managedInstance.first.m_guid, MessagesAsVector);
 }

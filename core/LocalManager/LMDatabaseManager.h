@@ -37,7 +37,10 @@ public:
 	static void setDBConnectionParameters(std::string host, std::string user, std::string pwd, std::string db);
 
 	//Instance management
+	bool addNewManagedInstanceLogMessages(std::string ServiceDescriptorGUID, const std::vector<std::string>& messages);
 	bool addNewManagedInstanceStatus(std::string ServiceDescriptorGUID, std::string newStatus);
+	bool deleteManagedInstanceLogMessagesIfMoreThan(int num);
+	bool deleteManagedInstanceLogMessagesOlderThanXSec(int olderThanInSeconds);
 	bool deleteManagedInstanceStatusOlderThanXSec(int olderThanInSeconds);
 	std::vector<std::pair<FluffiServiceDescriptor, AgentType>> getAllRegisteredInstances(std::string location);
 	std::string getRegisteredInstanceSubType(std::string ServiceDescriptorGUID);

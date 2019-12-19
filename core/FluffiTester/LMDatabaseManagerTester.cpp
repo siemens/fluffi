@@ -986,6 +986,94 @@ namespace LMDatabaseManagerTester
 			Assert::IsTrue(stoi(dbman->EXECUTE_TEST_STATEMENT("SELECT TestCaseType from interesting_testcases WHERE CreatorLocalID = " + std::to_string(localid2))) == LMDatabaseManager::TestCaseType::Locked);
 		}
 
+		TEST_METHOD(LMDatabaseManager_addNewManagedInstanceLogMessages)
+		{
+			dbman->EXECUTE_TEST_STATEMENT("TRUNCATE TABLE managed_instances_logmessages;");
+
+			std::string tooLongGUID(60, 'a');
+			Assert::IsFalse(dbman->addNewManagedInstanceLogMessages(tooLongGUID, {}), L"Inserting a log message with a too long guid succeeded for some reason");
+
+			std::string validGUID = "testguid";
+			std::vector<std::string> invalidLogMessages;
+			invalidLogMessages.push_back(std::string(2000, 'b'));
+			Assert::IsFalse(dbman->addNewManagedInstanceLogMessages(validGUID, invalidLogMessages), L"Inserting a log message with a too long content succeeded for some reason");
+
+			std::vector<std::string> validLogMessages;
+			validLogMessages.push_back("a");
+			validLogMessages.push_back("b");
+			validLogMessages.push_back("c");
+			Assert::IsTrue(dbman->addNewManagedInstanceLogMessages(validGUID, validLogMessages), L"Inserting new valid log messages failed");
+
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from managed_instances_logmessages") == "3", L"We got more or less log messages than expected");
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT ServiceDescriptorGUID from managed_instances_logmessages WHERE ID=1") == "testguid", L"Invalid guid stored (1)");
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT ServiceDescriptorGUID from managed_instances_logmessages WHERE ID=2") == "testguid", L"Invalid guid stored (2)");
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT ServiceDescriptorGUID from managed_instances_logmessages WHERE ID=3") == "testguid", L"Invalid guid stored (3)");
+
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT LogMessage from managed_instances_logmessages WHERE ID=1") == "a", L"Invalid log message stored (1)");
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT LogMessage from managed_instances_logmessages WHERE ID=2") == "b", L"Invalid log message stored (2)");
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT LogMessage from managed_instances_logmessages WHERE ID=3") == "c", L"Invalid log message stored (3)");
+
+			dbman->EXECUTE_TEST_STATEMENT("TRUNCATE TABLE managed_instances_logmessages;");
+		}
+		TEST_METHOD(LMDatabaseManager_deleteManagedInstanceLogMessagesIfMoreThan)
+		{
+			dbman->EXECUTE_TEST_STATEMENT("TRUNCATE TABLE managed_instances_logmessages;");
+
+			std::string validGUID = "testguid";
+			std::vector<std::string> validLogMessages;
+			validLogMessages.push_back("a");
+			validLogMessages.push_back("b");
+			validLogMessages.push_back("c");
+			Assert::IsTrue(dbman->addNewManagedInstanceLogMessages(validGUID, validLogMessages), L"Inserting new valid log messages failed");
+
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from managed_instances_logmessages") == "3", L"We got more or less log messages than expected (1)");
+
+			Assert::IsTrue(dbman->deleteManagedInstanceLogMessagesIfMoreThan(3), L"Calling deleteManagedInstanceLogMessagesIfMoreThan failed (1)");
+
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from managed_instances_logmessages") == "3", L"We got more or less log messages than expected (2)");
+
+			Assert::IsTrue(dbman->deleteManagedInstanceLogMessagesIfMoreThan(2), L"Calling deleteManagedInstanceLogMessagesIfMoreThan failed (2)");
+
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from managed_instances_logmessages") == "2", L"We got more or less log messages than expected (3)");
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT LogMessage from managed_instances_logmessages WHERE ID=2") == "b", L"Invalid log message stored (2)");
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT LogMessage from managed_instances_logmessages WHERE ID=3") == "c", L"Invalid log message stored (3)");
+
+			dbman->EXECUTE_TEST_STATEMENT("TRUNCATE TABLE managed_instances_logmessages;");
+		}
+		TEST_METHOD(LMDatabaseManager_deleteManagedInstanceLogMessagesOlderThanXSec)
+		{
+			dbman->EXECUTE_TEST_STATEMENT("TRUNCATE TABLE managed_instances_logmessages;");
+
+			std::string validGUID = "testguid";
+			std::vector<std::string> validLogMessages;
+			validLogMessages.push_back("a");
+			validLogMessages.push_back("b");
+			validLogMessages.push_back("c");
+			Assert::IsTrue(dbman->addNewManagedInstanceLogMessages(validGUID, validLogMessages), L"Inserting new valid log messages failed (1)");
+
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from managed_instances_logmessages") == "3", L"We got more or less log messages than expected (1)");
+
+			Assert::IsTrue(dbman->deleteManagedInstanceLogMessagesOlderThanXSec(5), L"Calling deleteManagedInstanceLogMessagesOlderThanXSec failed (1)");
+
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from managed_instances_logmessages") == "3", L"We got more or less log messages than expected (2)");
+
+			Sleep(2000);
+
+			Assert::IsTrue(dbman->addNewManagedInstanceLogMessages(validGUID, validLogMessages), L"Inserting new valid log messages failed (2)");
+
+			Assert::IsTrue(dbman->deleteManagedInstanceLogMessagesOlderThanXSec(5), L"Calling deleteManagedInstanceLogMessagesOlderThanXSec failed (2)");
+
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from managed_instances_logmessages") == "6", L"We got more or less log messages than expected (3)");
+
+			Sleep(4000);
+
+			Assert::IsTrue(dbman->deleteManagedInstanceLogMessagesOlderThanXSec(5), L"Calling deleteManagedInstanceLogMessagesOlderThanXSec failed (3)");
+
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from managed_instances_logmessages") == "3", L"We got more or less log messages than expected (4)");
+
+			dbman->EXECUTE_TEST_STATEMENT("TRUNCATE TABLE managed_instances_logmessages;");
+		}
+
 	private:
 
 		const std::string testdbUser = "root";
