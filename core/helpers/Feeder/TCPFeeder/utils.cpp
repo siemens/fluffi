@@ -339,6 +339,8 @@ uint16_t getServerPortFromPIDOrTimeout(SharedMemIPC& sharedMemIPC_ToRunner, uint
 #endif
 		exit(-1);
 	}
+
+	return targetport;
 }
 
 void waitForPortOpenOrTimeout(SharedMemIPC& sharedMemIPC_ToRunner, std::string targethost, uint16_t targetport, std::chrono::time_point<std::chrono::system_clock> timeOfLastConnectAttempt)
