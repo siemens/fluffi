@@ -20,7 +20,7 @@ def createLocationsNav(listLinks):
     locations = db.session.query(models.Locations).distinct(models.Locations.Name)
 
     for location in locations:
-        listLinks.append(Link(location.Name, '/locations/view/' + str(location.id)))
+        listLinks.append(Link(location.Name, '/locations/view/' + str(location.ID)))
 
     return listLinks
 
@@ -29,7 +29,7 @@ def createFuzzjobsNav(listLinks):
     projects = models.Fuzzjob.query.all()
 
     for project in projects:
-        listLinks.append(Link(project.name[:15], '/projects/view/%d' % project.id))
+        listLinks.append(Link(project.name[:15], '/projects/view/%d' % project.ID))
 
     return listLinks
 

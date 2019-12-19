@@ -100,15 +100,15 @@ UNIQUE_ACCESS_VIOLATION = (
 
 UNIQUE_ACCESS_VIOLATION_NO_RAW = (
     "SELECT av.ID, av.CrashFootprint, av.TestCaseType, av.CreatorServiceDescriptorGUID, av.CreatorLocalID, av.Rating, "
-	"av.TimeOfInsertion, nn.NiceName "
+	"av.TimeOfInsertion, nn.NiceName, nnmi.NiceName as NiceNameMI "
     "FROM (SELECT cd.CrashFootprint, it.TestCaseType, it.CreatorServiceDescriptorGUID, it.CreatorLocalID, "
 	"MIN(it.TimeOfInsertion) as TimeOfInsertion, it.ID, count(cd.CrashFootprint) as Rating "
 	"FROM interesting_testcases AS it "
 	"JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
 	"WHERE it.TestCaseType=2 "
 	"Group by cd.CrashFootprint) as av "
-    "LEFT JOIN nice_names_testcase AS nn "
-    "ON av.ID = nn.TestcaseID "
+    "LEFT JOIN nice_names_managed_instance as nnmi on av.CreatorServiceDescriptorGUID = nnmi.ServiceDescriptorGUID "
+    "LEFT JOIN nice_names_testcase AS nn ON av.ID = nn.TestcaseID "
     "ORDER BY av.TimeOfInsertion asc;")
 
 NUM_UNIQUE_CRASH = (
@@ -133,7 +133,7 @@ UNIQUE_CRASHES = (
 
 UNIQUE_CRASHES_NO_RAW = (
     "SELECT oc.ID, oc.CrashFootprint, oc.TestCaseType, oc.CreatorServiceDescriptorGUID, oc.CreatorLocalID, oc.Rating, "
-    "oc.TimeOfInsertion, nn.NiceName "
+    "oc.TimeOfInsertion, nn.NiceName, nnmi.NiceName as NiceNameMI "
     "FROM (SELECT cd.CrashFootprint, it.TestCaseType, it.CreatorServiceDescriptorGUID, it.CreatorLocalID, "
     "MIN(it.TimeOfInsertion) as TimeOfInsertion, it.ID, count(cd.CrashFootprint) as Rating "
     "FROM interesting_testcases AS it "
@@ -141,8 +141,8 @@ UNIQUE_CRASHES_NO_RAW = (
     "ON it.ID = cd.CreatorTestcaseID "
     "WHERE TestCaseType=3 "
     "GROUP BY cd.CrashFootprint) as oc "
-    "LEFT JOIN nice_names_testcase AS nn "
-    "ON oc.ID = nn.TestcaseID "
+    "LEFT JOIN nice_names_managed_instance as nnmi on oc.CreatorServiceDescriptorGUID = nnmi.ServiceDescriptorGUID "
+    "LEFT JOIN nice_names_testcase AS nn ON oc.ID = nn.TestcaseID "
     "ORDER BY oc.TimeOfInsertion asc;")
 
 MANAGED_INSTANCES_HOST_AND_PORT_AGENT_TYPE = (
@@ -266,9 +266,10 @@ def getITCountOfTypeQuery(n):
 def getITQueryOfType(n):
     return (
         "SELECT it.ID, it.RawBytes, it.CreatorServiceDescriptorGUID, it.CreatorLocalID, it.Rating, it.TimeOfInsertion, "
-        "nn.NiceName "
+        "nn.NiceName, nnmi.NiceName as NiceNameMI "
         "FROM interesting_testcases AS it "
         "LEFT JOIN nice_names_testcase AS nn ON it.ID = nn.TestcaseID "
+        "LEFT JOIN nice_names_managed_instance as nnmi on it.CreatorServiceDescriptorGUID = nnmi.ServiceDescriptorGUID "
         "WHERE TestCaseType={};".format(n)
     )
 
@@ -276,9 +277,10 @@ def getITQueryOfType(n):
 def getITQueryOfTypeNoRaw(n):
     return (
         "SELECT it.ID, it.CreatorServiceDescriptorGUID, it.CreatorLocalID, it.Rating, it.TimeOfInsertion, "
-        "nn.NiceName "
+        "nn.NiceName, nnmi.NiceName as NiceNameMI "
         "FROM interesting_testcases AS it "
         "LEFT JOIN nice_names_testcase AS nn ON it.ID = nn.TestcaseID "
+        "LEFT JOIN nice_names_managed_instance as nnmi on it.CreatorServiceDescriptorGUID = nnmi.ServiceDescriptorGUID "
         "WHERE TestCaseType={};".format(n)
     )
 

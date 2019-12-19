@@ -22,7 +22,7 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier
 {% block content %}
 
 <div class="container">
-    <h1><a href="/projects/view/{{managedInstances['project'].id}}">Managed Instances: {{
+    <h1><a href="/projects/view/{{managedInstances['project'].ID}}">Managed Instances: {{
         managedInstances['project'].name[:30] }}</a></h1>
 </div>
 
@@ -35,19 +35,19 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier
 
 <div class="container">
     <div class="col-md-3">
-        <p><a class="btn btn-default btn-lg kill" href="/projects/{{managedInstances['project'].id}}/killInstanceType/4"
+        <p><a class="btn btn-default btn-lg kill" href="/projects/{{managedInstances['project'].ID}}/killInstanceType/4"
               role="button">Kill All Instances &raquo;</a></p>
     </div>
     <div class="col-md-3">
-        <p><a class="btn btn-default btn-lg kill" href="/projects/{{managedInstances['project'].id}}/killInstanceType/0"
+        <p><a class="btn btn-default btn-lg kill" href="/projects/{{managedInstances['project'].ID}}/killInstanceType/0"
               role="button">Kill All Generators &raquo;</a></p>
     </div>
     <div class="col-md-3">
-        <p><a class="btn btn-default btn-lg kill" href="/projects/{{managedInstances['project'].id}}/killInstanceType/1"
+        <p><a class="btn btn-default btn-lg kill" href="/projects/{{managedInstances['project'].ID}}/killInstanceType/1"
               role="button">Kill All Runners &raquo;</a></p>
     </div>
     <div class="col-md-3">
-        <p><a class="btn btn-default btn-lg kill" href="/projects/{{managedInstances['project'].id}}/killInstanceType/2"
+        <p><a class="btn btn-default btn-lg kill" href="/projects/{{managedInstances['project'].ID}}/killInstanceType/2"
               role="button">Kill All Evaluators &raquo;</a></p>
     </div>
 </div>
@@ -110,7 +110,7 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier
             <td style="text-align: center;"><a><span class="glyphicon glyphicon-alert"></span></a></td>
             {% else %}
             <td style="text-align: center;">
-                <a href="/projects/{{managedInstances['project'].id}}/killInstance/localManager/{{ localManager['ServiceDescriptorGUID'] }}/{{ localManager['ServiceDescriptorHostAndPort'] }}">
+                <a href="/projects/{{managedInstances['project'].ID}}/killInstance/localManager/{{ localManager['ServiceDescriptorGUID'] }}/{{ localManager['ServiceDescriptorHostAndPort'] }}">
                     <span class="glyphicon glyphicon-remove"></span>
                 </a>
             </td>
@@ -130,14 +130,14 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier
         <td style="text-align: center;">
             {% if instance["NiceName"] %}
             <button id="tcBtn{{loop.index}}"
-                    onclick="addOrRenameNiceName({{ loop.index }}, {{ managedInstances['project'].id }}, 'update', '', '{{ instance['ServiceDescriptorGUID'] }}')"
+                    onclick="addOrRenameNiceName({{ loop.index }}, {{ managedInstances['project'].ID }}, 'update', '', '{{ instance['ServiceDescriptorGUID'] }}')"
                     class="add-or-rename-btn">
                 {{ instance['NiceName'] }}
             </button>
             <input class="form-control" id="tcInput{{loop.index}}" style="display: none;" type="text">
             {% else %}
             <button id="tcBtnNew{{loop.index}}"
-                    onclick="addOrRenameNiceName({{ loop.index }}, {{ managedInstances['project'].id }}, 'insert', '', '{{ instance['ServiceDescriptorGUID'] }}')"
+                    onclick="addOrRenameNiceName({{ loop.index }}, {{ managedInstances['project'].ID }}, 'insert', '', '{{ instance['ServiceDescriptorGUID'] }}')"
                     class="add-or-rename-btn">
                 {{ instance['ServiceDescriptorGUID'] }}
             </button>
@@ -166,7 +166,7 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier
         <td style="text-align: center;"><a><span class="glyphicon glyphicon-alert"></span></a></td>
         {% else %}
         <td style="text-align: center;"><a class="btn btn-secondary"
-                                           href="/projects/{{ managedInstances['project'].id }}/killInstance/{{ instance['ServiceDescriptorGUID'] }}"
+                                           href="/projects/{{ managedInstances['project'].ID }}/killInstance/{{ instance['ServiceDescriptorGUID'] }}"
                                            role="button"><span class="glyphicon glyphicon-remove"></span></a></td>
         {% endif %}
         </tr>

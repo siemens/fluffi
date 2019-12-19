@@ -51,7 +51,7 @@ function assignWorker(guid) {
 
 <div class="container">
     <h2>Projects</h2>
-    <div><a href="/locations/{{ location.id }}/addProject">Add Project</a></div>
+    <div><a href="/locations/{{ location.ID }}/addProject">Add Project</a></div>
     <table class="table">
         <thead>
         <tr>
@@ -62,9 +62,9 @@ function assignWorker(guid) {
         <tbody>
         {% for project in location.projects %}
         <tr>
-            <td><a href="/projects/view/{{project.id}}">{{ project.name }}</a></td>
+            <td><a href="/projects/view/{{project.ID}}">{{ project.name }}</a></td>
             <td>
-                <input onclick="deleteProject({{ project.id }}, '{{ location.id }}')" type="button" value="Delete"/>
+                <input onclick="deleteProject({{ project.ID }}, '{{ location.ID }}')" type="button" value="Delete"/>
             </td>
         </tr>
         {% endfor %}
@@ -99,7 +99,7 @@ function assignWorker(guid) {
                 <select id="worker-{{ worker.Servicedescriptorguid }}">
                     <option>Unassigned</option>
                     {% for project in location.projects %}
-                    <option value="{{ project.id }}">{{ project.name }}</option>
+                    <option value="{{ project.ID }}">{{ project.name }}</option>
                     {% endfor %}
                 </select>
                 <input onclick="assignWorker('{{ worker.Servicedescriptorguid }}')" type="button" value="Assign"/>

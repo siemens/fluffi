@@ -16,7 +16,7 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
 {% block content %}
 
 <div class="container">
-    <h1><a href="/projects/view/{{violationsAndCrashes.project.id}}">Access Violations and Crashes: {{
+    <h1><a href="/projects/view/{{violationsAndCrashes.project.ID}}">Access Violations and Crashes: {{
         violationsAndCrashes.project.name[:30] }}</a></h1>
 </div>
 {{ flashMessages() }}
@@ -50,12 +50,12 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
             {% endif %}
             <td style="text-align: center;">
                 <a class="btn btn-secondary"
-                   href="/projects/{{ violationsAndCrashes.project.id }}/getSmallestVioOrCrashTestcase/{{ testcase.footprint }}"
+                   href="/projects/{{ violationsAndCrashes.project.ID }}/getSmallestVioOrCrashTestcase/{{ testcase.footprint }}"
                    role="button">
                     <span class="glyphicon glyphicon-floppy-save"></span>
                 </a>
                 <a class="btn btn-secondary"
-                   href="/projects/{{ violationsAndCrashes.project.id }}/crashes/download/{{ testcase.footprint }}/{{ testcase.type }}"
+                   href="/projects/{{ violationsAndCrashes.project.ID }}/crashes/download/{{ testcase.footprint }}/{{ testcase.type }}"
                    role="button">
                     <span class="glyphicon glyphicon-save"></span>
                 </a>
