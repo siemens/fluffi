@@ -36,6 +36,13 @@ namespace FLUFFILogTester
 
 		TEST_METHOD(FLUFFILog_writeAndStoreLogEntry)
 		{
+			//Reset log messages from previous test cases
+			{
+				LMGetStatusRequestHandler rh(nullptr);
+				GetStatusResponse resp;
+				rh.setLogMessages(&resp);
+			}
+
 			LOG(ERROR) << "TestError1";
 			LOG(WARNING) << "TestWarning";
 			LOG(INFO) << "TestInfo";
