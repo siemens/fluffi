@@ -22,9 +22,12 @@ public:
 
 	static void setDBConnectionParameters(std::string host, std::string user, std::string pwd, std::string db);
 
+	bool addNewManagedLMLogMessages(std::string ServiceDescriptorGUID, const std::vector<std::string>& messages);
 	bool addNewManagedLMStatus(std::string ServiceDescriptorGUID, std::string newStatus);
 	bool addWorkerToDatabase(FluffiServiceDescriptor fsd, AgentType type, std::string subtypes, std::string location);
 	bool deleteDoneCommandsOlderThanXSec(int olderThanInSeconds);
+	bool deleteManagedLMLogMessagesIfMoreThan(int num);
+	bool deleteManagedLMLogMessagesOlderThanXSec(int olderThanInSeconds);
 	bool deleteManagedLMStatusOlderThanXSec(int olderThanInSeconds);
 	bool deleteWorkersNotSeenSinceXSec(int olderThanInSeconds);
 	std::vector<std::pair<std::string, std::string>> getAllRegisteredLMs();

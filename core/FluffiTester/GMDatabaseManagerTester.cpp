@@ -566,6 +566,94 @@ namespace GMDatabaseManagerTester
 			dbman->EXECUTE_TEST_STATEMENT("TRUNCATE TABLE command_queue;");
 		}
 
+		TEST_METHOD(GMDatabaseManager_addNewManagedLMLogMessages)
+		{
+			dbman->EXECUTE_TEST_STATEMENT("TRUNCATE TABLE localmanagers_logmessages;");
+
+			std::string tooLongGUID(60, 'a');
+			Assert::IsFalse(dbman->addNewManagedLMLogMessages(tooLongGUID, {}), L"Inserting a log message with a too long guid succeeded for some reason");
+
+			std::string validGUID = "testguid";
+			std::vector<std::string> invalidLogMessages;
+			invalidLogMessages.push_back(std::string(2000, 'b'));
+			Assert::IsFalse(dbman->addNewManagedLMLogMessages(validGUID, invalidLogMessages), L"Inserting a log message with a too long content succeeded for some reason");
+
+			std::vector<std::string> validLogMessages;
+			validLogMessages.push_back("a");
+			validLogMessages.push_back("b");
+			validLogMessages.push_back("c");
+			Assert::IsTrue(dbman->addNewManagedLMLogMessages(validGUID, validLogMessages), L"Inserting new valid log messages failed");
+
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from localmanagers_logmessages") == "3", L"We got more or less log messages than expected");
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT ServiceDescriptorGUID from localmanagers_logmessages WHERE ID=1") == "testguid", L"Invalid guid stored (1)");
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT ServiceDescriptorGUID from localmanagers_logmessages WHERE ID=2") == "testguid", L"Invalid guid stored (2)");
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT ServiceDescriptorGUID from localmanagers_logmessages WHERE ID=3") == "testguid", L"Invalid guid stored (3)");
+
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT LogMessage from localmanagers_logmessages WHERE ID=1") == "a", L"Invalid log message stored (1)");
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT LogMessage from localmanagers_logmessages WHERE ID=2") == "b", L"Invalid log message stored (2)");
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT LogMessage from localmanagers_logmessages WHERE ID=3") == "c", L"Invalid log message stored (3)");
+
+			dbman->EXECUTE_TEST_STATEMENT("TRUNCATE TABLE localmanagers_logmessages;");
+		}
+		TEST_METHOD(GMDatabaseManager_deleteManagedLMLogMessagesIfMoreThan)
+		{
+			dbman->EXECUTE_TEST_STATEMENT("TRUNCATE TABLE localmanagers_logmessages;");
+
+			std::string validGUID = "testguid";
+			std::vector<std::string> validLogMessages;
+			validLogMessages.push_back("a");
+			validLogMessages.push_back("b");
+			validLogMessages.push_back("c");
+			Assert::IsTrue(dbman->addNewManagedLMLogMessages(validGUID, validLogMessages), L"Inserting new valid log messages failed");
+
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from localmanagers_logmessages") == "3", L"We got more or less log messages than expected (1)");
+
+			Assert::IsTrue(dbman->deleteManagedLMLogMessagesIfMoreThan(3), L"Calling deleteManagedLMLogMessagesIfMoreThan failed (1)");
+
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from localmanagers_logmessages") == "3", L"We got more or less log messages than expected (2)");
+
+			Assert::IsTrue(dbman->deleteManagedLMLogMessagesIfMoreThan(2), L"Calling deleteManagedLMLogMessagesIfMoreThan failed (2)");
+
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from localmanagers_logmessages") == "2", L"We got more or less log messages than expected (3)");
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT LogMessage from localmanagers_logmessages WHERE ID=2") == "b", L"Invalid log message stored (2)");
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT LogMessage from localmanagers_logmessages WHERE ID=3") == "c", L"Invalid log message stored (3)");
+
+			dbman->EXECUTE_TEST_STATEMENT("TRUNCATE TABLE localmanagers_logmessages;");
+		}
+		TEST_METHOD(GMDatabaseManager_deleteManagedLMLogMessagesOlderThanXSec)
+		{
+			dbman->EXECUTE_TEST_STATEMENT("TRUNCATE TABLE localmanagers_logmessages;");
+
+			std::string validGUID = "testguid";
+			std::vector<std::string> validLogMessages;
+			validLogMessages.push_back("a");
+			validLogMessages.push_back("b");
+			validLogMessages.push_back("c");
+			Assert::IsTrue(dbman->addNewManagedLMLogMessages(validGUID, validLogMessages), L"Inserting new valid log messages failed (1)");
+
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from localmanagers_logmessages") == "3", L"We got more or less log messages than expected (1)");
+
+			Assert::IsTrue(dbman->deleteManagedLMLogMessagesOlderThanXSec(5), L"Calling deleteManagedLMLogMessagesOlderThanXSec failed (1)");
+
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from localmanagers_logmessages") == "3", L"We got more or less log messages than expected (2)");
+
+			Sleep(2000);
+
+			Assert::IsTrue(dbman->addNewManagedLMLogMessages(validGUID, validLogMessages), L"Inserting new valid log messages failed (2)");
+
+			Assert::IsTrue(dbman->deleteManagedLMLogMessagesOlderThanXSec(5), L"Calling deleteManagedLMLogMessagesOlderThanXSec failed (2)");
+
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from localmanagers_logmessages") == "6", L"We got more or less log messages than expected (3)");
+
+			Sleep(4000);
+
+			Assert::IsTrue(dbman->deleteManagedLMLogMessagesOlderThanXSec(5), L"Calling deleteManagedLMLogMessagesOlderThanXSec failed (3)");
+
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from localmanagers_logmessages") == "3", L"We got more or less log messages than expected (4)");
+
+			dbman->EXECUTE_TEST_STATEMENT("TRUNCATE TABLE localmanagers_logmessages;");
+		}
+
 	private:
 
 		const std::string testdbUser = "root";

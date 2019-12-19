@@ -1218,8 +1218,9 @@ bool LMDatabaseManager::addEntriesToCompletedTestcasesTable(const std::set<Fluff
 
 		const int maxGUIDLength = 50;
 	for (std::set<FluffiTestcaseID>::const_iterator it = testcaseIDs.begin(); it != testcaseIDs.end(); ++it) {
-		//As we use bulk insert, we need to assume a maximum string length. We assume it to be 50. Longer guids  will cause an error. Please note: this value can be adjusted
+		//As we use bulk insert, we need to assume a maximum string length. We assume it to be maxGUIDLength. Longer guids  will cause an error. Please note: this value can be adjusted
 		if ((*it).m_serviceDescriptor.m_guid.length() >= maxGUIDLength) {
+			LOG(ERROR) << "Trying to insert a GUID of invalid length with addEntriesToCompletedTestcasesTable";
 			return false;
 		}
 	}
@@ -1238,6 +1239,11 @@ bool LMDatabaseManager::addEntriesToCompletedTestcasesTable(const std::set<Fluff
 	if (array_size == 0) {
 		//Nothing to do here
 		return true;
+	}
+
+	//In order to avoid deadlocks we set the transaction level (see https://www.percona.com/blog/2012/03/27/innodbs-gap-locks/)
+	if (mysql_query(getDBConnection(), "SET TRANSACTION ISOLATION LEVEL READ COMMITTED") != 0) {
+		LOG(WARNING) << "\"SET TRANSACTION ISOLATION LEVEL READ COMMITTED\" failed";
 	}
 
 	size_t row_size = sizeof(struct st_data);
@@ -1404,11 +1410,6 @@ bool LMDatabaseManager::addBlocksToCoveredBlocks(const FluffiTestcaseID tcID, co
 	}
 	//#################### Second part: bulk insert blocks ####################
 	{
-		//In order to avoid deadlocks we set the transaction level (see https://www.percona.com/blog/2012/03/27/innodbs-gap-locks/)
-		if (mysql_query(getDBConnection(), "SET TRANSACTION ISOLATION LEVEL READ COMMITTED") != 0) {
-			LOG(WARNING) << "\"SET TRANSACTION ISOLATION LEVEL READ COMMITTED\" failed";
-		}
-
 		//bulk insert as documented in https://mariadb.com/kb/en/library/bulk-insert-row-wise-binding/
 
 		struct st_data {
@@ -1425,6 +1426,11 @@ bool LMDatabaseManager::addBlocksToCoveredBlocks(const FluffiTestcaseID tcID, co
 		if (array_size == 0) {
 			//Nothing to do here
 			return true;
+		}
+
+		//In order to avoid deadlocks we set the transaction level (see https://www.percona.com/blog/2012/03/27/innodbs-gap-locks/)
+		if (mysql_query(getDBConnection(), "SET TRANSACTION ISOLATION LEVEL READ COMMITTED") != 0) {
+			LOG(WARNING) << "\"SET TRANSACTION ISOLATION LEVEL READ COMMITTED\" failed";
 		}
 
 		size_t row_size = sizeof(struct st_data);

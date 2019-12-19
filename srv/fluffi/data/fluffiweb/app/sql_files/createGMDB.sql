@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS fluffi_gm.localmanagers_statuses (
 CREATE TABLE IF NOT EXISTS fluffi_gm.localmanagers_logmessages (
 	`ID` INT NOT NULL AUTO_INCREMENT,
 	`ServiceDescriptorGUID` varchar(50) DEFAULT NULL,
-	`TimeOfStatus` timestamp NULL DEFAULT NULL,
+	`TimeOfInsertion` timestamp NULL DEFAULT NULL,
 	`LogMessage` varchar(2000) NULL DEFAULT NULL,
 	PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
