@@ -31,6 +31,14 @@ CREATE TABLE IF NOT EXISTS fluffi.managed_instances_statuses (
 	PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8; 
 
+CREATE TABLE IF NOT EXISTS fluffi.managed_instances_logmessages (
+	`ID` INT NOT NULL AUTO_INCREMENT,
+	`ServiceDescriptorGUID` VARCHAR(50) NULL,
+	`TimeOfStatus` TIMESTAMP NULL DEFAULT NULL,
+	`LogMessage` VARCHAR(2000) NULL DEFAULT NULL,
+	PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8; 
+
 CREATE TABLE IF NOT EXISTS fluffi.interesting_testcases (
 	`ID` BIGINT NOT NULL AUTO_INCREMENT,
 	`CreatorServiceDescriptorGUID` VARCHAR(50) NOT NULL,

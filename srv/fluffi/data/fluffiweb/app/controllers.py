@@ -225,7 +225,7 @@ def getProject(projId):
                 setting.mutatorTypesIDs = config["GeneratorTypes"]
             elif setting.name == "evaluatorTypes":
                 setting.evaluatorTypesIDs = config["EvaluatorTypes"]
-            setting.id = row["Id"]
+            setting.id = row["ID"]
             project.settings.append(setting)
 
         project.possibleSettingNames = [sn for sn in config["DefaultSettingNames"] if
@@ -832,7 +832,7 @@ def updateSettings(projId, settingId, settingValue):
         connection = engine.connect()
         try:
             statement = text(UPDATE_SETTINGS)
-            data = {"Id": settingId, "SettingValue": settingValue}
+            data = {"ID": settingId, "SettingValue": settingValue}
             connection.execute(statement, data)
             message = "Setting modified"
             status = "OK"

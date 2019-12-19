@@ -784,7 +784,7 @@ def removeProjectTestcase(projId, testcaseId, tcType):
 
 @app.route("/projects/<int:projId>/delModule/<int:moduleId>", methods=["GET"])
 def removeProjectModule(projId, moduleId):
-    msg, category = deleteElement(projId, "Module", DELETE_MODULE_BY_ID, {"Id": moduleId})
+    msg, category = deleteElement(projId, "Module", DELETE_MODULE_BY_ID, {"ID": moduleId})
     flash(msg, category)
 
     return redirect("/projects/view/%d" % projId)
@@ -792,7 +792,7 @@ def removeProjectModule(projId, moduleId):
 
 @app.route("/projects/<int:projId>/delSetting/<int:settingId>", methods=["GET"])
 def removeProjectSetting(projId, settingId):
-    msg, category = deleteElement(projId, "Setting", DELETE_SETTING_BY_ID, {"Id": settingId})
+    msg, category = deleteElement(projId, "Setting", DELETE_SETTING_BY_ID, {"ID": settingId})
     flash(msg, category)
 
     return redirect("/projects/view/%d" % projId)

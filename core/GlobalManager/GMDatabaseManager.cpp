@@ -140,7 +140,7 @@ FluffiLMConfiguration GMDatabaseManager::getLMConfigurationForFuzzJob(int fuzzJo
 	std::string dbHost, dbUser, dbPassword, dbName, fuzzJobName;
 
 	MYSQL_STMT* sql_stmt = mysql_stmt_init(getDBConnection());
-	const char* stmt = "SELECT DBHost, DBUser, DBPass, DBName, name FROM fuzzjob WHERE id = ?";
+	const char* stmt = "SELECT DBHost, DBUser, DBPass, DBName, name FROM fuzzjob WHERE ID = ?";
 	mysql_stmt_prepare(sql_stmt, stmt, static_cast<unsigned long>(strlen(stmt)));
 
 	//params
@@ -303,7 +303,7 @@ bool GMDatabaseManager::addWorkerToDatabase(FluffiServiceDescriptor fsd, AgentTy
 	//// prepared Statement
 	MYSQL_STMT* sql_stmt = mysql_stmt_init(getDBConnection());
 
-	const char* stmt = "REPLACE INTO workers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, FuzzJob, Location, AgentType, AgentSubTypes, TimeOfLastRequest) VALUES (?, ?,  NULL, (SELECT locations.id FROM locations WHERE locations.Name = ?), ?, ?, NOW())";
+	const char* stmt = "REPLACE INTO workers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, FuzzJob, Location, AgentType, AgentSubTypes, TimeOfLastRequest) VALUES (?, ?,  NULL, (SELECT locations.ID FROM locations WHERE locations.Name = ?), ?, ?, NOW())";
 	mysql_stmt_prepare(sql_stmt, stmt, static_cast<unsigned long>(strlen(stmt)));
 
 	//params
@@ -363,7 +363,7 @@ bool GMDatabaseManager::setLMForLocationAndFuzzJob(std::string location, FluffiS
 	//// prepared Statement
 	MYSQL_STMT* sql_stmt = mysql_stmt_init(getDBConnection());
 
-	const char* stmt = "INSERT INTO localmanagers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, Location, Fuzzjob) values (?, ?, (SELECT locations.id FROM locations WHERE locations.Name = ?), ?)";
+	const char* stmt = "INSERT INTO localmanagers (ServiceDescriptorGUID, ServiceDescriptorHostAndPort, Location, Fuzzjob) values (?, ?, (SELECT locations.ID FROM locations WHERE locations.Name = ?), ?)";
 
 	mysql_stmt_prepare(sql_stmt, stmt, static_cast<unsigned long>(strlen(stmt)));
 
@@ -581,7 +581,7 @@ long GMDatabaseManager::getFuzzJobWithoutLM(std::string location)
 	unsigned long locationLength = static_cast<unsigned long>(location.length());
 
 	MYSQL_STMT* sql_stmt = mysql_stmt_init(getDBConnection());
-	const char* stmt = "SELECT location_fuzzjobs.Fuzzjob FROM location_fuzzjobs LEFT JOIN locations ON location_fuzzjobs.Location=locations.id WHERE locations.Name = ? AND location_fuzzjobs.Fuzzjob NOT IN (SELECT FuzzJob FROM localmanagers WHERE Location = locations.id) LIMIT 1";
+	const char* stmt = "SELECT location_fuzzjobs.Fuzzjob FROM location_fuzzjobs LEFT JOIN locations ON location_fuzzjobs.Location=locations.ID WHERE locations.Name = ? AND location_fuzzjobs.Fuzzjob NOT IN (SELECT FuzzJob FROM localmanagers WHERE Location = locations.ID) LIMIT 1";
 	mysql_stmt_prepare(sql_stmt, stmt, static_cast<unsigned long>(strlen(stmt)));
 
 	//params

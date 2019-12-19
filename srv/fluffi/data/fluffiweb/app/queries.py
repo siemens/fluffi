@@ -21,7 +21,7 @@ COMPLETED_TESTCASES_COUNT = (
 NUM_BLOCKS = (
     "SELECT COUNT(DISTINCT ModuleID, Offset) FROM covered_blocks")
 GET_SETTINGS = (
-    "SELECT Id, SettingName, SettingValue FROM settings")
+    "SELECT ID, SettingName, SettingValue FROM settings")
 GET_TARGET_MODULES = (
     "SELECT ID, ModuleName, ModulePath FROM target_modules")
 DELETE_TESTCASES = (
@@ -43,9 +43,9 @@ UPDATE_NICE_NAME_MANAGED_INSTANACE = (
 DELETE_TC_WTIH_LOCALID = (
     "DELETE FROM interesting_testcases WHERE CreatorServiceDescriptorGUID=:guid AND CreatorLocalID=:localId")
 DELETE_MODULE_BY_ID = (
-    "DELETE FROM target_modules WHERE id=:Id")
+    "DELETE FROM target_modules WHERE ID=:Id")
 DELETE_SETTING_BY_ID = (
-    "DELETE FROM settings WHERE id=:Id")
+    "DELETE FROM settings WHERE ID=:Id")
 GET_TOTAL_CPU_SECONDS = (
     "SELECT Amount FROM billing WHERE Resource = 'RunnerSeconds'")
 GET_TESTCASE_ID = (
@@ -179,7 +179,7 @@ GET_POPULATION_DETAILS = (
 GET_CHECKED_RATING = (
     "SELECT it.Rating "
     "FROM interesting_testcases AS it "
-    "WHERE TestCaseType=0 AND Rating > (SELECT o.value FROM fluffi_gm.gm_options AS o WHERE setting = 'checkrating')"
+    "WHERE TestCaseType=0 AND Rating > (SELECT o.Value FROM fluffi_gm.gm_options AS o WHERE Setting = 'checkrating')"
     "LIMIT 1")
 
 GET_CRASH_DETAILS = (
@@ -206,7 +206,7 @@ GET_PROJECTS = (
         "SUM(CASE WHEN TestCaseType = 3 THEN 1 ELSE 0 END),"
         "SUM(CASE WHEN TestCaseType = 4 THEN 1 ELSE 0 END),"
         "(SELECT Rating FROM interesting_testcases WHERE TestCaseType=0 AND Rating > "
-        "(SELECT o.value FROM fluffi_gm.gm_options AS o WHERE setting = 'checkrating') LIMIT 1)"
+        "(SELECT o.Value FROM fluffi_gm.gm_options AS o WHERE Setting = 'checkrating') LIMIT 1)"
     "FROM interesting_testcases;"
 )
 
