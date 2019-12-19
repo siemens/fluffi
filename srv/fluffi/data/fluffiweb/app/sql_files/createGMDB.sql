@@ -129,7 +129,7 @@ CREATE TABLE IF NOT EXISTS fluffi_gm.gm_options (
 CREATE TABLE IF NOT EXISTS fluffi_gm.system_fuzzjob_instances (
 	`ID` INT NOT NULL AUTO_INCREMENT,
 	`System` INT NOT NULL,
-	`Fuzzjob` INT NOT NULL DEFAULT NULL,
+	`Fuzzjob` INT NOT NULL,
 	`AgentType` INT(1) NOT NULL,
 	`InstanceCount` INT NOT NULL,
 	`Architecture` VARCHAR(10) NOT NULL,
@@ -140,6 +140,6 @@ CREATE TABLE IF NOT EXISTS fluffi_gm.system_fuzzjob_instances (
 	CONSTRAINT `system_fuzzjob_instances_FK2` FOREIGN KEY (`Fuzzjob`) REFERENCES `fuzzjob` (`ID`) ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT IGNORE INTO `gm_options` (`ID`, `Setting`, `Value`) VALUES (1, 'bootsystemdir', 'odroidRoot');
-INSERT IGNORE INTO `gm_options` (`ID`, `Setting`, `Value`) VALUES (2, 'agentstartermode', 'active');
-INSERT IGNORE INTO `gm_options` (`ID`, `Setting`, `Value`) VALUES (3, 'checkrating', '-10000');
+INSERT IGNORE INTO fluffi_gm.gm_options (`Setting`, `Value`) VALUES ('bootsystemdir', 'odroidRoot');
+INSERT IGNORE INTO fluffi_gm.gm_options (`Setting`, `Value`) VALUES ('agentstartermode', 'active');
+INSERT IGNORE INTO fluffi_gm.gm_options (`Setting`, `Value`) VALUES ('checkrating', '-10000');
