@@ -14,7 +14,7 @@ from sqlalchemy import ForeignKey
 
 class Fuzzjob(db.Model):
     __tablename__ = 'fuzzjob'
-    id = db.Column(db.Integer, primary_key = True)
+    ID = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String(256))
     DBHost = db.Column(db.String(256))
     DBUser = db.Column(db.String(256))
@@ -27,7 +27,7 @@ class Fuzzjob(db.Model):
 
 class Locations(db.Model):
     __tablename__ = 'locations'
-    id = db.Column(db.Integer, primary_key = True)
+    ID = db.Column(db.Integer, primary_key = True)
     Name = db.Column(db.String(256))
 
     def __repr__(self):
@@ -36,7 +36,7 @@ class Locations(db.Model):
 
 class Systems(db.Model):
     __tablename__ = 'systems'
-    id = db.Column(db.Integer, primary_key = True)
+    ID = db.Column(db.Integer, primary_key = True)
     Name = db.Column(db.String(256))
 
     def __repr__(self):
@@ -56,7 +56,7 @@ class Localmanagers(db.Model):
 
 class LocalmanagersStatuses(db.Model):
     __tablename__ = 'localmanagers_statuses'
-    Id = db.Column(db.Integer, primary_key = True)
+    ID = db.Column(db.Integer, primary_key = True)
     Servicedescriptorguid = db.Column(db.String(50))
     Timeofstatus = db.Column(db.DateTime)
     Status = db.Column(db.String(1000))
@@ -75,8 +75,8 @@ class Workers(db.Model):
 
 class LocationFuzzjobs(db.Model):
     __tablename__ = 'location_fuzzjobs'
-    Location = db.Column(ForeignKey('locations.id'), primary_key = True)
-    Fuzzjob = db.Column(ForeignKey('fuzzjob.id'), primary_key = True)
+    Location = db.Column(ForeignKey('locations.ID'), primary_key = True)
+    Fuzzjob = db.Column(ForeignKey('fuzzjob.ID'), primary_key = True)
 
     def __repr__(self):
         return '<LocationFuzzJob %r>' % self.Location
@@ -84,7 +84,7 @@ class LocationFuzzjobs(db.Model):
 
 class CommandQueue(db.Model):
     __tablename__ = 'command_queue'
-    Id = db.Column(db.Integer, primary_key = True)
+    ID= db.Column(db.Integer, primary_key = True)
     Command = db.Column(db.String(256))
     Argument = db.Column(db.String(4096))
     CreationDate = db.Column(db.DateTime)
@@ -94,7 +94,7 @@ class CommandQueue(db.Model):
 
 class DeploymentPackages(db.Model):
     __tablename__ = 'deployment_packages'
-    id = db.Column(db.Integer, primary_key = True)
+    ID = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String(150))
 
     def __repr__(self):
@@ -103,8 +103,8 @@ class DeploymentPackages(db.Model):
 
 class FuzzjobDeploymentPackages(db.Model):
     __tablename__ = 'fuzzjob_deployment_packages'
-    Fuzzjob = db.Column(ForeignKey('fuzzjob.id'), primary_key = True)
-    DeploymentPackage = db.Column(ForeignKey('deployment_packages.id'), primary_key = True)
+    Fuzzjob = db.Column(ForeignKey('fuzzjob.ID'), primary_key = True)
+    DeploymentPackage = db.Column(ForeignKey('deployment_packages.ID'), primary_key = True)
 
     def __repr__(self):
         return '<FuzzjobDeploymentPackage %r>' % self.DeploymentPackage
@@ -112,8 +112,8 @@ class FuzzjobDeploymentPackages(db.Model):
 
 class SystemsLocation(db.Model):
     __tablename__ = 'systems_location'
-    System = db.Column(ForeignKey('systems.id'), primary_key = True)
-    Location = db.Column(ForeignKey('locations.id'), ForeignKey('location_fuzzjobs.Location'), primary_key = False)
+    System = db.Column(ForeignKey('systems.ID'), primary_key = True)
+    Location = db.Column(ForeignKey('locations.ID'), ForeignKey('location_fuzzjobs.Location'), primary_key = False)
 
     def __repr__(self):
         return '<SystemsLocation %r>' % self.System
@@ -121,7 +121,7 @@ class SystemsLocation(db.Model):
 
 class GmOptions(db.Model):
     __tablename__ = 'gm_options'
-    id = db.Column(db.Integer, primary_key = True)
+    ID = db.Column(db.Integer, primary_key = True)
     setting = db.Column(db.String(150))
     value = db.Column(db.String(150))
 
@@ -131,9 +131,9 @@ class GmOptions(db.Model):
 
 class SystemFuzzjobInstances(db.Model):
     __tablename__ = 'system_fuzzjob_instances'
-    id = db.Column(db.Integer, primary_key = True)
-    System = db.Column(ForeignKey('systems.id'))
-    Fuzzjob = db.Column(ForeignKey('fuzzjob.id'))
+    ID = db.Column(db.Integer, primary_key = True)
+    System = db.Column(ForeignKey('systems.ID'))
+    Fuzzjob = db.Column(ForeignKey('fuzzjob.ID'))
     AgentType = db.Column(db.Integer)
     InstanceCount = db.Column(db.Integer)
     Architecture = db.Column(db.String(10))

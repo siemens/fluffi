@@ -18,7 +18,7 @@ Author(s): Thomas Riedmaier, Pascal Eckmann, Abian Blome
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace FluffiTester
+namespace TEWorkerThreadStateBuilderTester
 {
 	TEST_CLASS(TEWorkerThreadStateBuilderTest)
 	{

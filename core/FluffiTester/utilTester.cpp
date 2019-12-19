@@ -23,7 +23,7 @@ Author(s): Michael Kraus, Thomas Riedmaier, Abian Blome, Pascal Eckmann
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace FluffiTester
+namespace UtilTester
 {
 	TEST_CLASS(UtilTest)
 	{
@@ -70,8 +70,12 @@ namespace FluffiTester
 				is_equal = std::equal(v.begin(), v.end(), asdfStringVector.begin());
 			Assert::IsTrue(is_equal, L"splitString(\"asdf\", \"\") does not return an asdf String Vector");
 
-			v = Util::splitString("asdf asdf asdf qwer", " ");
+			v = Util::splitString("asdf1 asdf2 asdf3 qwer", " ");
 			Assert::AreEqual(v.size(), (size_t)4, L"Correct separation of spaces");
+			Assert::IsTrue(v[0] == "asdf1");
+			Assert::IsTrue(v[1] == "asdf2");
+			Assert::IsTrue(v[2] == "asdf3");
+			Assert::IsTrue(v[3] == "qwer");
 		}
 
 		TEST_METHOD(Util_attemptDeletePathRecursive)

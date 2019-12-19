@@ -48,7 +48,7 @@ bool PutTestEvaluationRequestHandler::markTestcaseAsCompleted(LMDatabaseManager*
 	if (m_completedTestcases_notYetPushedToDB.size() > 100 || std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - m_timeOfLastFlush).count() > m_forceFlushAfterMS) {
 		LOG(DEBUG) << "flushing the set of cashed completed testcases to the database";
 		//flush completed testcases to db
-		bool success = dbManager->addEntriesToCompletedTestcasesTable(&m_completedTestcases_notYetPushedToDB);
+		bool success = dbManager->addEntriesToCompletedTestcasesTable(m_completedTestcases_notYetPushedToDB);
 		if (success) {
 			m_completedTestcases_notYetPushedToDB.clear();
 			m_timeOfLastFlush = std::chrono::steady_clock::now();
@@ -149,7 +149,7 @@ void PutTestEvaluationRequestHandler::handleFLUFFIMessage(WorkerThreadState* wor
 			for (int i = 0; i < putTestEvaluationRequest->result().blocks().size(); i++) {
 				blocksAsSet.insert(FluffiBasicBlock(putTestEvaluationRequest->result().blocks().Get(i)));
 			}
-			success = lmWorkerThreadState->dbManager->addBlocksToCoveredBlocks(testcaseID, &blocksAsSet);
+			success = lmWorkerThreadState->dbManager->addBlocksToCoveredBlocks(testcaseID, blocksAsSet);
 			if (!success) {
 				LOG(ERROR) << "PutTestEvaluationRequestHandler: addBlocksToCoveredBlocks failed";
 				goto fail;

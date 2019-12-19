@@ -168,6 +168,10 @@ Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Thomas Riedmaier
     height: 1000px;
 }
 
+#icontainer>iframe {
+    border: 0px;
+}
+
 .btn-design {
     background-color: #4CAF50;
     border: none;

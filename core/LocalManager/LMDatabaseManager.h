@@ -37,15 +37,18 @@ public:
 	static void setDBConnectionParameters(std::string host, std::string user, std::string pwd, std::string db);
 
 	//Instance management
+	bool addNewManagedInstanceLogMessages(std::string ServiceDescriptorGUID, const std::vector<std::string>& messages);
 	bool addNewManagedInstanceStatus(std::string ServiceDescriptorGUID, std::string newStatus);
-	std::vector<FluffiServiceDescriptor> getRegisteredInstancesOfAgentType(AgentType type, std::string location);
+	bool deleteManagedInstanceLogMessagesIfMoreThan(int num);
+	bool deleteManagedInstanceLogMessagesOlderThanXSec(int olderThanInSeconds);
+	bool deleteManagedInstanceStatusOlderThanXSec(int olderThanInSeconds);
+	std::vector<std::pair<FluffiServiceDescriptor, AgentType>> getAllRegisteredInstances(std::string location);
 	std::string getRegisteredInstanceSubType(std::string ServiceDescriptorGUID);
 	std::vector<std::pair<std::string, int>> getRegisteredInstancesNumOfSubTypes();
-	std::vector<std::pair<FluffiServiceDescriptor, AgentType>> getAllRegisteredInstances(std::string location);
-	bool removeManagedInstance(std::string ServiceDescriptorGUID, std::string location);
-	bool deleteManagedInstanceStatusOlderThanXSec(int olderThanInSeconds);
-	bool writeManagedInstance(const FluffiServiceDescriptor serviceDescriptor, int type, std::string subtype, std::string location);
+	std::vector<FluffiServiceDescriptor> getRegisteredInstancesOfAgentType(AgentType type, std::string location);
 	std::vector<StatusOfInstance> getStatusOfManagedInstances(std::string location);
+	bool removeManagedInstance(std::string ServiceDescriptorGUID, std::string location);
+	bool writeManagedInstance(const FluffiServiceDescriptor serviceDescriptor, int type, std::string subtype, std::string location);
 
 	//Testcase management
 	enum TestCaseType {
@@ -59,15 +62,15 @@ public:
 	};
 	static const int defaultInitialPopulationRating = 10000;
 
-	bool addBlocksToCoveredBlocks(const FluffiTestcaseID tcID, const std::set<FluffiBasicBlock>* basicBlocks); //in order to prevent deadlocks, the basic blocks need to be inserted in a sorted order. Therefore a set (which is soted) is used to pass the basicBlocks
+	bool addBlocksToCoveredBlocks(const FluffiTestcaseID tcID, const std::set<FluffiBasicBlock>& basicBlocks); //in order to prevent deadlocks, the basic blocks need to be inserted in a sorted order. Therefore a set (which is soted) is used to pass the basicBlocks
 	bool addDeltaToTestcaseRating(const FluffiTestcaseID tcID, int ratingDelta);
-	bool addEntriesToCompletedTestcasesTable(const std::set<FluffiTestcaseID>* testcaseIDs);
+	bool addEntriesToCompletedTestcasesTable(const std::set<FluffiTestcaseID>& testcaseIDs);
 	bool addEntryToCompletedTestcasesTable(const FluffiTestcaseID tcID);
 	bool addEntryToCrashDescriptionsTable(const FluffiTestcaseID tcID, const std::string crashFootprint);
 	bool addEntryToInterestingTestcasesTable(const FluffiTestcaseID tcID, const FluffiTestcaseID tcparentID, int rating, const std::string testcaseDir, TestCaseType tcType);
 
-	bool dropTestcaseTypeIFMoreThan(LMDatabaseManager::TestCaseType type, int instances);
 	bool dropTestcaseIfCrashFootprintAppearedMoreThanXTimes(int times, std::string crashFootprint);
+	bool dropTestcaseTypeIFMoreThan(LMDatabaseManager::TestCaseType type, int instances);
 	std::deque<std::string> getAllCrashFootprints();
 
 	GetCurrentBlockCoverageResponse* generateGetCurrentBlockCoverageResponse();
@@ -78,14 +81,14 @@ public:
 
 	//Configuration
 	std::deque<FluffiSetting> getAllSettings();
-	std::deque<FluffiModuleNameToID> getTargetModules();
 	std::deque<FluffiBasicBlock> getTargetBlocks();
+	std::deque<FluffiModuleNameToID> getTargetModules();
 
 	//Misc
-	bool initializeBillingTable();
-	bool addRunnerSeconds(unsigned int secondsToAdd);
 	bool addRunTestcasesNoLongerListed(unsigned int numberOfTestcasesNoLongerListed);
+	bool addRunnerSeconds(unsigned int secondsToAdd);
 	unsigned long long cleanCompletedTestcasesTableOlderThanXSec(int olderThanInSeconds);
+	bool initializeBillingTable();
 
 #ifdef _VSTEST
 	std::string EXECUTE_TEST_STATEMENT(const std::string query);

@@ -23,7 +23,7 @@ Author(s): Pascal Eckmann, Junes Najah, Thomas Riedmaier
 
 <script>
 function deleteTestcase(testcaseId, tcType) {
-    var deleteUrl = "/projects/" + "{{ data.project.id }}" + "/delTestcase/" + testcaseId + "/" + tcType;
+    var deleteUrl = "/projects/" + "{{ data.project.ID }}" + "/delTestcase/" + testcaseId + "/" + tcType;
     window.location.replace(deleteUrl);
 }
 
@@ -79,7 +79,7 @@ function addPages(actualPage, pageCount){
 </script>
 
 <div class="container">
-    <h1><a href="/projects/view/{{data.project.id}}">{{ data.name }} details: {{ data.project.name }}</a></h1>
+    <h1><a href="/projects/view/{{data.project.ID}}">{{ data.name }} details: {{ data.project.name }}</a></h1>
 </div>
 {{ flashMessages() }}
 <hr>
@@ -88,7 +88,7 @@ function addPages(actualPage, pageCount){
     <div class="row">
         <div class="col-md-6 tc_view_center">
             {% if data.name == "Population" %}
-            <form action="{{ url_for('addTestcase', projId=data.project.id) }}" enctype="multipart/form-data"
+            <form action="{{ url_for('addTestcase', projId=data.project.ID) }}" enctype="multipart/form-data"
                   method="POST">
                 <div class="form-group">
                     <input class="form-control-file" id="addTestcase" multiple name="addTestcase" type="file">
@@ -98,7 +98,7 @@ function addPages(actualPage, pageCount){
             {% endif %}
         </div>
         <div class="col-md-6 tc_view_center">
-            <a class="btn btn-primary tc_view_center_child" href="{{ url_for(data.downloadName, projId=data.project.id) }}" role="button">Download {{ data.name }}</a>
+            <a class="btn btn-primary tc_view_center_child" href="{{ url_for(data.downloadName, projId=data.project.ID) }}" role="button">Download {{ data.name }}</a>
         </div>
     </div>
     <hr>
@@ -136,16 +136,16 @@ function addPages(actualPage, pageCount){
                 {% else %}
                     {% if testcase.niceName %}
                     <button id="tcBtn{{loop.index}}"
-                            onclick="addOrRenameNiceName({{ loop.index }}, {{ data.project.id }}, 'update', '{{ testcase.testcaseID }}', '')"
+                            onclick="addOrRenameNiceName({{ loop.index }}, {{ data.project.ID }}, 'update', '{{ testcase.testcaseID }}', '')"
                             class="btn-desgin">
                         {{ testcase.niceName }}
                     </button>
                     <input class="form-control" id="tcInput{{loop.index}}" style="display: none;" type="text">
                     {% else %}
                     <button id="tcBtnNew{{loop.index}}"
-                            onclick="addOrRenameNiceName({{ loop.index }}, {{ data.project.id }}, 'insert', '{{ testcase.testcaseID }}', '')"
+                            onclick="addOrRenameNiceName({{ loop.index }}, {{ data.project.ID }}, 'insert', '{{ testcase.testcaseID }}', '')"
                             class="btn-desgin">
-                        {{ testcase.id }}
+                        {{ testcase.ID }}
                     </button>
                     <input class="form-control" id="tcInputNew{{loop.index}}" style="display: none;" type="text">
                     {% endif %}
@@ -156,12 +156,12 @@ function addPages(actualPage, pageCount){
             {% endif %}
             <td>{{ testcase.timeOfInsertion | default('', True) }}</td>
             <td>
-                <button class="btn btn-default btn-desgin" onclick="deleteTestcase('{{ testcase.id }}', '{{ data.redirect }}')"
+                <button class="btn btn-default btn-desgin" onclick="deleteTestcase('{{ testcase.ID }}', '{{ data.redirect }}')"
                         type="button">
                     <span class="glyphicon glyphicon-remove"></span>
                 </button>
                 <button class="btn btn-default btn-desgin" type="button">
-                    <a href="/projects/{{ data.project.id }}/getTestcase/{{ testcase.id }}"><span
+                    <a href="/projects/{{ data.project.ID }}/getTestcase/{{ testcase.ID }}"><span
                             class="glyphicon glyphicon-download-alt"></span></a>
                 </button>
             </td>

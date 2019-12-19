@@ -7,34 +7,41 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-Author(s): Thomas Riedmaier, Abian Blome, Pascal Eckmann
+Author(s): Thomas Riedmaier
 */
 
-#pragma once
+#include "stdafx.h"
+#include "FLUFFILogHandler.h"
 
-class CommInt;
-class LMWorkerThreadStateBuilder;
-class IWorkerThreadStateBuilder;
-class LMWorkerThreadState;
-class FluffiServiceDescriptor;
-class InstanceMonitorWorker
+FLUFFILogHandler::FLUFFILogHandler() :
+	errorMessages()
 {
-public:
-	InstanceMonitorWorker(CommInt* commInt, LMWorkerThreadStateBuilder* workerThreadStateBuilder, int loopIntervalMS, std::string location);
-	virtual ~InstanceMonitorWorker();
+}
 
-	void workerMain();
-	void stop();
+void FLUFFILogHandler::handle(const el::LogDispatchData* data) {
+	if (data->logMessage()->level() == el::Level::Error) { //If it's an error message store it, so it can be collected later.
+		addToMessageQueue(data->logMessage()->logger()->logBuilder()->build(data->logMessage(), false));
+	}
+}
 
-	std::thread* m_thread = nullptr;
+void FLUFFILogHandler::addToMessageQueue(el::base::type::string_t&& logLine)
+{
+	std::unique_lock<std::mutex> mlock(m_mutex_);
 
-private:
-	void storeStatus(const std::pair<FluffiServiceDescriptor, AgentType>& managedInstance, std::string statusToStore);
-	void storeLogMessages(const std::pair<FluffiServiceDescriptor, AgentType>& managedInstance, const google::protobuf::RepeatedPtrField<std::string> & logMessages);
+	//Prevent overflow in case nobady collects the error messages
+	if (errorMessages.size() > 1000) {
+		errorMessages.pop_front();
+	}
 
-	CommInt* m_commInt = nullptr;
-	IWorkerThreadStateBuilder* m_workerThreadStateBuilder = nullptr;
-	LMWorkerThreadState* m_workerThreadState = nullptr;
-	int m_loopIntervalMS;
-	std::string m_location;
-};
+	errorMessages.push_back(logLine);
+}
+
+std::deque<std::string> FLUFFILogHandler::getAllMessages() {
+	std::unique_lock<std::mutex> mlock(m_mutex_);
+
+	std::deque<std::string> re = errorMessages;
+
+	errorMessages.clear();
+
+	return re;
+}

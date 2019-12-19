@@ -93,6 +93,7 @@ message GetStatusRequest {
 
 message GetStatusResponse {
   string status = 1;
+  repeated string logMessages = 2;
 }
 
 message SetTGsAndTEsRequest {

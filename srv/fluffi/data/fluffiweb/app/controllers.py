@@ -105,7 +105,7 @@ def listFuzzJobs():
             else:
                 project.checkRating = False
 
-            project.numLM = int(models.Localmanagers.query.filter_by(Fuzzjob = project.id).count())
+            project.numLM = int(models.Localmanagers.query.filter_by(Fuzzjob = project.ID).count())
         except Exception as e:
             print(e)
             project.status = "Unreachable"
@@ -140,7 +140,7 @@ def getLocationFormWithChoices(projId, locationForm):
     locationFuzzJobsIds = [f.Location for f in locationFuzzJobs]
 
     for location in db.session.query(models.Locations):
-        if location.id not in locationFuzzJobsIds:
+        if location.ID not in locationFuzzJobsIds:
             choices.append(location.Name)
 
     locationForm.location.choices = choices
@@ -149,7 +149,7 @@ def getLocationFormWithChoices(projId, locationForm):
 
 
 def getProject(projId):
-    project = models.Fuzzjob.query.filter_by(id = projId).first()
+    project = models.Fuzzjob.query.filter_by(ID = projId).first()
 
     engine = create_engine(
         'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
@@ -225,7 +225,7 @@ def getProject(projId):
                 setting.mutatorTypesIDs = config["GeneratorTypes"]
             elif setting.name == "evaluatorTypes":
                 setting.evaluatorTypesIDs = config["EvaluatorTypes"]
-            setting.id = row["Id"]
+            setting.ID = row["ID"]
             project.settings.append(setting)
 
         project.possibleSettingNames = [sn for sn in config["DefaultSettingNames"] if
@@ -237,7 +237,7 @@ def getProject(projId):
             module = type('', (), {})()
             module.name = row["ModuleName"]
             module.path = row["ModulePath"]
-            module.id = row["ID"]
+            module.ID = row["ID"]
             project.modules.append(module)
 
         project.status = "Reachable"
@@ -261,7 +261,7 @@ def getProject(projId):
         connection.close()
         engine.dispose()
 
-    project.locations = db.session.query(models.LocationFuzzjobs, models.Locations.Name, models.Locations.id).filter_by(
+    project.locations = db.session.query(models.LocationFuzzjobs, models.Locations.Name, models.Locations.ID).filter_by(
         Fuzzjob = projId).outerjoin(models.Locations)
     project.numLM = models.Localmanagers.query.filter_by(Fuzzjob = projId).count()
 
@@ -309,7 +309,7 @@ def getProjects():
 
 
 def getGeneralInformationData(projId, stmt):
-    project = models.Fuzzjob.query.filter_by(id = projId).first()
+    project = models.Fuzzjob.query.filter_by(ID = projId).first()
     data = type('', (), {})()
     data.testcases = []
     data.project = project
@@ -324,9 +324,14 @@ def getGeneralInformationData(projId, stmt):
             testcase.testcaseID = row["ID"]
             if "CrashFootprint" in row and row["CrashFootprint"] is not None:
                     testcase.footprint = row["CrashFootprint"]
-            testcase.id = "{}:{}".format(row["CreatorServiceDescriptorGUID"], row["CreatorLocalID"])
+            testcase.ID = "{}:{}".format(row["CreatorServiceDescriptorGUID"], row["CreatorLocalID"])
             testcase.rating = row["Rating"]
-            testcase.niceName = row["NiceName"]
+            if row["CreatorServiceDescriptorGUID"] is not None:
+                testcase.niceName = "{}:{}".format(row["CreatorServiceDescriptorGUID"], row["CreatorLocalID"])
+            if row["NiceNameMI"] is not None:
+                testcase.niceName = "{}:{}".format(row["NiceNameMI"], row["CreatorLocalID"])
+            if row["NiceName"] is not None:
+                testcase.niceName = row["NiceName"]
             testcase.timeOfInsertion = row["TimeOfInsertion"]
             data.testcases.append(testcase)
     except Exception as e:
@@ -340,7 +345,7 @@ def getGeneralInformationData(projId, stmt):
 
 
 def getRowCount(projId, stmt):
-    project = models.Fuzzjob.query.filter_by(id = projId).first()
+    project = models.Fuzzjob.query.filter_by(ID = projId).first()
     data = 0
 
     engine = create_engine(
@@ -360,7 +365,7 @@ def getRowCount(projId, stmt):
 
 
 def insertOrUpdateNiceName(projId, myId, newName, command, elemType):
-    project = models.Fuzzjob.query.filter_by(id = projId).first()
+    project = models.Fuzzjob.query.filter_by(ID = projId).first()
 
     engine = create_engine(
         'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
@@ -393,11 +398,11 @@ def insertOrUpdateNiceName(projId, myId, newName, command, elemType):
 def getLocation(locId):
     location = type('', (), {})()
     location.projects = []
-    location.id = locId
-    location.name = db.session.query(models.Locations.Name).filter_by(id = locId).first()[0]
+    location.ID = locId
+    location.name = db.session.query(models.Locations.Name).filter_by(ID = locId).first()[0]
 
     for l in models.LocationFuzzjobs.query.filter_by(Location = locId).all():
-        currentFuzzjob = models.Fuzzjob.query.filter_by(id = l.Fuzzjob).first()
+        currentFuzzjob = models.Fuzzjob.query.filter_by(ID = l.Fuzzjob).first()
         location.projects.append(currentFuzzjob)
     location.workers = models.Workers.query.filter(models.Workers.Location == locId, models.Workers.Fuzzjob == None, models.Workers.Agenttype != 4).all()
     return location
@@ -405,7 +410,7 @@ def getLocation(locId):
 
 def getLocalManager(projId):
     localManagers = []
-    project = models.Fuzzjob.query.filter_by(id=projId).first()
+    project = models.Fuzzjob.query.filter_by(ID = projId).first()
 
     engine = create_engine(
         'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), "fluffi_gm"))
@@ -431,7 +436,7 @@ def getLocalManager(projId):
 def getManagedInstancesAndSummary(projId):
     # new data in Status will be added to the instances in managedInstances automatically - you just need to add them in
     # viewManagedInstances.html
-    project = models.Fuzzjob.query.filter_by(id = projId).first()
+    project = models.Fuzzjob.query.filter_by(ID = projId).first()
     managedInstances = {"instances": [], "project": project}
     localManagers = []
     summarySection = {}
@@ -501,7 +506,7 @@ def getManagedInstancesAndSummary(projId):
 
 
 def getViolationsAndCrashes(projId):
-    project = models.Fuzzjob.query.filter_by(id = projId).first()
+    project = models.Fuzzjob.query.filter_by(ID = projId).first()
     violationsAndCrashes = type('', (), {})()
     violationsAndCrashes.testcases = []
     violationsAndCrashes.project = project
@@ -529,7 +534,7 @@ def getViolationsAndCrashes(projId):
 
 
 def insertSettings(projId, request, settingForm):
-    project = models.Fuzzjob.query.filter_by(id = projId).first()
+    project = models.Fuzzjob.query.filter_by(ID = projId).first()
 
     if project is not None:
         engine = create_engine(
@@ -586,7 +591,7 @@ def setNewBasicBlocks(targetFile, projId):
     for row in reader:
         basicBlocks.append(row)
 
-    project = models.Fuzzjob.query.filter_by(id=projId).first()
+    project = models.Fuzzjob.query.filter_by(ID = projId).first()
 
     engine = create_engine(
         'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
@@ -643,7 +648,7 @@ def executeResetFuzzjobStmts(projId, deletePopulation):
 
 
 def insertModules(projId, f):
-    project = models.Fuzzjob.query.filter_by(id = projId).first()
+    project = models.Fuzzjob.query.filter_by(ID = projId).first()
 
     if project is not None:
         engine = create_engine(
@@ -687,7 +692,7 @@ def insertModules(projId, f):
 def createByteIOTestcase(projId, testcaseId):
     filename = ""
     (guid, localId) = testcaseId.split(":")
-    project = models.Fuzzjob.query.filter_by(id = projId).first()
+    project = models.Fuzzjob.query.filter_by(ID = projId).first()
     byteIO = io.BytesIO()
 
     engine = create_engine(
@@ -717,7 +722,7 @@ def createByteIOTestcase(projId, testcaseId):
 
 
 def createByteIOForSmallestVioOrCrash(projId, footprint):
-    project = models.Fuzzjob.query.filter_by(id = projId).first()
+    project = models.Fuzzjob.query.filter_by(ID = projId).first()
     byteIO = io.BytesIO()
 
     engine = create_engine(
@@ -742,7 +747,7 @@ def createByteIOForSmallestVioOrCrash(projId, footprint):
 
 
 def addCommand(projId, guid, hostAndPort = None):
-    project = models.Fuzzjob.query.filter_by(id = projId).first()
+    project = models.Fuzzjob.query.filter_by(ID = projId).first()
 
     engine = create_engine(
         'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
@@ -765,7 +770,7 @@ def addCommand(projId, guid, hostAndPort = None):
 
 
 def addCommandToKillInstanceType(projId, myType):
-    project = models.Fuzzjob.query.filter_by(id = projId).first()
+    project = models.Fuzzjob.query.filter_by(ID = projId).first()
 
     engine = create_engine(
         'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
@@ -793,7 +798,7 @@ def addCommandToKillInstanceType(projId, myType):
 
 
 def insertTestcases(projId, files):
-    project = models.Fuzzjob.query.filter_by(id = projId).first()
+    project = models.Fuzzjob.query.filter_by(ID = projId).first()
 
     engine = create_engine(
         'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
@@ -826,13 +831,13 @@ def insertTestcases(projId, files):
 
 def updateSettings(projId, settingId, settingValue):
     if len(settingValue) > 0:
-        project = models.Fuzzjob.query.filter_by(id=projId).first()
+        project = models.Fuzzjob.query.filter_by(ID=projId).first()
         engine = create_engine(
             'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
         connection = engine.connect()
         try:
             statement = text(UPDATE_SETTINGS)
-            data = {"Id": settingId, "SettingValue": settingValue}
+            data = {"ID": settingId, "SettingValue": settingValue}
             connection.execute(statement, data)
             message = "Setting modified"
             status = "OK"
@@ -851,7 +856,7 @@ def updateSettings(projId, settingId, settingValue):
 
 
 def deleteElement(projId, elementName, query, data):
-    project = models.Fuzzjob.query.filter_by(id = projId).first()
+    project = models.Fuzzjob.query.filter_by(ID = projId).first()
 
     engine = create_engine(
         'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
@@ -893,17 +898,17 @@ def insertFormInputForConfiguredInstances(request, system):
 
                 if agenttype != 4:
                     fj = models.Fuzzjob.query.filter_by(name = key[:-3]).first()
-                    fuzzjobId = fj.id
+                    fuzzjobId = fj.ID
 
                 arch = dic.get(key + '_arch')
-                instance = models.SystemFuzzjobInstances.query.filter_by(System = sys.id, Fuzzjob = fuzzjobId,
+                instance = models.SystemFuzzjobInstances.query.filter_by(System = sys.ID, Fuzzjob = fuzzjobId,
                                                                          AgentType = int(agenttype)).first()
                 if instance is not None:
                     db.session.delete(instance)
                     db.session.commit()
 
                 if value != 0:
-                    newinstances = models.SystemFuzzjobInstances(System = sys.id, Fuzzjob = fuzzjobId,
+                    newinstances = models.SystemFuzzjobInstances(System = sys.ID, Fuzzjob = fuzzjobId,
                                                                  AgentType = agenttype,
                                                                  InstanceCount = value, Architecture = arch)
                     db.session.add(newinstances)
@@ -938,16 +943,16 @@ def insertFormInputForConfiguredFuzzjobInstances(request, fuzzjob):
 
                 if agenttype != 4:
                     sys = models.Systems.query.filter_by(Name = key[:-3]).first()
-                    systemId = sys.id
+                    systemId = sys.ID
 
                 arch = dic.get(key + '_arch')
-                instance = models.SystemFuzzjobInstances.query.filter_by(System = systemId, Fuzzjob = fj.id,
+                instance = models.SystemFuzzjobInstances.query.filter_by(System = systemId, Fuzzjob = fj.ID,
                                                                          AgentType = int(agenttype)).first()
                 if instance is not None:
                     db.session.delete(instance)
                     db.session.commit()
                 if value != 0:
-                    newinstances = models.SystemFuzzjobInstances(System = systemId, Fuzzjob = fj.id,
+                    newinstances = models.SystemFuzzjobInstances(System = systemId, Fuzzjob = fj.ID,
                                                                  AgentType = agenttype,
                                                                  InstanceCount = value, Architecture = arch)
                     db.session.add(newinstances)
@@ -982,7 +987,7 @@ def insertFormInputForProject(form, request):
 
     for loc in locations:
         location = models.Locations.query.filter_by(Name=loc).first()
-        location_fuzzjob = models.LocationFuzzjobs(Location=location.id, Fuzzjob=project.id)
+        location_fuzzjob = models.LocationFuzzjobs(Location=location.ID, Fuzzjob=project.ID)
         db.session.add(location_fuzzjob)
         db.session.commit()
 
@@ -1018,8 +1023,8 @@ def insertFormInputForProject(form, request):
             deployment_package = models.DeploymentPackages(name = targetFileName)
             db.session.add(deployment_package)
             db.session.commit()
-            fuzzjob_deployment_package = models.FuzzjobDeploymentPackages(Fuzzjob = project.id,
-                                                                          DeploymentPackage = deployment_package.id)
+            fuzzjob_deployment_package = models.FuzzjobDeploymentPackages(Fuzzjob = project.ID,
+                                                                          DeploymentPackage = deployment_package.ID)
             db.session.add(fuzzjob_deployment_package)
             db.session.commit()
 
@@ -1072,9 +1077,9 @@ def insertFormInputForProject(form, request):
 
         if 'basicBlockFile' in request.files:
             if form.subtype.data == "ALL_GDB":
-                setNewBasicBlocks(request.files['basicBlockFile'], project.id)
+                setNewBasicBlocks(request.files['basicBlockFile'], project.ID)
 
-        return ["Success: Created new project", "success", project.id]
+        return ["Success: Created new project", "success", project.ID]
     except Exception as e:
         print(e)
         return ["Error: " + str(e), "error"]
@@ -1084,7 +1089,7 @@ def insertFormInputForProject(form, request):
 
 
 def getGraphData(projId):
-    project = models.Fuzzjob.query.filter_by(id = projId).first()
+    project = models.Fuzzjob.query.filter_by(ID = projId).first()
     graphdata = dict()
     nodes = []
     edges = []
