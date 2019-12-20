@@ -25,6 +25,8 @@ MKDIR include86\openssl
 MKDIR lib
 MKDIR lib\x64
 MKDIR lib\x86
+MKDIR lib\x64d
+MKDIR lib\x86d
 
 REM Getting Openssl
 
@@ -75,16 +77,19 @@ cd ..
 
 copy openssl\build64\libcryptoMT.lib lib\x64
 copy openssl\build64\libsslMT.lib lib\x64
+copy openssl\build64\ossl_static.pdb lib\x64
 
-copy openssl\build64d\libcryptoMTd.lib lib\x64
-copy openssl\build64d\libsslMTd.lib lib\x64
+copy openssl\build64d\libcryptoMTd.lib lib\x64d
+copy openssl\build64d\libsslMTd.lib lib\x64d
+copy openssl\build64d\ossl_static.pdb lib\x64d
 
 copy openssl\build86\libcryptoMT.lib lib\x86
 copy openssl\build86\libsslMT.lib lib\x86
+copy openssl\build86\ossl_static.pdb lib\x86
 
-
-copy openssl\build86d\libcryptoMTd.lib lib\x86
-copy openssl\build86d\libsslMTd.lib lib\x86
+copy openssl\build86d\libcryptoMTd.lib lib\x86d
+copy openssl\build86d\libsslMTd.lib lib\x86d
+copy openssl\build86d\ossl_static.pdb lib\x86d
 
 copy openssl\build64\include\openssl\opensslconf.h include64\openssl
 copy openssl\build86\include\openssl\opensslconf.h include86\openssl
