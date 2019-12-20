@@ -10,7 +10,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Michael Kraus, Thomas Riedmaier, Pascal Eckmann
 */
 
-//g++ --std=c++11 -fPIC -shared sslwrap.cpp  -lssl -lcrypto -lpthread -ldl -L../../../dependencies/openssl/lib/$( file /bin/bash | awk -F',' '{print $2}' | tr -d ' ')/ -o libsslwrap.so -Wl,-z,defs  -Wl,--version-script=libsslwrap.version -I../../../dependencies/openssl/include -I../../../dependencies/openssl/include$( file /bin/bash | awk -F',' '{print $2}' | tr -d ' ')
 
 #include "stdafx.h"
 #include "sslwrap.h"

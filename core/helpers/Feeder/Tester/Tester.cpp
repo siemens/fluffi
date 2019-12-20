@@ -15,9 +15,6 @@ Author(s): Thomas Riedmaier, Pascal Eckmann
 #include "ExternalProcess.h"
 #include "Util.h"
 
-//cp ../../../$( file /bin/bash | awk -F',' '{print $2}' | tr -d ' ')/bin/libsharedmemipc.so .
-//cp ../../../$( file /bin/bash | awk -F',' '{print $2}' | tr -d ' ')/bin/libzmq.so.5 .
-//g++ --std=c++11 -o Tester -L . -I../../../SharedCode -I../../../dependencies/libprotoc/include/siemens/cpp -I../../../dependencies/libprotoc/include -I../../../SharedMemIPC  -I ../../../dependencies/easylogging/include -I ../../../dependencies/libuuid/include Tester.cpp ../../../$( file /bin/bash | awk -F',' '{print $2}' | tr -d ' ')/lib/sharedcode.a  ../../../dependencies/libprotoc/lib/x86-64/libprotobuf.a  ../../../dependencies/easylogging/lib/x86-64/libeasyloggingpp.a -pthread -lstdc++fs -ldl -l:libzmq.so.5 -lsharedmemipc  -Wl,-rpath='${ORIGIN}'
 
 INITIALIZE_EASYLOGGINGPP
 
