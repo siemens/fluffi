@@ -13,8 +13,6 @@ Author(s): Thomas Riedmaier, Pascal Eckmann
 #include "stdafx.h"
 #include "SharedMemIPC.h"
 
-//cp ../../../bin/libsharedmemipc.so .
-//g++ --std=c++11 -I../../../SharedMemIPC/ -o SharedMemFeeder stdafx.cpp SharedMemFeeder.cpp libsharedmemipc.so -Wl,-rpath='${ORIGIN}'
 
 #if defined(_WIN32) || defined(_WIN64)
 #else

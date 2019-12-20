@@ -8,10 +8,29 @@
 # 
 # Author(s): Junes Najah
 
+ARCH := $(shell file /bin/bash | awk -F',' '{print $$2}' | tr -d ' ')
+
+WARNINGS = -Wno-psabi -Wall -Wextra -Wconversion -Wsign-compare -Wlogical-op -Wnull-dereference -Wold-style-cast
+DEBUG = $(WARNIGNS) -g3 -O0 -DDEBUG
+RELEASE = $(WARNINGS) -s -g0 -O2
+
+#By default compile as release (uncomment here for debug build)
+#AFLAGS = $(DEBUG)
+AFLAGS = $(RELEASE)
+CC = g++ -std=c++11
+
+
+.PHONY: gdbstarter
+
 all:
-	$(MAKE) -C GDBStarter
-	$(MAKE) -C ProcessStarter
+	@$(MAKE) --no-print-directory gdbstarter ps
+
+gdbstarter:
+	$(CC) $(AFLAGS) -o GDBStarter/GDBStarter -I ../../dependencies/base64/include GDBStarter/GDBStarter.cpp ../../dependencies/base64/lib/$(ARCH)/base64.a -lstdc++fs
+
+ps:
+	$(CC) $(AFLAGS) -o ProcessStarter/ProcessStarter ProcessStarter/ProcessStarter.cpp
 
 clean:
-	cd GDBStarter && $(MAKE) clean
-	cd ProcessStarter && $(MAKE) clean
+	@rm -f GDBStarter/GDBStarter
+	@rm -f ProcessStarter/ProcessStarter
