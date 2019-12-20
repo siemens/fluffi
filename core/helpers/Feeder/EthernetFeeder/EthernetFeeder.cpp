@@ -13,9 +13,8 @@ Author(s): Thomas Riedmaier, Pascal Eckmann
 #include "stdafx.h"
 #include "SharedMemIPC.h"
 
-
 #define RESP_TIMEOUT_MS 3000
-#define KNOWN_GOOD (char)0x00, (char)0x88, (char)0x92, (char)0xFE, (char)0xFE, (char)0x05, (char)0x00, (char)0x07, (char)0x01, (char)0x00, (char)0x06, (char)0x00, (char)0x80, (char)0x00, (char)0x04, (char)0xFF, (char)0xFF, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00
+unsigned char KNOWN_GOOD[] = { 0x00, 0x88, 0x92, 0xFE, 0xFE, 0x05, 0x00, 0x07, 0x01, 0x00, 0x06, 0x00, 0x80, 0x00, 0x04, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 #if defined(_WIN32) || defined(_WIN64)
 #define SOCKETTYPE SOCKET
@@ -46,7 +45,7 @@ void printMacToStream(std::ostream& os, unsigned char MACData[])
 	// os << std::endl;
 }
 
-bool sendBytesToTarget(std::vector<char>* fuzzBytes, char* targetMAC, bool waitForResponse) {
+bool sendBytesToTarget(std::vector<char>* fuzzBytes, unsigned char* targetMAC, bool waitForResponse) {
 #if defined(_WIN32) || defined(_WIN64)
 	std::cout << "EthernetFeeder::sendBytesToTarget is not yet implemented on Windows." << std::endl;
 	return false;
@@ -65,7 +64,7 @@ bool sendBytesToTarget(std::vector<char>* fuzzBytes, char* targetMAC, bool waitF
 		struct ifreq if_idx;
 		struct ifreq if_mac;
 		char* sendbuf = new char[fuzzBytes->size() - 1 + 12];
-		struct ether_header* eh = (struct ether_header*) sendbuf;
+		struct ether_header* eh = reinterpret_cast<struct ether_header*>(sendbuf);
 		struct sockaddr_ll socket_address;
 		const char* ifName = "eth0";
 
@@ -101,12 +100,12 @@ bool sendBytesToTarget(std::vector<char>* fuzzBytes, char* targetMAC, bool waitF
 		/* Construct the Ethernet header */
 		memset(sendbuf, 0, fuzzBytes->size() - 1 + 12);
 		/* Ethernet header */
-		eh->ether_shost[0] = ((uint8_t*)&if_mac.ifr_hwaddr.sa_data)[0];
-		eh->ether_shost[1] = ((uint8_t*)&if_mac.ifr_hwaddr.sa_data)[1];
-		eh->ether_shost[2] = ((uint8_t*)&if_mac.ifr_hwaddr.sa_data)[2];
-		eh->ether_shost[3] = ((uint8_t*)&if_mac.ifr_hwaddr.sa_data)[3];
-		eh->ether_shost[4] = ((uint8_t*)&if_mac.ifr_hwaddr.sa_data)[4];
-		eh->ether_shost[5] = ((uint8_t*)&if_mac.ifr_hwaddr.sa_data)[5];
+		eh->ether_shost[0] = (reinterpret_cast<uint8_t*>(&if_mac.ifr_hwaddr.sa_data))[0];
+		eh->ether_shost[1] = (reinterpret_cast<uint8_t*>(&if_mac.ifr_hwaddr.sa_data))[1];
+		eh->ether_shost[2] = (reinterpret_cast<uint8_t*>(&if_mac.ifr_hwaddr.sa_data))[2];
+		eh->ether_shost[3] = (reinterpret_cast<uint8_t*>(&if_mac.ifr_hwaddr.sa_data))[3];
+		eh->ether_shost[4] = (reinterpret_cast<uint8_t*>(&if_mac.ifr_hwaddr.sa_data))[4];
+		eh->ether_shost[5] = (reinterpret_cast<uint8_t*>(&if_mac.ifr_hwaddr.sa_data))[5];
 		eh->ether_dhost[0] = targetMAC[0];
 		eh->ether_dhost[1] = targetMAC[1];
 		eh->ether_dhost[2] = targetMAC[2];
@@ -130,7 +129,7 @@ bool sendBytesToTarget(std::vector<char>* fuzzBytes, char* targetMAC, bool waitF
 		socket_address.sll_addr[5] = targetMAC[5];
 
 		/* Send packet */
-		if (sendto(sockfd, sendbuf, fuzzBytes->size() - 1 + 12, 0, (struct sockaddr*)&socket_address, sizeof(struct sockaddr_ll)) < 0) {
+		if (sendto(sockfd, sendbuf, fuzzBytes->size() - 1 + 12, 0, reinterpret_cast<struct sockaddr*>(&socket_address), sizeof(struct sockaddr_ll)) < 0) {
 			std::cout << "EthernetFeeder::Sendto failed:" << errno << std::endl;
 			closesocket(sockfd);
 			delete[] sendbuf;
@@ -152,7 +151,8 @@ bool sendBytesToTarget(std::vector<char>* fuzzBytes, char* targetMAC, bool waitF
 			}
 
 			/* Put the interface into promiscuous mode */
-			struct packet_mreq mreq = { 0 };
+			struct packet_mreq mreq;
+			memset(&mreq, 0, sizeof(mreq));
 			mreq.mr_ifindex = if_idx.ifr_ifindex;
 			mreq.mr_type = PACKET_MR_PROMISC;
 			if (setsockopt(sockfd, SOL_PACKET, PACKET_ADD_MEMBERSHIP, &mreq, sizeof(mreq)) == -1) {
@@ -166,14 +166,14 @@ bool sendBytesToTarget(std::vector<char>* fuzzBytes, char* targetMAC, bool waitF
 			socket_address.sll_family = AF_PACKET;
 			socket_address.sll_ifindex = if_idx.ifr_ifindex;
 			socket_address.sll_protocol = htons(ETH_P_ALL);
-			if (bind(sockfd, (struct sockaddr*)&socket_address, sizeof(socket_address)) == -1) {
+			if (bind(sockfd, reinterpret_cast<struct sockaddr*>(&socket_address), sizeof(socket_address)) == -1) {
 				std::cout << "EthernetFeeder::bind failed:" << errno << std::endl;
 				closesocket(sockfd);
 				return false;
 			}
 
 			uint8_t buf[65537];
-			eh = (struct ether_header*) buf;
+			eh = reinterpret_cast<struct ether_header*>(buf);
 			while (std::chrono::system_clock::now() < timestampToLeave) {
 				/* set timeout */
 				long timeleft = std::chrono::duration_cast<std::chrono::milliseconds>(timestampToLeave - std::chrono::system_clock::now()).count();
@@ -187,15 +187,15 @@ bool sendBytesToTarget(std::vector<char>* fuzzBytes, char* targetMAC, bool waitF
 				}
 
 				memset(buf, 0, sizeof(buf));
-				int numbytes = recvfrom(sockfd, buf, sizeof(buf), 0, NULL, NULL);
+				ssize_t  numbytes = recvfrom(sockfd, buf, sizeof(buf), 0, NULL, NULL);
 
 				/* Check the packet is for me AND its from the target */
-				if (eh->ether_dhost[0] == ((uint8_t*)&if_mac.ifr_hwaddr.sa_data)[0] &&
-					eh->ether_dhost[1] == ((uint8_t*)&if_mac.ifr_hwaddr.sa_data)[1] &&
-					eh->ether_dhost[2] == ((uint8_t*)&if_mac.ifr_hwaddr.sa_data)[2] &&
-					eh->ether_dhost[3] == ((uint8_t*)&if_mac.ifr_hwaddr.sa_data)[3] &&
-					eh->ether_dhost[4] == ((uint8_t*)&if_mac.ifr_hwaddr.sa_data)[4] &&
-					eh->ether_dhost[5] == ((uint8_t*)&if_mac.ifr_hwaddr.sa_data)[5] &&
+				if (eh->ether_dhost[0] == (reinterpret_cast<uint8_t*>(&if_mac.ifr_hwaddr.sa_data))[0] &&
+					eh->ether_dhost[1] == (reinterpret_cast<uint8_t*>(&if_mac.ifr_hwaddr.sa_data))[1] &&
+					eh->ether_dhost[2] == (reinterpret_cast<uint8_t*>(&if_mac.ifr_hwaddr.sa_data))[2] &&
+					eh->ether_dhost[3] == (reinterpret_cast<uint8_t*>(&if_mac.ifr_hwaddr.sa_data))[3] &&
+					eh->ether_dhost[4] == (reinterpret_cast<uint8_t*>(&if_mac.ifr_hwaddr.sa_data))[4] &&
+					eh->ether_dhost[5] == (reinterpret_cast<uint8_t*>(&if_mac.ifr_hwaddr.sa_data))[5] &&
 					eh->ether_shost[0] == targetMAC[0] &&
 					eh->ether_shost[1] == targetMAC[1] &&
 					eh->ether_shost[2] == targetMAC[2] &&
@@ -204,6 +204,7 @@ bool sendBytesToTarget(std::vector<char>* fuzzBytes, char* targetMAC, bool waitF
 					eh->ether_shost[5] == targetMAC[5])
 				{
 					//For me - from the target
+					std::cout << "EthernetFeeder::received a response packet of length " << numbytes;
 					closesocket(sockfd);
 					return true;
 				}
@@ -216,9 +217,9 @@ bool sendBytesToTarget(std::vector<char>* fuzzBytes, char* targetMAC, bool waitF
 					std::cout << std::endl;
 
 					std::cout << "EthernetFeeder::However, we are looking for a packet from ";
-					printMacToStream(std::cout, (unsigned char*)targetMAC);
+					printMacToStream(std::cout, targetMAC);
 					std::cout << " for ";
-					printMacToStream(std::cout, (unsigned char*)if_mac.ifr_hwaddr.sa_data);
+					printMacToStream(std::cout, reinterpret_cast<unsigned char *>(if_mac.ifr_hwaddr.sa_data));
 					std::cout << std::endl;
 
 					std::cout << "EthernetFeeder::Let's see, if there are more packets!" << std::endl;
@@ -257,14 +258,14 @@ std::vector<char> readAllBytesFromFile(const std::string filename)
 	long fileSize = ftell(inputFile);
 	fseek(inputFile, 0, SEEK_SET);
 
-	if ((unsigned int)fileSize == 0) {
+	if (fileSize == 0) {
 		fclose(inputFile);
 		return{};
 	}
 
-	std::vector<char> result((unsigned int)fileSize);
+	std::vector<char> result(fileSize);
 
-	size_t bytesRead = static_cast<size_t>(fread((char*)&result[0], 1, fileSize, inputFile));
+	size_t bytesRead = static_cast<size_t>(fread(&result[0], 1, fileSize, inputFile));
 	if (bytesRead != static_cast<size_t>(fileSize)) {
 		std::cout << "readAllBytesFromFile failed to read all bytes! Bytes read: " << bytesRead << ". Filesize " << fileSize << std::endl;
 	}
@@ -274,12 +275,13 @@ std::vector<char> readAllBytesFromFile(const std::string filename)
 	return result;
 }
 
-bool isServerAlive(char* targetMAC) {
-	std::vector<char> knownGood{ KNOWN_GOOD };
+bool isServerAlive(unsigned char* targetMAC) {
+	int n = sizeof(KNOWN_GOOD) / sizeof(KNOWN_GOOD[0]);
+	std::vector<char> knownGood(KNOWN_GOOD, KNOWN_GOOD + n);
 	return sendBytesToTarget(&knownGood, targetMAC, true);
 }
 
-bool waitUntilServerResponds(char* targetMAC) {
+bool waitUntilServerResponds(unsigned char* targetMAC) {
 	while (true) {
 		bool isalive = isServerAlive(targetMAC);
 		if (isalive) {
@@ -300,8 +302,7 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
-	//char targetMAC[] = { (char)0x01 ,(char)0x0e ,(char)0xcf ,(char)0x00 ,(char)0x00 ,(char)0x00 };
-	char targetMAC[] = { (char)0x3a ,(char)0xe9 ,(char)0x58,(char)0x64 ,(char)0x29 ,(char)0xd1 };
+	unsigned char targetMAC[] = { 0x3a ,0xe9 ,0x58,0x64 ,0x29 ,0xd1 };
 
 	SharedMemIPC sharedMemIPC_ToRunner(argv[argc - 1]);
 	bool success = sharedMemIPC_ToRunner.initializeAsClient();
@@ -357,7 +358,7 @@ int main(int argc, char* argv[])
 			else {
 				std::string errorDesc = "EthernetFeeder:Failed sending the fuzz file bytes to the target";
 				std::cout << errorDesc << std::endl;
-				SharedMemMessage messageToFeeder(SHARED_MEM_MESSAGE_FUZZ_ERROR, errorDesc.c_str(), (int)errorDesc.length());
+				SharedMemMessage messageToFeeder(SHARED_MEM_MESSAGE_FUZZ_ERROR, errorDesc.c_str(), static_cast<int>(errorDesc.length()));
 				sharedMemIPC_ToRunner.sendMessageToServer(&messageToFeeder);
 			}
 		}
