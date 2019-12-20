@@ -27,11 +27,22 @@ git clone https://github.com/openssl/openssl.git
 cd openssl
 git checkout 97ace46e11dba4c4c2b7cb67140b6ec152cfaaf4
 
+# Transalting arch to something openssl understands
+
+if [[ $ARCH == "Intel80386" ]] ; then
+	OSSLARCH="linux-x86"
+elif [[ $ARCH == "x86-64" ]] ; then
+	OSSLARCH="linux-x86_64"
+elif [[ $ARCH == "ARM" ]] ; then
+	OSSLARCH="linux-armv4"
+elif [[ $ARCH == "ARMaarch64" ]] ; then
+	OSSLARCH="linux-aarch64"
+fi
 
 # Actually build openssl
 mkdir -p build$ARCH
 cd build$ARCH
-perl ../config --release no-tests no-unit-test no-asm enable-static-engine no-shared
+perl ../Configure $OSSLARCH --release no-tests no-unit-test no-asm enable-static-engine no-shared
 make -j$THREADS
 cd ../..
 
