@@ -51,7 +51,7 @@ for (my $k=0; $k < $mystrcmpCopies; $k++){
 		print $file "		str1++;\n";
 		print $file "		str2++;\n";
 		print $file "	}\n";
-		print $file "	return *(const unsigned char*)str1 - *(const unsigned char*)str2;\n";
+		print $file "	return *reinterpret_cast<const unsigned char*>(str1) - *reinterpret_cast<const unsigned char*>(str2);\n";
 		print $file "}\n\n";
 	}
 }
