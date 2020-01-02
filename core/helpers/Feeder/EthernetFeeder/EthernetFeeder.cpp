@@ -358,7 +358,7 @@ int main(int argc, char* argv[])
 			else {
 				std::string errorDesc = "EthernetFeeder:Failed sending the fuzz file bytes to the target";
 				std::cout << errorDesc << std::endl;
-				SharedMemMessage messageToFeeder(SHARED_MEM_MESSAGE_FUZZ_ERROR, errorDesc.c_str(), static_cast<int>(errorDesc.length()));
+				SharedMemMessage messageToFeeder(SHARED_MEM_MESSAGE_ERROR, errorDesc.c_str(), static_cast<int>(errorDesc.length()));
 				sharedMemIPC_ToRunner.sendMessageToServer(&messageToFeeder);
 			}
 		}
