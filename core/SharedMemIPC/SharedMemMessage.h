@@ -57,6 +57,7 @@ class SHAREDMEMIPC_API  SharedMemMessage
 public:
 
 	SharedMemMessage(SharedMemMessageType messageType, const char* data, int dataLength);
+	SharedMemMessage(const SharedMemMessage &other);
 	SharedMemMessage();
 	virtual ~SharedMemMessage();
 
