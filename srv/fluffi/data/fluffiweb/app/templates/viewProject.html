@@ -26,7 +26,7 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
     <div class="row">
         <div class="col-md-6 {{'alert-bg' if project.checkRating }}"><h1>{{ project.name }}</h1></div>
         <div class="col-md-6" style="padding-top:25px">
-            <form action="{{ url_for('archiveProject', projId=project.id) }}" method="POST" class="archive-form-2">
+            <form action="{{ url_for('archiveProject', projId=project.ID) }}" method="POST" class="archive-form-2">
                 <input class="confirm btn btn-default" type="submit" value="Archive Project"/>
             </form>
         </div>
@@ -54,33 +54,33 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
                     <td style="text-align: center;">{{ project.testcases }}</td>
                 </tr>
                 <tr>
-                    <th scope="row"><a href="/projects/{{ project.id }}/population/1">Population</a></th>
+                    <th scope="row"><a href="/projects/{{ project.ID }}/population/1">Population</a></th>
                     <td style="text-align: center;">{{ project.numPopulation }} / {{ project.numMinimizedPop }}</td>
                 </tr>
                 <tr>
-                    <th scope="row"><a href="/projects/{{ project.id }}/accessVioTotal/1">Access Violations (Total)</a>
+                    <th scope="row"><a href="/projects/{{ project.ID }}/accessVioTotal/1">Access Violations (Total)</a>
                     </th>
                     <td style="text-align: center;">{{ project.numTotalAccessViolation }}</td>
                 </tr>
                 <tr>
-                    <th scope="row"><a href="/projects/{{ project.id }}/accessVioUnique">Access Violations (Unique)</a>
+                    <th scope="row"><a href="/projects/{{ project.ID }}/accessVioUnique">Access Violations (Unique)</a>
                     </th>
                     <td style="text-align: center;">{{ project.numUniqueAccessViolation }}</td>
                 </tr>
                 <tr>
-                    <th scope="row"><a href="/projects/{{ project.id }}/totalCrashes/1">Crashes (Total)</a></th>
+                    <th scope="row"><a href="/projects/{{ project.ID }}/totalCrashes/1">Crashes (Total)</a></th>
                     <td style="text-align: center;">{{ project.numCrash }}</td>
                 </tr>
                 <tr>
-                    <th scope="row"><a href="/projects/{{ project.id }}/uniqueCrashes">Crashes (Unique)</a></th>
+                    <th scope="row"><a href="/projects/{{ project.ID }}/uniqueCrashes">Crashes (Unique)</a></th>
                     <td style="text-align: center;">{{ project.numUniqueCrash }}</td>
                 </tr>
                 <tr>
-                    <th scope="row"><a href="/projects/{{ project.id }}/hangs/1">Hangs</a></th>
+                    <th scope="row"><a href="/projects/{{ project.ID }}/hangs/1">Hangs</a></th>
                     <td style="text-align: center;">{{ project.numHang }}</td>
                 </tr>
                 <tr>
-                    <th scope="row"><a href="/projects/{{ project.id }}/noResponse/1">No Response</a></th>
+                    <th scope="row"><a href="/projects/{{ project.ID }}/noResponse/1">No Response</a></th>
                     <td style="text-align: center;">{{ project.numNoResponse }}</td>
                 </tr>
                 <tr>
@@ -118,21 +118,21 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
                 <div class="container">
                     <h2 class="display-3" style="color:black;">Analysis</h2>
                     <div class="col-md-6">
-                        <p><a class="btn btn-primary btn-lg analysis-btn" href="/projects/{{ project.id }}/violations" role="button">
+                        <p><a class="btn btn-primary btn-lg analysis-btn" href="/projects/{{ project.ID }}/violations" role="button">
                             Access Violations and Crashes &raquo;</a>
                         </p>
-                        <p><a class="btn btn-primary btn-lg analysis-btn" href="/projects/{{ project.id }}/download" role="button">
+                        <p><a class="btn btn-primary btn-lg analysis-btn" href="/projects/{{ project.ID }}/download" role="button">
                             Download Testcase Set &raquo;</a>
                         </p>
-                        <p><a class="btn btn-primary btn-lg analysis-btn" href="/static/viewPopulationGraph.html?#{{ project.id }}"
+                        <p><a class="btn btn-primary btn-lg analysis-btn" href="/static/viewPopulationGraph.html?#{{ project.ID }}"
                               role="button">Population Graph &raquo;</a></p>
                     </div>
                     <div class="col-md-6">
-                        <p><a class="btn btn-primary btn-lg analysis-btn" href="/projects/diagrams/{{ project.id }}" role="button">
+                        <p><a class="btn btn-primary btn-lg analysis-btn" href="/projects/diagrams/{{ project.ID }}" role="button">
                             Project Diagrams &raquo;</a>
                         </p>
                         {% if project.numLM > 0 %}
-                        <p><a class="btn btn-primary btn-lg analysis-btn" href="/projects/{{ project.id }}/managedInstances"
+                        <p><a class="btn btn-primary btn-lg analysis-btn" href="/projects/{{ project.ID }}/managedInstances"
                               role="button">Managed Instances &raquo;</a>
                         </p>
                         {% else %}
@@ -140,7 +140,7 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
                             Managed Instances &raquo;</a>
                         </p>
                         {% endif %}
-                        <p><a class="btn btn-primary btn-lg analysis-btn" href="/projects/{{ project.id }}/configSystemInstances"
+                        <p><a class="btn btn-primary btn-lg analysis-btn" href="/projects/{{ project.ID }}/configSystemInstances"
                               role="button">Config System Instances &raquo;</a></p>
                     </div>
                 </div>
@@ -161,9 +161,9 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
         <tbody>
         {% for location in project.locations %}
         <tr>
-            <td><a href="/locations/view/{{ location.id }}">{{ location.Name }}</a></td>
+            <td><a href="/locations/view/{{ location.ID }}">{{ location.Name }}</a></td>
             <td>
-                <input onclick="deleteLocation({{ project.id }}, '{{ location.Name }}')" type="button" value="Delete"/>
+                <input onclick="deleteLocation({{ project.ID }}, '{{ location.Name }}')" type="button" value="Delete"/>
             </td>
         </tr>
         {% endfor %}
@@ -181,7 +181,7 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
                     <h4 class="modal-title">Add Location to Project:</h4>
                 </div>
                 <div class="modal-body">
-                    <form action="{{ url_for('addProjectLocation', projId=project.id) }}" method="POST"
+                    <form action="{{ url_for('addProjectLocation', projId=project.ID) }}" method="POST"
                           name="addLocation">
                         {{ locationForm.hidden_tag() }}
                         <p>
@@ -210,7 +210,7 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
 <div class="container">
     <h2>Settings</h2>
     <div data-toggle="fieldset" id="option-fieldset">
-        <form action="{{ url_for('createSetting', projId=project.id) }}" method="POST" name="addSetting">
+        <form action="{{ url_for('createSetting', projId=project.ID) }}" method="POST" name="addSetting">
             <table class="table">
                 <thead>
                 <tr>
@@ -226,8 +226,8 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
                     {% if setting.name == "runnerType" %}
                     <td>{{ setting.name }}</td>
                     <td>
-                        <select class="form-control" id="SettingValue-{{ setting.id }}"
-                                name="SettingValue-{{ setting.id }}">
+                        <select class="form-control" id="SettingValue-{{ setting.ID }}"
+                                name="SettingValue-{{ setting.ID }}">
                             <option selected="selected">{{ setting.value }}</option>
                             {% for option in setting.options %}
                             <option value="{{ option }}">{{ option }}</option>
@@ -235,11 +235,11 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
                         </select>
                     </td>
                     <td>
-                        <input onclick="updateSetting({{ project.id }}, {{ setting.id }}, {{ loop.index }})"
+                        <input onclick="updateSetting({{ project.ID }}, {{ setting.ID }}, {{ loop.index }})"
                                type="button"
                                value="Update"/>
-                        <input id="deleteSetting{{ setting.name }}{{ project.id }}"
-                               onclick="deleteSetting({{ project.id }}, {{ setting.id }})" type="button"
+                        <input id="deleteSetting{{ setting.name }}{{ project.ID }}"
+                               onclick="deleteSetting({{ project.ID }}, {{ setting.ID }})" type="button"
                                value="Delete"/>
                     </td>
                     <td>
@@ -255,8 +255,8 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
                     </td>
                     <td>
                         <input data-target="#updateGeneratorTypes" data-toggle="modal" type="button" value="Update"/>
-                        <input id="deleteSetting{{ setting.name }}{{ project.id }}"
-                               onclick="deleteSetting({{ project.id }}, {{ setting.id }})" type="button"
+                        <input id="deleteSetting{{ setting.name }}{{ project.ID }}"
+                               onclick="deleteSetting({{ project.ID }}, {{ setting.ID }})" type="button"
                                value="Delete"/>
                     </td>
                     <td>
@@ -286,7 +286,7 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
                                     </div>
                                     <div>
                                         <input class="btn btn-primary"
-                                               onclick="updateTypeSetting({{ project.id }}, {{ setting.id }}, {{ setting.mutatorTypesIDs }}, 'mutator')"
+                                               onclick="updateTypeSetting({{ project.ID }}, {{ setting.ID }}, {{ setting.mutatorTypesIDs }}, 'mutator')"
                                                type="button"
                                                value="Update"/>
                                     </div>
@@ -304,8 +304,8 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
                     </td>
                     <td>
                         <input data-target="#updateevaluatorTypes" data-toggle="modal" type="button" value="Update"/>
-                        <input id="deleteSetting{{ setting.name }}{{ project.id }}"
-                               onclick="deleteSetting({{ project.id }}, {{ setting.id }})" type="button"
+                        <input id="deleteSetting{{ setting.name }}{{ project.ID }}"
+                               onclick="deleteSetting({{ project.ID }}, {{ setting.ID }})" type="button"
                                value="Delete"/>
                     </td>
                     <td>
@@ -335,7 +335,7 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
                                     </div>
                                     <div>
                                         <input class="btn btn-primary "
-                                               onclick="updateTypeSetting({{ project.id }}, {{ setting.id }}, {{ setting.evaluatorTypesIDs }}, 'evaluator')"
+                                               onclick="updateTypeSetting({{ project.ID }}, {{ setting.ID }}, {{ setting.evaluatorTypesIDs }}, 'evaluator')"
                                                type="button"
                                                value="Update"/>
                                     </div>
@@ -348,14 +348,14 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
                     </div>
                     {% else %}
                     <td>{{ setting.name }}</td>
-                    <td><input id="SettingValue-{{ setting.id }}" size="98" type="text" value="{{ setting.value }}"/>
+                    <td><input id="SettingValue-{{ setting.ID }}" size="98" type="text" value="{{ setting.value }}"/>
                     </td>
                     <td>
-                        <input onclick="updateSetting({{ project.id }}, {{ setting.id }}, {{ loop.index }})"
+                        <input onclick="updateSetting({{ project.ID }}, {{ setting.ID }}, {{ loop.index }})"
                                type="button"
                                value="Update"/>
-                        <input id="deleteSetting{{ setting.name }}{{ project.id }}"
-                               onclick="deleteSetting({{ project.id }}, {{ setting.id }})" type="button"
+                        <input id="deleteSetting{{ setting.name }}{{ project.ID }}"
+                               onclick="deleteSetting({{ project.ID }}, {{ setting.ID }})" type="button"
                                value="Delete"/>
                     </td>
                     <td>
@@ -402,7 +402,7 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
 <div class="container">
     <h2>Target Modules</h2>
     <div data-toggle="fieldset" id="phone-fieldset">
-        <form action="{{ url_for('createProjectModule', projId=project.id) }}" method="POST" name="addModule">
+        <form action="{{ url_for('createProjectModule', projId=project.ID) }}" method="POST" name="addModule">
             <table class="table">
                 <thead>
                 <tr>
@@ -417,8 +417,8 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
                     <td>{{ module.name }}</td>
                     <td>{{ module.path }}</td>
                     <td>
-                        <input id="deleteModule{{ module.name }}{{ project.id }}"
-                               onclick="deleteModule({{ project.id }}, {{ module.id }})" type="button"
+                        <input id="deleteModule{{ module.name }}{{ project.ID }}"
+                               onclick="deleteModule({{ project.ID }}, {{ module.ID }})" type="button"
                                value="Delete"/>
                     </td>
                 </tr>
@@ -467,7 +467,7 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
             <h2>Upload new Target <span class="glyphicon glyphicon-info-sign" data-placement="right" data-toggle="tooltip"
                                             style="font-size: 20px" title="This will only save the new *.zip file!"></span>
             </h2>
-            <form action="{{ url_for('uploadNewTargetZip', projId=project.id) }}" method="POST" enctype=multipart/form-data>
+            <form action="{{ url_for('uploadNewTargetZip', projId=project.ID) }}" method="POST" enctype=multipart/form-data>
                 <p>Upload new Target as *.zip file:</p>
                 <input name="uploadFile" type="file" required>
                 <input class="btn btn-primary" type="submit" value="Upload" style="margin-top:15px"/>
@@ -479,7 +479,7 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
             <h2>Upload new Basic Blocks for GDB <span class="glyphicon glyphicon-info-sign" data-placement="right" data-toggle="tooltip"
                                             style="font-size: 20px" title="Upload file with following style: 'module, offset'!"></span>
             </h2>
-            <form action="{{ url_for('uploadNewBasicBlocks', projId=project.id) }}" method="POST" enctype=multipart/form-data>
+            <form action="{{ url_for('uploadNewBasicBlocks', projId=project.ID) }}" method="POST" enctype=multipart/form-data>
                 <p>Upload new BasicBlocks for GDB as *.txt or *.csv file:</p>
                 <input name="uploadFile" type="file" required>
                 <input class="btn btn-primary" type="submit" value="Upload" style="margin-top:15px"/>
@@ -491,7 +491,7 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
             <h2>Reset Fuzzjob <span class="glyphicon glyphicon-info-sign" data-placement="right" data-toggle="tooltip"
                                     style="font-size: 20px" title="Clears all tables except Settings and Target Modules"></span>
             </h2>
-            <form action="{{ url_for('resetFuzzjob', projId=project.id) }}" method="POST" name="resetFuzzjob">
+            <form action="{{ url_for('resetFuzzjob', projId=project.ID) }}" method="POST" name="resetFuzzjob">
                 <div class="checkbox">
                     <label><input name="deletePopulation" type="checkbox" value="delete">Delete Population</label>
                 </div>

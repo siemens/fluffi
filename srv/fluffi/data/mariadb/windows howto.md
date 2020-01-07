@@ -10,7 +10,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier
 -->
 
-If you want to install the FLUFFI db on a Windows server, start with my.ini.
+If you want to install the FLUFFI db on a Windows server, start with [my.ini](my.ini). It should be copied to mysql's data folder, e.g., C:\Program Files\MariaDB 10.4\data
+
+Please note, that you need to adjust the values (especially innodb_buffer_pool_size)
 
 Then create users and database with
 

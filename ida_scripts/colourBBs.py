@@ -8,7 +8,7 @@
 # 
 # Author(s): Abian Blome, Thomas Riedmaier
 
-import idaapi
+import ida_kernwin
 import ida_nalt
 import idautils
 import idc
@@ -34,7 +34,7 @@ class BasicBlocks(Base):
         self.when = when
         self.testcase = testcase
 
-filename = idaapi.ask_file(False, '*.csv', 'Please select csv')
+filename = ida_kernwin.ask_file(False, '*.csv', 'Please select csv')
 
 blocks = []
 
@@ -49,14 +49,14 @@ with open(filename) as csvfile:
 
 for bb in blocks:
     absPos = bb + ida_nalt.get_imagebase()
-    f = idaapi.get_func(absPos)
+    f = ida_funcs.get_func(absPos)
     if f is None:
         continue
-    fc = idaapi.FlowChart(f)
+    fc = ida_gdl.FlowChart(f)
     # Highlight the complete function
-    idc.SetColor(absPos, idc.CIC_FUNC, 0xFFF000)
+    idc.set_color(absPos, idc.CIC_FUNC, 0xFFF000)
     for block in fc:
-        if block.startEA <= absPos and block.endEA > absPos:
+        if block.start_ea <= absPos and block.end_ea > absPos:
             #print "Setting colour for %x" % absPos
             for i in Heads(block.startEA, block.endEA):
                 idc.set_color(i, CIC_ITEM, 0xFFAA00)

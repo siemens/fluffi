@@ -78,6 +78,8 @@ void LMMonitorWorker::workerMain()
 		m_workerThreadState->dbManager->deleteDoneCommandsOlderThanXSec(60 * 30);
 		m_workerThreadState->dbManager->deleteManagedLMStatusOlderThanXSec(60 * 3);
 		m_workerThreadState->dbManager->deleteWorkersNotSeenSinceXSec(60 * 1);
+		m_workerThreadState->dbManager->deleteManagedLMLogMessagesIfMoreThan(1000);
+		m_workerThreadState->dbManager->deleteManagedLMLogMessagesOlderThanXSec(60 * 60 * 24 * 7);
 
 		// call get Status to all registered instances
 		for (auto& managedInstance : m_workerThreadState->dbManager->getAllRegisteredLMs()) {
@@ -106,6 +108,12 @@ void LMMonitorWorker::workerMain()
 			}
 
 			m_workerThreadState->dbManager->addNewManagedLMStatus(managedInstance.first, resp.getstatusresponse().status());
+
+			std::vector<std::string> MessagesAsVector;
+			for (int i = 0; i < resp.getstatusresponse().logmessages().size(); i++) {
+				MessagesAsVector.push_back(resp.getstatusresponse().logmessages().Get(i));
+			}
+			m_workerThreadState->dbManager->addNewManagedLMLogMessages(managedInstance.first, MessagesAsVector);
 		}
 	}
 

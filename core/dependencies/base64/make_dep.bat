@@ -20,6 +20,11 @@
 ::
 :: Author(s): Thomas Riedmaier, Pascal Eckmann
 
+IF NOT DEFINED VCVARSALL (
+		ECHO Environment Variable VCVARSALL needs to be set!
+		goto errorDone
+)
+
 RMDIR /Q/S include
 RMDIR /Q/S lib
 
@@ -43,7 +48,7 @@ mkdir build64
 mkdir build86
 SETLOCAL
 cd build64
-call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64
+call %VCVARSALL% x64
 
 cl.exe /MT /c /EHsc ..\base64.cpp
 LIB.EXE /OUT:base64.LIB base64.obj
@@ -54,7 +59,7 @@ ENDLOCAL
 
 SETLOCAL
 cd build86
-call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86
+call %VCVARSALL% x86
 
 cl.exe /MT /c /EHsc ..\base64.cpp
 LIB.EXE /OUT:base64.LIB base64.obj
@@ -82,10 +87,10 @@ ver > nul
 
 RMDIR /Q/S cpp-base64
 
-goto :eof
+goto done
 
-:err
+:errorDone
 exit /B 1
 
-:eof
+:done
 exit /B 0

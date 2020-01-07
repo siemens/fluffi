@@ -12,10 +12,10 @@ ECHO off
 
 :parseArgs
 :: asks for the -WITH_DEPS argument and store the value in the variable WITH_DEPS
-call:getArgWithValue "-WITH_DEPS" "WITH_DEPS" "%~1" "%~2" && SHIFT && SHIFT && goto :parseArgs
+call:getArgWithValue "-WITH_DEPS" "WITH_DEPS" "%~1" "%~2" && SHIFT && SHIFT && goto parseArgs
 
 :: asks for the -DEPLOY_TO_FTP argument and store the value in the variable DEPLOY_TO_FTP
-call:getArgWithValue "-DEPLOY_TO_FTP" "DEPLOY_TO_FTP" "%~1" "%~2" && SHIFT && SHIFT && goto :parseArgs
+call:getArgWithValue "-DEPLOY_TO_FTP" "DEPLOY_TO_FTP" "%~1" "%~2" && SHIFT && SHIFT && goto parseArgs
 
 :: resetting %ERRORLEVEL%
 ver > nul
@@ -25,64 +25,74 @@ ECHO WITH_DEPS: %WITH_DEPS%
 ECHO DEPLOY_TO_FTP: %DEPLOY_TO_FTP%
 ECHO.
 
+:: Figuring out Visual Studio Build path
+
+SET VCVARSALL="NOT FOUND"
+IF EXIST "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" (
+		SET VCVARSALL="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat"
+		)
+IF EXIST "C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvarsall.bat" (
+		SET VCVARSALL="C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvarsall.bat"
+		)
+IF EXIST "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvarsall.bat" (
+		SET VCVARSALL="C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvarsall.bat"
+		)
+
 :: =====================================================================
 :: Building FLUFFI dependencies
 
 IF "%WITH_DEPS%" == "TRUE" (
-		ECHO Checking IF all build requirements for FLUFFI dependencies are installed
+		ECHO Checking IF all build requirements for FLUFFI dependencies are installed ...
 		WHERE git >nul 2>nul
 		IF %ERRORLEVEL% NEQ 0 (
 				ECHO git wasn't found 
-				goto :err
+				goto errorDone
 				)
-		IF NOT EXIST "C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" (
-				ECHO Build tools for Visual Studio 2015 C++ weren't found 
-				goto :err
+		IF %VCVARSALL% == "NOT FOUND" (
+				ECHO Build tools for Visual Studio 2017 C++ weren't found 
+				goto errorDone
 				)
 		IF NOT EXIST "C:\Program Files\Git\usr\bin\patch.exe" (
 				ECHO patch.exe wasn't found 
-				goto :err
-				)
-		IF NOT EXIST "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" (
-				ECHO Build tools for Visual Studio 2013 C++ weren't found 
-				goto :err
+				goto errorDone
 				)
 		WHERE cmake >nul 2>nul
 		IF %ERRORLEVEL% NEQ 0 (
 				ECHO cmake wasn't found 
-				goto :err
+				goto errorDone
 				)
 		WHERE powershell >nul 2>nul
 		IF %ERRORLEVEL% NEQ 0 (
 				ECHO powershell wasn't found 
-				goto :err
+				goto errorDone
 				)
 		WHERE perl >nul 2>nul
 		IF %ERRORLEVEL% NEQ 0 (
 				ECHO perl wasn't found 
-				goto :err
+				goto errorDone
 				)
 		IF NOT EXIST "C:\cygwin64\bin\bash.exe" (
 				ECHO cygwin64 isn't installed.
-				goto :err
+				goto errorDone
 				)
 		IF NOT EXIST "C:\cygwin64\bin\make.exe" (
 				ECHO cygwin64 make isn't installed.
-				goto :err
+				goto errorDone
 				)
 		IF NOT EXIST "C:\cygwin64\bin\i686-pc-cygwin-gcc.exe" (
 				ECHO cygwin64 gcc-i68 isn't installed.
-				goto :err
+				goto errorDone
 				)
 		IF NOT EXIST "C:\cygwin64\bin\gcc.exe" (
 				ECHO cygwin64 gcc isn't installed.
-				goto :err
+				goto errorDone
 				)
 
+		ECHO ... success. Ready to build FLUFFI dependencies!
 		ECHO Building Fluffi dependencies
 		CD ..\..\core\dependencies
 		call make_all_dep.bat
-		IF errorlevel 1 goto :err
+		IF errorlevel 1 goto errorDone
 		CD ..\..\build\windows
 		)
 
@@ -91,21 +101,21 @@ IF "%WITH_DEPS%" == "TRUE" (
 :: =====================================================================
 :: Building FLUFFI Core
 
-ECHO Checking IF all tools needed to build FLUFFI are installed
-IF NOT EXIST "C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" (
-		ECHO Build tools for Visual Studio 2015 C++ weren't found 
-		goto :err
+ECHO Checking IF all tools needed to build FLUFFI are installed ...
+IF %VCVARSALL% == "NOT FOUND" (
+		ECHO Build tools for Visual Studio 2017 C++ weren't found 
+		goto errorDone
 		)
 WHERE go >nul 2>nul
 IF %ERRORLEVEL% NEQ 0 (
 		ECHO go wasn't found 
-		goto :err
+		goto errorDone
 		)
-
+ECHO ... success. Ready to build FLUFFI core!
 ECHO Building Fluffi core
 CD ..\..\core
 call build.bat
-IF errorlevel 1 goto :err
+IF errorlevel 1 goto errorDone
 CD ..\build\windows
 
 :: =====================================================================
@@ -117,18 +127,18 @@ IF "%DEPLOY_TO_FTP%" == "TRUE" (
 		ECHO Checking IF all tools needed to deploy fluffi to the ftp server are installed
 		IF NOT EXIST "C:\Program Files\7-Zip\7z.exe" (
 				ECHO 7zip wasn't found 
-				goto :err
+				goto errorDone
 				)
 
 
 		IF NOT EXIST "C:\Program Files (x86)\WinSCP\winscp.com" (
 				ECHO WinSCP wasn't found 
-				goto :err
+				goto errorDone
 				)
 
 		ECHO Deploying FLUFFI to ftp server
 		call deploy2FTP.bat
-		IF errorlevel 1 goto :err
+		IF errorlevel 1 goto errorDone
 
 		)
 
@@ -136,7 +146,7 @@ IF "%DEPLOY_TO_FTP%" == "TRUE" (
 :: =====================================================================
 
 ECHO Completed sucessfully :)
-goto :eof
+goto done
 
 :: =====================================================================
 :: This function sets a variable from a cli arg with value
@@ -157,9 +167,9 @@ IF "%~3"=="%~1" (
 exit /B 1
 goto :eof
 
-:err
+:errorDone
 ECHO Something went wrong :(
 exit /B 1
 
-:eof
+:done
 exit /B 0

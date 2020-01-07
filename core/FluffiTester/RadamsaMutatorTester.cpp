@@ -21,7 +21,7 @@ Author(s): Abian Blome, Thomas Riedmaier
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace FluffiTester
+namespace RadamsaMutatorTester
 {
 	TEST_CLASS(RadamsaMutatorTest)
 	{

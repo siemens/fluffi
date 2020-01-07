@@ -18,7 +18,7 @@ Author(s): Thomas Riedmaier, Pascal Eckmann
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace FluffiTester
+namespace TGWorkerThreadStateBuilderTester
 {
 	TEST_CLASS(TGWorkerThreadStateBuilderTest)
 	{

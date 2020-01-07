@@ -13,8 +13,6 @@ Author(s): Thomas Riedmaier, Pascal Eckmann
 #include "stdafx.h"
 #include "SharedMemIPC.h"
 
-//cp ../../../bin/libsharedmemipc.so .
-//g++ --std=c++11 -I../../../SharedMemIPC/ -o UDPFeeder stdafx.cpp UDPFeeder.cpp libsharedmemipc.so -Wl,-rpath='${ORIGIN}'
 
 #define RESP_TIMEOUT_MS 60000
 #define KNOWN_GOOD (char)0x98, (char)0x79, (char)0x01, (char)0x00, (char)0x00, (char)0x01, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x04, (char)0x74, (char)0x65, (char)0x73, (char)0x74, (char)0x04, (char)0x74, (char)0x65, (char)0x73, (char)0x74, (char)0x00, (char)0x00, (char)0x01, (char)0x00, (char)0x01

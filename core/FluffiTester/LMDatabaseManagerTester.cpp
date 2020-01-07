@@ -25,7 +25,7 @@ Author(s): Thomas Riedmaier, Abian Blome, Pascal Eckmann
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace FluffiTester
+namespace LMDatabaseManagerTester
 {
 	TEST_CLASS(LMDatabaseManagerTest)
 	{
@@ -349,29 +349,29 @@ namespace FluffiTester
 			blocks.insert(FluffiBasicBlock(44, 33));
 
 			//must fail before testcase is inserted into interesting testcases table
-			Assert::IsFalse(dbman->addBlocksToCoveredBlocks(ftid1, &blocks));
+			Assert::IsFalse(dbman->addBlocksToCoveredBlocks(ftid1, blocks));
 
 			dbman->addEntryToInterestingTestcasesTable(ftid1, ftid1, 0, "", LMDatabaseManager::TestCaseType::Population);
 			dbman->addEntryToInterestingTestcasesTable(ftid2, ftid2, 0, "", LMDatabaseManager::TestCaseType::Population);
 
 			//Must fail as target module are not set it
-			Assert::IsFalse(dbman->addBlocksToCoveredBlocks(ftid1, &blocks));
+			Assert::IsFalse(dbman->addBlocksToCoveredBlocks(ftid1, blocks));
 
 			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO target_modules (ID, ModuleName) VALUES (11, 'test1.dll')");
 			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO target_modules (ID, ModuleName) VALUES (33, 'test2.dll')");
 			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO target_modules (ID, ModuleName) VALUES (55, 'test3.dll')");
 
 			//Now it should work
-			Assert::IsTrue(dbman->addBlocksToCoveredBlocks(ftid1, &blocks));
+			Assert::IsTrue(dbman->addBlocksToCoveredBlocks(ftid1, blocks));
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from covered_blocks") == "2");
 
 			//Duplicate insert should merely overwrite the timestamp
-			Assert::IsTrue(dbman->addBlocksToCoveredBlocks(ftid1, &blocks));
+			Assert::IsTrue(dbman->addBlocksToCoveredBlocks(ftid1, blocks));
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from covered_blocks") == "2");
 
 			blocks.insert(FluffiBasicBlock(66, 55));
 
-			Assert::IsTrue(dbman->addBlocksToCoveredBlocks(ftid2, &blocks));
+			Assert::IsTrue(dbman->addBlocksToCoveredBlocks(ftid2, blocks));
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from covered_blocks") == "5");
 
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT CreatorTestcaseID from covered_blocks WHERE Offset = 66") == dbman->EXECUTE_TEST_STATEMENT("SELECT ID from interesting_testcases WHERE CreatorServiceDescriptorGUID = '" + guid2 + "'"));
@@ -386,7 +386,7 @@ namespace FluffiTester
 
 			//Transaction isolation should not change
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT @@TX_ISOLATION;") == "REPEATABLE-READ");
-			Assert::IsTrue(dbman->addBlocksToCoveredBlocks(ftid1, &blocks));
+			Assert::IsTrue(dbman->addBlocksToCoveredBlocks(ftid1, blocks));
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT @@TX_ISOLATION;") == "REPEATABLE-READ");
 
 			//64 bit rvas should be possible
@@ -401,7 +401,7 @@ namespace FluffiTester
 			std::set<FluffiBasicBlock> blocks2;
 			blocks2.insert(FluffiBasicBlock(0x12345678ab, 11));
 
-			Assert::IsTrue(dbman->addBlocksToCoveredBlocks(ftid3, &blocks2));
+			Assert::IsTrue(dbman->addBlocksToCoveredBlocks(ftid3, blocks2));
 			Assert::IsTrue(stoull(dbman->EXECUTE_TEST_STATEMENT("SELECT Offset from covered_blocks WHERE CreatorTestcaseID = (SELECT ID from interesting_testcases WHERE CreatorServiceDescriptorGUID ='guid3') LIMIT 1")) == 0x12345678ab);
 		}
 
@@ -559,7 +559,7 @@ namespace FluffiTester
 			std::set<FluffiBasicBlock> blocks;
 			blocks.insert(FluffiBasicBlock(22, 11));
 			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO target_modules (ID, ModuleName) VALUES (11, 'test1.dll')");
-			Assert::IsTrue(dbman->addBlocksToCoveredBlocks(ftid2, &blocks));
+			Assert::IsTrue(dbman->addBlocksToCoveredBlocks(ftid2, blocks));
 			Assert::IsTrue(stoi(dbman->EXECUTE_TEST_STATEMENT("SELECT Count(*) from covered_blocks")) == 1);
 			Assert::IsTrue(stoi(dbman->EXECUTE_TEST_STATEMENT("SELECT Count(*) from interesting_testcases WHERE CreatorServiceDescriptorGUID = \"" + guid2 + "\"")) == 1);
 			Assert::IsTrue(dbman->addEntryToInterestingTestcasesTable(ftid2, ftid1, 200, "", LMDatabaseManager::TestCaseType::Exception_AccessViolation));
@@ -598,7 +598,7 @@ namespace FluffiTester
 			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO target_modules (ID, ModuleName) VALUES (33, 'test2.dll')");
 			dbman->EXECUTE_TEST_STATEMENT("INSERT INTO target_modules (ID, ModuleName) VALUES (55, 'test3.dll')");
 
-			dbman->addBlocksToCoveredBlocks(ftid1, &blocks);
+			dbman->addBlocksToCoveredBlocks(ftid1, blocks);
 
 			GetCurrentBlockCoverageResponse* resp = dbman->generateGetCurrentBlockCoverageResponse();
 
@@ -626,7 +626,7 @@ namespace FluffiTester
 			delete resp;
 
 			//Assert nothing changes if we reinsert the blocks for a different testcase
-			dbman->addBlocksToCoveredBlocks(ftid2, &blocks);
+			dbman->addBlocksToCoveredBlocks(ftid2, blocks);
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) FROM covered_blocks") == "6");
 			resp = dbman->generateGetCurrentBlockCoverageResponse();
 			Assert::IsTrue(blocks.size() == 3);
@@ -882,7 +882,7 @@ namespace FluffiTester
 		{
 			std::set<FluffiTestcaseID> ids;
 
-			bool success = dbman->addEntriesToCompletedTestcasesTable(&ids);
+			bool success = dbman->addEntriesToCompletedTestcasesTable(ids);
 			Assert::IsTrue(success, L"failed adding an empty vector");
 			Assert::IsTrue("0" == dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) FROM completed_testcases"), L"Expected 0 elements in completed_testcases but that was not the case");
 
@@ -895,7 +895,7 @@ namespace FluffiTester
 			FluffiServiceDescriptor sd3{ "hap3", "guid3" };
 			FluffiTestcaseID tid3{ sd3, 3 };
 			ids.insert(tid3);
-			success = dbman->addEntriesToCompletedTestcasesTable(&ids);
+			success = dbman->addEntriesToCompletedTestcasesTable(ids);
 			Assert::IsTrue(success, L"failed adding an vector of three elements");
 			Assert::IsTrue("3" == dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) FROM completed_testcases"), L"Expected 3 elements in completed_testcases but that was not the case (1)");
 
@@ -907,7 +907,7 @@ namespace FluffiTester
 			FluffiTestcaseID tid4{ sd4, 4 };
 			ids.insert(tid4);
 
-			success = dbman->addEntriesToCompletedTestcasesTable(&ids);
+			success = dbman->addEntriesToCompletedTestcasesTable(ids);
 			Assert::IsTrue(success, L"failed adding the vector a second time");
 			Assert::IsTrue("7" == dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) FROM completed_testcases"), L"Expected 7 elements in completed_testcases but that was not the case");
 
@@ -984,6 +984,94 @@ namespace FluffiTester
 
 			//Check if other entries are affected
 			Assert::IsTrue(stoi(dbman->EXECUTE_TEST_STATEMENT("SELECT TestCaseType from interesting_testcases WHERE CreatorLocalID = " + std::to_string(localid2))) == LMDatabaseManager::TestCaseType::Locked);
+		}
+
+		TEST_METHOD(LMDatabaseManager_addNewManagedInstanceLogMessages)
+		{
+			dbman->EXECUTE_TEST_STATEMENT("TRUNCATE TABLE managed_instances_logmessages;");
+
+			std::string tooLongGUID(60, 'a');
+			Assert::IsFalse(dbman->addNewManagedInstanceLogMessages(tooLongGUID, {}), L"Inserting a log message with a too long guid succeeded for some reason");
+
+			std::string validGUID = "testguid";
+			std::vector<std::string> invalidLogMessages;
+			invalidLogMessages.push_back(std::string(2000, 'b'));
+			Assert::IsFalse(dbman->addNewManagedInstanceLogMessages(validGUID, invalidLogMessages), L"Inserting a log message with a too long content succeeded for some reason");
+
+			std::vector<std::string> validLogMessages;
+			validLogMessages.push_back("a");
+			validLogMessages.push_back("b");
+			validLogMessages.push_back("c");
+			Assert::IsTrue(dbman->addNewManagedInstanceLogMessages(validGUID, validLogMessages), L"Inserting new valid log messages failed");
+
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from managed_instances_logmessages") == "3", L"We got more or less log messages than expected");
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT ServiceDescriptorGUID from managed_instances_logmessages WHERE ID=1") == "testguid", L"Invalid guid stored (1)");
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT ServiceDescriptorGUID from managed_instances_logmessages WHERE ID=2") == "testguid", L"Invalid guid stored (2)");
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT ServiceDescriptorGUID from managed_instances_logmessages WHERE ID=3") == "testguid", L"Invalid guid stored (3)");
+
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT LogMessage from managed_instances_logmessages WHERE ID=1") == "a", L"Invalid log message stored (1)");
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT LogMessage from managed_instances_logmessages WHERE ID=2") == "b", L"Invalid log message stored (2)");
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT LogMessage from managed_instances_logmessages WHERE ID=3") == "c", L"Invalid log message stored (3)");
+
+			dbman->EXECUTE_TEST_STATEMENT("TRUNCATE TABLE managed_instances_logmessages;");
+		}
+		TEST_METHOD(LMDatabaseManager_deleteManagedInstanceLogMessagesIfMoreThan)
+		{
+			dbman->EXECUTE_TEST_STATEMENT("TRUNCATE TABLE managed_instances_logmessages;");
+
+			std::string validGUID = "testguid";
+			std::vector<std::string> validLogMessages;
+			validLogMessages.push_back("a");
+			validLogMessages.push_back("b");
+			validLogMessages.push_back("c");
+			Assert::IsTrue(dbman->addNewManagedInstanceLogMessages(validGUID, validLogMessages), L"Inserting new valid log messages failed");
+
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from managed_instances_logmessages") == "3", L"We got more or less log messages than expected (1)");
+
+			Assert::IsTrue(dbman->deleteManagedInstanceLogMessagesIfMoreThan(3), L"Calling deleteManagedInstanceLogMessagesIfMoreThan failed (1)");
+
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from managed_instances_logmessages") == "3", L"We got more or less log messages than expected (2)");
+
+			Assert::IsTrue(dbman->deleteManagedInstanceLogMessagesIfMoreThan(2), L"Calling deleteManagedInstanceLogMessagesIfMoreThan failed (2)");
+
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from managed_instances_logmessages") == "2", L"We got more or less log messages than expected (3)");
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT LogMessage from managed_instances_logmessages WHERE ID=2") == "b", L"Invalid log message stored (2)");
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT LogMessage from managed_instances_logmessages WHERE ID=3") == "c", L"Invalid log message stored (3)");
+
+			dbman->EXECUTE_TEST_STATEMENT("TRUNCATE TABLE managed_instances_logmessages;");
+		}
+		TEST_METHOD(LMDatabaseManager_deleteManagedInstanceLogMessagesOlderThanXSec)
+		{
+			dbman->EXECUTE_TEST_STATEMENT("TRUNCATE TABLE managed_instances_logmessages;");
+
+			std::string validGUID = "testguid";
+			std::vector<std::string> validLogMessages;
+			validLogMessages.push_back("a");
+			validLogMessages.push_back("b");
+			validLogMessages.push_back("c");
+			Assert::IsTrue(dbman->addNewManagedInstanceLogMessages(validGUID, validLogMessages), L"Inserting new valid log messages failed (1)");
+
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from managed_instances_logmessages") == "3", L"We got more or less log messages than expected (1)");
+
+			Assert::IsTrue(dbman->deleteManagedInstanceLogMessagesOlderThanXSec(5), L"Calling deleteManagedInstanceLogMessagesOlderThanXSec failed (1)");
+
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from managed_instances_logmessages") == "3", L"We got more or less log messages than expected (2)");
+
+			Sleep(2000);
+
+			Assert::IsTrue(dbman->addNewManagedInstanceLogMessages(validGUID, validLogMessages), L"Inserting new valid log messages failed (2)");
+
+			Assert::IsTrue(dbman->deleteManagedInstanceLogMessagesOlderThanXSec(5), L"Calling deleteManagedInstanceLogMessagesOlderThanXSec failed (2)");
+
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from managed_instances_logmessages") == "6", L"We got more or less log messages than expected (3)");
+
+			Sleep(4000);
+
+			Assert::IsTrue(dbman->deleteManagedInstanceLogMessagesOlderThanXSec(5), L"Calling deleteManagedInstanceLogMessagesOlderThanXSec failed (3)");
+
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from managed_instances_logmessages") == "3", L"We got more or less log messages than expected (4)");
+
+			dbman->EXECUTE_TEST_STATEMENT("TRUNCATE TABLE managed_instances_logmessages;");
 		}
 
 	private:

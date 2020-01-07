@@ -13,8 +13,11 @@ Author(s): Thomas Riedmaier, Michael Kraus, Abian Blome
 #include "stdafx.h"
 #include "CommPartnerManager.h"
 
-CommPartnerManager::CommPartnerManager()
-	: m_weigthSum(0), m_gen(m_rd())
+CommPartnerManager::CommPartnerManager() :
+	m_weigthSum(0),
+	m_mutex_(),
+	m_commDescriptorSet(),
+	m_gen(m_rd())
 {
 }
 

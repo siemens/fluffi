@@ -27,5 +27,5 @@ public:
 private:
 	CommInt* m_comm;
 
-	bool agentIsWelcomedAt(WorkerThreadState* workerThreadState, AgentType type, const google::protobuf::RepeatedPtrField< std::string > sts, const FluffiServiceDescriptor lmServiceDescriptor);
+	bool agentIsWelcomedAt(WorkerThreadState* workerThreadState, AgentType type, const google::protobuf::RepeatedPtrField< std::string >& sts, const FluffiServiceDescriptor lmServiceDescriptor);
 };

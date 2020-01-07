@@ -22,7 +22,7 @@ Author(s): Abian Blome, Thomas Riedmaier
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace FluffiTester
+namespace HonggfuzzMutatorTester
 {
 	TEST_CLASS(HonggfuzzMutatorTest)
 	{
