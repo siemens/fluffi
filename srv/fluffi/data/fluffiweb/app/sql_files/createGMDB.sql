@@ -129,15 +129,14 @@ CREATE TABLE IF NOT EXISTS fluffi_gm.gm_options (
 CREATE TABLE IF NOT EXISTS fluffi_gm.system_fuzzjob_instances (
 	`ID` INT NOT NULL AUTO_INCREMENT,
 	`System` INT NOT NULL,
-	`Fuzzjob` INT NOT NULL,
+	`Fuzzjob` INT DEFAULT NULL,
 	`AgentType` INT(1) NOT NULL,
 	`InstanceCount` INT NOT NULL,
 	`Architecture` VARCHAR(10) NOT NULL,
 	PRIMARY KEY (`ID`),
 	UNIQUE KEY(`System`, `Fuzzjob`, `AgentType`),
 	INDEX `system_fuzzjob_instances_FK1` (`System`),
-	CONSTRAINT `system_fuzzjob_instances_FK1` FOREIGN KEY (`System`) REFERENCES `systems` (`ID`) ON UPDATE CASCADE ON DELETE CASCADE,
-	CONSTRAINT `system_fuzzjob_instances_FK2` FOREIGN KEY (`Fuzzjob`) REFERENCES `fuzzjob` (`ID`) ON UPDATE CASCADE ON DELETE CASCADE
+	CONSTRAINT `system_fuzzjob_instances_FK1` FOREIGN KEY (`System`) REFERENCES `systems` (`ID`) ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT IGNORE INTO fluffi_gm.gm_options (`Setting`, `Value`) VALUES ('bootsystemdir', 'odroidRoot');
