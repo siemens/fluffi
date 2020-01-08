@@ -75,7 +75,7 @@ void fixHTTPContentLength(std::vector<char>* bytes) {
 		return;
 	}
 
-	int realContentLength = (int)fullrequest.length() - (int)doubleLinebreakPos - 4;
+	int realContentLength = static_cast<int>(fullrequest.length()) - static_cast<int>(doubleLinebreakPos) - 4;
 
 	int specifiedContentLength = atoi(&fullrequest[contentLengthPos + 16]);
 

@@ -25,7 +25,6 @@ Author(s): Thomas Riedmaier, Abian Blome, Roman Bendt, Pascal Eckmann
 #define SOCKET_ERROR -1
 #endif
 
-
 void preprocess(std::vector<char> bytes) {
 	// Add preprocession steps here as needed, e.g. for HTTP:
 	// dropNoDoubleLinebreak(&bytes);
@@ -64,26 +63,26 @@ bool sendBytesToHostAndPort(std::vector<char> fuzzBytes, std::string targethost,
 		}
 
 		// Connect to server.
-		volatile int iResult = connect(connectSocket, (struct sockaddr*)&saServer, sizeof(saServer));
+		volatile int iResult = connect(connectSocket, reinterpret_cast<struct sockaddr*>(&saServer), sizeof(saServer));
 		if (iResult == SOCKET_ERROR) {
 			closesocket(connectSocket);
 			connectSocket = INVALID_SOCKET;
 			continue;
 		}
 
-		iResult = send(connectSocket, &(fuzzBytes)[0], (int)fuzzBytes.size(), 0);
+		iResult = static_cast<int>(send(connectSocket, &(fuzzBytes)[0], static_cast<int>(fuzzBytes.size()), 0));
 		if (iResult == SOCKET_ERROR) {
 			closesocket(connectSocket);
 			connectSocket = INVALID_SOCKET;
 			continue;
 		}
 		char outbuf[1];
-		iResult = recv(connectSocket, outbuf, sizeof(outbuf), 0); //recv  one byte (if possible)
+		iResult = static_cast<int>(recv(connectSocket, outbuf, sizeof(outbuf), 0)); //recv  one byte (if possible)
 		if (iResult == SOCKET_ERROR) {
 #if defined(_WIN32) || defined(_WIN64)
 			int lasterr = WSAGetLastError();
 #else
-			int lasterr = errno;
+			//int lasterr = errno;
 #endif
 			closesocket(connectSocket);
 			connectSocket = INVALID_SOCKET;
@@ -113,7 +112,7 @@ int main(int argc, char* argv[])
 	std::string targethost = "127.0.0.1";
 
 	auto timeOfLastConnectAttempt = std::chrono::system_clock::now() + std::chrono::milliseconds(feederTimeoutMS);
-	int targetport = 0;
+	uint16_t targetport = 0;
 	std::string ipcName;
 	initFromArgs(argc, argv, targetport, ipcName);
 
@@ -142,7 +141,7 @@ int main(int argc, char* argv[])
 		}
 		else {
 			std::string errorDesc = "Failed sending the fuzz file bytes to the target port";
-			SharedMemMessage messageToFeeder(SHARED_MEM_MESSAGE_FUZZ_ERROR, errorDesc.c_str(), (int)errorDesc.length());
+			SharedMemMessage messageToFeeder(SHARED_MEM_MESSAGE_ERROR, errorDesc.c_str(), static_cast<int>(errorDesc.length()));
 			sharedMemIPC_ToRunner.sendMessageToServer(&messageToFeeder);
 		}
 	}

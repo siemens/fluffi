@@ -15,8 +15,8 @@ Author(s): Thomas Riedmaier
 #if defined(_WIN32) || defined(_WIN64)
 
 void installIATHooks();
-unsigned int addrToRVA(size_t addr);
+size_t addrToRVA(size_t addr);
 #else
 std::vector<std::string> splitString(std::string str, std::string token);
-unsigned int addrToRVA(std::uintptr_t addr);
+size_t addrToRVA(std::uintptr_t addr);
 #endif
