@@ -16,7 +16,7 @@ if __name__ == '__main__':
     p.add_argument('-P', '--passwd', default='fluffi_gm', help='database password')
     p.add_argument('-m', '--host', default='db.fluffi', help='database host')
     p.add_argument('-p', '--port', default='3306', help='database port')
-    p.add_argument('job', help='fuzzjob name')
+    p.add_argument('job', help='fuzzjob name (without prefix)')
     args = p.parse_args()
 
     s = args.user + ':' + args.passwd + '@tcp(' + args.host + ':' + args.port +')/fluffi_' + args.job
