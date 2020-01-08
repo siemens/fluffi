@@ -23,4 +23,5 @@ Author(s): Thomas Riedmaier
 #include <windows.h>
 #else
 #include <sys/unistd.h>
+#include <bsd/string.h>
 #endif

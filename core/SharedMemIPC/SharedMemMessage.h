@@ -29,6 +29,7 @@ Author(s): Thomas Riedmaier, Abian Blome
 #endif
 
 enum SharedMemMessageType {
+	//Fuzzing with FLUFFI
 	SHARED_MEM_MESSAGE_TERMINATE = 0x1,
 	SHARED_MEM_MESSAGE_FUZZ_FILENAME = 0x2,
 	SHARED_MEM_MESSAGE_FUZZ_DONE = 0x3,
@@ -38,9 +39,14 @@ enum SharedMemMessageType {
 
 	SHARED_MEM_MESSAGE_TARGET_CRASHED = 0x10,
 
+	//kfuzz
+	SHARED_MEM_MESSAGE_KFUZZ_REQUEST = 0x20,
+	SHARED_MEM_MESSAGE_KFUZZ_RESPONSE = 0x21,
+
+	//Error codes
 	SHARED_MEM_MESSAGE_NOT_INITIALIZED = 0x100,
 	SHARED_MEM_MESSAGE_TRANSMISSION_TIMEOUT = 0x101,
-	SHARED_MEM_MESSAGE_FUZZ_ERROR = 0x102,
+	SHARED_MEM_MESSAGE_ERROR = 0x102,
 	SHARED_MEM_MESSAGE_FEEDER_COULD_NOT_INITIALIZE = 0x103,
 	SHARED_MEM_MESSAGE_WAIT_INTERRUPTED = 0x104,
 	SHARED_MEM_MESSAGE_TRANSMISSION_ERROR = 0x105
@@ -51,6 +57,7 @@ class SHAREDMEMIPC_API  SharedMemMessage
 public:
 
 	SharedMemMessage(SharedMemMessageType messageType, const char* data, int dataLength);
+	SharedMemMessage(const SharedMemMessage &other);
 	SharedMemMessage();
 	virtual ~SharedMemMessage();
 

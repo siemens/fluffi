@@ -71,7 +71,7 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 				printf("Registering for dll load notifications: ");
 				void * cookie;
 				SIZE_T success = LdrRegisterDllNotification(0, DLLLoadedNotification, 0, &cookie);
-				printf("%d\n", success);
+				printf("%d\n", (int)success);
 			}
 		}
 	case DLL_THREAD_DETACH:

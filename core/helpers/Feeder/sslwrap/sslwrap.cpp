@@ -10,8 +10,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Michael Kraus, Thomas Riedmaier, Pascal Eckmann
 */
 
-//g++ --std=c++11 -fPIC -shared sslwrap.cpp  -lssl -lcrypto -lpthread -ldl -L../../../dependencies/openssl/lib/$( file /bin/bash | awk -F',' '{print $2}' | tr -d ' ')/ -o libsslwrap.so -Wl,-z,defs  -Wl,--version-script=libsslwrap.version -I../../../dependencies/openssl/include -I../../../dependencies/openssl/include$( file /bin/bash | awk -F',' '{print $2}' | tr -d ' ')
-
 #include "stdafx.h"
 #include "sslwrap.h"
 
@@ -61,7 +59,7 @@ int sendByteBufOnce(char* dstIP, int port, char* msg, int msgSize, int clientCer
 	}
 
 	// Request
-	int n = BIO_puts(buf_io, msg);
+	int n = BIO_write(buf_io, msg, msgSize);
 	if (n < 0) {
 		std::cout << ">sslwrap.dll< - Error writing bytes OR no data available, try again!" << std::endl;
 		freeStructures(ssl, server, ctx, buf_io);
@@ -134,7 +132,7 @@ int sendByteBufWithResponse(char* dstIP, int dstPort, char* msg, int msgSize, ch
 	}
 
 	// Request
-	int n = BIO_puts(buf_io, msg);
+	int n = BIO_write(buf_io, msg, msgSize);
 	if (n < 0) {
 		std::cout << ">sslwrap.dll< - Error writing bytes OR no data available, try again!" << std::endl;
 		freeStructures(ssl, server, ctx, buf_io);
@@ -319,7 +317,7 @@ SOCKETTYPE create_socket(const char ip[], const int port) {
 	/* ---------------------------------------------------------- *
 	* Try to connect to the server                    *
 	* ---------------------------------------------------------- */
-	if (connect(sockfd, (struct sockaddr*) &dest_addr, sizeof(struct sockaddr)) == SOCKET_ERROR) {
+	if (connect(sockfd, reinterpret_cast<struct sockaddr*>(&dest_addr), sizeof(struct sockaddr)) == SOCKET_ERROR) {
 		char* tmp_ptr = inet_ntoa(dest_addr.sin_addr);
 		std::cout << ">sslwrap.dll< - Error: Cannot connect to ip " << ip << " [" << tmp_ptr << "] on port " << port << "." << std::endl;
 		if (closesocket(sockfd) == SOCKET_ERROR) {
@@ -365,7 +363,7 @@ SSL* establishConnection(const char* dstIP, const int dstPort, SOCKETTYPE server
 	/*---------------------------------------------------------- *
 	* Attach the SSL session to the socket descriptor            *
 	* ---------------------------------------------------------- */
-	SSL_set_fd(ssl, (int)server);
+	SSL_set_fd(ssl, static_cast<int>(server));
 
 	/* ---------------------------------------------------------- *
 	* Try to SSL-connect here, returns 1 for success             *

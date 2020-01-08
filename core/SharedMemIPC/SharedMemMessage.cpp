@@ -28,6 +28,14 @@ SharedMemMessage::SharedMemMessage() :
 {
 }
 
+SharedMemMessage::SharedMemMessage(const SharedMemMessage &other) :
+	m_messageType(other.m_messageType),
+	m_data_size(other.m_data_size),
+	m_data(new char[m_data_size])
+{
+	memcpy_s(m_data, m_data_size, other.m_data, m_data_size);
+}
+
 SharedMemMessage::~SharedMemMessage()
 {
 	delete[] m_data;
