@@ -12,9 +12,6 @@ Author(s): Pascal Eckmann
 
 # PXE
 
-> __! work in progress !__
-> Some of the instructions aren't completely finished yet.
-
 ## Infrastructure
 
 All required systems (FTP, TFTP, SMB) are available if _docker-compose_ has been started with the specified [configuration](../../srv/fluffi/docker-compose.yaml).    
@@ -34,7 +31,7 @@ __On _web.fluffi_ you can select the OS, which should be loaded over PXE.__
         - e.g. `server2016/` -> Windows image, detailed steps are in the instruction for [Windows](windows.md)
 
 ## Agent systems OS
-- ##### Windows __! work in progress !__
+- ##### Windows
     - [Create and configure Windows image for PXE](windows.md)
 - ##### Ubuntu
     - [Create and configure Ubuntu image for PXE](ubuntu.md)
@@ -46,3 +43,10 @@ __On _web.fluffi_ you can select the OS, which should be loaded over PXE.__
 - Add the MAC address with the associated hostname to the [MAC2Host.csv](../../srv/fluffi/data/smb/files/initial/MAC2Host.csv) file on SMB share
     - _Attention: Only use upper case letters in MAC address_
     - __Odroid__: Additional add your MAC adress and your hostname to the [ethers](../../srv/fluffi/data/dnsmasq/ethers) file from _dnsmasq_ with following style: `00:11:22:33:44:55 odroidHostname`
+    
+## Add virtual machine to Fluffi
+- Setup VM (tested with VMware Workstation Pro)
+    - Use BIOS instead of UEFI
+    - Bridge your network device to the VM to use PXE properly
+    - Select OS in _webgui_ and boot your emtpy VM (it should now load the OS over PXE)
+- Now you can integrate the system in Fluffi according to [usage.md](../../usage.md)

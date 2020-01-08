@@ -12,8 +12,6 @@ Author(s): Pascal Eckmann
 
 # Armbian (for Odroid XU4 boards)
 
-This instruction is tested with [Armbian_5.94_Odroidxu4_Ubuntu_bionic_default_4.14.133_minimal](https://dl.armbian.com/_old/odroidxu4/archive/).
-
 1. Download and extract [Armbian](https://www.armbian.com/odroid-xu4/)
 2. Mount/open downloaded image
     - `sudo fdisk -l [image]`

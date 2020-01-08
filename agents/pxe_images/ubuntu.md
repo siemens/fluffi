@@ -12,8 +12,6 @@ Author(s): Pascal Eckmann
 
 # Ubuntu
 
-This instruction is tested with [Ubuntu 18.04 LTS (Bionic Beaver)](http://archive.ubuntu.com/ubuntu/dists/bionic/main/installer-amd64/current/images/netboot/).
-
 ## Prepare Ubuntu image
 
 1. Download netinstall version of Ubuntu, e.g. [Bionic Beaver](http://archive.ubuntu.com/ubuntu/dists/bionic/main/installer-amd64/current/images/netboot/)
