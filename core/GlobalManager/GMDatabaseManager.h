@@ -12,6 +12,11 @@ Author(s): Abian Blome, Thomas Riedmaier
 
 #pragma once
 
+#if defined(_WIN32) || defined(_WIN64)
+#else
+#define strcpy_s(a,b,c) strlcpy(a,c,b)
+#endif
+
 class FluffiLMConfiguration;
 class FluffiServiceDescriptor;
 class GMDatabaseManager
@@ -21,20 +26,24 @@ public:
 	~GMDatabaseManager();
 
 	static void setDBConnectionParameters(std::string host, std::string user, std::string pwd, std::string db);
-	FluffiServiceDescriptor getLMServiceDescriptorForWorker(FluffiServiceDescriptor fsd);
-	FluffiLMConfiguration getLMConfigurationForFuzzJob(int fuzzJob);
+
+	bool addNewManagedLMLogMessages(std::string ServiceDescriptorGUID, const std::vector<std::string>& messages);
+	bool addNewManagedLMStatus(std::string ServiceDescriptorGUID, std::string newStatus);
 	bool addWorkerToDatabase(FluffiServiceDescriptor fsd, AgentType type, std::string subtypes, std::string location);
-	bool setLMForLocationAndFuzzJob(std::string location, FluffiServiceDescriptor lmServiceDescriptor, long fuzzjob);
+	bool deleteDoneCommandsOlderThanXSec(int olderThanInSeconds);
+	bool deleteManagedLMLogMessagesIfMoreThan(int num);
+	bool deleteManagedLMLogMessagesOlderThanXSec(int olderThanInSeconds);
 	bool deleteManagedLMStatusOlderThanXSec(int olderThanInSeconds);
 	bool deleteWorkersNotSeenSinceXSec(int olderThanInSeconds);
-	bool deleteDoneCommandsOlderThanXSec(int olderThanInSeconds);
 	std::vector<std::pair<std::string, std::string>> getAllRegisteredLMs();
+	long getFuzzJobWithoutLM(std::string location);
+	FluffiLMConfiguration getLMConfigurationForFuzzJob(int fuzzJob);
+	FluffiServiceDescriptor getLMServiceDescriptorForWorker(FluffiServiceDescriptor fsd);
+	std::vector<std::tuple<int, std::string, std::string>> getNewCommands();
 	bool removeManagedLM(std::string ServiceDescriptorGUID);
 	bool removeWorkerFromDatabase(FluffiServiceDescriptor fsd);
-	bool addNewManagedLMStatus(std::string ServiceDescriptorGUID, std::string newStatus);
-	long getFuzzJobWithoutLM(std::string location);
-	std::vector<std::tuple<int, std::string, std::string>> getNewCommands();
 	bool setCommandAsDone(int commandID, std::string errorMessage);
+	bool setLMForLocationAndFuzzJob(std::string location, FluffiServiceDescriptor lmServiceDescriptor, long fuzzjob);
 
 #ifdef _VSTEST
 	std::string EXECUTE_TEST_STATEMENT(const std::string query);

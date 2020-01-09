@@ -7,20 +7,23 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-Author(s): Thomas Riedmaier, Abian Blome, Junes Najah
+Author(s): Thomas Riedmaier, Junes Najah, Abian Blome
 -->
 
 {% extends "base.html" %}
+{% block title %}FLUFFI - Locations - Add Project{% endblock %}
 
 {% block content %}
-    <h1>Add project to location</h1>
-    <form action="" method="POST" name="addLocationProject">
-        {{ form.hidden_tag() }}
-        <p>
-             Name:<br>
-            {{ form.project }}<br>
-        </p>
-        <p><input type="submit" value="Add Project"/></p>
-    </form>
+    <div class="container">
+        <h1>Add project to location</h1>
+        <form action="" method="POST" name="addLocationProject">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                <label for="name">Name:</label>
+                {{ form.project(class_="form-control") }}
+            </div>
+            <input class="btn btn-primary" type="submit" value="Add Project"/>
+        </form>
+    </div>
 
 {% endblock %}

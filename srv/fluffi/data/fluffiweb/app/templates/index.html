@@ -11,6 +11,7 @@ Author(s): Junes Najah, Thomas Riedmaier, Michael Kraus, Abian Blome, Pascal Eck
 -->
 
 {% extends "base.html" %}
+{% block title %}FLUFFI - Home{% endblock %}
 
 {% block scripts  %}
 <script src="{{ url_for('static', filename = 'javascript/fuzzjobNavigation.js') }}" type="text/javascript"></script>
@@ -58,7 +59,7 @@ Author(s): Junes Najah, Thomas Riedmaier, Michael Kraus, Abian Blome, Pascal Eck
                                 <td style="text-align: center;">{{ project.numPopulation }}</td>
                                 <td style="text-align: center;">{{ project.testcases }}</td>
                                 <td>
-                                    <a class="btn btn-secondary" href="/projects/view/{{project.id}}" role="button">
+                                    <a class="btn btn-secondary" href="/projects/view/{{project.ID}}" role="button">
                                         <span class="glyphicon glyphicon-zoom-in"></span>
                                     </a>
                                 </td>
@@ -90,7 +91,7 @@ Author(s): Junes Najah, Thomas Riedmaier, Michael Kraus, Abian Blome, Pascal Eck
                                 <font color="#98989b">{{ project.testcases }}</font>
                             </td>
                             <td>
-                                <a class="btn btn-secondary" href="/projects/view/{{project.id}}" role="button">
+                                <a class="btn btn-secondary" href="/projects/view/{{project.ID}}" role="button">
                                     <span class="glyphicon glyphicon-zoom-in icon-inactive"></span>
                                 </a>
                             </td>

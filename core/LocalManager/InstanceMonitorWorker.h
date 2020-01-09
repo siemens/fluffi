@@ -16,6 +16,7 @@ class CommInt;
 class LMWorkerThreadStateBuilder;
 class IWorkerThreadStateBuilder;
 class LMWorkerThreadState;
+class FluffiServiceDescriptor;
 class InstanceMonitorWorker
 {
 public:
@@ -28,6 +29,9 @@ public:
 	std::thread* m_thread = nullptr;
 
 private:
+	void storeStatus(const std::pair<FluffiServiceDescriptor, AgentType>& managedInstance, std::string statusToStore);
+	void storeLogMessages(const std::pair<FluffiServiceDescriptor, AgentType>& managedInstance, const google::protobuf::RepeatedPtrField<std::string> & logMessages);
+
 	CommInt* m_commInt = nullptr;
 	IWorkerThreadStateBuilder* m_workerThreadStateBuilder = nullptr;
 	LMWorkerThreadState* m_workerThreadState = nullptr;

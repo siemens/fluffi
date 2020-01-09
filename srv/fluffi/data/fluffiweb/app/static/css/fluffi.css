@@ -7,7 +7,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
+Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Thomas Riedmaier
 */
 
 .dl-horizontal dt {
@@ -110,7 +110,8 @@ Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
 
 .remove {
     text-align: left; 
-    width: 12%;
+    min-width: 30px;
+    text-align: right;
 }
 
 .kill {
@@ -165,6 +166,10 @@ Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
 
 #icontainer {
     height: 1000px;
+}
+
+#icontainer>iframe {
+    border: 0px;
 }
 
 .btn-design {
@@ -315,4 +320,59 @@ Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
 
 #status_link_btn {
     margin-top: 15px;
+}
+
+.pages_box {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.pages {
+    display: inline-block;
+}
+
+.single_page {
+    display: inline-block;
+    margin: 0 4px;
+    width: 26px;
+    height: 26px;
+    text-align: center;
+    padding: 3px;
+    border-radius: 4px;
+}
+
+.single_page_active {
+    background-color: #133552;
+    color: #ffffff;
+}
+
+.single_page_inactive {
+    background-color: #337ab7;
+    color: #ffffff;
+}
+
+.single_page_inactive:hover {
+    background-color: #286090;
+    cursor: pointer;
+}
+
+.tc_view_center {
+    text-align: center;
+}
+
+.tc_view_center_child {
+    display: inline-block;
+}
+
+#addTestcase {
+    width: 100%;
+    background: #eee;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.stickyBtn {
+    position: fixed; 
+    bottom: 50px; 
+    right: 50px;
 }

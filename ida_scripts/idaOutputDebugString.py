@@ -8,7 +8,7 @@
 # 
 # Author(s): Abian Blome, Thomas Riedmaier
 
-import idaapi
+import ida_loader
 import ida_nalt
 import idc
 
@@ -27,19 +27,19 @@ def imp_cb(ea, name, ord):
             xrefs.add((xref.frm, xref.to))
     return True
 
-nimps = idaapi.get_import_module_qty()
+nimps = ida_nalt.get_import_module_qty()
 
 print "Found %d import(s)..." % nimps
 
 for i in xrange(0, nimps):
-    name = idaapi.get_import_module_name(i)
+    name = ida_nalt.get_import_module_name(i)
     if name.upper() == "KERNEL32":
         print "Walking-> %s" % name
-        idaapi.enum_import_names(i, imp_cb)
+        ida_nalt.enum_import_names(i, imp_cb)
         break
 
 for frm, to in xrefs:
-    offset = idaapi.get_fileregion_offset(frm)
+    offset = ida_loader.get_fileregion_offset(frm)
     print "File location: %08x (%08x -> %08x)" % (offset, frm, to)
     try:
         patchFile(frm, offset)

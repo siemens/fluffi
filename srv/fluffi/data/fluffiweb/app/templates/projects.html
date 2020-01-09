@@ -11,6 +11,7 @@ Author(s): Junes Najah, Abian Blome, Pascal Eckmann, Thomas Riedmaier, Michael K
 -->
 
 {% extends "base.html" %}
+{% block title %}FLUFFI - Fuzzjobs - Overview{% endblock %}
 
 {% block scripts  %}
 <script src="{{ url_for('static', filename = 'javascript/inputValidator.js') }}" type="text/javascript"></script>
@@ -55,7 +56,7 @@ Author(s): Junes Najah, Abian Blome, Pascal Eckmann, Thomas Riedmaier, Michael K
         <tbody>
         {% for project in projects %}
         <tr>
-            <td><a class="{{'alert-bg-table' if project.checkRating }}" href="/projects/view/{{ project.id }}">{{ project.name[:30] }}</a></td>
+            <td><a class="{{'alert-bg-table' if project.checkRating }}" href="/projects/view/{{ project.ID }}">{{ project.name[:30] }}</a></td>
             <td>{{ project.status }}</td>
             <td>{{ project.testcases }}</td>
             <td>{{ project.numPopulation }}</td>
@@ -64,7 +65,7 @@ Author(s): Junes Najah, Abian Blome, Pascal Eckmann, Thomas Riedmaier, Michael K
             <td>{{ project.numException }}</td>
             <td>{{ project.numNoResponse }}</td>
             <td>
-                <form action="{{ url_for('archiveProject', projId=project.id) }}" method="POST" class="archive-form">
+                <form action="{{ url_for('archiveProject', projId=project.ID) }}" method="POST" class="archive-form">
                     <input class="btn btn-default" id="{{ project.name }}" type="submit" value="archive"/>
                 </form>
             </td>

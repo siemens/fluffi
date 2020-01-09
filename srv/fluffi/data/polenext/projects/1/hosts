@@ -9,8 +9,8 @@
 # Author(s): Thomas Riedmaier, Fabian Russwurm, Michael Kraus, Pascal Eckmann
 
 [windows]
-fluffi_windows1 ansible_ssh_host=fluffi_windows1.fluffi
-fluffi_windows2 ansible_ssh_host=fluffi_windows2.fluffi
+fluffiWindows1 ansible_ssh_host=fluffiWindows1.fluffi
+fluffiWindows2 ansible_ssh_host=fluffiWindows2.fluffi
 
 [windows:vars]
 ansible_user=fluffi_windows_user
@@ -21,8 +21,8 @@ ansible_ssh_port=5985
 
 
 [linux]
-fluffi_linux1 ansible_ssh_host=fluffi_linux1.fluffi
-fluffi_linux2 ansible_ssh_host=fluffi_linux2.fluffi
+fluffiLinux1 ansible_ssh_host=fluffiLinux1.fluffi
+fluffiLinux2 ansible_ssh_host=fluffiLinux2.fluffi
 
 [linux:vars]
 ansible_connection=ssh
@@ -32,8 +32,8 @@ ansible_sudo_pass=fluffi_linux_pw
 
 
 [odroids]
-fluffi_odroid1 ansible_ssh_host=fluffi_odroid1.fluffi
-fluffi_odroid2 ansible_ssh_host=fluffi_odroid2.fluffi
+fluffiOdroid1 ansible_ssh_host=fluffiOdroid1.fluffi
+fluffiOdroid2 ansible_ssh_host=fluffiOdroid2.fluffi
 
 [odroids:vars]
 ansible_connection=ssh

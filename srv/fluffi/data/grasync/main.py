@@ -6,7 +6,7 @@
 # 
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # 
-# Author(s): Junes Najah, Thomas Riedmaier
+# Author(s): Junes Najah, Thomas Riedmaier, Pascal Eckmann
 
 from sqlalchemy import create_engine, text
 from influxdb import InfluxDBClient
@@ -47,7 +47,7 @@ while True:
     print(active_fuzzjobs)
     try:
         for fuzzjob in active_fuzzjobs:        
-            fuzzjob_engine = create_engine(SQLALCHEMY_DATABASE_URI_WITHOUT_DB + 'fluffi_' + fuzzjob)
+            fuzzjob_engine = create_engine(SQLALCHEMY_DATABASE_URI_WITHOUT_DB + 'fluffi_' + fuzzjob, connect_args={"init_command":"SET SESSION time_zone='+00:00'"})
             connection = fuzzjob_engine.connect()
 
             # Covered Blocks and Population Size            
@@ -71,17 +71,19 @@ while True:
             # System CPU Utilization & Combined Queue Size & Executions per second
             result = connection.execute(INSTANCE_PERFORMANCE_STATS)
             for row in result:
+                time_of_status = row['TimeOfStatus']
+
                 status_dict = dict((k.strip(), float(v.strip())) for k,v in (item.split(' ') for item in [s.strip() for s in row['Status'].split('|')] if item))
                 host_and_port = row['ServiceDescriptorHostAndPort']
                 server = host_and_port.split('.')[0] if '.' in host_and_port else ''
                 if 'SysCPUUtil' in status_dict:
-                    json_bodies.append(create_json_body(fuzzjob+'_sys_cpu_util', {'server': server}, NOW, status_dict['SysCPUUtil']))
+                    json_bodies.append(create_json_body(fuzzjob+'_sys_cpu_util', {'server': server}, time_of_status, status_dict['SysCPUUtil']))
                 if 'TestCasesQueueSize' in status_dict:
-                    json_bodies.append(create_json_body(fuzzjob+'_queue_size', {'hostAndPort': host_and_port}, NOW, status_dict['TestCasesQueueSize']))
+                    json_bodies.append(create_json_body(fuzzjob+'_queue_size', {'hostAndPort': host_and_port}, time_of_status, status_dict['TestCasesQueueSize']))
                 if 'TestEvaluationsQueueSize' in status_dict:
-                    json_bodies.append(create_json_body(fuzzjob+'_evaluations_queue_size', {'hostAndPort': host_and_port}, NOW, status_dict['TestEvaluationsQueueSize']))
+                    json_bodies.append(create_json_body(fuzzjob+'_evaluations_queue_size', {'hostAndPort': host_and_port}, time_of_status, status_dict['TestEvaluationsQueueSize']))
                 if 'TestcasesPerSecond' in status_dict:
-                    json_bodies.append(create_json_body(fuzzjob+'_tc_per_second', {'hostAndPort': host_and_port}, NOW, status_dict['TestcasesPerSecond']))
+                    json_bodies.append(create_json_body(fuzzjob+'_tc_per_second', {'hostAndPort': host_and_port}, time_of_status, status_dict['TestcasesPerSecond']))
 
             # Accumulated Crashes
             result = connection.execute(text(COUNT_TCTYPE), {'tcType': 1})

@@ -11,6 +11,7 @@ Author(s): Michael Kraus, Junes Najah, Thomas Riedmaier, Abian Blome, Pascal Eck
 -->
 
 {% extends "base.html" %}
+{% block title %}FLUFFI - Locations - Overview{% endblock %}
 
 {% block content %}
 
@@ -38,9 +39,9 @@ Author(s): Michael Kraus, Junes Najah, Thomas Riedmaier, Abian Blome, Pascal Eck
         <tbody>
         {% for location in locations %}
         <tr>
-            <td><a href="/locations/view/{{ location.id }}">{{ location.Name }}</a></td>
+            <td><a href="/locations/view/{{ location.ID }}">{{ location.Name }}</a></td>
             <td style="text-align: center;"><a class="btn btn-secondary"
-                                               href="/locations/removeLocation/{{ location.id }}" role="button"><span
+                                               href="/locations/removeLocation/{{ location.ID }}" role="button"><span
                     class="glyphicon glyphicon-remove"></span></a></td>
 
         </tr>

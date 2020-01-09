@@ -7,15 +7,16 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier
+Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
 -->
 
 {% extends "base.html" %}
+{% block title %}FLUFFI - Fuzzjobs - {{ violationsAndCrashes.project.name[:30] }} - Access Violations and Crashes{% endblock %}
 
 {% block content %}
 
 <div class="container">
-    <h1><a href="/projects/view/{{violationsAndCrashes.project.id}}">Access Violations and Crashes: {{
+    <h1><a href="/projects/view/{{violationsAndCrashes.project.ID}}">Access Violations and Crashes: {{
         violationsAndCrashes.project.name[:30] }}</a></h1>
 </div>
 {{ flashMessages() }}
@@ -25,11 +26,11 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier
 </div>
 
 <div class="container">
-    <h2>Testcases</h2>
+    <h2></h2>
     <table class="table">
         <thead>
         <tr>
-            <th style="text-align: center;">Count</th>
+            <th style="text-align: center;">Occurences</th>
             <th style="text-align: center;">CrashFootprint</th>
             <th style="text-align: center;">Type</th>
             <th style="text-align: center;">Download</th>
@@ -49,12 +50,12 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier
             {% endif %}
             <td style="text-align: center;">
                 <a class="btn btn-secondary"
-                   href="/projects/{{ violationsAndCrashes.project.id }}/getSmallestVioOrCrashTestcase/{{ testcase.footprint }}"
+                   href="/projects/{{ violationsAndCrashes.project.ID }}/getSmallestVioOrCrashTestcase/{{ testcase.footprint }}"
                    role="button">
                     <span class="glyphicon glyphicon-floppy-save"></span>
                 </a>
                 <a class="btn btn-secondary"
-                   href="/projects/{{ violationsAndCrashes.project.id }}/crashes/download/{{ testcase.footprint }}/{{ testcase.type }}"
+                   href="/projects/{{ violationsAndCrashes.project.ID }}/crashes/download/{{ testcase.footprint }}/{{ testcase.type }}"
                    role="button">
                     <span class="glyphicon glyphicon-save"></span>
                 </a>

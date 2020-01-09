@@ -1230,7 +1230,6 @@ bool ExternalProcess::runAndWaitForCompletion(unsigned long timeoutMilliseconds)
 		LOG(ERROR) << "The process cannot run, as it is not in a runnable state";
 		return false;
 	}
-	m_hasBeenRun = true;
 
 	struct timespec timeout;
 
@@ -1265,11 +1264,13 @@ bool ExternalProcess::runAndWaitForCompletion(unsigned long timeoutMilliseconds)
 			else if (errno == EAGAIN) {
 				LOG(WARNING) << "Process hang detected";
 				die();
+				m_hasBeenRun = true;
 				return false;
 			}
 			else {
 				LOG(ERROR) << "sigtimedwait failed: " << strerror(errno);
 				die();
+				m_hasBeenRun = true;
 				return false;
 			}
 		}
@@ -1280,6 +1281,7 @@ bool ExternalProcess::runAndWaitForCompletion(unsigned long timeoutMilliseconds)
 		pid_t signalSourcePID = waitpid(m_childPID, &status, WNOHANG);
 		if (signalSourcePID == -1) {
 			die();
+			m_hasBeenRun = true;
 			return false;
 		}
 		else if (signalSourcePID == 0) {
@@ -1338,6 +1340,7 @@ bool ExternalProcess::runAndWaitForCompletion(unsigned long timeoutMilliseconds)
 		}
 	} while (true);
 
+	m_hasBeenRun = true;
 	return true;
 }
 
@@ -1346,8 +1349,6 @@ bool ExternalProcess::run() {
 		LOG(ERROR) << "The process cannot run, as it is not in a runnable state";
 		return false;
 	}
-
-	m_hasBeenRun = true;
 
 	struct timespec timeout; //timeout for the initial "stop" signal. Once we received that-> detach
 	timeout.tv_sec = 100;
@@ -1380,11 +1381,13 @@ bool ExternalProcess::run() {
 			else if (errno == EAGAIN) {
 				LOG(WARNING) << "Process hang detected";
 				die();
+				m_hasBeenRun = true;
 				return false;
 			}
 			else {
 				LOG(ERROR) << "sigtimedwait failed: " << strerror(errno);
 				die();
+				m_hasBeenRun = true;
 				return false;
 			}
 		}
@@ -1395,6 +1398,7 @@ bool ExternalProcess::run() {
 		pid_t signalSourcePID = waitpid(m_childPID, &status, WNOHANG);
 		if (signalSourcePID == -1) {
 			die();
+			m_hasBeenRun = true;
 			return false;
 		}
 		else if (signalSourcePID == 0) {
@@ -1417,6 +1421,7 @@ bool ExternalProcess::run() {
 		}
 	} while (true);
 
+	m_hasBeenRun = true;
 	return true;
 }
 
@@ -1751,6 +1756,8 @@ void ExternalProcess::debug(unsigned long timeoutMilliseconds, std::shared_ptr<D
 					}
 					LOG(DEBUG) << "The application received a SIGSEGV and we treat any access violation as fatal";
 					die();
+					m_hasBeenRun = true;
+					return;
 				}
 				else {
 					//Option 2) Forward the exception and see if the application can handle it. Kill it if not
@@ -1766,6 +1773,8 @@ void ExternalProcess::debug(unsigned long timeoutMilliseconds, std::shared_ptr<D
 						//The application was unable to handle this exception
 						LOG(DEBUG) << "The application was unable to handle this exception - killing it";
 						die();
+						m_hasBeenRun = true;
+						return;
 					}
 				}
 			}
@@ -1800,7 +1809,7 @@ void ExternalProcess::debug(unsigned long timeoutMilliseconds, std::shared_ptr<D
 }
 
 void ExternalProcess::updateTimeSpent() {
-	if (m_hasBeenInitialized && m_childPID != 0) {
+	if (m_hasBeenInitialized && m_childPID != 0 && !m_hasBeenRun) {
 		//TBH I don't know how to implement this recursively without blowing it up imensely. Just thinking about child processes that terminated, which might calculate "negative" ticks since last count.
 		//We stick to performance of the specified process for now
 

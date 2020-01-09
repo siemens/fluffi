@@ -36,6 +36,7 @@
     - initial-windows-desktopBackground
     - { role: initial-windows-VCRedistributables, architecture: "x86"}
     - { role: initial-windows-VCRedistributables, architecture: "x64"}
+    - initial-windows-autologon
     - initial-windows-installPackages
     - initial-windows-installDrivers
     - initial-windows-deployRestInstanceStarter

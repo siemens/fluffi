@@ -14,6 +14,7 @@ Author(s): Thomas Riedmaier, Abian Blome
 #include "GetStatusRequestHandler.h"
 #include "CommInt.h"
 #include "ExternalProcess.h"
+#include "FLUFFILogHandler.h"
 
 GetStatusRequestHandler::GetStatusRequestHandler(CommInt* comm) :
 	m_comm(comm),
@@ -32,6 +33,10 @@ bool GetStatusRequestHandler::isManagerActive(unsigned long maxAllowedTimeOfInac
 	return maxAllowedTimeOfInactivityMS > static_cast<unsigned long>(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - m_timeOfLastManagerRequest).count());
 }
 
+void GetStatusRequestHandler::resetManagerActiveDetector() {
+	m_timeOfLastManagerRequest = std::chrono::steady_clock::now();
+}
+
 bool GetStatusRequestHandler::wasManagerReplaced() {
 	return m_ManagerWasReplaced;
 }
@@ -48,8 +53,18 @@ void GetStatusRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThrea
 	m_timeOfLastManagerRequest = std::chrono::steady_clock::now();
 
 	GetStatusResponse* statusResponse = new GetStatusResponse();
+	setLogMessages(statusResponse);
 	statusResponse->set_status(generateStatus());
 	resp->set_allocated_getstatusresponse(statusResponse);
+}
+
+void GetStatusRequestHandler::setLogMessages(GetStatusResponse* statusResponse) {
+	FLUFFILogHandler* fluffiLogger = el::Helpers::logDispatchCallback<FLUFFILogHandler>("FLUFFILog");
+	std::deque<std::string> messages = fluffiLogger->getAllMessages();
+
+	for (auto it = messages.begin(); it != messages.end(); ++it) {
+		statusResponse->add_logmessages(*it);
+	}
 }
 
 std::string GetStatusRequestHandler::generateGeneralStatus() {

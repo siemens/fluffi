@@ -71,6 +71,7 @@ func main() {
 	fPrefix := flag.String("o", "oede_", "output folder and file name prefix")
 	fDbstring := flag.String("d", "", "connect string for fuzzjob database")
 	fVerbose := flag.Bool("v", false, "print pretty diffs to stdout")
+	fLogOutput := flag.Bool("f", false, "print log to file instead of console")
 	fLeft:= flag.Bool("l", false, "merge strategy left")
 	fRight := flag.Bool("r", false, "merge strategy right")
 	fInsert := flag.Bool("i", false, "merge strategy insert")
@@ -106,8 +107,10 @@ func main() {
 		strategy = strategy | DELETE
 	}
 
-	errs.FlogOpen()
-	defer errs.FlogClose()
+	if *fLogOutput {
+		errs.FlogOpen()
+		defer errs.FlogClose()
+	}
 	foe, f := errs.Foe("Oedipus:")
 
 	rand.Seed(time.Now().UnixNano())
@@ -121,8 +124,6 @@ func main() {
 		_ = fp1.Close()
 
 		// second, decode database credential string and connect to mysql
-		// "fluffi_gm:fluffi_gm@tcp(db.fluffi:3306)/fluffi_miniweb"
-		// 666c756666695f676d3a666c756666695f676d40746370286865787861676f6e2e666c756666693a33333036292f666c756666695f6d696e69776562
 		bstr, e := hex.DecodeString(*fDbstring)
 		foe(e, "cannot decode db connection hex string")
 		db, e := sql.Open("mysql", string(bstr))
@@ -161,7 +162,11 @@ func main() {
 			}
 			// find parent
 			for j, maybe := range cases {
-				// log.Printf("%d : %d (%d)\n", i, j, len(cases))
+				/*
+				if *fVerbose {
+					log.Printf("%d : %d (%d)\n", i, j, len(cases))
+				}
+				*/
 				if maybe.CreatorLID == node.ParentLID && maybe.CreatorGUID == node.ParentGUID {
 					cases[j].Children = append(cases[j].Children, &cases[i])
 					cases[i].Parent = &cases[j]
@@ -171,8 +176,7 @@ func main() {
 			// if i % 5000 == 0 { log.Println("reached:", i) }
 		}
 
-		// get parent of first and remove it from initials list (if there are more than one initial testcases
-		// TODO this breaks if we get a wrong named file (aka has no parent) (??? after fix???)
+		// get parent of first and remove it from initials list (if there are more than one initial testcases)
 		if first != nil {
 			var firstsParent *Mutation
 			firstsParent = first
@@ -193,6 +197,7 @@ func main() {
 		for n, node := range initials {
 			log.Println(node.Pretty(), "children: ", cases[n].NumChildren())
 		}
+
 		// for as many as needed walk over the initial list and go down a tree
 		for i := 0; i < numMutations; i++ {
 			var target, last *Mutation
@@ -201,6 +206,9 @@ func main() {
 				target = initials[i]
 			} else {
 				// after that, we descent down the trees of those initials and use their latest children
+				// BUG: this used to fail if we used up all the existing testcases for new mutations.
+				// Now, we just return less than requested. Might still need reworking if we have lots of
+				// projects where the population is exceptionally small.
 				target = initials[i%len(initials)]
 				for len(target.Children) != 0 {
 					last = target
@@ -234,6 +242,10 @@ func main() {
 				}
 			}
 			r.Close()
+			if len(initials) == 0 {
+				files = files[:1+i]
+				break
+			}
 		}
 		db.Close()
 
@@ -253,7 +265,7 @@ func main() {
 		f("no initial file given")
 	}
 
-	for i := 1; i <= numMutations; i++ {
+	for i := 1; i <= len(files)-1; i++ {
 		fp, e := os.OpenFile((*fPrefix)+strconv.Itoa(i), os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
 		foe(e, "could not open target mutation file for writing")
 		_, e = fp.Write(mergeInputs(files[0], files[i], *fVerbose, strategy))

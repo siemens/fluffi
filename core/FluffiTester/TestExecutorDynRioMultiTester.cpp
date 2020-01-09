@@ -23,7 +23,7 @@ Author(s): Thomas Riedmaier, Abian Blome, Pascal Eckmann
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace FluffiTester
+namespace TestExecutorDynRioMultiTester
 {
 	TEST_CLASS(TestExecutorDynRioMultiTest)
 	{

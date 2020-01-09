@@ -23,7 +23,7 @@ Author(s): Thomas Riedmaier, Pascal Eckmann, Abian Blome
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace FluffiTester
+namespace TestExecutorGDBTester
 {
 	TEST_CLASS(TestExecutorGDBTest)
 	{

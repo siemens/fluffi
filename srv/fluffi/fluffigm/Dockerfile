@@ -11,7 +11,7 @@
 FROM ubuntu:bionic
 
 RUN apt update
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -yq software-properties-common
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -yq software-properties-common libbsd0
 
 WORKDIR /fluffi/
 

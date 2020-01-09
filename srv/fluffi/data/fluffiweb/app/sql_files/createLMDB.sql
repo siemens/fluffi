@@ -31,6 +31,14 @@ CREATE TABLE IF NOT EXISTS fluffi.managed_instances_statuses (
 	PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8; 
 
+CREATE TABLE IF NOT EXISTS fluffi.managed_instances_logmessages (
+	`ID` INT NOT NULL AUTO_INCREMENT,
+	`ServiceDescriptorGUID` VARCHAR(50) NULL,
+	`TimeOfInsertion` TIMESTAMP NULL DEFAULT NULL,
+	`LogMessage` VARCHAR(2000) NULL DEFAULT NULL,
+	PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8; 
+
 CREATE TABLE IF NOT EXISTS fluffi.interesting_testcases (
 	`ID` BIGINT NOT NULL AUTO_INCREMENT,
 	`CreatorServiceDescriptorGUID` VARCHAR(50) NOT NULL,
@@ -124,6 +132,7 @@ CREATE TABLE IF NOT EXISTS fluffi.nice_names_testcase (
 		REFERENCES fluffi.interesting_testcases(`ID`)
 		ON UPDATE RESTRICT ON DELETE CASCADE,
 	UNIQUE (`TestcaseID`),
+	UNIQUE (`NiceName`),
 	PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -132,6 +141,7 @@ CREATE TABLE IF NOT EXISTS fluffi.nice_names_managed_instance (
 	`NiceName` VARCHAR(100) NOT NULL,
 	`ServiceDescriptorGUID` VARCHAR(50) NOT NULL,	
 	UNIQUE (`ServiceDescriptorGUID`),	
+	UNIQUE (`NiceName`),
 	PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

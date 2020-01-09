@@ -11,6 +11,7 @@ Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
 -->
 
 {% extends "base.html" %}
+{% block title %}FLUFFI - Systems{% endblock %}
 
 {% block scripts  %}
 <script src="{{ url_for('static', filename = 'javascript/modifySystemLocation.js') }}"
@@ -198,6 +199,10 @@ Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
                 <th style="text-align: left; width: 15%;">Conf. Instances</th>
                 <th style="text-align: left; width: 15%;">Run. Instances</th>
                 <th style="text-align: left; width: 23%;">Location</th>
+                <th class="remove"><a class="btn btn-secondary"
+                                                             href="/systems/reboot/{{ group.Name }}"
+                                                             role="button"><span
+                        class="glyphicon glyphicon-repeat"></span></a></th>
                 <th class="remove"><span class="glyphicon glyphicon-trash"></span></th>
             </tr>
             </thead>
@@ -223,23 +228,29 @@ Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Thomas Riedmaier
                 <td class="instance-run-error">{{ host.InstanceRun }}</td>
                 {% endif %}
                 <td class="update-system-loc">
-                    <select class="form-control" id="SystemLocationValue-{{ host.Id }}"
-                            name="SystemLocationValue-{{ host.Id }}"
+                    <select class="form-control" id="SystemLocationValue-{{ host.ID }}"
+                            name="SystemLocationValue-{{ host.ID }}"
                             onchange="updateSystemLocation('{{ host.Name }}', this.value)">
                         <option selected="selected">{{ host.Location }}</option>
                         {% for location in locations %}
                         {% if location.Name != host.Location %}
-                        <option value="{{ location.id }}">{{ location.Name }}</option>
+                        <option value="{{ location.ID }}">{{ location.Name }}</option>
                         {% endif %}
                         {% endfor %}
                     </select>
                 </td>
-                {% if host.isNotPersistentDevSys == True %}
                 <td class="remove"><a class="btn btn-secondary"
-                                                             href="/systems/removeDevSystem/{{ host.Name }}/{{ host.Id }}"
+                                                             href="/systems/reboot/{{ host.Name }}"
                                                              role="button"><span
-                        class="glyphicon glyphicon-remove"></span></a></td>
+                        class="glyphicon glyphicon-repeat"></span></a></td>
+                <td class="remove">
+                {% if host.isNotPersistentDevSys == True %}
+                <a class="btn btn-secondary"
+                                                             href="/systems/removeDevSystem/{{ host.Name }}/{{ host.ID }}"
+                                                             role="button"><span
+                        class="glyphicon glyphicon-remove"></span></a>
                 {% endif %}
+                </td>
             </tr>
             {% endfor %}
             </tbody>

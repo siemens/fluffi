@@ -8,34 +8,59 @@
 :: 
 :: Author(s): Thomas Riedmaier, Roman Bendt
 
-:: Requires Visual CPP Build Tools 2015 Update 3
+:: Requires Visual Studio 2017 build tools
+
+SETLOCAL
+IF NOT DEFINED VCVARSALL (
+		ECHO Environment Variable VCVARSALL needs to be set!
+		goto errorDone
+)
+ENDLOCAL
+
+SETLOCAL
+call %VCVARSALL% x64
 
 :: Fluffi x64
-"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" FluffiV1.sln /m  /t:Build /p:Configuration=Release /p:Platform=x64 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
-if errorlevel 1 goto errorDone
-
-:: Fluffi x86
-"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" FluffiV1.sln /m  /t:Build /p:Configuration=Release /p:Platform=x86 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
+MSBuild.exe FluffiV1.sln /m  /t:Build /p:Configuration=Release /p:Platform=x64
 if errorlevel 1 goto errorDone
 
 :: Starter x64
-"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" helpers\Starter\Starter.sln /m  /t:Build /p:Configuration=Release /p:Platform=x64 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
-if errorlevel 1 goto errorDone
-
-:: Starter x86
-"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" helpers\Starter\Starter.sln /m  /t:Build /p:Configuration=Release /p:Platform=x86 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
+MSBuild.exe helpers\Starter\Starter.sln /m  /t:Build /p:Configuration=Release /p:Platform=x64
 if errorlevel 1 goto errorDone
 
 :: Feeder x64
-"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" helpers\Feeder\Feeder.sln /m  /t:Build /p:Configuration=Release /p:Platform=x64 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
+MSBuild.exe helpers\Feeder\Feeder.sln /m  /t:Build /p:Configuration=Release /p:Platform=x64
+if errorlevel 1 goto errorDone
+
+:: Fuzzcmp x64
+MSBuild.exe helpers\fuzzcmp\fuzzcmp.sln /m  /t:Build /p:Configuration=Release /p:Platform=x64
+if errorlevel 1 goto errorDone
+
+ENDLOCAL
+
+SETLOCAL
+call %VCVARSALL% x86
+
+:: Fluffi x86
+MSBuild.exe FluffiV1.sln /m  /t:Build /p:Configuration=Release /p:Platform=x86
+if errorlevel 1 goto errorDone
+
+:: Starter x86
+MSBuild.exe helpers\Starter\Starter.sln /m  /t:Build /p:Configuration=Release /p:Platform=x86
 if errorlevel 1 goto errorDone
 
 :: Feeder x86
-"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" helpers\Feeder\Feeder.sln /m  /t:Build /p:Configuration=Release /p:Platform=x86 /property:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140"
+MSBuild.exe helpers\Feeder\Feeder.sln /m  /t:Build /p:Configuration=Release /p:Platform=x86
 if errorlevel 1 goto errorDone
 
-:: Requires at least go 1.12
+:: Fuzzcmp x86
+MSBuild.exe helpers\fuzzcmp\fuzzcmp.sln /m  /t:Build /p:Configuration=Release /p:Platform=x86
+if errorlevel 1 goto errorDone
 
+ENDLOCAL
+
+:: Requires at least go 1.12
+SETLOCAL
 set CGO_ENABLED=0
 cd CaRRoT\
 set GOARCH=386
@@ -60,7 +85,9 @@ cd ..
 goto done
 
 :errorDone
+ENDLOCAL
 EXIT /B  1
 
 :done
+ENDLOCAL
 EXIT /B  0

@@ -26,7 +26,7 @@ int memcpy_s(void* a, size_t b, const void* c, size_t d) {
 
 char** split_commandline(const std::string cmdline)
 {
-	char** argv = NULL;
+	char** argv = nullptr;
 
 	wordexp_t p;
 
@@ -35,14 +35,14 @@ char** split_commandline(const std::string cmdline)
 	if (success != 0)
 	{
 		std::cout << "TCPFeeder: wordexp \"" << cmdline << "\" failed: " << success << std::endl;
-		return NULL;
+		return nullptr;
 	}
 
-	if (!(argv = (char**)calloc(p.we_wordc + 1, sizeof(char*))))
+	if (!(argv = static_cast<char**>(calloc(p.we_wordc + 1, sizeof(char*)))))
 	{
 		wordfree(&p);
 		std::cout << "TCPFeeder: calloc failed" << std::endl;
-		return NULL;
+		return nullptr;
 	}
 
 	for (size_t i = 0; i < p.we_wordc; i++)
@@ -86,7 +86,7 @@ std::string execCommandAndGetOutput(std::string command) {
 	{
 		close(link[1]);
 		char buff[4096];
-		int nbytes = 0;
+		ssize_t nbytes = 0;
 		std::string totalStr;
 		while (0 != (nbytes = read(link[0], buff, sizeof(buff)))) {
 			totalStr = totalStr + buff;
@@ -101,7 +101,6 @@ std::string execCommandAndGetOutput(std::string command) {
 	}
 }
 #endif
-
 
 bool isPortOpen(std::string target, uint16_t port)
 {
@@ -123,13 +122,13 @@ bool isPortOpen(std::string target, uint16_t port)
 #else
 	if (inet_aton(target.c_str(), &saServer.sin_addr) == 0) {
 #endif
-		std::cout << "Error using inet_aton" << std::endl;
+		std::cout << "TCPFeeder: Error using inet_aton" << std::endl;
 		closesocket(connectSocket);
 		throw std::runtime_error("Error using inet_aton");
 	}
 
 	// Connect to server.
-	iResult = connect(connectSocket, (struct sockaddr*)&saServer, sizeof(saServer));
+	iResult = connect(connectSocket, reinterpret_cast<struct sockaddr*>(&saServer), sizeof(saServer));
 	if (iResult == SOCKET_ERROR) {
 		closesocket(connectSocket);
 		connectSocket = INVALID_SOCKET;
@@ -139,7 +138,7 @@ bool isPortOpen(std::string target, uint16_t port)
 	closesocket(connectSocket);
 	connectSocket = INVALID_SOCKET;
 	return true;
-	}
+}
 
 std::vector<std::string> splitString(std::string str, std::string token) {
 	if (str.empty())	return std::vector<std::string> { "" };
@@ -174,21 +173,24 @@ std::vector<char> readAllBytesFromFile(const std::string filename)
 	long fileSize = ftell(inputFile);
 	fseek(inputFile, 0, SEEK_SET);
 
-	if ((unsigned int)fileSize == 0) {
+	if (fileSize == 0) {
 		fclose(inputFile);
 		return{};
 	}
 
-	std::vector<char> result((unsigned int)fileSize);
+	std::vector<char> result(fileSize);
 
-	fread((char*)&result[0], fileSize, 1, inputFile);
+	size_t  bytesRead = fread(&result[0], 1, fileSize, inputFile);
+	if (bytesRead != static_cast<size_t>(fileSize)) {
+		std::cout << "TCPFeeder.readAllBytesFromFile failed to read all bytes! Bytes read: " << bytesRead << ". Filesize " << fileSize << std::endl;
+	}
 
 	fclose(inputFile);
 
 	return result;
 }
 
-int getServerPortFromPID(int targetPID) {
+uint16_t getServerPortFromPID(uint16_t targetPID) {
 #if defined(_WIN32) || defined(_WIN64)
 	// Declare and initialize variables
 	PMIB_TCPTABLE2 pTcpTable;
@@ -236,7 +238,7 @@ int getServerPortFromPID(int targetPID) {
 #else
 	std::string netstatOut = execCommandAndGetOutput("netstat -4 -lntp");
 	std::vector<std::string> netstatLines = splitString(netstatOut, "\n");
-	int i = 0;
+	size_t i = 0;
 	size_t pidPOS = std::string::npos;
 	for (; i < netstatLines.size(); i++) {
 		pidPOS = netstatLines[i].find("PID", 0);
@@ -251,7 +253,7 @@ int getServerPortFromPID(int targetPID) {
 
 			if (pid == targetPID) {
 				size_t portPOS = netstatLines[i].find(":", 0);
-				return std::stoi(netstatLines[i].substr(portPOS + 1, std::string::npos));
+				return static_cast<uint16_t>(std::stoi(netstatLines[i].substr(portPOS + 1, std::string::npos)));
 			}
 		}
 		catch (...) {
@@ -272,9 +274,7 @@ void initializeIPC(SharedMemIPC& sharedMemIPC_ToRunner)
 	}
 }
 
-
-
-void initFromArgs(int argc, char* argv[], int& targetport, std::string& ipcName)
+void initFromArgs(int argc, char* argv[], uint16_t& targetport, std::string& ipcName)
 {
 	if (argc < 2) {
 		std::cout << "Usage: TCPFeeder.exe [port] <shared memory name>";
@@ -292,7 +292,7 @@ void initFromArgs(int argc, char* argv[], int& targetport, std::string& ipcName)
 	}
 #endif
 	if (argc == 3) {
-		targetport = std::stoi(argv[1]);
+		targetport = static_cast<uint16_t>(std::stoi(argv[1]));
 	}
 
 	ipcName = std::string(argv[argc - 1]);
@@ -302,7 +302,6 @@ uint16_t getTargetPID(SharedMemIPC& sharedMemIPC_ToRunner, int feederTimeoutMS)
 {
 	std::string targetPIDAsString;
 	SharedMemMessage message_FromRunner;
-	std::cout << message_FromRunner.getMessageType() << std::endl;
 	sharedMemIPC_ToRunner.waitForNewMessageToClient(&message_FromRunner, feederTimeoutMS);
 	if (message_FromRunner.getMessageType() == SHARED_MEM_MESSAGE_TRANSMISSION_TIMEOUT) {
 		std::cout << "TCPFeeder: Received a SHARED_MEM_MESSAGE_TRANSMISSION_TIMEOUT message in getTargetPID, terminating!" << std::endl;
@@ -324,7 +323,7 @@ uint16_t getTargetPID(SharedMemIPC& sharedMemIPC_ToRunner, int feederTimeoutMS)
 		exit(-1);
 	}
 
-	return std::stoi(targetPIDAsString);
+	return static_cast<uint16_t>(std::stoi(targetPIDAsString));
 }
 
 uint16_t getServerPortFromPIDOrTimeout(SharedMemIPC& sharedMemIPC_ToRunner, uint16_t targetPID, std::chrono::time_point<std::chrono::system_clock> timeLimit)
@@ -336,13 +335,15 @@ uint16_t getServerPortFromPIDOrTimeout(SharedMemIPC& sharedMemIPC_ToRunner, uint
 	if (targetport == 0) {
 		std::string errorMessage = "Server port of target(PID " + std::to_string(targetPID) + ") could not be identified!";
 		std::cout << "TCPFeeder: " << errorMessage << std::endl;
-		SharedMemMessage couldNotInitializeMsg(SHARED_MEM_MESSAGE_FEEDER_COULD_NOT_INITIALIZE, errorMessage.c_str(), (int)errorMessage.length());
+		SharedMemMessage couldNotInitializeMsg(SHARED_MEM_MESSAGE_FEEDER_COULD_NOT_INITIALIZE, errorMessage.c_str(), static_cast<int>(errorMessage.length()));
 		sharedMemIPC_ToRunner.sendMessageToServer(&couldNotInitializeMsg);
 #if defined(_WIN32) || defined(_WIN64)
 		WSACleanup();
 #endif
 		exit(-1);
 	}
+
+	return targetport;
 }
 
 void waitForPortOpenOrTimeout(SharedMemIPC& sharedMemIPC_ToRunner, std::string targethost, uint16_t targetport, std::chrono::time_point<std::chrono::system_clock> timeOfLastConnectAttempt)
@@ -363,7 +364,7 @@ void waitForPortOpenOrTimeout(SharedMemIPC& sharedMemIPC_ToRunner, std::string t
 	if (!success) {
 		std::string errorMessage = "It was not possible to connect to the target on port " + std::to_string(targetport) + "!";
 		std::cout << "TCPFeeder: " << errorMessage << std::endl;
-		SharedMemMessage couldNotInitializeMsg(SHARED_MEM_MESSAGE_FEEDER_COULD_NOT_INITIALIZE, errorMessage.c_str(), (int)errorMessage.length());
+		SharedMemMessage couldNotInitializeMsg(SHARED_MEM_MESSAGE_FEEDER_COULD_NOT_INITIALIZE, errorMessage.c_str(), static_cast<int>(errorMessage.length()));
 		sharedMemIPC_ToRunner.sendMessageToServer(&couldNotInitializeMsg);
 #if defined(_WIN32) || defined(_WIN64)
 		WSACleanup();

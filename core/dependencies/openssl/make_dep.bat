@@ -7,6 +7,11 @@
 ::
 :: Author(s): Thomas Riedmaier, Pascal Eckmann
 
+IF NOT DEFINED VCVARSALL (
+		ECHO Environment Variable VCVARSALL needs to be set!
+		goto errorDone
+)
+
 RMDIR /Q/S include
 RMDIR /Q/S include64
 RMDIR /Q/S include86
@@ -20,6 +25,8 @@ MKDIR include86\openssl
 MKDIR lib
 MKDIR lib\x64
 MKDIR lib\x86
+MKDIR lib\x64d
+MKDIR lib\x86d
 
 REM Getting Openssl
 
@@ -39,52 +46,53 @@ mkdir build64
 mkdir build86
 mkdir build64d
 mkdir build86d
-SETLOCAL
 cd build64
-call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64
+SETLOCAL
+call %VCVARSALL% x64
 set CL=/MP
 set __CNF_LDLIBS=-static
 perl ..\Configure VC-WIN64A --release no-tests no-unit-test no-asm enable-static-engine no-shared
-"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\nmake.exe"
+nmake.exe
 cd ..
 cd build64d
 perl ..\Configure VC-WIN64A --debug no-tests no-unit-test no-asm enable-static-engine no-shared
-"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\nmake.exe"
-cd ..
+nmake.exe
 ENDLOCAL
-
-
-SETLOCAL
+cd ..
 cd build86
-call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86
+SETLOCAL
+call %VCVARSALL% x86
 set CL=/MP
 set __CNF_LDLIBS=-static
 perl ..\Configure VC-WIN32 --release no-tests no-unit-test no-asm enable-static-engine no-shared
-"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\nmake.exe"
+nmake.exe
 cd ..
 cd build86d
 perl ..\Configure VC-WIN32 --debug no-tests no-unit-test no-asm enable-static-engine no-shared
-"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\nmake.exe"
-cd ..
+nmake.exe
 ENDLOCAL
+cd ..
 cd ..
 
 
 copy openssl\build64\libcryptoMT.lib lib\x64
 copy openssl\build64\libsslMT.lib lib\x64
+copy openssl\build64\ossl_static.pdb lib\x64
 
-copy openssl\build64d\libcryptoMTd.lib lib\x64
-copy openssl\build64d\libsslMTd.lib lib\x64
+copy openssl\build64d\libcryptoMTd.lib lib\x64d
+copy openssl\build64d\libsslMTd.lib lib\x64d
+copy openssl\build64d\ossl_static.pdb lib\x64d
 
 copy openssl\build86\libcryptoMT.lib lib\x86
 copy openssl\build86\libsslMT.lib lib\x86
+copy openssl\build86\ossl_static.pdb lib\x86
 
-
-copy openssl\build86d\libcryptoMTd.lib lib\x86
-copy openssl\build86d\libsslMTd.lib lib\x86
+copy openssl\build86d\libcryptoMTd.lib lib\x86d
+copy openssl\build86d\libsslMTd.lib lib\x86d
+copy openssl\build86d\ossl_static.pdb lib\x86d
 
 copy openssl\build64\include\openssl\opensslconf.h include64\openssl
-copy openssl\build64\include\openssl\opensslconf.h include86\openssl
+copy openssl\build86\include\openssl\opensslconf.h include86\openssl
 xcopy openssl\include\*.h include /sy
 
 copy openssl\ms\applink.c include
@@ -95,10 +103,10 @@ ver > nul
 
 RMDIR /Q/S openssl
 
-goto :eof
+goto done
 
-:err
+:errorDone
 exit /B 1
 
-:eof
+:done
 exit /B 0

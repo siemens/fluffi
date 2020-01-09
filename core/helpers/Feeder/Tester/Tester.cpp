@@ -15,10 +15,6 @@ Author(s): Thomas Riedmaier, Pascal Eckmann
 #include "ExternalProcess.h"
 #include "Util.h"
 
-//cp ../../../bin/libsharedmemipc.so .
-//cp ../../../bin/libzmq.so.5 .
-//g++ --std=c++11 -o Tester -L . -I../../../SharedCode -I../../../dependencies/libprotoc/include/siemens/cpp -I../../../dependencies/libprotoc/include -I../../../SharedMemIPC  -I ../../../dependencies/easylogging/include -I ../../../dependencies/libuuid/include Tester.cpp ../../../lib/sharedcode.a  ../../../dependencies/libprotoc/lib/x86-64/libprotobuf.a  ../../../dependencies/easylogging/lib/x86-64/libeasyloggingpp.a -pthread -lstdc++fs -ldl -l:libzmq.so.5 -lsharedmemipc  -Wl,-rpath='${ORIGIN}'
-
 INITIALIZE_EASYLOGGINGPP
 
 //Taken from dynamorio
@@ -44,7 +40,7 @@ bool initializeFeeder(std::shared_ptr<ExternalProcess> feederProcess, SharedMemI
 	}
 
 	std::string targetPIDString = std::to_string(targetProcessID);
-	SharedMemMessage targetCMDMessage{ SHARED_MEM_MESSAGE_TARGET_PID, targetPIDString.c_str(), (int)targetPIDString.length() };
+	SharedMemMessage targetCMDMessage{ SHARED_MEM_MESSAGE_TARGET_PID, targetPIDString.c_str(), static_cast<int>(targetPIDString.length()) };
 
 	if (!sharedMemIPC_toFeeder->sendMessageToClient(&targetCMDMessage)) {
 		LOG(ERROR) << "Could not send the targetCMDMessage to the feeder process";
@@ -52,7 +48,7 @@ bool initializeFeeder(std::shared_ptr<ExternalProcess> feederProcess, SharedMemI
 	}
 
 	SharedMemMessage responseFromFeeder;
-	sharedMemIPC_toFeeder->waitForNewMessageToServer(&responseFromFeeder, (unsigned long)std::chrono::duration_cast<std::chrono::milliseconds>(latestRoutineExitTimeStamp - std::chrono::system_clock::now()).count());
+	sharedMemIPC_toFeeder->waitForNewMessageToServer(&responseFromFeeder, static_cast<unsigned long>(std::chrono::duration_cast<std::chrono::milliseconds>(latestRoutineExitTimeStamp - std::chrono::system_clock::now()).count()));
 	if (responseFromFeeder.getMessageType() == SHARED_MEM_MESSAGE_TRANSMISSION_TIMEOUT) {
 		LOG(ERROR) << "Recived a SHARED_MEM_MESSAGE_TRANSMISSION_TIMEOUT message: starting Feeder failed!";
 		return false;
@@ -161,7 +157,7 @@ int main(int argc, char* argv[])
 	}
 
 	//send "go" to feeder
-	SharedMemMessage fuzzFilenameMsg{ SHARED_MEM_MESSAGE_FUZZ_FILENAME, testcaseFile.c_str(),(int)testcaseFile.length() };
+	SharedMemMessage fuzzFilenameMsg{ SHARED_MEM_MESSAGE_FUZZ_FILENAME, testcaseFile.c_str(),static_cast<int>(testcaseFile.length()) };
 	if (!sharedMemIPC_toFeeder.sendMessageToClient(&fuzzFilenameMsg)) {
 		LOG(ERROR) << "Problem while sending a fuzzing filename to the feeder!";
 		return -1;

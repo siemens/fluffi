@@ -13,9 +13,6 @@ Author(s): Thomas Riedmaier, Pascal Eckmann
 #include "stdafx.h"
 #include "SharedMemIPC.h"
 
-//cp ../../../bin/libsharedmemipc.so .
-//g++ --std=c++11 -I../../../SharedMemIPC/ -o SharedMemFeeder stdafx.cpp SharedMemFeeder.cpp libsharedmemipc.so -Wl,-rpath='${ORIGIN}'
-
 #if defined(_WIN32) || defined(_WIN64)
 #else
 // trim from end (in place)
@@ -100,17 +97,18 @@ std::vector<std::string> splitString(std::string str, std::string token) {
 	if (token.empty()) return std::vector<std::string> { str };
 
 	std::vector<std::string>result;
-	while (str.size()) {
-		size_t index = str.find(token);
-		if (index != std::string::npos) {
-			result.push_back(str.substr(0, index));
-			str = str.substr(index + token.size());
-			if (str.size() == 0)result.push_back(str);
+	size_t curIndex = 0;
+	size_t lenOfToken = token.size();
+	while (true) {
+		size_t nextIndex = str.find(token, curIndex);
+		if (nextIndex != std::string::npos) {
+			result.push_back(str.substr(curIndex, nextIndex - curIndex));
 		}
 		else {
-			result.push_back(str);
-			str = "";
+			result.push_back(str.substr(curIndex));
+			break;
 		}
+		curIndex = nextIndex + lenOfToken;
 	}
 	return result;
 }
@@ -147,7 +145,7 @@ int main(int argc, char* argv[])
 		if (targetcmdline == L"") {
 			std::string errorMessage = "Command line of target(PID " + targetPIDAsString + ") could not be read!";
 			std::cout << "SharedMemFeeder: " << errorMessage << std::endl;
-			SharedMemMessage tmp(SHARED_MEM_MESSAGE_FEEDER_COULD_NOT_INITIALIZE, errorMessage.c_str(), (int)errorMessage.length());
+			SharedMemMessage tmp(SHARED_MEM_MESSAGE_FEEDER_COULD_NOT_INITIALIZE, errorMessage.c_str(), static_cast<int>(errorMessage.length()));
 			sharedMemIPC_ToRunner.sendMessageToServer(&tmp);
 			return -1;
 		}
@@ -159,7 +157,7 @@ int main(int argc, char* argv[])
 		if (actualLineStart == std::string::npos || actualLineEnd == std::string::npos) {
 			std::string errorMessage = "Command line of target(PID " + targetPIDAsString + ") seems to be empty!";
 			std::cout << "SharedMemFeeder: " << errorMessage << std::endl;
-			SharedMemMessage tmp(SHARED_MEM_MESSAGE_FEEDER_COULD_NOT_INITIALIZE, errorMessage.c_str(), (int)errorMessage.length());
+			SharedMemMessage tmp(SHARED_MEM_MESSAGE_FEEDER_COULD_NOT_INITIALIZE, errorMessage.c_str(), static_cast<int>(errorMessage.length()));
 			sharedMemIPC_ToRunner.sendMessageToServer(&tmp);
 			return -1;
 		}
@@ -204,7 +202,7 @@ int main(int argc, char* argv[])
 		else {
 			std::string errorMessage = "SharedMemFeeder: Something went wrong! The target did not come up!";
 			std::cout << errorMessage << std::endl;
-			SharedMemMessage tmp(SHARED_MEM_MESSAGE_FEEDER_COULD_NOT_INITIALIZE, errorMessage.c_str(), (int)errorMessage.length());
+			SharedMemMessage tmp(SHARED_MEM_MESSAGE_FEEDER_COULD_NOT_INITIALIZE, errorMessage.c_str(), static_cast<int>(errorMessage.length()));
 			sharedMemIPC_ToRunner.sendMessageToServer(&tmp);
 			return -1;
 		}

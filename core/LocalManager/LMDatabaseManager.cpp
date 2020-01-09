@@ -206,11 +206,46 @@ bool LMDatabaseManager::writeManagedInstance(const FluffiServiceDescriptor servi
 		}
 	}
 
+	//Try to set a nice nime (for gui and evaluation purposes)
+	for (int i = 0; i < 10; i++)
 	{
-		//// prepared Statement to insert to store the nice name of the instance (for gui and evaluation purposes)
-		MYSQL_STMT* sql_stmt = mysql_stmt_init(getDBConnection());
+		if (i == 9) {
+			LOG(WARNING) << "writeManagedInstance failed to insert a nice name for 10 times. Giving up";
+			PERFORMANCE_WATCH_FUNCTION_EXIT("writeManagedInstance")
+				return false;
+		}
 
-		const char* stmt = "INSERT IGNORE INTO nice_names_managed_instance (ServiceDescriptorGUID,NiceName ) SELECT ?, CONCAT(?, COUNT(*)) FROM nice_names_managed_instance FOR UPDATE";
+		//Find out how many nice names there are already
+		if (mysql_query(getDBConnection(), "SELECT COUNT(*) FROM nice_names_managed_instance") != 0) {
+			LOG(ERROR) << "LMDatabaseManager::writeManagedInstance failed to figure out how many entries there are already in the nice_names_managed_instance table (1)";
+			PERFORMANCE_WATCH_FUNCTION_EXIT("writeManagedInstance")
+				return false;
+		}
+
+		MYSQL_RES* result = mysql_store_result(getDBConnection());
+		if (result == NULL) {
+			LOG(ERROR) << "LMDatabaseManager::writeManagedInstance failed to figure out how many entries there are already in the nice_names_managed_instance table (2)";
+			PERFORMANCE_WATCH_FUNCTION_EXIT("writeManagedInstance")
+				return false;
+		}
+
+		MYSQL_ROW row = mysql_fetch_row(result);
+		if (row == NULL) {
+			mysql_free_result(result);
+			LOG(ERROR) << "LMDatabaseManager::writeManagedInstance failed to figure out how many entries there are already in the nice_names_managed_instance table (3)";
+			PERFORMANCE_WATCH_FUNCTION_EXIT("writeManagedInstance")
+				return false;
+		}
+
+		std::string niceName = subtype + row[0];
+		const char* cNiceName = niceName.c_str();
+		unsigned long cNiceNameLength = static_cast<unsigned long>(niceName.length());
+
+		mysql_free_result(result);
+
+		// Try setting the nice name
+		MYSQL_STMT* sql_stmt = mysql_stmt_init(getDBConnection());
+		const char* stmt = "INSERT INTO nice_names_managed_instance (ServiceDescriptorGUID,NiceName ) values (?, ?)";
 		mysql_stmt_prepare(sql_stmt, stmt, static_cast<unsigned long>(strlen(stmt)));
 
 		//params
@@ -223,20 +258,26 @@ bool LMDatabaseManager::writeManagedInstance(const FluffiServiceDescriptor servi
 		bind[0].length = &GUIDLength;
 
 		bind[1].buffer_type = MYSQL_TYPE_VAR_STRING;
-		bind[1].buffer = const_cast<char*>(cSubtype);
-		bind[1].buffer_length = subtypeLength;
-		bind[1].length = &subtypeLength;
+		bind[1].buffer = const_cast<char*>(cNiceName);
+		bind[1].buffer_length = cNiceNameLength;
+		bind[1].length = &cNiceNameLength;
 
 		mysql_stmt_bind_param(sql_stmt, bind);
 		bool re = mysql_stmt_execute(sql_stmt) == 0;
 		if (!re) {
-			LOG(ERROR) << "writeManagedInstance encountered the following error (2): " << mysql_stmt_error(sql_stmt);
+			std::string theError = mysql_stmt_error(sql_stmt);
+			if (theError.find("for key 'ServiceDescriptorGUID'") != std::string::npos) {
+				//there already is a nice name for this ServiceDescriptorGUID - nothing to do here
+				break;
+			}
+			LOG(WARNING) << "writeManagedInstance encountered the following error (2): " << theError << ". We will try again!";
 		}
 
 		mysql_stmt_close(sql_stmt);
 
-		if (!re) {
-			return false;
+		if (re) {
+			//Successfully inserted nice name
+			break;
 		}
 	}
 
@@ -988,77 +1029,114 @@ bool LMDatabaseManager::addEntryToInterestingTestcasesTable(const FluffiTestcase
 
 	int preparedType = tcType;
 
-	//// prepared Statement
-	MYSQL_STMT* sql_stmt = mysql_stmt_init(getDBConnection());
+	// First step: Delete interesting testcaes if it already exists
+	{
+		MYSQL_STMT* sql_stmt = mysql_stmt_init(getDBConnection());
 
-	const char* stmt = "INSERT IGNORE interesting_testcases (CreatorServiceDescriptorGUID, CreatorLocalID, ParentServiceDescriptorGUID, ParentLocalID, Rating, RawBytes, TestCaseType, TimeOfInsertion) values (?, ?, ?, ?, ?, ?, ?,CURRENT_TIMESTAMP()) ON DUPLICATE KEY UPDATE Rating = ?, TestCaseType = ? ";
-	mysql_stmt_prepare(sql_stmt, stmt, static_cast<unsigned long>(strlen(stmt)));
+		const char* stmt = "DELETE FROM interesting_testcases WHERE CreatorServiceDescriptorGUID = ? AND CreatorLocalID = ?";
+		mysql_stmt_prepare(sql_stmt, stmt, static_cast<unsigned long>(strlen(stmt)));
 
-	//params
-	MYSQL_BIND bind[9];
-	memset(bind, 0, sizeof(bind));
+		//params
+		MYSQL_BIND bind[2];
+		memset(bind, 0, sizeof(bind));
 
-	bind[0].buffer_type = MYSQL_TYPE_VAR_STRING;
-	bind[0].buffer = const_cast<char*>(cStrCreatorServiceDescriptorGUID);
-	bind[0].buffer_length = creatorGUIDLength;
-	bind[0].length = &creatorGUIDLength;
+		bind[0].buffer_type = MYSQL_TYPE_VAR_STRING;
+		bind[0].buffer = const_cast<char*>(cStrCreatorServiceDescriptorGUID);
+		bind[0].buffer_length = creatorGUIDLength;
+		bind[0].length = &creatorGUIDLength;
 
-	bind[1].buffer_type = MYSQL_TYPE_LONGLONG;
-	bind[1].buffer = &preparedCreatorLocalID;
-	bind[1].is_null = 0;
-	bind[1].is_unsigned = true;
-	bind[1].length = NULL;
+		bind[1].buffer_type = MYSQL_TYPE_LONGLONG;
+		bind[1].buffer = &preparedCreatorLocalID;
+		bind[1].is_null = 0;
+		bind[1].is_unsigned = true;
+		bind[1].length = NULL;
 
-	bind[2].buffer_type = MYSQL_TYPE_VAR_STRING;
-	bind[2].buffer = const_cast<char*>(cStrParentServiceDescriptorGUID);
-	bind[2].buffer_length = parentGUIDLength;
-	bind[2].length = &parentGUIDLength;
+		mysql_stmt_bind_param(sql_stmt, bind);
+		bool re = mysql_stmt_execute(sql_stmt) == 0;
+		if (!re) {
+			LOG(ERROR) << "addEntryToInterestingTestcasesTable encountered the following error: " << mysql_stmt_error(sql_stmt);
+		}
 
-	bind[3].buffer_type = MYSQL_TYPE_LONGLONG;
-	bind[3].buffer = &preparedParentLocalID;
-	bind[3].is_null = 0;
-	bind[3].is_unsigned = true;
-	bind[3].length = NULL;
+		mysql_stmt_close(sql_stmt);
 
-	bind[4].buffer_type = MYSQL_TYPE_LONG;
-	bind[4].buffer = &preparedRating;
-	bind[4].is_null = 0;
-	bind[4].is_unsigned = false;
-	bind[4].length = NULL;
-
-	bind[5].buffer_type = MYSQL_TYPE_LONG_BLOB;
-	bind[5].buffer = const_cast<char*>(cStrRawBytes);
-	bind[5].buffer_length = rawBytesLength;
-	bind[5].length = &rawBytesLength;
-
-	bind[6].buffer_type = MYSQL_TYPE_LONG;
-	bind[6].buffer = &preparedType;
-	bind[6].is_null = 0;
-	bind[6].is_unsigned = true;
-	bind[6].length = NULL;
-
-	bind[7].buffer_type = MYSQL_TYPE_LONG;
-	bind[7].buffer = &preparedRating;
-	bind[7].is_null = 0;
-	bind[7].is_unsigned = false;
-	bind[7].length = NULL;
-
-	bind[8].buffer_type = MYSQL_TYPE_LONG;
-	bind[8].buffer = &preparedType;
-	bind[8].is_null = 0;
-	bind[8].is_unsigned = true;
-	bind[8].length = NULL;
-
-	mysql_stmt_bind_param(sql_stmt, bind);
-	//if problems with big files arise, mysql_stmt_send_long_data might be the solution
-	bool re = mysql_stmt_execute(sql_stmt) == 0;
-	if (!re) {
-		LOG(ERROR) << "addEntryToInterestingTestcasesTable encountered the following error: " << mysql_stmt_error(sql_stmt);
+		if (!re) {
+			return re;
+		}
 	}
 
-	mysql_stmt_close(sql_stmt);
+	// Second step: Actually insert the interesting testcase
+	{
+		MYSQL_STMT* sql_stmt = mysql_stmt_init(getDBConnection());
+
+		const char* stmt = "INSERT INTO interesting_testcases (CreatorServiceDescriptorGUID, CreatorLocalID, ParentServiceDescriptorGUID, ParentLocalID, Rating, RawBytes, TestCaseType, TimeOfInsertion) values (?, ?, ?, ?, ?, ?, ?,CURRENT_TIMESTAMP())";
+		mysql_stmt_prepare(sql_stmt, stmt, static_cast<unsigned long>(strlen(stmt)));
+
+		//params
+		MYSQL_BIND bind[9];
+		memset(bind, 0, sizeof(bind));
+
+		bind[0].buffer_type = MYSQL_TYPE_VAR_STRING;
+		bind[0].buffer = const_cast<char*>(cStrCreatorServiceDescriptorGUID);
+		bind[0].buffer_length = creatorGUIDLength;
+		bind[0].length = &creatorGUIDLength;
+
+		bind[1].buffer_type = MYSQL_TYPE_LONGLONG;
+		bind[1].buffer = &preparedCreatorLocalID;
+		bind[1].is_null = 0;
+		bind[1].is_unsigned = true;
+		bind[1].length = NULL;
+
+		bind[2].buffer_type = MYSQL_TYPE_VAR_STRING;
+		bind[2].buffer = const_cast<char*>(cStrParentServiceDescriptorGUID);
+		bind[2].buffer_length = parentGUIDLength;
+		bind[2].length = &parentGUIDLength;
+
+		bind[3].buffer_type = MYSQL_TYPE_LONGLONG;
+		bind[3].buffer = &preparedParentLocalID;
+		bind[3].is_null = 0;
+		bind[3].is_unsigned = true;
+		bind[3].length = NULL;
+
+		bind[4].buffer_type = MYSQL_TYPE_LONG;
+		bind[4].buffer = &preparedRating;
+		bind[4].is_null = 0;
+		bind[4].is_unsigned = false;
+		bind[4].length = NULL;
+
+		bind[5].buffer_type = MYSQL_TYPE_LONG_BLOB;
+		bind[5].buffer = const_cast<char*>(cStrRawBytes);
+		bind[5].buffer_length = rawBytesLength;
+		bind[5].length = &rawBytesLength;
+
+		bind[6].buffer_type = MYSQL_TYPE_LONG;
+		bind[6].buffer = &preparedType;
+		bind[6].is_null = 0;
+		bind[6].is_unsigned = true;
+		bind[6].length = NULL;
+
+		bind[7].buffer_type = MYSQL_TYPE_LONG;
+		bind[7].buffer = &preparedRating;
+		bind[7].is_null = 0;
+		bind[7].is_unsigned = false;
+		bind[7].length = NULL;
+
+		bind[8].buffer_type = MYSQL_TYPE_LONG;
+		bind[8].buffer = &preparedType;
+		bind[8].is_null = 0;
+		bind[8].is_unsigned = true;
+		bind[8].length = NULL;
+
+		mysql_stmt_bind_param(sql_stmt, bind);
+		//if problems with big files arise, mysql_stmt_send_long_data might be the solution
+		bool re = mysql_stmt_execute(sql_stmt) == 0;
+		if (!re) {
+			LOG(ERROR) << "addEntryToInterestingTestcasesTable encountered the following error: " << mysql_stmt_error(sql_stmt);
+		}
+
+		mysql_stmt_close(sql_stmt);
+	}
 	PERFORMANCE_WATCH_FUNCTION_EXIT("addEntryToInterestingTestcasesTable")
-		return re;
+		return true;
 }
 
 bool LMDatabaseManager::setSessionParameters(MYSQL* conn) {
@@ -1135,13 +1213,14 @@ bool LMDatabaseManager::addEntryToCompletedTestcasesTable(const FluffiTestcaseID
 		return success;
 }
 
-bool LMDatabaseManager::addEntriesToCompletedTestcasesTable(const std::set<FluffiTestcaseID>* testcaseIDs) {
+bool LMDatabaseManager::addEntriesToCompletedTestcasesTable(const std::set<FluffiTestcaseID>& testcaseIDs) {
 	PERFORMANCE_WATCH_FUNCTION_ENTRY
 
 		const int maxGUIDLength = 50;
-	for (std::set<FluffiTestcaseID>::const_iterator it = testcaseIDs->begin(); it != testcaseIDs->end(); ++it) {
-		//As we use bulk insert, we need to assume a maximum string length. We assume it to be 50. Longer guids  will cause an error. Please note: this value can be adjusted
+	for (std::set<FluffiTestcaseID>::const_iterator it = testcaseIDs.begin(); it != testcaseIDs.end(); ++it) {
+		//As we use bulk insert, we need to assume a maximum string length. We assume it to be maxGUIDLength. Longer guids  will cause an error. Please note: this value can be adjusted
 		if ((*it).m_serviceDescriptor.m_guid.length() >= maxGUIDLength) {
+			LOG(ERROR) << "Trying to insert a GUID of invalid length with addEntriesToCompletedTestcasesTable";
 			return false;
 		}
 	}
@@ -1155,17 +1234,22 @@ bool LMDatabaseManager::addEntriesToCompletedTestcasesTable(const std::set<Fluff
 		char localid_ind;
 	};
 
-	size_t array_size = testcaseIDs->size();
+	size_t array_size = testcaseIDs.size();
 
 	if (array_size == 0) {
 		//Nothing to do here
 		return true;
 	}
 
+	//In order to avoid deadlocks we set the transaction level (see https://www.percona.com/blog/2012/03/27/innodbs-gap-locks/)
+	if (mysql_query(getDBConnection(), "SET TRANSACTION ISOLATION LEVEL READ COMMITTED") != 0) {
+		LOG(WARNING) << "\"SET TRANSACTION ISOLATION LEVEL READ COMMITTED\" failed";
+	}
+
 	size_t row_size = sizeof(struct st_data);
 	struct st_data* data = new struct st_data[array_size];
 	unsigned int i = 0;
-	for (std::set<FluffiTestcaseID>::iterator it = testcaseIDs->begin(); it != testcaseIDs->end(); i++, ++it) {
+	for (std::set<FluffiTestcaseID>::iterator it = testcaseIDs.begin(); it != testcaseIDs.end(); i++, ++it) {
 		strcpy_s(data[i].guid, maxGUIDLength, (*it).m_serviceDescriptor.m_guid.c_str()); //check above ensures that tcID->servicedescriptor().guid().length() < maxGUIDLength (which is the size of the target buffer)
 
 		data[i].guid_ind = STMT_INDICATOR_NTS;
@@ -1263,7 +1347,7 @@ bool LMDatabaseManager::addDeltaToTestcaseRating(const FluffiTestcaseID tcID, in
 		return re;
 }
 
-bool LMDatabaseManager::addBlocksToCoveredBlocks(const FluffiTestcaseID tcID, const std::set<FluffiBasicBlock>* basicBlocks) { //in order to prevent deadlocks, the basic blocks need to be inserted in a sorted order. Therefore a set (which is soted) is used to pass the basicBlocks
+bool LMDatabaseManager::addBlocksToCoveredBlocks(const FluffiTestcaseID tcID, const std::set<FluffiBasicBlock>& basicBlocks) { //in order to prevent deadlocks, the basic blocks need to be inserted in a sorted order. Therefore a set (which is soted) is used to pass the basicBlocks
 	PERFORMANCE_WATCH_FUNCTION_ENTRY
 
 		//#################### First part: get testcase ID ####################
@@ -1326,11 +1410,6 @@ bool LMDatabaseManager::addBlocksToCoveredBlocks(const FluffiTestcaseID tcID, co
 	}
 	//#################### Second part: bulk insert blocks ####################
 	{
-		//In order to avoid deadlocks we set the transaction level (see https://www.percona.com/blog/2012/03/27/innodbs-gap-locks/)
-		if (mysql_query(getDBConnection(), "SET TRANSACTION ISOLATION LEVEL READ COMMITTED") != 0) {
-			LOG(WARNING) << "\"SET TRANSACTION ISOLATION LEVEL READ COMMITTED\" failed";
-		}
-
 		//bulk insert as documented in https://mariadb.com/kb/en/library/bulk-insert-row-wise-binding/
 
 		struct st_data {
@@ -1342,17 +1421,22 @@ bool LMDatabaseManager::addBlocksToCoveredBlocks(const FluffiTestcaseID tcID, co
 			char offset_ind;
 		};
 
-		unsigned int array_size = static_cast<unsigned int>(basicBlocks->size());
+		unsigned int array_size = static_cast<unsigned int>(basicBlocks.size());
 
 		if (array_size == 0) {
 			//Nothing to do here
 			return true;
 		}
 
+		//In order to avoid deadlocks we set the transaction level (see https://www.percona.com/blog/2012/03/27/innodbs-gap-locks/)
+		if (mysql_query(getDBConnection(), "SET TRANSACTION ISOLATION LEVEL READ COMMITTED") != 0) {
+			LOG(WARNING) << "\"SET TRANSACTION ISOLATION LEVEL READ COMMITTED\" failed";
+		}
+
 		size_t row_size = sizeof(struct st_data);
 		struct st_data* data = new struct st_data[array_size];
 		unsigned int i = 0;
-		for (auto& basicBlock : *basicBlocks) {
+		for (auto& basicBlock : basicBlocks) {
 			data[i].testcaseid = testcaseID;
 			data[i].testcaseid_ind = STMT_INDICATOR_NONE;
 			data[i].moduleid = static_cast<unsigned char>(basicBlock.m_moduleID);
@@ -1532,7 +1616,7 @@ bool LMDatabaseManager::addEntryToCrashDescriptionsTable(const FluffiTestcaseID 
 	//// prepared Statement
 	MYSQL_STMT* sql_stmt = mysql_stmt_init(getDBConnection());
 
-	const char* stmt = "INSERT INTO crash_descriptions (CreatorTestcaseID, CrashFootprint) values ((SELECT ID from interesting_testcases WHERE CreatorServiceDescriptorGUID= ? AND CreatorLocalID = ?) , ?) ON DUPLICATE KEY UPDATE CrashFootprint = ? ";
+	const char* stmt = "REPLACE INTO crash_descriptions (CreatorTestcaseID, CrashFootprint) values ((SELECT ID from interesting_testcases WHERE CreatorServiceDescriptorGUID= ? AND CreatorLocalID = ? LIMIT 1) , ?)";
 	mysql_stmt_prepare(sql_stmt, stmt, static_cast<unsigned long>(strlen(stmt)));
 
 	//params
@@ -1878,5 +1962,159 @@ bool LMDatabaseManager::setTestcaseType(const FluffiTestcaseID tcID, TestCaseTyp
 	mysql_stmt_close(sql_stmt);
 
 	PERFORMANCE_WATCH_FUNCTION_EXIT("setTestcaseType")
+		return re;
+}
+
+bool LMDatabaseManager::addNewManagedInstanceLogMessages(std::string ServiceDescriptorGUID, const std::vector<std::string>& messages) {
+	PERFORMANCE_WATCH_FUNCTION_ENTRY
+
+		const int maxGUIDLength = 50;
+
+	//As we use bulk insert, we need to assume a maximum string length. We assume it to be maxGUIDLength. Longer guids  will cause an error. Please note: this value can be adjusted
+	if (ServiceDescriptorGUID.length() >= maxGUIDLength) {
+		LOG(ERROR) << "Trying to insert a GUID of invalid length with addNewManagedLMLogMessages";
+		return false;
+	}
+
+	const int maxLogMessageLength = 1990;
+
+	for (std::vector<std::string>::const_iterator it = messages.begin(); it != messages.end(); ++it) {
+		//As we use bulk insert, we need to assume a maximum string length. We assume it to be maxLogMessageLength. Longer log messages  will cause an error. Please note: this value can be adjusted
+		if ((*it).length() >= maxLogMessageLength) {
+			LOG(ERROR) << "Trying to insert a log message of invalid length with addNewManagedLMLogMessages";
+			return false;
+		}
+	}
+
+	//bulk insert as documented in https://mariadb.com/kb/en/library/bulk-insert-row-wise-binding/
+
+	struct st_data {
+		char guid[maxGUIDLength];
+		char guid_ind;
+		char logMessage[maxLogMessageLength];
+		char logMessage_ind;
+	};
+
+	unsigned int array_size = static_cast<unsigned int>(messages.size());
+
+	if (array_size == 0) {
+		//Nothing to do here
+		return true;
+	}
+
+	//In order to avoid deadlocks we set the transaction level (see https://www.percona.com/blog/2012/03/27/innodbs-gap-locks/)
+	if (mysql_query(getDBConnection(), "SET TRANSACTION ISOLATION LEVEL READ COMMITTED") != 0) {
+		LOG(WARNING) << "\"SET TRANSACTION ISOLATION LEVEL READ COMMITTED\" failed";
+	}
+
+	size_t row_size = sizeof(struct st_data);
+	struct st_data* data = new struct st_data[array_size];
+	unsigned int i = 0;
+	for (std::vector<std::string>::const_iterator it = messages.begin(); it != messages.end(); i++, ++it) {
+		strcpy_s(data[i].guid, maxGUIDLength, ServiceDescriptorGUID.c_str()); //check above ensures that m_serviceDescriptor.length() < maxGUIDLength (which is the size of the target buffer)
+		data[i].guid_ind = STMT_INDICATOR_NTS;
+		strcpy_s(data[i].logMessage, maxLogMessageLength, (*it).c_str()); //check above ensures that (*it).length() < maxLogMessageLength (which is the size of the target buffer)
+		data[i].logMessage_ind = STMT_INDICATOR_NTS;
+	}
+
+	//// prepared Statement
+	MYSQL_STMT* sql_stmt = mysql_stmt_init(getDBConnection());
+
+	const char* stmt = "INSERT INTO managed_instances_logmessages (ServiceDescriptorGUID, TimeOfInsertion,LogMessage) values (? , CURRENT_TIMESTAMP(), ?)";
+	mysql_stmt_prepare(sql_stmt, stmt, static_cast<unsigned long>(strlen(stmt)));
+
+	//params
+	MYSQL_BIND bind[2];
+	memset(bind, 0, sizeof(bind));
+
+	bind[0].buffer_type = MYSQL_TYPE_VAR_STRING;
+	bind[0].buffer = &data[0].guid;
+	bind[0].u.indicator = &data[0].guid_ind;
+
+	bind[1].buffer_type = MYSQL_TYPE_VAR_STRING;
+	bind[1].buffer = &data[0].logMessage;
+	bind[1].u.indicator = &data[0].logMessage_ind;
+
+	/* set array size */
+	mysql_stmt_attr_set(sql_stmt, STMT_ATTR_ARRAY_SIZE, &array_size);
+
+	/* set row size */
+	mysql_stmt_attr_set(sql_stmt, STMT_ATTR_ROW_SIZE, &row_size);
+
+	mysql_stmt_bind_param(sql_stmt, bind);
+	bool re = mysql_stmt_execute(sql_stmt) == 0;
+	if (!re) {
+		LOG(ERROR) << "addNewManagedInstanceLogMessages encountered the following error: " << mysql_stmt_error(sql_stmt);
+	}
+
+	mysql_stmt_close(sql_stmt);
+
+	delete[] data;
+
+	PERFORMANCE_WATCH_FUNCTION_EXIT("addNewManagedInstanceLogMessages")
+		return re;
+}
+
+bool LMDatabaseManager::deleteManagedInstanceLogMessagesIfMoreThan(int num) {
+	PERFORMANCE_WATCH_FUNCTION_ENTRY
+		int preparedNum = num;
+
+	//// prepared Statement
+	MYSQL_STMT* sql_stmt = mysql_stmt_init(getDBConnection());
+
+	const char* stmt = "DELETE ll FROM managed_instances_logmessages as ll JOIN ( SELECT ID FROM  managed_instances_logmessages ORDER BY ID DESC LIMIT 1 OFFSET ?  ) lllimit ON ll.ID <= lllimit.ID";
+	mysql_stmt_prepare(sql_stmt, stmt, static_cast<unsigned long>(strlen(stmt)));
+
+	//params
+	MYSQL_BIND bind[1];
+	memset(bind, 0, sizeof(bind));
+
+	bind[0].buffer_type = MYSQL_TYPE_LONG;
+	bind[0].buffer = &preparedNum;
+	bind[0].is_null = 0;
+	bind[0].is_unsigned = true;
+	bind[0].length = NULL;
+
+	mysql_stmt_bind_param(sql_stmt, bind);
+	bool re = mysql_stmt_execute(sql_stmt) == 0;
+	if (!re) {
+		LOG(ERROR) << "deleteManagedInstanceLogMessagesIfMoreThan encountered the following error: " << mysql_stmt_error(sql_stmt);
+	}
+
+	mysql_stmt_close(sql_stmt);
+
+	PERFORMANCE_WATCH_FUNCTION_EXIT("deleteManagedInstanceLogMessagesIfMoreThan")
+		return re;
+}
+
+bool LMDatabaseManager::deleteManagedInstanceLogMessagesOlderThanXSec(int olderThanInSeconds) {
+	PERFORMANCE_WATCH_FUNCTION_ENTRY
+		int preparedSec = olderThanInSeconds;
+
+	//// prepared Statement
+	MYSQL_STMT* sql_stmt = mysql_stmt_init(getDBConnection());
+
+	const char* stmt = "DELETE FROM managed_instances_logmessages WHERE TimeOfInsertion < (CURRENT_TIMESTAMP() - INTERVAL ? SECOND)";
+	mysql_stmt_prepare(sql_stmt, stmt, static_cast<unsigned long>(strlen(stmt)));
+
+	//params
+	MYSQL_BIND bind[1];
+	memset(bind, 0, sizeof(bind));
+
+	bind[0].buffer_type = MYSQL_TYPE_LONG;
+	bind[0].buffer = &preparedSec;
+	bind[0].is_null = 0;
+	bind[0].is_unsigned = true;
+	bind[0].length = NULL;
+
+	mysql_stmt_bind_param(sql_stmt, bind);
+	bool re = mysql_stmt_execute(sql_stmt) == 0;
+	if (!re) {
+		LOG(ERROR) << "deleteManagedInstanceLogMessagesOlderThanXSec encountered the following error: " << mysql_stmt_error(sql_stmt);
+	}
+
+	mysql_stmt_close(sql_stmt);
+
+	PERFORMANCE_WATCH_FUNCTION_EXIT("deleteManagedInstanceLogMessagesOlderThanXSec")
 		return re;
 }

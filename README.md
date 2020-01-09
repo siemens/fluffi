@@ -24,3 +24,10 @@ FLUFFI - A distributed evolutionary binary fuzzer for pentesters.
 - [Contributing to FLUFFI](CONTRIBUTING.md)
 - [LICENSE](LICENSE.md)
 
+
+# Bugs found
+
+So far, FLUFFI was almost exclusively used on SIEMENS products and solutions. Bugs found therein will not be published.
+
+However, FLUFFI found the following published bugs (please help us keep this list up to date):
+- [Buffer underflow in bc_shift_addsub](https://bugs.php.net/bug.php?id=78878)(CVE-2019-11046)

@@ -6,7 +6,7 @@
 # 
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # 
-# Author(s): Junes Najah, Michael Kraus, Abian Blome, Pascal Eckmann, Fabian Russwurm, Thomas Riedmaier
+# Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Abian Blome, Fabian Russwurm, Thomas Riedmaier
 
 from flask import flash, redirect, url_for, request, send_file, Markup
 from werkzeug.exceptions import HTTPException
@@ -63,7 +63,7 @@ def projects():
 
 @app.route("/projects/archive/<int:projId>", methods=["POST"])
 def archiveProject(projId):
-    project = models.Fuzzjob.query.filter_by(id=projId).first()
+    project = models.Fuzzjob.query.filter_by(ID=projId).first()
     nice_name = project.name
 
     if lock.check_file():
@@ -205,8 +205,8 @@ def addLocationProject(locId):
     projects = []
 
     for project in models.Fuzzjob.query.all():
-        if models.LocationFuzzjobs.query.filter_by(Location=locId, Fuzzjob=project.id).first() is None:
-            data = (project.id, project.name)
+        if models.LocationFuzzjobs.query.filter_by(Location=locId, Fuzzjob=project.ID).first() is None:
+            data = (project.ID, project.name)
             projects.append(data)
 
     form = AddLocationProjectForm()
@@ -242,8 +242,8 @@ def createLocation():
 
 @app.route("/locations/removeLocation/<int:locId>")
 def removeLocation(locId):
-    location = models.Locations.query.filter_by(id=locId).first()
-    location_fuzzjobs = models.LocationFuzzjobs.query.filter_by(Location=location.id)
+    location = models.Locations.query.filter_by(ID=locId).first()
+    location_fuzzjobs = models.LocationFuzzjobs.query.filter_by(Location=location.ID)
     db.session.delete(location)
 
     for location_fuzzjob in location_fuzzjobs:
@@ -268,7 +268,7 @@ def renameElement(projId):
 
 @app.route("/projects/<int:projId>/download")
 def downloadTestcaseSet(projId):
-    project = models.Fuzzjob.query.filter_by(id=projId).first()
+    project = models.Fuzzjob.query.filter_by(ID=projId).first()
     nice_name = project.name + ": Testcase Set"
 
     return createZipArchive(projId, nice_name, "testcaseSet")
@@ -359,42 +359,65 @@ def downloadArchive(archive):
     return send_file(getDownloadPath() + archive, as_attachment=True, cache_timeout=0)
 
 
-@app.route("/projects/<int:projId>/population")
-def viewPopulation(projId):
-    data = getGeneralInformationData(projId, getITQueryOfTypeNoRaw(TESTCASE_TYPES["population"]))
+@app.route("/projects/<int:projId>/population/<int:page>")
+def viewPopulation(projId, page):
+    count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["population"]))
+    if count % 1000 == 0:
+        count = count // 1000
+    else:
+        count = (count // 1000) + 1
+    if page > count:
+        page = 1
+    statement = getITQueryOfTypeNoRaw(TESTCASE_TYPES["population"])[:-1] + " LIMIT " + str((page - 1) * 1000) + ", 1000;"
+    data = getGeneralInformationData(projId, statement)
     data.name = "Population"
     data.redirect = "population"
     data.downloadName = "downloadPopulation"
 
     return renderTemplate("viewTCsTempl.html",
                           title="View Population",
-                          data=data)
+                          data=data,
+                          show_rating=True,
+                          actual_page=page,
+                          page_count=count,
+                          base_link="/projects/" + str(projId) + "/population/")
 
 
 @app.route("/projects/<int:projId>/population/download")
 def downloadPopulation(projId):
-    project = models.Fuzzjob.query.filter_by(id=projId).first()
+    project = models.Fuzzjob.query.filter_by(ID=projId).first()
     type = "population"
     nice_name = project.name + ": Population"
 
     return createZipArchive(projId, nice_name, type)
 
 
-@app.route("/projects/<int:projId>/accessVioTotal")
-def viewAccessVioTotal(projId):
-    data = getGeneralInformationData(projId, getITQueryOfTypeNoRaw(TESTCASE_TYPES["accessViolations"]))
+@app.route("/projects/<int:projId>/accessVioTotal/<int:page>")
+def viewAccessVioTotal(projId, page):
+    count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["accessViolations"]))
+    if count % 1000 == 0:
+        count = count // 1000
+    else:
+        count = (count // 1000) + 1
+    if page > count:
+        page = 1
+    statement = getITQueryOfTypeNoRaw(TESTCASE_TYPES["accessViolations"])[:-1] + " LIMIT " + str((page - 1) * 1000) + ", 1000;"
+    data = getGeneralInformationData(projId, statement)
     data.name = "Access Violations"
     data.redirect = "accessVioTotal"
     data.downloadName = "downloadAccessVioTotal"
 
     return renderTemplate("viewTCsTempl.html",
                           title="View Access Violations",
-                          data=data)
+                          data=data,
+                          actual_page=page,
+                          page_count=count,
+                          base_link="/projects/" + str(projId) + "/accessVioTotal/")
 
 
 @app.route("/projects/<int:projId>/accessVioTotal/download")
 def downloadAccessVioTotal(projId):
-    project = models.Fuzzjob.query.filter_by(id=projId).first()
+    project = models.Fuzzjob.query.filter_by(ID=projId).first()
     type = "accessViolations"
     nice_name = project.name + ": Access Violations (Total)"
 
@@ -410,33 +433,45 @@ def viewAccessVioUnique(projId):
 
     return renderTemplate("viewTCsTempl.html",
                           title="View Unique Access Violations",
-                          data=data)
+                          data=data,
+                          show_occurences=True)
 
 
 @app.route("/projects/<int:projId>/accessVioUnique/download")
 def downloadAccessVioUnique(projId):
-    project = models.Fuzzjob.query.filter_by(id=projId).first()
+    project = models.Fuzzjob.query.filter_by(ID=projId).first()
     type = "accessViolationsUnique"
     nice_name = project.name + ": Access Violations (Unique)"
 
     return createZipArchive(projId, nice_name, type)
 
 
-@app.route("/projects/<int:projId>/totalCrashes")
-def viewTotalCrashes(projId):
-    data = getGeneralInformationData(projId, getITQueryOfTypeNoRaw(TESTCASE_TYPES["crashes"]))
+@app.route("/projects/<int:projId>/totalCrashes/<int:page>")
+def viewTotalCrashes(projId, page):
+    count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["crashes"]))
+    if count % 1000 == 0:
+        count = count // 1000
+    else:
+        count = (count // 1000) + 1
+    if page > count:
+        page = 1
+    statement = getITQueryOfTypeNoRaw(TESTCASE_TYPES["crashes"])[:-1] + " LIMIT " + str((page - 1) * 1000) + ", 1000;"
+    data = getGeneralInformationData(projId, statement)
     data.name = "Crashes"
     data.redirect = "totalCrashes"
     data.downloadName = "downloadTotalCrashes"
 
     return renderTemplate("viewTCsTempl.html",
                           title="View Total Crashes",
-                          data=data)
+                          data=data,
+                          actual_page = page,
+                          page_count = count,
+                          base_link = "/projects/" + str(projId) + "/totalCrashes/")
 
 
 @app.route("/projects/<int:projId>/totalCrashes/download")
 def downloadTotalCrashes(projId):
-    project = models.Fuzzjob.query.filter_by(id=projId).first()
+    project = models.Fuzzjob.query.filter_by(ID=projId).first()
     type = "crashes"
     nice_name = project.name + ": Crashes (Total)"
 
@@ -452,54 +487,77 @@ def viewUniqueCrashes(projId):
 
     return renderTemplate("viewTCsTempl.html",
                           title="View Unique Crashes",
-                          data=data)
+                          data=data,
+                          show_occurences=True)
 
 
 @app.route("/projects/<int:projId>/uniqueCrashes/download")
 def downloadUniqueCrashes(projId):
-    project = models.Fuzzjob.query.filter_by(id=projId).first()
+    project = models.Fuzzjob.query.filter_by(ID=projId).first()
     type = "crashesUnique"
     nice_name = project.name + ": Crashes (Unique)"
 
     return createZipArchive(projId, nice_name, type)
 
 
-@app.route("/projects/<int:projId>/hangs")
-def viewHangs(projId):
-    data = getGeneralInformationData(projId, getITQueryOfTypeNoRaw(TESTCASE_TYPES["hangs"]))
+@app.route("/projects/<int:projId>/hangs/<int:page>")
+def viewHangs(projId, page):
+    count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["hangs"]))
+    if count % 1000 == 0:
+        count = count // 1000
+    else:
+        count = (count // 1000) + 1
+    if page > count:
+        page = 1
+    statement = getITQueryOfTypeNoRaw(TESTCASE_TYPES["hangs"])[:-1] + " LIMIT " + str((page - 1) * 1000) + ", 1000;"
+    data = getGeneralInformationData(projId, statement)
     data.name = "Hangs"
     data.redirect = "hangs"
     data.downloadName = "downloadHangs"
 
     return renderTemplate("viewTCsTempl.html",
                           title="View Hangs",
-                          data=data)
+                          data=data,
+                          actual_page = page,
+                          page_count = count,
+                          base_link = "/projects/" + str(projId) + "/hangs/")
 
 
 @app.route("/projects/<int:projId>/hangs/download")
 def downloadHangs(projId):
-    project = models.Fuzzjob.query.filter_by(id=projId).first()
+    project = models.Fuzzjob.query.filter_by(ID=projId).first()
     type = "hangs"
     nice_name = project.name + ": Hangs"
 
     return createZipArchive(projId, nice_name, type)
 
 
-@app.route("/projects/<int:projId>/noResponse")
-def viewNoResponses(projId):
-    data = getGeneralInformationData(projId, getITQueryOfTypeNoRaw(TESTCASE_TYPES["noResponses"]))
+@app.route("/projects/<int:projId>/noResponse/<int:page>")
+def viewNoResponses(projId, page):
+    count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["noResponses"]))
+    if count % 1000 == 0:
+        count = count // 1000
+    else:
+        count = (count // 1000) + 1
+    if page > count:
+        page = 1
+    statement = getITQueryOfTypeNoRaw(TESTCASE_TYPES["noResponses"])[:-1] + " LIMIT " + str((page - 1) * 1000) + ", 1000;"
+    data = getGeneralInformationData(projId, statement)
     data.name = "No Responses"
     data.redirect = "noResponse"
     data.downloadName = "downloadNoResponses"
 
     return renderTemplate("viewTCsTempl.html",
                           title="View No Responses",
-                          data=data)
+                          data=data,
+                          actual_page=page,
+                          page_count=count,
+                          base_link="/projects/" + str(projId) + "/noResponse/")
 
 
 @app.route("/projects/<int:projId>/noResponse/download")
 def downloadNoResponses(projId):
-    project = models.Fuzzjob.query.filter_by(id=projId).first()
+    project = models.Fuzzjob.query.filter_by(ID=projId).first()
     type = "noResponses"
     nice_name = project.name + ": No Response"
 
@@ -518,7 +576,7 @@ def viewViolations(projId):
 
 @app.route("/projects/<int:projId>/crashes/download/<string:footprint>/<int:testCaseType>")
 def downloadCrashes(projId, footprint, testCaseType):
-    project = models.Fuzzjob.query.filter_by(id=projId).first()
+    project = models.Fuzzjob.query.filter_by(ID=projId).first()
     type = "crashesFootprintTestcase " + str(footprint) + " " + str(testCaseType)
     nice_name = project.name + ": Crashes (Footprint)"
 
@@ -527,7 +585,7 @@ def downloadCrashes(projId, footprint, testCaseType):
 
 @app.route("/projects/<int:projId>/crashesorvio/download/<string:footprint>")
 def downloadCrashesOrViolations(projId, footprint):
-    project = models.Fuzzjob.query.filter_by(id=projId).first()
+    project = models.Fuzzjob.query.filter_by(ID=projId).first()
     type = "crashesOrViolationFootprint " + str(footprint)
     nice_name = project.name + ": Crashes and Violations (Footprint)"
 
@@ -563,14 +621,14 @@ def viewManagedInstances(projId):
                           localManagers=localManagers
                           )
 
-
+ 
 @app.route("/projects/<int:projId>/configSystemInstances")
 def viewConfigSystemInstances(projId):
     # initialize forms
     systemInstanceConfigForm = SystemInstanceConfigForm()
-    fuzzjob = db.session.query(models.Fuzzjob).filter_by(id=projId).first()
+    fuzzjob = db.session.query(models.Fuzzjob).filter_by(ID=projId).first()
     sysList = []
-    systems = db.session.query(models.Systems).all()
+    systems = db.session.query(models.Systems).all()    
 
     for sys in systems:
         sysList.append(sys)
@@ -584,6 +642,7 @@ def viewConfigSystemInstances(projId):
                                                     models.SystemFuzzjobInstances.InstanceCount,
                                                     models.SystemFuzzjobInstances.Architecture).filter_by(
         Fuzzjob=projId).all()
+    
     for system in sysList:
         s = {'name': system.Name, 'tg': 0, 'tr': 0, 'te': 0, 'tgarch': "", 'trarch': "", 'tearch': ""}
         if 'lemming' not in system.Name:
@@ -591,7 +650,7 @@ def viewConfigSystemInstances(projId):
         else:
             lemmingInstanceList.append(s)
         for conf in dbconfiguredFuzzjobInstances:
-            if system.id == conf.System:
+            if system.ID == conf.System:
                 if conf.AgentType == 0:
                     s['tg'] = conf.InstanceCount
                     s['tgarch'] = "(" + conf.Architecture + ")"
@@ -601,14 +660,13 @@ def viewConfigSystemInstances(projId):
                 if conf.AgentType == 2:
                     s['te'] = conf.InstanceCount
                     s['tearch'] = "(" + conf.Architecture + ")"
-
+    
     for conf in dbconfiguredFuzzjobInstances:
         if conf.AgentType == 4:
             lmCount = lmCount + conf.InstanceCount
 
     return renderTemplate("viewConfigSystemInstances.html",
                           title="View Instance Configuration",
-                          system=system,
                           systemInstanceConfigForm=systemInstanceConfigForm,
                           configSystems=sysInstanceList,
                           lemmingSystems=lemmingInstanceList,
@@ -646,7 +704,7 @@ def addProjectLocation(projId):
         locations = request.form.getlist('location')
         for loc in locations:
             location = models.Locations.query.filter_by(Name=loc).first()
-            location_fuzzjob = models.LocationFuzzjobs(Location=location.id, Fuzzjob=projId)
+            location_fuzzjob = models.LocationFuzzjobs(Location=location.ID, Fuzzjob=projId)
             db.session.add(location_fuzzjob)
             db.session.commit()
         flash("Added location(s)", "success")
@@ -670,10 +728,10 @@ def addTestcase(projId):
     if 'addTestcase' in request.files:
         msg, category = insertTestcases(projId, request.files.getlist('addTestcase'))
         flash(msg, category)
-        return redirect("/projects/{}/population".format(projId))
+        return redirect("/projects/{}/population/1".format(projId))
     else:
         flash("Please select files to add ...", "error")
-        return redirect("/projects/{}/population".format(projId))
+        return redirect("/projects/{}/population/1".format(projId))
 
 
 @app.route("/locations/assignWorker/<string:workerID>", methods=["POST"])
@@ -707,7 +765,7 @@ def changeProjectSetting(projId, settingId):
 @app.route("/projects/<int:projId>/delLocation/<string:locName>", methods=["GET"])
 def removeProjectLocation(projId, locName):
     location = models.Locations.query.filter_by(Name=locName).first()
-    location_fuzzjob = models.LocationFuzzjobs.query.filter_by(Fuzzjob=projId, Location=location.id).first()
+    location_fuzzjob = models.LocationFuzzjobs.query.filter_by(Fuzzjob=projId, Location=location.ID).first()
     db.session.delete(location_fuzzjob)
     db.session.commit()
     flash("Location deleted", "success")
@@ -726,7 +784,7 @@ def removeProjectTestcase(projId, testcaseId, tcType):
 
 @app.route("/projects/<int:projId>/delModule/<int:moduleId>", methods=["GET"])
 def removeProjectModule(projId, moduleId):
-    msg, category = deleteElement(projId, "Module", DELETE_MODULE_BY_ID, {"Id": moduleId})
+    msg, category = deleteElement(projId, "Module", DELETE_MODULE_BY_ID, {"ID": moduleId})
     flash(msg, category)
 
     return redirect("/projects/view/%d" % projId)
@@ -734,7 +792,7 @@ def removeProjectModule(projId, moduleId):
 
 @app.route("/projects/<int:projId>/delSetting/<int:settingId>", methods=["GET"])
 def removeProjectSetting(projId, settingId):
-    msg, category = deleteElement(projId, "Setting", DELETE_SETTING_BY_ID, {"Id": settingId})
+    msg, category = deleteElement(projId, "Setting", DELETE_SETTING_BY_ID, {"ID": settingId})
     flash(msg, category)
 
     return redirect("/projects/view/%d" % projId)
@@ -789,7 +847,7 @@ def createCustomProject():
 
 @app.route("/projects/diagrams/<int:projId>", methods=["GET", "POST"])
 def viewProjectGraph(projId):
-    project = models.Fuzzjob.query.filter_by(id=projId).first()
+    project = models.Fuzzjob.query.filter_by(ID=projId).first()
     fuzzjobname = project.name
 
     return renderTemplate("viewProjectGraph.html",
@@ -862,7 +920,7 @@ def systems():
     changePXEForm.pxesystem.choices = availablePXEsystems
 
     for project in projIds:
-        managedInstances, summarySection, localmanagers = getManagedInstancesAndSummary(project.id)
+        managedInstances, summarySection, localmanagers = getManagedInstancesAndSummary(project.ID)
         managedInstancesAll.append(managedInstances)
 
     # Not assigned LocalManagers
@@ -884,17 +942,17 @@ def systems():
                                        func.sum(models.SystemFuzzjobInstances.InstanceCount).label('total'),
                                        models.Systems).group_by(models.SystemFuzzjobInstances.System).join(
             models.Systems).filter(
-            models.SystemFuzzjobInstances.System == models.Systems.id).all()
+            models.SystemFuzzjobInstances.System == models.Systems.ID).all()
         instanceLM = db.session.query(models.SystemFuzzjobInstances,
                                       func.sum(models.SystemFuzzjobInstances.InstanceCount).label('lm'),
                                       models.Systems).group_by(models.SystemFuzzjobInstances.System).join(
-            models.Systems).filter(and_(models.SystemFuzzjobInstances.System == models.Systems.id),
+            models.Systems).filter(and_(models.SystemFuzzjobInstances.System == models.Systems.ID),
                                    (models.SystemFuzzjobInstances.AgentType == 4)).all()
 
         localMan = db.session.query(models.Localmanagers).all()
         systemLocations = db.session.query(models.SystemsLocation, models.Systems, models.Locations).join(
-            models.Systems).filter(models.SystemsLocation.System == models.Systems.id).join(models.Locations).filter(
-            models.SystemsLocation.Location == models.Locations.id).all()
+            models.Systems).filter(models.SystemsLocation.System == models.Systems.ID).join(models.Locations).filter(
+            models.SystemsLocation.Location == models.Locations.ID).all()
 
         for system in systemLocations:
             for group in groups:
@@ -997,7 +1055,7 @@ def addNewSystemToPolemarch():
         sys = models.Systems(Name="dev-" + hostname)
         db.session.add(sys)
         db.session.commit()
-        sysloc = models.SystemsLocation(System=sys.id, Location=loc.id)
+        sysloc = models.SystemsLocation(System=sys.ID, Location=loc.ID)
         db.session.add(sysloc)
         db.session.commit()
         flash("Added new system!", "success")
@@ -1030,7 +1088,7 @@ def removeDevSystemFromPolemarch(hostName, hostId):
         return redirect(url_for('systems'))
     else:
         sys = models.Systems.query.filter_by(Name="dev-" + hostName).first()
-        sysloc = models.SystemsLocation.query.filter_by(System=sys.id).first()
+        sysloc = models.SystemsLocation.query.filter_by(System=sys.ID).first()
         db.session.delete(sysloc)
         db.session.delete(sys)
         db.session.commit()
@@ -1044,10 +1102,10 @@ def updateSystemLocation(hostName, locationId):
         try:
             sys = models.Systems.query.filter_by(Name=hostName).first()
             if sys is not None:
-                systemloc = models.SystemsLocation.query.filter_by(System=sys.id).first()
+                systemloc = models.SystemsLocation.query.filter_by(System=sys.ID).first()
             if sys is None:
                 sys = models.Systems.query.filter_by(Name="dev-" + hostName).first()
-                systemloc = models.SystemsLocation.query.filter_by(System=sys.id).first()
+                systemloc = models.SystemsLocation.query.filter_by(System=sys.ID).first()
             systemloc.Location = locationId
             db.session.commit()
             message = "Setting modified"
@@ -1084,9 +1142,9 @@ def viewSystem(hostname, group):
     system = ANSIBLE_REST_CONNECTOR.getSystemObjectByName(hostname)
     jobList = []
     fuzzjobs = db.session.query(models.SystemsLocation, models.Systems, models.LocationFuzzjobs, models.Fuzzjob).join(
-        models.Systems).filter(models.SystemsLocation.System == models.Systems.id).filter_by(Name=hostname).join(
+        models.Systems).filter(models.SystemsLocation.System == models.Systems.ID).filter_by(Name=hostname).join(
         models.LocationFuzzjobs).filter(models.SystemsLocation.Location == models.LocationFuzzjobs.Location).join(
-        models.Fuzzjob).filter(models.LocationFuzzjobs.Fuzzjob == models.Fuzzjob.id)
+        models.Fuzzjob).filter(models.LocationFuzzjobs.Fuzzjob == models.Fuzzjob.ID)
 
     for job in fuzzjobs:
         jobList.append(job[3].name)
@@ -1101,7 +1159,7 @@ def viewSystem(hostname, group):
     lmCount = 0
     instancesum = db.session.query(models.SystemFuzzjobInstances.AgentType, models.Systems,
                                    func.sum(models.SystemFuzzjobInstances.InstanceCount).label('total')).join(
-        models.Systems).filter(models.SystemFuzzjobInstances.System == models.Systems.id).group_by(
+        models.Systems).filter(models.SystemFuzzjobInstances.System == models.Systems.ID).group_by(
         models.SystemFuzzjobInstances.System, models.SystemFuzzjobInstances.AgentType).filter_by(Name=hostname).all()
 
     for instancetype in instancesum:
@@ -1119,14 +1177,14 @@ def viewSystem(hostname, group):
                                                     models.SystemFuzzjobInstances.AgentType,
                                                     models.SystemFuzzjobInstances.InstanceCount,
                                                     models.SystemFuzzjobInstances.Architecture, models.Systems).join(
-        models.Systems).filter(models.SystemFuzzjobInstances.System == models.Systems.id).filter_by(
+        models.Systems).filter(models.SystemFuzzjobInstances.System == models.Systems.ID).filter_by(
         Name=hostname).all()
 
     for fuzzjob in configFuzzjobs:
         fj = {'name': fuzzjob.name, 'tg': 0, 'tr': 0, 'te': 0, 'tgarch': "", 'trarch': "", 'tearch': ""}
         fuzzjobList.append(fj)
         for conf in dbconfiguredFuzzjobInstances:
-            if fuzzjob.id == conf.Fuzzjob:
+            if fuzzjob.ID == conf.Fuzzjob:
                 if conf.AgentType == 0:
                     fj['tg'] = conf.InstanceCount
                     fj['tgarch'] = "(" + conf.Architecture + ")"
@@ -1180,7 +1238,7 @@ def configureFuzzjobInstances(fuzzjob):
         msg, category = insertFormInputForConfiguredFuzzjobInstances(request, fuzzjob)
     flash(msg, category)
 
-    return redirect(url_for("viewConfigSystemInstances", projId=projId.id))
+    return redirect(url_for("viewConfigSystemInstances", projId=projId.ID))
 
 
 @app.route("/systems/removeConfiguredInstances/<string:system>/<string:fuzzjob>/<string:type>", methods=["POST"])
@@ -1198,9 +1256,9 @@ def removeConfiguredInstances(system, fuzzjob, type):
             agenttype = 4
         if agenttype != 4:
             fj = models.Fuzzjob.query.filter_by(name=fuzzjob).first()
-            fuzzjobId = fj.id
+            fuzzjobId = fj.ID
 
-        instance = models.SystemFuzzjobInstances.query.filter_by(System=sys.id, Fuzzjob=fuzzjobId,
+        instance = models.SystemFuzzjobInstances.query.filter_by(System=sys.ID, Fuzzjob=fuzzjobId,
                                                                  AgentType=int(agenttype)).first()
         if instance is not None:
             db.session.delete(instance)
@@ -1209,6 +1267,16 @@ def removeConfiguredInstances(system, fuzzjob, type):
         status = 'error'
 
     return json.dumps({"status": status})
+
+
+@app.route("/systems/reboot/<string:hostname>", methods=["GET"])
+def rebootSystem(hostname):
+    historyURL = ANSIBLE_REST_CONNECTOR.executePlaybook('rebootSystems.yml', hostname)
+
+    if historyURL is not None:
+        return redirect(historyURL, code=302)
+    else:
+        return redirect(url_for("systems"))
 
 
 @app.route("/systems/view/<string:hostname>/initialSetup", methods=["POST"])
@@ -1235,14 +1303,14 @@ def viewDeployFluffi(hostname):
         systems_list = ANSIBLE_REST_CONNECTOR.getSystemsOfGroup(hostname)
         for num, system in enumerate(systems_list):
             location = location + "\"" + system + "\":\"" + (db.session.query(models.SystemsLocation, models.Systems, models.Locations).join(
-                models.Systems).filter(models.SystemsLocation.System == models.Systems.id).filter_by(Name=system).join(
-                models.Locations).filter(models.SystemsLocation.Location == models.Locations.id).first())[2].Name + "\""
+                models.Systems).filter(models.SystemsLocation.System == models.Systems.ID).filter_by(Name=system).join(
+                models.Locations).filter(models.SystemsLocation.Location == models.Locations.ID).first())[2].Name + "\""
             if num < len(systems_list) - 1:
                 location = location + ","
     else:
         location = location + "\"" + hostname + "\":\"" + (db.session.query(models.SystemsLocation, models.Systems, models.Locations).join(
-            models.Systems).filter(models.SystemsLocation.System == models.Systems.id).filter_by(Name=hostname).join(
-            models.Locations).filter(models.SystemsLocation.Location == models.Locations.id).first())[2].Name + "\""
+            models.Systems).filter(models.SystemsLocation.System == models.Systems.ID).filter_by(Name=hostname).join(
+            models.Locations).filter(models.SystemsLocation.Location == models.Locations.ID).first())[2].Name + "\""
     location = location + "}"
 
     arguments = {'architecture': architecture.split("-")[1], 'location': location}
@@ -1286,8 +1354,8 @@ def viewInstallFuzzjobPackage(hostname):
     packages = []
     res = db.session.query(models.Fuzzjob, models.FuzzjobDeploymentPackages, models.DeploymentPackages).filter_by(
         name=selectedFuzzJob).join(models.FuzzjobDeploymentPackages).filter(
-        models.Fuzzjob.id == models.FuzzjobDeploymentPackages.Fuzzjob).join(models.DeploymentPackages).filter(
-        models.FuzzjobDeploymentPackages.DeploymentPackage == models.DeploymentPackages.id)
+        models.Fuzzjob.ID == models.FuzzjobDeploymentPackages.Fuzzjob).join(models.DeploymentPackages).filter(
+        models.FuzzjobDeploymentPackages.DeploymentPackage == models.DeploymentPackages.ID)
 
     for package in res:
         packages.append(package[2].name)
@@ -1342,8 +1410,8 @@ def startFluffi(hostname, groupName):
         requestCount = 0
         arguments = {}
         location = db.session.query(models.SystemsLocation, models.Systems, models.Locations).join(
-            models.Systems).filter(models.SystemsLocation.System == models.Systems.id).filter_by(Name=host).join(
-            models.Locations).filter(models.SystemsLocation.Location == models.Locations.id).first()
+            models.Systems).filter(models.SystemsLocation.System == models.Systems.ID).filter_by(Name=host).join(
+            models.Locations).filter(models.SystemsLocation.Location == models.Locations.ID).first()
         arguments['component'] = component
         arguments['location'] = location[2].Name
         arguments['architecture'] = architecture.split("-")[1]
@@ -1359,13 +1427,13 @@ def startFluffi(hostname, groupName):
             requestCount += 1
 
         sys = models.Systems.query.filter_by(Name=host).first()
-        instance = models.SystemFuzzjobInstances.query.filter_by(System=sys.id, AgentType=int(component)).first()
+        instance = models.SystemFuzzjobInstances.query.filter_by(System=sys.ID, AgentType=int(component)).first()
         oldCount = 0
         if instance is not None:
             oldCount = instance.InstanceCount
             db.session.delete(instance)
             db.session.commit()
-        newinstances = models.SystemFuzzjobInstances(System=sys.id, AgentType=component,
+        newinstances = models.SystemFuzzjobInstances(System=sys.ID, AgentType=component,
                                                      InstanceCount=requestCount + oldCount)
         db.session.add(newinstances)
         db.session.commit()
