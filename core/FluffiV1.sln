@@ -10,8 +10,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # 
 # Author(s): Thomas Riedmaier, Abian Blome
 #
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.960
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestcaseRunner", "TestcaseRunner\TestcaseRunner.vcxproj", "{A6116DDC-7337-4F9A-9FF3-3FB6AF3B5503}"
 	ProjectSection(ProjectDependencies) = postProject
