@@ -10,14 +10,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier
 */
 
-//g++ --std=c++11 -I ../../../dependencies/base64/include -o kFuzzStarter kFuzzStarter.cpp ../../../dependencies/base64/lib/x86-64/base64.a -lstdc++fs
-
 #include "stdafx.h"
 
 void execCommand(std::string command) {
 	printf("executing command %s\n", command.c_str());
 
-#if defined(_WIN32) || defined(_WIN64)
 	STARTUPINFO si;
 	memset(&si, 0, sizeof(si));
 	PROCESS_INFORMATION pi;
@@ -26,64 +23,16 @@ void execCommand(std::string command) {
 
 	// Successfully created the process.  Wait for it to finish.
 	WaitForSingleObject(pi.hProcess, INFINITE);
-
-#else
-
-	pid_t pID = fork();
-	if (pID == 0) // child
-	{
-		char ** argv = split_commandline(command);
-
-		execv(argv[0], &argv[1]);
-		printf("Failed to call execv!");
-		return -1;
-	}
-	else if (pID < 0) // failed to fork
-	{
-		printf("Failed to fork to new process!");
-		return -1;
-	}
-	else // Code only executed by parent process
-	{
-		int status = 0;
-		waitpid(pID, &status, 0);
-	}
-
-#endif
 }
 
 void execCommandAsync(std::string command) {
-	printf("executing command %s\n", command.c_str());
+	printf("executing command %s asynchronously\n", command.c_str());
 
-#if defined(_WIN32) || defined(_WIN64)
 	STARTUPINFO si;
 	memset(&si, 0, sizeof(si));
 	PROCESS_INFORMATION pi;
 	memset(&pi, 0, sizeof(pi));
 	CreateProcess(NULL, const_cast<LPSTR>(command.c_str()), NULL, NULL, false, CREATE_BREAKAWAY_FROM_JOB, NULL, NULL, &si, &pi);
-
-#else
-
-	pid_t pID = fork();
-	if (pID == 0) // child
-	{
-		char ** argv = split_commandline(command);
-
-		execv(argv[0], &argv[1]);
-		printf("Failed to call execv!");
-		return -1;
-	}
-	else if (pID < 0) // failed to fork
-	{
-		printf("Failed to fork to new process!");
-		return -1;
-	}
-	else // Code only executed by parent process
-	{
-		int status = 0;
-	}
-
-#endif
 }
 
 int startvm(
@@ -93,11 +42,10 @@ int startvm(
 	bool restorecurrent,
 	std::string snapshotName,
 	std::string vmmonPath,
-	std::string pathToWinDBG,
+	std::string pathToWinDBGPrev,
 	std::string pipeName,
-	std::string pathToWindbgInit,
+	std::string pathTokfuzzWindbg,
 	std::string gdbInitFile,
-	std::string target,
 	int sleepMS
 )
 {
@@ -113,20 +61,19 @@ int startvm(
 
 	int waittime = 1000;
 	int waittimeWinDbg = 6000;
-	std::experimental::filesystem::path windbgInit(pathToWindbgInit);
-	std::experimental::filesystem::path windbg(pathToWinDBG);
+	std::experimental::filesystem::path kfuzzWindbg(pathTokfuzzWindbg);
+	std::experimental::filesystem::path windbg(pathToWinDBGPrev);
 	std::experimental::filesystem::path vmmon(vmmonPath);
 	std::experimental::filesystem::path vmrun(pathToVMWare);
 	vmrun /= "vmrun.exe";
 
-	//Write startup commands to the "gdb" initialization file
+	//Write startup commands to the "gdb" initialization file (if any)
 	std::ofstream initfile;
 	initfile.open(gdbInitFile, std::ios::out);
 	if (!initfile.is_open()) {
 		std::cout << "could not write to the gdb initialization file" << std::endl;
 		return -1;
 	}
-	initfile << "target " << target << std::endl;
 	initfile.close();
 
 	// Kill old instance of vmmon
@@ -164,7 +111,7 @@ int startvm(
 	std::this_thread::sleep_for(std::chrono::milliseconds(waittimeWinDbg));
 
 	//Start winDBG
-	execCommandAsync(windbg.generic_string() + " -a pykd.dll -k \"com:pipe,resets=0,reconnect,port=\\\\.\\pipe\\" + pipeName + "\" -c \"!py " + windbgInit.generic_string() + "\"");
+	execCommandAsync(windbg.generic_string() + " -k \"com:pipe,resets=0,reconnect,port=\\\\.\\pipe\\" + pipeName + "\" -c \".load " + kfuzzWindbg.generic_string() + "\"");
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(sleepMS));
 
@@ -177,10 +124,9 @@ int main(int argc, char* argv[])
 		std::cout << "Usage: kFuzzStarter <parameters> <initgdb file>" << std::endl;
 		std::cout << "Currently implemented parameters:" << std::endl;
 		std::cout << "--startVM <Name of vm>: start a virtual machine" << std::endl;
-		std::cout << "--target <IP of vm>: IP address of target virtual machine" << std::endl;
 		std::cout << "--pipeName <Name of pipe>: Name of the vkd pipe" << std::endl;
-		std::cout << "--initPath <Path to init script>: Path to init script" << std::endl;
-		std::cout << "--windbgPath <Path to winDBG>: Path to winDBG. Default: \"C:\\Program Files (x86)\\Windows Kits\\10\\Debuggers\\x64\\windbg.exe\"" << std::endl;
+		std::cout << "--kfuzzWindbg <Path to kfuzz-windbg.dll>: Path to kfuzz-windbg.dll" << std::endl;
+		std::cout << "--winDbgPrevPath <Path to WinDBG Preview>: Path to WinDBG Preview. Default: \"C:\\windbg\\DbgX.Shell.exe\"" << std::endl;
 		std::cout << "--vmmonPath <Path to VirtualKD>: Path to VirtualKD vmmon. Default: \"D:\\Siemens\\Tools\\VirtualKD-3.0\\vmmon64.exe\"" << std::endl;
 		std::cout << "--vmwarePath <Path to VMWare>: Path to VBoxManage. Default: \"C:\\Program Files (x86)\\VMware\\VMware Workstation\"" << std::endl;
 		std::cout << "--restoreSnapshot <name>: When using vmware, you might want to restore the current snapshot when starting the virtual machine" << std::endl;
@@ -197,11 +143,10 @@ int main(int argc, char* argv[])
 	bool restorecurrent = false;
 	std::string snapshotName = "";
 	std::string pipeName = "";
-	std::string pathToInit = "";
-	std::string target = "";
+	std::string kfuzzWindbg = "";
 	std::string pathToVMWare = "C:\\Program Files (x86)\\VMware\\VMware Workstation";
 	std::string vmmonPath = "D:\\Siemens\\Tools\\VirtualKD-3.0\\vmmon64.exe";
-	std::string windbgPath = "C:\\Program Files (x86)\\Windows Kits\\10\\Debuggers\\x64\\windbg.exe";
+	std::string winDbgPrevPath = "C:\\windbg\\DbgX.Shell.exe";
 	std::string gdbInitFile = argv[argc - 1];
 
 	for (int i = 1 /*skip program name*/; i < argc - 1; i++) {
@@ -210,20 +155,15 @@ int main(int argc, char* argv[])
 			i++;
 			pipeName = std::string(argv[i]);
 		}
-		if (std::string(argv[i]) == "--target") {
-			startVM = true;
-			i++;
-			target = std::string(argv[i]);
-		}
 		if (std::string(argv[i]) == "--startVM") {
 			startVM = true;
 			i++;
 			nameOfVM = std::string(argv[i]);
 		}
-		if (std::string(argv[i]) == "--initPath") {
+		if (std::string(argv[i]) == "--kfuzzWindbg") {
 			startVM = true;
 			i++;
-			pathToInit = std::string(argv[i]);
+			kfuzzWindbg = std::string(argv[i]);
 		}
 		if (std::string(argv[i]) == "--vmwarePath") {
 			startVM = true;
@@ -235,10 +175,10 @@ int main(int argc, char* argv[])
 			i++;
 			vmmonPath = std::string(argv[i]);
 		}
-		if (std::string(argv[i]) == "--windbgPath") {
+		if (std::string(argv[i]) == "--winDbgPrevPath") {
 			startVM = true;
 			i++;
-			windbgPath = std::string(argv[i]);
+			winDbgPrevPath = std::string(argv[i]);
 		}
 		if (std::string(argv[i]) == "--local") {
 			i++;
@@ -261,7 +201,7 @@ int main(int argc, char* argv[])
 	}
 
 	if (startVM) {
-		startvm(nameOfVM, pathToVMWare, additionalCommands, restorecurrent, snapshotName, vmmonPath, windbgPath, pipeName, pathToInit, gdbInitFile, target, sleepMS);
+		startvm(nameOfVM, pathToVMWare, additionalCommands, restorecurrent, snapshotName, vmmonPath, winDbgPrevPath, pipeName, kfuzzWindbg, gdbInitFile, sleepMS);
 	}
 	if (!pathToLocalExecutableAndArgs.empty()) {
 		execCommandAsync(pathToLocalExecutableAndArgs);

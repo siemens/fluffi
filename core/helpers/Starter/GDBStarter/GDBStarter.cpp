@@ -10,8 +10,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Pascal Eckmann
 */
 
-//g++ --std=c++11 -I ../../../dependencies/base64/include -o GDBStarter GDBStarter.cpp ../../../dependencies/base64/lib/x86-64/base64.a -lstdc++fs
-
 #include "stdafx.h"
 #include "base64.h"
 

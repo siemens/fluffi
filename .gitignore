@@ -141,3 +141,5 @@ core/x64/
 core/x86-64/
 srv/fluffi/data/fluffiweb/app/static/3rdParty/
 srv/fluffi/data/fluffiweb/app/static/bootstrap/
+core/helpers/Starter/kFuzzStarter/Win32/
+core/helpers/Starter/kFuzzStarter/x64/
