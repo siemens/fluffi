@@ -8,66 +8,28 @@
 :: 
 :: Author(s): Thomas Riedmaier
 
-:: Requirements for building these dependencies:
-:: - Visual Studio 2017 compile chain (needed for almost everything)
-:: - Strawberry Perl (needed for dynamorio and openssl)
-:: - Cygwin64 with 32 and 64 bit gcc and make (radamsa)
-:: - Network access to github and gitlab
+RMDIR /Q/S include
 
-cd zeromq
-call make_dep.bat
-IF errorlevel 1 goto errorDone
+MKDIR include
+
+
+REM Getting WinDbg-Libraries
+
+RMDIR /Q/S WinDbg-Libraries
+
+git clone https://github.com/microsoft/WinDbg-Libraries.git
+cd WinDbg-Libraries
+git checkout 8b1ba64c8cabb961f8a8cc8e46f7ce33cc09b83f
 cd ..
 
-cd libprotoc
-call make_dep.bat
-IF errorlevel 1 goto errorDone
-cd ..
 
-cd dynamorio
-call make_dep.bat
-IF errorlevel 1 goto errorDone
-cd ..
 
-cd mariadb
-call make_dep.bat
-IF errorlevel 1 goto errorDone
-cd ..
+copy WinDbg-Libraries\DbgModelCppLib\DbgModelClientEx.h include
 
-cd radamsa
-call make_dep.bat
-IF errorlevel 1 goto errorDone
-cd ..
+::reset errorlevel
+ver > nul
 
-cd easylogging
-call make_dep.bat
-IF errorlevel 1 goto errorDone
-cd ..
-
-cd openssl
-call make_dep.bat
-IF errorlevel 1 goto errorDone
-cd ..
-
-cd base64
-call make_dep.bat
-IF errorlevel 1 goto errorDone
-cd ..
-
-cd afl
-call make_dep.bat
-IF errorlevel 1 goto errorDone
-cd ..
-
-cd honggfuzz
-call make_dep.bat
-IF errorlevel 1 goto errorDone
-cd ..
-
-cd WinDbgModel
-call make_dep.bat
-IF errorlevel 1 goto errorDone
-cd ..
+RMDIR /Q/S WinDbg-Libraries
 
 goto done
 
