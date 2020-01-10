@@ -136,9 +136,10 @@ FLUFFI supports various test case generators. You can use as many of them as you
    It is the job of the external mutator to:
   1. Come up with a unique ID (UUID)
   2. Create a subdirectory in the `extGeneratorDirectory` named like that UUID
-  3. Place a nice name in the fuzzjob's `nice_names_managed_instance` table for that UUID
-  4. Place new mutations in the UUID subdirectory following this schema: `ParentGUID_ParentLocalID_GeneratorLocalID`
-  5. Ensure that the hard drive does not fill up (e.g. by implementing a upper limit of files in the directory)
+  3. Connects to the GM database and extracts the connection parameters for the fuzzjob's database from the `fuzzjob` table
+  4. Connects to the fuzzjob's database and places a nice name in the fuzzjob's `nice_names_managed_instance` table for the chosen UUID
+  5. Place new mutations in the UUID subdirectory following this schema: `ParentGUID_ParentLocalID_GeneratorLocalID` (if you want you can use any information from the fuzzjob's database)
+  6. Ensure that the hard drive does not fill up (e.g. by implementing a upper limit of files in the directory)
 
 You need to set the percentage of how many generators should have which generator type. For example, if you only want `RadamsaMutators`, set `RadamsaMutator`=100 and all others to 0.
 
