@@ -7,7 +7,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-Author(s): Thomas Riedmaier, Abian Blome, Roman Bendt
+Author(s): Thomas Riedmaier, Abian Blome, Junes Najah, Roman Bendt
 -->
 
 # Usage
@@ -138,10 +138,12 @@ FLUFFI supports various test case generators. You can use as many of them as you
    in this case you need to specify an additional setting: `extGeneratorDirectory`
    This setting points to a directory, where FLUFFI will insert a file called `fuzzjob.name` containing the name of the current FuzzJob.
    It is the job of the external mutator to:
-      1. register on the GM with a new UUID (and a nice name)
-      2. create a subdirectory with that UUID
-      3. place new mutations in that subdirectory following this schema: `ParentGUID_ParentLocalID_GeneratorLocalID`
-      4. ensure that the hard drive does not fill up (e.g. by implementing a upper limit of files in the directory)
+  1. Come up with a unique ID (UUID)
+  2. Create a subdirectory in the `extGeneratorDirectory` named like that UUID
+  3. Connects to the GM database and extracts the connection parameters for the fuzzjob's database from the `fuzzjob` table
+  4. Connects to the fuzzjob's database and places a nice name in the fuzzjob's `nice_names_managed_instance` table for the chosen UUID
+  5. Place new mutations in the UUID subdirectory following this schema: `ParentGUID_ParentLocalID_GeneratorLocalID` (if you want you can use any information from the fuzzjob's database)
+  6. Ensure that the hard drive does not fill up (e.g. by implementing a upper limit of files in the directory)
 
 You need to set the percentage of how many generators should have which generator type. For example, if you only want `RadamsaMutators`, set `RadamsaMutator`=100 and all others to 0.
 
