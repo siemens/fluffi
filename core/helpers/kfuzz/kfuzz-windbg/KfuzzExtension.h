@@ -10,49 +10,26 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier
 */
 
-#include "stdafx.h"
-
-int main(int argc, char* argv[])
+#pragma once
+namespace Debugger::DataModel::Libraries::Kfuzz
 {
-	if (argc < 2) {
-		printf("Usage: ProcessStarter <Process To start>");
-		return -1;
-	}
+	using namespace Debugger::DataModel::ClientEx;
+	using namespace Debugger::DataModel::ProviderEx;
 
-#if defined(_WIN32) || defined(_WIN64)
-	std::stringstream oss;
-	for (int i = 1; i < argc; i++) {
-		oss << argv[i] << " ";
-	}
-
-	STARTUPINFO si;
-	memset(&si, 0, sizeof(si));
-	PROCESS_INFORMATION pi;
-	memset(&pi, 0, sizeof(pi));
-	CreateProcess(NULL, const_cast<LPSTR>(oss.str().c_str()), NULL, NULL, false, CREATE_BREAKAWAY_FROM_JOB, NULL, NULL, &si, &pi);
-
-#else
-	pid_t pID = fork();
-	if (pID == 0) // child
+	// KfuzzExtension:
+	//
+	// A singleton class which extends the debugger's notion of a "Utility" with a new "kfuzz" property.
+	//
+	class KfuzzExtension : public ExtensionModel
 	{
-		setenv("LD_PRELOAD", "./dynamorio/lib64/release/libdynamorio.so ./dynamorio/lib64/release/libdrpreload.so", 1);
-		execv(argv[1], &argv[1]);
-		printf("Failed to call execv!");
-		return -1;
-	}
-	else if (pID < 0) // failed to fork
-	{
-		printf("Failed to fork to new process!");
-		return -1;
-	}
-	else // Code only executed by parent process
-	{
-	}
+	public:
 
-#endif
+		KfuzzExtension();
 
-	//If you want to wait before returning until your target initialized use this line here :)
-	//std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-
-	return 0;
+		// Get_Kfuzz():
+		//
+		// The property accessor for the "kfuzz" property which is added to "Utility".
+		//
+		Object Get_Kfuzz(_In_ const Object& idk);
+	};
 }

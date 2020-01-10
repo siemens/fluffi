@@ -11,48 +11,33 @@ Author(s): Thomas Riedmaier
 */
 
 #include "stdafx.h"
+#include "KfuzzExtension.h"
+#include "KfuzzProvider.h"
 
-int main(int argc, char* argv[])
+namespace Debugger::DataModel::Libraries::Kfuzz
 {
-	if (argc < 2) {
-		printf("Usage: ProcessStarter <Process To start>");
-		return -1;
-	}
-
-#if defined(_WIN32) || defined(_WIN64)
-	std::stringstream oss;
-	for (int i = 1; i < argc; i++) {
-		oss << argv[i] << " ";
-	}
-
-	STARTUPINFO si;
-	memset(&si, 0, sizeof(si));
-	PROCESS_INFORMATION pi;
-	memset(&pi, 0, sizeof(pi));
-	CreateProcess(NULL, const_cast<LPSTR>(oss.str().c_str()), NULL, NULL, false, CREATE_BREAKAWAY_FROM_JOB, NULL, NULL, &si, &pi);
-
-#else
-	pid_t pID = fork();
-	if (pID == 0) // child
+	// KfuzzExtension():
+	//
+	// The constructor for the singleton extension class which adds new properties to "Utility"
+	//
+	KfuzzExtension::KfuzzExtension() :
+		ExtensionModel(NamedModelParent(L"Debugger.Models.Utility"))
 	{
-		setenv("LD_PRELOAD", "./dynamorio/lib64/release/libdynamorio.so ./dynamorio/lib64/release/libdrpreload.so", 1);
-		execv(argv[1], &argv[1]);
-		printf("Failed to call execv!");
-		return -1;
+		//
+		// Add a new read-only property named "kfuzz" whose value is acquired through calling the Get_Kfuzz
+		// accessor method.
+		//
+		AddReadOnlyProperty(L"kfuzz", this, &KfuzzExtension::Get_Kfuzz);
 	}
-	else if (pID < 0) // failed to fork
+
+	// Get_Kfuzz():
+	//
+	// The property accessor for the "kfuzz" property this extension adds to "Utility".
+	Object KfuzzExtension::Get_Kfuzz(_In_ const Object& /*idk*/)
 	{
-		printf("Failed to fork to new process!");
-		return -1;
+		std::string buildTimeAndDate = "build on " + std::string(__DATE__) + " - " + std::string(__TIME__);
+		return Object::Create(HostContext(),
+			L"kfuzz extension", buildTimeAndDate,
+			L"commands processed", KfuzzProvider::Get().GetNumOfProcessedCommands());
 	}
-	else // Code only executed by parent process
-	{
-	}
-
-#endif
-
-	//If you want to wait before returning until your target initialized use this line here :)
-	//std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-
-	return 0;
 }

@@ -10,49 +10,34 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier
 */
 
-#include "stdafx.h"
+#pragma once
 
-int main(int argc, char* argv[])
+class GDBEmulator
 {
-	if (argc < 2) {
-		printf("Usage: ProcessStarter <Process To start>");
-		return -1;
-	}
+public:
+	GDBEmulator();
+	virtual ~GDBEmulator();
 
-#if defined(_WIN32) || defined(_WIN64)
-	std::stringstream oss;
-	for (int i = 1; i < argc; i++) {
-		oss << argv[i] << " ";
-	}
+	bool init();
+	int handleConsoleCommands();
 
-	STARTUPINFO si;
-	memset(&si, 0, sizeof(si));
-	PROCESS_INFORMATION pi;
-	memset(&pi, 0, sizeof(pi));
-	CreateProcess(NULL, const_cast<LPSTR>(oss.str().c_str()), NULL, NULL, false, CREATE_BREAKAWAY_FROM_JOB, NULL, NULL, &si, &pi);
+	static std::shared_ptr<GDBEmulator>  getInstance();
 
-#else
-	pid_t pID = fork();
-	if (pID == 0) // child
-	{
-		setenv("LD_PRELOAD", "./dynamorio/lib64/release/libdynamorio.so ./dynamorio/lib64/release/libdrpreload.so", 1);
-		execv(argv[1], &argv[1]);
-		printf("Failed to call execv!");
-		return -1;
-	}
-	else if (pID < 0) // failed to fork
-	{
-		printf("Failed to fork to new process!");
-		return -1;
-	}
-	else // Code only executed by parent process
-	{
-	}
+private:
 
-#endif
+	SharedMemMessage stringToMessage(std::string command);
+	std::string  messageToString(const SharedMemMessage& message);
+	std::string sendCommandToWinDbgAndGetResponse(std::string command);
+	void winDbgMessageDispatcher();
 
-	//If you want to wait before returning until your target initialized use this line here :)
-	//std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+	static BOOL WINAPI consoleHandler(DWORD dwCtrlType);
 
-	return 0;
-}
+	SharedMemIPC m_requestIPC;
+	SharedMemIPC m_subscriberIPC;
+	std::mutex m_mutex_;
+	std::unique_ptr<std::thread> m_WinDbgMessageDispatcher;
+	bool m_stopRequested;
+	HANDLE m_SharedMemIPCInterruptEvent;
+
+	static std::shared_ptr<GDBEmulator> instance;
+};

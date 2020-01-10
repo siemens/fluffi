@@ -10,49 +10,29 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier
 */
 
-#include "stdafx.h"
-
-int main(int argc, char* argv[])
+#pragma once
+namespace Debugger::DataModel::Libraries::Kfuzz
 {
-	if (argc < 2) {
-		printf("Usage: ProcessStarter <Process To start>");
-		return -1;
-	}
-
-#if defined(_WIN32) || defined(_WIN64)
-	std::stringstream oss;
-	for (int i = 1; i < argc; i++) {
-		oss << argv[i] << " ";
-	}
-
-	STARTUPINFO si;
-	memset(&si, 0, sizeof(si));
-	PROCESS_INFORMATION pi;
-	memset(&pi, 0, sizeof(pi));
-	CreateProcess(NULL, const_cast<LPSTR>(oss.str().c_str()), NULL, NULL, false, CREATE_BREAKAWAY_FROM_JOB, NULL, NULL, &si, &pi);
-
-#else
-	pid_t pID = fork();
-	if (pID == 0) // child
+	// KfuzzEventCallback:
+	//
+	// A class to handle Events sent by the debugging engine
+	class KfuzzEventCallback : public  DebugBaseEventCallbacks
 	{
-		setenv("LD_PRELOAD", "./dynamorio/lib64/release/libdynamorio.so ./dynamorio/lib64/release/libdrpreload.so", 1);
-		execv(argv[1], &argv[1]);
-		printf("Failed to call execv!");
-		return -1;
-	}
-	else if (pID < 0) // failed to fork
-	{
-		printf("Failed to fork to new process!");
-		return -1;
-	}
-	else // Code only executed by parent process
-	{
-	}
+	public:
+		KfuzzEventCallback();
+		virtual ~KfuzzEventCallback();
 
-#endif
+		ULONG STDMETHODCALLTYPE AddRef(void);
+		ULONG STDMETHODCALLTYPE Release(void);
+		HRESULT STDMETHODCALLTYPE GetInterestMask(PULONG Mask);
 
-	//If you want to wait before returning until your target initialized use this line here :)
-	//std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+		HRESULT STDMETHODCALLTYPE Exception(PEXCEPTION_RECORD64 Exception, ULONG FirstChance);
+		HRESULT STDMETHODCALLTYPE ExitProcess(ULONG ExitCode);
 
-	return 0;
+	private:
+		volatile ULONG m_cRef;
+		SharedMemIPC m_publisherIPC;
+
+		SharedMemMessage stringToMessage(std::string command);
+	};
 }
