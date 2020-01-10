@@ -25,7 +25,7 @@
 :: OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 :: DAMAGE.
 :: 
-:: Author(s): Thomas Riedmaier, Pascal Eckmann
+:: Author(s): Thomas Riedmaier, Pascal Eckmann, Roman Bendt
 
 IF NOT DEFINED VCVARSALL (
 		ECHO Environment Variable VCVARSALL needs to be set!
