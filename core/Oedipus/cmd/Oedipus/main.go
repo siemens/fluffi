@@ -34,6 +34,14 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+var fNonDeterministic *bool
+func coin() bool {
+	if *fNonDeterministic {
+		return rand.Intn(2) == 1
+	}
+	return true
+}
+
 const (
 	LEFT uint8 = 1 << iota
 	RIGHT
@@ -76,6 +84,7 @@ func main() {
 	fRight := flag.Bool("r", false, "merge strategy right")
 	fInsert := flag.Bool("i", false, "merge strategy insert")
 	fDelete := flag.Bool("m", false, "merge strategy delete")
+	fNonDeterministic = flag.Bool("g", false, "genetic or deterministic behavior")
 
 	flag.Usage = func() {
 		log.Println("Οἰδίπους - a dual parent testcase mutator")
@@ -186,7 +195,7 @@ func main() {
 			for i := range initials {
 				if initials[i] == firstsParent {
 					log.Println("file was child of", "(", initials[i].CreatorGUID, "-", initials[i].CreatorLID, ")")
-					if len(initials) > 1 {
+					if len(initials) > 1 && coin() {
 						initials = append(initials[:i], initials[i+1:]...)
 					}
 					break
@@ -219,11 +228,14 @@ func main() {
 					}
 				}
 				// remove the target from possible reruns into this tree
-				if target == initials[i%len(initials)] {
-					// if target is still the initial one, it does not have children.
-					initials = append(initials[:i%len(initials)], initials[1+(i%len(initials)):]...)
-				} else { // this whole thing should only trigger on initials that do not have children
-					last.Children = last.Children[1:]
+				if !*fNonDeterministic {
+					if target == initials[i%len(initials)] {
+						// if target is still the initial one, it does not have children.
+						initials = append(initials[:i%len(initials)], initials[1+(i%len(initials)):]...)
+					} else { // this whole thing should only trigger on initials that do not have children
+						last.Children = last.Children[1:]
+					}
+
 				}
 			}
 			// load target bytes to file structure
@@ -303,11 +315,11 @@ func mergeInputs(a1, a2 []byte, verbose bool, strat uint8 ) []byte {
 	for _, d := range diffs {
 		switch d.Type {
 		case diffmatchpatch.DiffInsert:
-			if strat&INSERT != 0 {
+			if coin() && strat&INSERT != 0 {
 				_, e = b.WriteString(d.Text)
 			}
 		case diffmatchpatch.DiffDelete:
-			if strat&DELETE != 0 {
+			if coin() && strat&DELETE != 0 {
 				_, e = b.WriteString(d.Text)
 			}
 		case diffmatchpatch.DiffEqual:
@@ -321,3 +333,4 @@ func mergeInputs(a1, a2 []byte, verbose bool, strat uint8 ) []byte {
 	ret, e := hex.DecodeString(b.String())
 	return ret
 }
+

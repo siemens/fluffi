@@ -89,7 +89,7 @@ std::deque<TestcaseDescriptor> OedipusMutator::batchMutate(unsigned int numToGen
 	}
 
 	LOG(DEBUG) << "Executing Oedipus";
-	std::string cmdline = "Oedipus -r -m -d " + this->encodedDBcredentials + " -n " + std::to_string(numToGenerate) + " -o " + m_testcaseDir + Util::pathSeperator + "Oedipus_ " + parentPathAndFilename;
+	std::string cmdline = "Oedipus -g -r -m -d " + this->encodedDBcredentials + " -n " + std::to_string(numToGenerate) + " -o " + m_testcaseDir + Util::pathSeperator + "Oedipus_ " + parentPathAndFilename;
 
 	LOG(DEBUG) << "CMD: " << cmdline;
 
