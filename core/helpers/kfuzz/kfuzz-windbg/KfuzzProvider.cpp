@@ -25,7 +25,7 @@ namespace Debugger::DataModel::Libraries::Kfuzz
 	KfuzzProvider::KfuzzProvider() :
 		m_stopRequested(false),
 		m_numOfProcessedCommands(-1),
-		m_responseIPC("kfuzz_windbg_request_response", 100000),
+		m_responseIPC("kfuzz_windbg_request_response", 1 * 1024 * 1024),
 		m_SharedMemIPCInterruptEvent(NULL),
 		m_eventCallback()
 	{
@@ -334,6 +334,9 @@ namespace Debugger::DataModel::Libraries::Kfuzz
 		}
 		else if (command == "info files") {
 			responseSS << "Local exec file:" << std::endl;
+
+			//Force symbol reload (required if attatching to a kernel)
+			dbgSymbols->Reload("");
 
 			//How many modules are there?
 			unsigned long loadedModules;

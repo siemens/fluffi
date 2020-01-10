@@ -111,7 +111,7 @@ int startvm(
 	std::this_thread::sleep_for(std::chrono::milliseconds(waittimeWinDbg));
 
 	//Start winDBG
-	execCommandAsync(windbg.generic_string() + " -k \"com:pipe,resets=0,reconnect,port=\\\\.\\pipe\\" + pipeName + "\" -c \".load " + kfuzzWindbg.generic_string() + "\"");
+	execCommandAsync(windbg.generic_string() + " -k \"com:pipe,resets=0,reconnect,port=\\\\.\\pipe\\" + pipeName + "\" -c \".load " + kfuzzWindbg.string() + "\"");
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(sleepMS));
 
@@ -123,7 +123,7 @@ int main(int argc, char* argv[])
 	if (argc < 2) {
 		std::cout << "Usage: kFuzzStarter <parameters> <initgdb file>" << std::endl;
 		std::cout << "Currently implemented parameters:" << std::endl;
-		std::cout << "--startVM <Name of vm>: start a virtual machine" << std::endl;
+		std::cout << "--startVM <Path to vmx file>: start a virtual machine" << std::endl;
 		std::cout << "--pipeName <Name of pipe>: Name of the vkd pipe" << std::endl;
 		std::cout << "--kfuzzWindbg <Path to kfuzz-windbg.dll>: Path to kfuzz-windbg.dll" << std::endl;
 		std::cout << "--winDbgPrevPath <Path to WinDBG Preview>: Path to WinDBG Preview. Default: \"C:\\windbg\\DbgX.Shell.exe\"" << std::endl;

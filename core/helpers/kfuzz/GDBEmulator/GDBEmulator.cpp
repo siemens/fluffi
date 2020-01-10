@@ -16,7 +16,7 @@ Author(s): Thomas Riedmaier
 std::shared_ptr<GDBEmulator> GDBEmulator::instance = nullptr;
 
 GDBEmulator::GDBEmulator() :
-	m_requestIPC("kfuzz_windbg_request_response", 100000),
+	m_requestIPC("kfuzz_windbg_request_response", 1 * 1024 * 1024),
 	m_subscriberIPC("kfuzz_windbg_publish_subscribe"),
 	m_mutex_(),
 	m_WinDbgMessageDispatcher(nullptr),
@@ -68,7 +68,7 @@ std::string GDBEmulator::sendCommandToWinDbgAndGetResponse(std::string command) 
 	//Make sure only one thread at a time communicates with WinDbg (Ctrl+C handling is asynchronous)
 	std::unique_lock<std::mutex> mlock(m_mutex_);
 
-	int timeoutMilliseconds = 1000;
+	int timeoutMilliseconds = 10000;
 	SharedMemMessage response;
 	SharedMemMessage request = stringToMessage(command);
 	if (!m_requestIPC.sendMessageToServer(&request) || !m_requestIPC.waitForNewMessageToClient(&response, timeoutMilliseconds)) {

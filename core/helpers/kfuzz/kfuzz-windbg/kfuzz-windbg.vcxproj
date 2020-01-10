@@ -113,6 +113,15 @@ Author(s): Thomas Riedmaier
       <ModuleDefinitionFile>kfuzz-windbg.def</ModuleDefinitionFile>
       <AdditionalDependencies>dbgeng.lib;runtimeobject.lib;SharedMemIPCd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+        <PostBuildEvent>
+      <Command>robocopy "$(SolutionDir)..\..\Win32\Debug" "$(TargetDir)." SharedMemIPC*
+if errorlevel 4 goto BuildEventFailed
+if errorlevel 0 goto end
+:BuildEventFailed echo FILECOPY for $(ProjectName) FAILED
+exit 1
+:end echo FILECOPY for $(ProjectName) COMPLETED OK
+exit 0</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -128,6 +137,15 @@ Author(s): Thomas Riedmaier
       <ModuleDefinitionFile>kfuzz-windbg.def</ModuleDefinitionFile>
       <AdditionalDependencies>dbgeng.lib;runtimeobject.lib;SharedMemIPCd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>robocopy "$(SolutionDir)..\..\x64\Debug" "$(TargetDir)." SharedMemIPC*
+if errorlevel 4 goto BuildEventFailed
+if errorlevel 0 goto end
+:BuildEventFailed echo FILECOPY for $(ProjectName) FAILED
+exit 1
+:end echo FILECOPY for $(ProjectName) COMPLETED OK
+exit 0</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -146,6 +164,15 @@ Author(s): Thomas Riedmaier
       <ModuleDefinitionFile>kfuzz-windbg.def</ModuleDefinitionFile>
       <AdditionalDependencies>dbgeng.lib;runtimeobject.lib;SharedMemIPC.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>robocopy "$(SolutionDir)..\..\Win32\Release" "$(TargetDir)." SharedMemIPC*
+if errorlevel 4 goto BuildEventFailed
+if errorlevel 0 goto end
+:BuildEventFailed echo FILECOPY for $(ProjectName) FAILED
+exit 1
+:end echo FILECOPY for $(ProjectName) COMPLETED OK
+exit 0</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -165,6 +192,15 @@ Author(s): Thomas Riedmaier
       <ModuleDefinitionFile>kfuzz-windbg.def</ModuleDefinitionFile>
       <AdditionalDependencies>dbgeng.lib;runtimeobject.lib;SharedMemIPC.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>robocopy "$(SolutionDir)..\..\x64\Release" "$(TargetDir)." SharedMemIPC*
+if errorlevel 4 goto BuildEventFailed
+if errorlevel 0 goto end
+:BuildEventFailed echo FILECOPY for $(ProjectName) FAILED
+exit 1
+:end echo FILECOPY for $(ProjectName) COMPLETED OK
+exit 0</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="kfuzz-windbg.def" />

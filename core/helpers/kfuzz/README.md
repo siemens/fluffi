@@ -27,6 +27,16 @@ With the help of this adapter, Windows kernel space modules can be fuzzed with F
  - [VirtualKD](https://sysprogs.com/legacy/virtualkd/)
  - [WinDBG Preview](https://www.microsoft.com/store/productId/9PGJGD53TN86) (important - not the old WinDBG). To distribute WinDBG Preview to FLUFFI machines download it once with any internet-connected Windows 10 machine, and copy its folder to your target machines.
 
+## Setting up a virtual machine with WinDbg
+- Set up the virtual machine with your target
+- Install the VirtualKD `target` part in the virtual machine
+- Reboot using the \[VirtualKD\] \[Debugger activated\] startup option
+- Start the Virtual KD machine monitor. The target machine should be shown now. Note down the shown `pipe name`.
+- Untick the `DbgBreakPoint() on start` option
+- Connect to the VM using WinDBG: `DbgX.Shell.exe -k "com:pipe,resets=0,reconnect,port=\\.\pipe\<PIPE NAME>"`
+- Break using the `II` Break button
+- Take a snapshot of the virtual machine and note the snapshot name
+
 ## Usage
 
 1. Create a starter (e.g. by  adapting the [kFuzzStarter](../Starter/kFuzzStarter)), that 
