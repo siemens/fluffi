@@ -17,7 +17,7 @@ diff --git a/honggfuzz.h b/honggfuzz.h
 index d0a219e6..13e77b1b 100644
 --- honggfuzz.h
 +++ honggfuzz.h
-@@ -24,15 +24,10 @@
+@@ -24,16 +24,12 @@
  #ifndef _HF_HONGGFUZZ_H_
  #define _HF_HONGGFUZZ_H_
  
@@ -31,9 +31,11 @@ index d0a219e6..13e77b1b 100644
 -#include <sys/queue.h>
 -#include <sys/types.h>
  #include <time.h>
- 
++#include <deque>
+
  #include "libhfcommon/util.h"
-@@ -118,30 +113,11 @@ typedef struct {
+
+@@ -118,30 +114,10 @@
      uint32_t nChunks;
  } bitmap_t;
  
@@ -65,11 +67,10 @@ index d0a219e6..13e77b1b 100644
 +#include <BaseTsd.h>
 +typedef SSIZE_T ssize_t;
 +#endif
-+
  
  /* EOF Sanitizer coverage specific data structures */
- 
-@@ -153,19 +129,6 @@ typedef enum {
+
+@@ -153,20 +129,6 @@
      _HF_STATE_DYNAMIC_MAIN = 4,
  } fuzzState_t;
  
@@ -86,14 +87,14 @@ index d0a219e6..13e77b1b 100644
 -    TAILQ_ENTRY(strings_t)
 -    pointers;
 -};
- 
+-
  typedef struct {
      bool pcGuardMap[_HF_PC_GUARD_MAX];
-@@ -177,132 +140,15 @@ typedef struct {
- } feedback_t;
- 
+     uint8_t bbMapPc[_HF_PERF_BITMAP_SIZE_16M];
+@@ -178,131 +140,13 @@
+
  typedef struct {
--    struct {
+     struct {
 -        size_t threadsMax;
 -        size_t threadsFinished;
 -        uint32_t threadsActiveCnt;
@@ -146,10 +147,11 @@ index d0a219e6..13e77b1b 100644
 -        TAILQ_HEAD(strq_t, strings_t) dictq;
 -        size_t dictionaryCnt;
 -        size_t mutationsMax;
--        unsigned mutationsPerRun;
--        size_t maxFileSz;
--    } mutate;
--    struct {
++        std::deque<std::string> dict;
+         unsigned mutationsPerRun;
+         size_t maxFileSz;
+     } mutate;
+     struct {
 -        bool useScreen;
 -        char cmdline_txt[65];
 -        int64_t lastDisplayMillis;
@@ -161,8 +163,8 @@ index d0a219e6..13e77b1b 100644
 -        pthread_mutex_t report_mutex;
 -        bool monitorSIGABRT;
 -        size_t dynFileIterExpire;
--        bool only_printable;
--    } cfg;
+         bool only_printable;
+     } cfg;
 -    struct {
 -        bool enable;
 -    } sanitizer;
@@ -219,19 +221,10 @@ index d0a219e6..13e77b1b 100644
 -        char** symsWl;
 -        size_t symsWlCnt;
 -    } netbsd;
-+	struct {
-+		const char* dictionaryFile;
-+		size_t dictionaryCnt;
-+		unsigned mutationsPerRun;
-+		size_t maxFileSz;
-+	} mutate;
-+	struct {
-+		bool only_printable;
-+	} cfg;
  } honggfuzz_t;
- 
+
  typedef enum {
-@@ -313,51 +159,10 @@ typedef enum {
+@@ -313,51 +157,10 @@
  } runState_t;
  
  typedef struct {
@@ -246,10 +239,11 @@ index d0a219e6..13e77b1b 100644
 -    int exception;
 -    char report[_HF_REPORT_SIZE];
 -    bool mainWorker;
--    unsigned mutationsPerRun;
++    honggfuzz_t global;
+     unsigned mutationsPerRun;
 -    struct dynfile_t* dynfileqCurrent;
--    uint8_t* dynamicFile;
--    size_t dynamicFileSz;
+     uint8_t* dynamicFile;
+     size_t dynamicFileSz;
 -    int dynamicFileFd;
 -    int dynamicFileCopyFd;
 -    uint32_t fuzzNo;
@@ -280,10 +274,6 @@ index d0a219e6..13e77b1b 100644
 -        int cpuBranchFd;
 -        int cpuIptBtsFd;
 -    } netbsd;
-+	honggfuzz_t global;
-+	uint8_t* dynamicFile;
-+	size_t dynamicFileSz;
-+	unsigned mutationsPerRun;
  } run_t;
  
  /*
@@ -313,7 +303,7 @@ index 0a20d587..b9360b7e 100644
  
  static inline void mangle_Overwrite(run_t* run, const uint8_t* src, size_t off, size_t sz) {
      size_t maxToCopy = run->dynamicFileSz - off;
-@@ -70,11 +65,11 @@ static inline void mangle_Move(run_t* run, size_t off_from, size_t off_to, size_
+@@ -70,11 +69,11 @@
  }
  
  static void mangle_Inflate(run_t* run, size_t off, size_t len) {
@@ -328,7 +318,7 @@ index 0a20d587..b9360b7e 100644
      }
  
      input_setSize(run, run->dynamicFileSz + len);
-@@ -129,68 +124,11 @@ static void mangle_BitPrintable(run_t* run) {
+@@ -129,29 +128,26 @@
      util_turnToPrintable(&(run->dynamicFile[off]), 1);
  }
  
@@ -338,60 +328,71 @@ index 0a20d587..b9360b7e 100644
 -    for (uint64_t i = 0; i < choice; i++) {
 -        str = TAILQ_NEXT(str, pointers);
 -    }
--
--    size_t off = util_rndGet(0, run->dynamicFileSz - 1);
++void mangle_DictionaryInsertNoCheck(run_t* run) {
++    uint64_t choice = util_rndGet(0, run->global.mutate.dict.size() - 1);
++    std::string str = run->global.mutate.dict.at(choice);
+
+     size_t off = util_rndGet(0, run->dynamicFileSz - 1);
 -    mangle_Inflate(run, off, str->len);
 -    mangle_Move(run, off, off + str->len, str->len);
 -    mangle_Overwrite(run, (uint8_t*)str->s, off, str->len);
--}
--
++    mangle_Inflate(run, off, str.size());
++    mangle_Move(run, off, off + str.size(), str.size());
++    mangle_Overwrite(run, (uint8_t*)str.c_str(), off, str.size());
+ }
+
 -static void mangle_DictionaryInsert(run_t* run) {
 -    if (run->global->mutate.dictionaryCnt == 0) {
--        mangle_Bit(run);
--        return;
--    }
--    mangle_DictionaryInsertNoCheck(run);
--}
--
++void mangle_DictionaryInsert(run_t* run) {
++    if (run->global.mutate.dict.size() == 0) {
+         mangle_Bit(run);
+         return;
+     }
+     mangle_DictionaryInsertNoCheck(run);
+ }
+
 -static void mangle_DictionaryInsertPrintable(run_t* run) {
 -    if (run->global->mutate.dictionaryCnt == 0) {
--        mangle_BitPrintable(run);
--        return;
--    }
--    mangle_DictionaryInsertNoCheck(run);
--}
--
--static void mangle_DictionaryNoCheck(run_t* run) {
--    size_t off = util_rndGet(0, run->dynamicFileSz - 1);
--
++void mangle_DictionaryInsertPrintable(run_t* run) {
++    if (run->global.mutate.dict.size() == 0) {
+         mangle_BitPrintable(run);
+         return;
+     }
+@@ -161,17 +157,14 @@
+ static void mangle_DictionaryNoCheck(run_t* run) {
+     size_t off = util_rndGet(0, run->dynamicFileSz - 1);
+
 -    uint64_t choice = util_rndGet(0, run->global->mutate.dictionaryCnt - 1);
 -    struct strings_t* str = TAILQ_FIRST(&run->global->mutate.dictq);
 -    for (uint64_t i = 0; i < choice; i++) {
 -        str = TAILQ_NEXT(str, pointers);
 -    }
--
++    uint64_t choice = util_rndGet(0, run->global.mutate.dict.size() - 1);
++    std::string str = run->global.mutate.dict.at(choice);
+
 -    mangle_Overwrite(run, (uint8_t*)str->s, off, str->len);
--}
--
--static void mangle_Dictionary(run_t* run) {
++    mangle_Overwrite(run, (uint8_t*)str.c_str(), off, str.size());
+ }
+
+ static void mangle_Dictionary(run_t* run) {
 -    if (run->global->mutate.dictionaryCnt == 0) {
--        mangle_Bit(run);
--        return;
--    }
--
--    mangle_DictionaryNoCheck(run);
--}
--
++    if (run->global.mutate.dict.size() == 0) {
+         mangle_Bit(run);
+         return;
+     }
+@@ -179,8 +172,8 @@
+     mangle_DictionaryNoCheck(run);
+ }
+
 -static void mangle_DictionaryPrintable(run_t* run) {
 -    if (run->global->mutate.dictionaryCnt == 0) {
--        mangle_BitPrintable(run);
--        return;
--    }
--
--    mangle_DictionaryNoCheck(run);
--}
-+//Dictionary Mangling is not integrated into FLUFFI
- 
++void mangle_DictionaryPrintable(run_t* run) {
++    if (run->global.mutate.dict.size() == 0) {
+         mangle_BitPrintable(run);
+         return;
+     }
+@@ -190,7 +183,7 @@
+
  static void mangle_Magic(run_t* run) {
      static const struct {
 -        const uint8_t val[8];
@@ -399,8 +400,8 @@ index 0a20d587..b9360b7e 100644
          const size_t size;
      } mangleMagicVals[] = {
          /* 1B - No endianness */
-@@ -433,7 +371,7 @@ static void mangle_Magic(run_t* run) {
- 
+@@ -433,7 +426,7 @@
+
  static void mangle_MagicPrintable(run_t* run) {
      static const struct {
 -        const uint8_t val[8];
@@ -408,7 +409,7 @@ index 0a20d587..b9360b7e 100644
          const size_t size;
      } mangleMagicVals[] = {
          /* 1B - No endianness */
-@@ -719,9 +657,15 @@ static void mangle_AddSubWithRange(run_t* run, size_t off, uint64_t varLen) {
+@@ -719,9 +712,15 @@
                  val += delta;
              } else {
                  /* Foreign endianess */
@@ -424,7 +425,7 @@ index 0a20d587..b9360b7e 100644
              }
              mangle_Overwrite(run, (uint8_t*)&val, off, varLen);
              return;
-@@ -734,9 +678,15 @@ static void mangle_AddSubWithRange(run_t* run, size_t off, uint64_t varLen) {
+@@ -734,9 +733,15 @@
                  val += delta;
              } else {
                  /* Foreign endianess */
@@ -440,7 +441,7 @@ index 0a20d587..b9360b7e 100644
              }
              mangle_Overwrite(run, (uint8_t*)&val, off, varLen);
              return;
-@@ -749,16 +699,22 @@ static void mangle_AddSubWithRange(run_t* run, size_t off, uint64_t varLen) {
+@@ -749,16 +754,22 @@
                  val += delta;
              } else {
                  /* Foreign endianess */
@@ -464,7 +465,7 @@ index 0a20d587..b9360b7e 100644
              break;
          }
      }
-@@ -819,7 +775,7 @@ static void mangle_NegBytePrintable(run_t* run) {
+@@ -819,7 +830,7 @@
      run->dynamicFile[off] = 94 - (run->dynamicFile[off] - 32) + 32;
  }
  
@@ -472,8 +473,8 @@ index 0a20d587..b9360b7e 100644
 +void mangle_CloneByte(run_t* run) {
      size_t off1 = util_rndGet(0, run->dynamicFileSz - 1);
      size_t off2 = util_rndGet(0, run->dynamicFileSz - 1);
- 
-@@ -828,7 +784,7 @@ static void mangle_CloneByte(run_t* run) {
+
+@@ -828,7 +839,7 @@
      run->dynamicFile[off2] = tmp;
  }
  
@@ -481,8 +482,8 @@ index 0a20d587..b9360b7e 100644
 +void mangle_Expand(run_t* run) {
      size_t off = util_rndGet(0, run->dynamicFileSz - 1);
      size_t len = util_rndGet(1, run->dynamicFileSz - off);
- 
-@@ -836,7 +792,7 @@ static void mangle_Expand(run_t* run) {
+
+@@ -836,7 +847,7 @@
      mangle_Move(run, off, off + len, run->dynamicFileSz);
  }
  
@@ -491,7 +492,7 @@ index 0a20d587..b9360b7e 100644
      if (run->dynamicFileSz <= 1U) {
          return;
      }
-@@ -848,7 +804,7 @@ static void mangle_Shrink(run_t* run) {
+@@ -848,7 +859,7 @@
      mangle_Move(run, off + len, off, run->dynamicFileSz);
  }
  
@@ -499,8 +500,8 @@ index 0a20d587..b9360b7e 100644
 +void mangle_InsertRnd(run_t* run) {
      size_t off = util_rndGet(0, run->dynamicFileSz - 1);
      size_t len = util_rndGet(1, run->dynamicFileSz - off);
- 
-@@ -857,7 +813,7 @@ static void mangle_InsertRnd(run_t* run) {
+
+@@ -857,7 +868,7 @@
      util_rndBuf(&run->dynamicFile[off], len);
  }
  
@@ -508,8 +509,8 @@ index 0a20d587..b9360b7e 100644
 +void mangle_InsertRndPrintable(run_t* run) {
      size_t off = util_rndGet(0, run->dynamicFileSz - 1);
      size_t len = util_rndGet(1, run->dynamicFileSz - off);
- 
-@@ -866,7 +822,7 @@ static void mangle_InsertRndPrintable(run_t* run) {
+
+@@ -866,7 +877,7 @@
      util_rndBufPrintable(&run->dynamicFile[off], len);
  }
  
@@ -518,25 +519,7 @@ index 0a20d587..b9360b7e 100644
      char buf[32];
      snprintf(buf, sizeof(buf), "%" PRId64, (int64_t)util_rnd64());
      size_t off = util_rndGet(0, run->dynamicFileSz - 1);
-@@ -884,8 +840,6 @@ void mangle_mangleContent(run_t* run) {
-         mangle_DecByte,
-         mangle_NegByte,
-         mangle_AddSub,
--        mangle_Dictionary,
--        mangle_DictionaryInsert,
-         mangle_MemMove,
-         mangle_MemSet,
-         mangle_Random,
-@@ -905,8 +859,6 @@ void mangle_mangleContent(run_t* run) {
-         mangle_DecBytePrintable,
-         mangle_NegBytePrintable,
-         mangle_AddSubPrintable,
--        mangle_DictionaryPrintable,
--        mangle_DictionaryInsertPrintable,
-         mangle_MemMove,
-         mangle_MemSetPrintable,
-         mangle_RandomPrintable,
-@@ -927,9 +879,9 @@ void mangle_mangleContent(run_t* run) {
+@@ -927,9 +938,9 @@
      }
  
      /* Max number of stacked changes is, by default, 6 */
@@ -1681,7 +1664,7 @@ diff --git a/mangle.h b/mangle.h
 index e38f339e..5a8ca3b3 100644
 --- mangle.h
 +++ mangle.h
-@@ -27,5 +27,11 @@
+@@ -27,5 +27,15 @@
  #include "honggfuzz.h"
 
  extern void mangle_mangleContent(run_t* run);
@@ -1691,5 +1674,9 @@ index e38f339e..5a8ca3b3 100644
 +extern void mangle_Shrink(run_t* run);
 +extern void mangle_Expand(run_t* run);
 +extern void mangle_CloneByte(run_t* run);
++extern void mangle_Dictionary(run_t* run);
++extern void mangle_DictionaryInsert(run_t* run);
++extern void mangle_DictionaryPrintable(run_t* run);
++extern void mangle_DictionaryInsertPrintable(run_t* run);
 
  #endif
