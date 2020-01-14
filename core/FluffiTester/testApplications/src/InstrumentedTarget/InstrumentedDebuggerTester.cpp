@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
 
 			if (fuzzBytes.size() < 1) {
 				std::string errorDesc = "Could not open the target file";
-				SharedMemMessage messageToFeeder(SHARED_MEM_MESSAGE_FUZZ_ERROR, errorDesc.c_str(), (int)errorDesc.length());
+				SharedMemMessage messageToFeeder(SHARED_MEM_MESSAGE_ERROR, errorDesc.c_str(), (int)errorDesc.length());
 				sharedMemIPC.sendMessageToClient(&messageToFeeder);
 				continue;
 			}

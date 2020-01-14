@@ -26,11 +26,10 @@ Author(s): Thomas Riedmaier, Abian Blome
 #ifdef USE_SSL
 #if defined(_WIN32) || defined(_WIN64)
 #include <applink.c>
+#pragma comment(lib, "sslwrap.lib")
 #else
 #define __cdecl __attribute__((__cdecl__))
 #endif
-
-#pragma comment(lib, "sslwrap.lib")
 
 int __cdecl sendByteBufOnce(char* dstIP, int port, char* msg, int msgSize, int clientCertSize, const unsigned char * clientCert, int clientPrivateKeySize, const unsigned char * clientPrivateKey);
 int __cdecl sendByteBufWithResponse(char* dstIP, int port, char* msg, int msgSize, char* response, int responseSize, int clientCertSize, const unsigned char * clientCert, int clientPrivateKeySize, const unsigned char * clientPrivateKey);

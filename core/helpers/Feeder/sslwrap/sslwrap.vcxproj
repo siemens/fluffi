@@ -85,12 +85,12 @@ Author(s): Michael Kraus, Thomas Riedmaier
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <IncludePath>$(SolutionDir)\..\..\dependencies\openssl\include;$(SolutionDir)\..\..\dependencies\openssl\include86;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\..\..\dependencies\openssl\lib\x86;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)\..\..\dependencies\openssl\lib\x86d;$(LibraryPath)</LibraryPath>
     <SourcePath>$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>$(SolutionDir)\..\..\dependencies\openssl\lib\x64;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)\..\..\dependencies\openssl\lib\x64d;$(LibraryPath)</LibraryPath>
     <SourcePath>$(SourcePath)</SourcePath>
     <IncludePath>$(SolutionDir)\..\..\dependencies\openssl\include;$(SolutionDir)\..\..\dependencies\openssl\include64;$(IncludePath)</IncludePath>
   </PropertyGroup>

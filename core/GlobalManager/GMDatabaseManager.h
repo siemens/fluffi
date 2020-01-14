@@ -12,6 +12,11 @@ Author(s): Abian Blome, Thomas Riedmaier
 
 #pragma once
 
+#if defined(_WIN32) || defined(_WIN64)
+#else
+#define strcpy_s(a,b,c) strlcpy(a,c,b)
+#endif
+
 class FluffiLMConfiguration;
 class FluffiServiceDescriptor;
 class GMDatabaseManager

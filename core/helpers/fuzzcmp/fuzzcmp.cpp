@@ -60,7 +60,7 @@ void installIATHook(std::vector<std::tuple<std::string, size_t>> replacements) {
 
 							for (std::vector<std::tuple<std::string, size_t>>::iterator it = replacements.begin(); it != replacements.end(); ++it) {
 								if (strcmp(funcName, std::get<0>(*it).c_str()) == 0) {
-									printf("Redirecting %s: %s->%s from 0x%X to 0x%X\n", szPath, libraryName, funcName, *funcAddr, std::get<1>(*it));
+									printf("Redirecting %s: %s->%s from 0x%llX to 0x%llX\n", szPath, libraryName, funcName, (unsigned long long)*funcAddr, (unsigned long long)std::get<1>(*it));
 
 									DWORD originalPermissions = 0;
 									VirtualProtect(funcAddr, sizeof(size_t), PAGE_EXECUTE_READWRITE, &originalPermissions);
@@ -92,7 +92,7 @@ void installIATHooks() {
 	printf("Done installing API Hooks\n");
 }
 
-unsigned int addrToRVA(size_t addr) {
+size_t addrToRVA(size_t addr) {
 	HMODULE hMods[1024];
 	DWORD cbNeeded;
 	HANDLE curProcess = GetCurrentProcess();
@@ -143,8 +143,8 @@ std::vector<std::string> splitString(std::string str, const char token) {
 	return result;
 }
 
-unsigned int addrToRVA(std::uintptr_t addr) {
-	unsigned int re = UINT_MAX;
+size_t addrToRVA(std::uintptr_t addr) {
+	size_t re = UINT_MAX;
 	FILE * fp;
 	char * line = NULL;
 	size_t len = 0;

@@ -28,7 +28,9 @@ for (my $k=0; $k < $mystrcmpCopies; $k++){
 		print $file "int mystrcmp".$k.$lr."(const char * str1, const char * str2) {\n";
 		print $file "lastUsedStrcmpFunc=".$k."+".( ($lr eq "left") ? 0 : $mystrcmpCopies).";\n";
 		for (my $j=0; $j < $maxdetailedSteps; $j++){
-			print $file "char".$j.":\n";
+			if($j != 0){
+				print $file "char".$j.":\n";
+			}
 			print $file "	switch (str1[".$j."]) {\n";
 			print $file "	case 0: {goto char".$j."StrNoMatch;}\n";
 			for ( my $i=-128;$i<128;$i++){ 
@@ -49,7 +51,7 @@ for (my $k=0; $k < $mystrcmpCopies; $k++){
 		print $file "		str1++;\n";
 		print $file "		str2++;\n";
 		print $file "	}\n";
-		print $file "	return *(const unsigned char*)str1 - *(const unsigned char*)str2;\n";
+		print $file "	return *reinterpret_cast<const unsigned char*>(str1) - *reinterpret_cast<const unsigned char*>(str2);\n";
 		print $file "}\n\n";
 	}
 }
@@ -72,7 +74,7 @@ print $file " mystrcmp".($mystrcmpCopies-1)."right };\n";
 
 
 print $file "\nint __cdecl mystrcmp_(size_t caller, const char * str1, const char * str2){\n";
-print $file "unsigned int rva = addrToRVA(caller);\n";
+print $file "size_t rva = addrToRVA(caller);\n";
 print $file "int leftmatch = sl[rva % ".$mystrcmpCopies."](str1, str2);\n";
 print $file "int rightmatch = sr[rva % ".$mystrcmpCopies."](str2, str1);\n";
 print $file "return leftmatch | rightmatch;\n";

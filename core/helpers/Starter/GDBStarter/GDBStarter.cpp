@@ -10,9 +10,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Thomas Riedmaier, Pascal Eckmann
 */
 
-
-//g++ --std=c++11 -I ../../../dependencies/base64/include -o GDBStarter GDBStarter.cpp ../../../dependencies/base64/lib/x86-64/base64.a -lstdc++fs
-
 #include "stdafx.h"
 #include "base64.h"
 
@@ -45,7 +42,7 @@ std::string wstring_to_utf8(const std::wstring& str)
 #else
 char** split_commandline(const std::string cmdline)
 {
-	char** argv = NULL;
+	char** argv = nullptr;
 
 	wordexp_t p;
 
@@ -54,14 +51,14 @@ char** split_commandline(const std::string cmdline)
 	if (success != 0)
 	{
 		std::cout << "wordexp \"" << cmdline << "\" failed: " << success;
-		return NULL;
+		return nullptr;
 	}
 
-	if (!(argv = (char**)calloc(p.we_wordc + 1, sizeof(char*))))
+	if (!(argv = static_cast<char**>(calloc(p.we_wordc + 1, sizeof(char*)))))
 	{
 		wordfree(&p);
 		std::cout << "calloc failed";
-		return NULL;
+		return nullptr;
 	}
 
 	for (size_t i = 0; i < p.we_wordc; i++)
@@ -98,12 +95,12 @@ void execCommand(std::string command) {
 
 		execv(argv[0], &argv[1]);
 		printf("Failed to call execv!");
-		return ;
+		return;
 	}
 	else if (pID < 0) // failed to fork
 	{
 		printf("Failed to fork to new process!");
-		return ;
+		return;
 	}
 	else // Code only executed by parent process
 	{
@@ -251,6 +248,7 @@ int startlocal(std::string pathToLocalExecutableAndArgs, std::string additionalC
 		initfile << argv[i] << " ";
 	}
 
+	initfile << additionalCommands << std::endl;
 	initfile << std::endl;
 
 	//free argv

@@ -146,7 +146,7 @@ $(ARCH)/buildtmp/gmobj/%.o: $(FLUFFIPATH)/GlobalManager/%.cpp
 
 $(ARCH)/bin/GlobalManager: $(GMOBJS) $(GMLIBOBJS) $(ARCH)/lib/sharedcode.a 
 	@echo -e "[\033[92mlinking\033[0m] "$(notdir $@)
-	@$(CC) $(AFLAGS) -L $(ARCH)/bin  -o $@ $(GMOBJS) $(GMLIBOBJS) $(ARCH)/lib/sharedcode.a  $(LDFLAGS) $(MYSQLLINK) -l:libzmq.so.5 -l:libmariadb.so.3 -Wl,-rpath='$${ORIGIN}'
+	@$(CC) $(AFLAGS) -L $(ARCH)/bin  -o $@ $(GMOBJS) $(GMLIBOBJS) $(ARCH)/lib/sharedcode.a  $(LDFLAGS) $(MYSQLLINK) -lbsd -l:libzmq.so.5 -l:libmariadb.so.3 -Wl,-rpath='$${ORIGIN}'
 
 $(ARCH)/buildtmp/lmobj/%.o: $(FLUFFIPATH)/LocalManager/%.cpp
 	@echo -e "[\033[94mcompiling\033[0m] "$(notdir $<)"..."

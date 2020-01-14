@@ -100,17 +100,18 @@ std::vector<std::string> splitString(std::string str, std::string token) {
 	if (token.empty()) return std::vector<std::string> { str };
 
 	std::vector<std::string>result;
-	while (str.size()) {
-		size_t index = str.find(token);
-		if (index != std::string::npos) {
-			result.push_back(str.substr(0, index));
-			str = str.substr(index + token.size());
-			if (str.size() == 0)result.push_back(str);
+	size_t curIndex = 0;
+	size_t lenOfToken = token.size();
+	while (true) {
+		size_t nextIndex = str.find(token, curIndex);
+		if (nextIndex != std::string::npos) {
+			result.push_back(str.substr(curIndex, nextIndex - curIndex));
 		}
 		else {
-			result.push_back(str);
-			str = "";
+			result.push_back(str.substr(curIndex));
+			break;
 		}
+		curIndex = nextIndex + lenOfToken;
 	}
 	return result;
 }

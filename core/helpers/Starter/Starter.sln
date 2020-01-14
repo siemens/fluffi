@@ -10,14 +10,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # 
 # Author(s): Thomas Riedmaier
 #
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.960
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ProcessStarter", "ProcessStarter\ProcessStarter.vcxproj", "{A40BB05D-081F-47FD-BCB7-72ED2FC874A8}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ServiceStarter", "ServiceStarter\ServiceStarter.vcxproj", "{0A4C426D-903A-4EA6-82E5-7E158178D356}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GDBStarter", "GDBStarter\GDBStarter.vcxproj", "{FD5813C5-4834-404C-B248-57CD94635604}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kFuzzStarter", "kFuzzStarter\kFuzzStarter.vcxproj", "{FD5813C5-4834-404C-B248-57CD94635607}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,8 +53,19 @@ Global
 		{FD5813C5-4834-404C-B248-57CD94635604}.Release|x64.Build.0 = Release|x64
 		{FD5813C5-4834-404C-B248-57CD94635604}.Release|x86.ActiveCfg = Release|Win32
 		{FD5813C5-4834-404C-B248-57CD94635604}.Release|x86.Build.0 = Release|Win32
+		{FD5813C5-4834-404C-B248-57CD94635607}.Debug|x64.ActiveCfg = Debug|x64
+		{FD5813C5-4834-404C-B248-57CD94635607}.Debug|x64.Build.0 = Debug|x64
+		{FD5813C5-4834-404C-B248-57CD94635607}.Debug|x86.ActiveCfg = Debug|Win32
+		{FD5813C5-4834-404C-B248-57CD94635607}.Debug|x86.Build.0 = Debug|Win32
+		{FD5813C5-4834-404C-B248-57CD94635607}.Release|x64.ActiveCfg = Release|x64
+		{FD5813C5-4834-404C-B248-57CD94635607}.Release|x64.Build.0 = Release|x64
+		{FD5813C5-4834-404C-B248-57CD94635607}.Release|x86.ActiveCfg = Release|Win32
+		{FD5813C5-4834-404C-B248-57CD94635607}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BE0EF32B-A9DA-4A43-8EA1-66ED0E9E52E4}
 	EndGlobalSection
 EndGlobal

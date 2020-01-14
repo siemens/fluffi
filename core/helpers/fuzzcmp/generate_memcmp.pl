@@ -27,7 +27,9 @@ for (my $k=0; $k < $mymemcmpCopies; $k++){
 		print $file "int mymemcmp".$k.$lr."(const unsigned char * ptr1, const unsigned char * ptr2, size_t num) {\n";
 		print $file "	lastUsedMemcmpFunc=".$k."+".( ($lr eq "left") ? 0 : $mymemcmpCopies).";\n";
 		for (my $j=0; $j < $maxdetailedSteps; $j++){
-			print $file "char".$j.":\n";
+			if($j != 0){
+				print $file "char".$j.":\n";
+			}
 			print $file "	if(num == ".$j.") return 0;\n";
 			print $file "	switch (ptr1[".$j."]) {\n";
 			for ( my $i=0;$i<256;$i++){
@@ -69,7 +71,7 @@ print $file " mymemcmp".($mymemcmpCopies-1)."right };\n";
 
 
 print $file "\nint __cdecl mymemcmp_(size_t caller, const void * ptr1, const void * ptr2, size_t num){\n";
-print $file "unsigned int rva = addrToRVA(caller);\n";
+print $file "size_t rva = addrToRVA(caller);\n";
 print $file "int leftmatch = ml[rva % ".$mymemcmpCopies."](static_cast<const unsigned char *>(ptr1), static_cast<const unsigned char *>(ptr2), num);\n";
 print $file "int rightmatch = mr[rva % ".$mymemcmpCopies."](static_cast<const unsigned char *>(ptr1), static_cast<const unsigned char *>(ptr2), num);\n";
 print $file "return leftmatch | rightmatch;\n";

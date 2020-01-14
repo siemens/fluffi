@@ -13,9 +13,8 @@ Author(s): Thomas Riedmaier, Pascal Eckmann
 #include "stdafx.h"
 #include "SharedMemIPC.h"
 
-
 #define RESP_TIMEOUT_MS 60000
-#define KNOWN_GOOD (char)0x98, (char)0x79, (char)0x01, (char)0x00, (char)0x00, (char)0x01, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x04, (char)0x74, (char)0x65, (char)0x73, (char)0x74, (char)0x04, (char)0x74, (char)0x65, (char)0x73, (char)0x74, (char)0x00, (char)0x00, (char)0x01, (char)0x00, (char)0x01
+unsigned char KNOWN_GOOD[] = { 0x98, 0x79, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x74, 0x65, 0x73, 0x74, 0x04, 0x74, 0x65, 0x73, 0x74, 0x00, 0x00, 0x01, 0x00, 0x01 };
 
 #if defined(_WIN32) || defined(_WIN64)
 #define SOCKETTYPE SOCKET
@@ -39,7 +38,7 @@ bool sendBytesToPort(std::vector<char>* fuzzBytes, int serverport, bool waitForR
 		return false;
 	}
 
-	memset((char*)&si_other, 0, sizeof(si_other));
+	memset(&si_other, 0, sizeof(si_other));
 	si_other.sin_family = AF_INET;
 	si_other.sin_port = htons(serverport);
 
@@ -53,12 +52,12 @@ bool sendBytesToPort(std::vector<char>* fuzzBytes, int serverport, bool waitForR
 		return false;
 	}
 
-	size_t fuzzBytesSize = (size_t)fuzzBytes->size();
+	size_t fuzzBytesSize = fuzzBytes->size();
 	char* fuzzByteArray = &(*fuzzBytes)[0];
 
 	fuzzBytesSize = fuzzBytesSize > 65506 ? 65506 : fuzzBytesSize;
 
-	if (sendto(s, fuzzByteArray, (int)fuzzBytesSize, 0, (sockaddr*)&si_other, slen) == -1) {
+	if (sendto(s, fuzzByteArray, fuzzBytesSize, 0, reinterpret_cast<sockaddr*>(&si_other), slen) == -1) {
 		std::cout << "Error using sendto" << std::endl;
 		closesocket(s);
 		return false;
@@ -80,7 +79,7 @@ bool sendBytesToPort(std::vector<char>* fuzzBytes, int serverport, bool waitForR
 		}
 
 		char buf[1];
-		int blen = recvfrom(s, buf, sizeof(buf), 0, (struct sockaddr*) &si_other, (socklen_t*)&slen);
+		int blen = static_cast<int>(recvfrom(s, buf, sizeof(buf), 0, reinterpret_cast<struct sockaddr*>(&si_other), reinterpret_cast<socklen_t*>(&slen)));
 		if (blen == -1) {
 #if defined(_WIN32) || defined(_WIN64)
 			if (WSAGetLastError() != WSAEMSGSIZE) {
@@ -99,7 +98,8 @@ bool sendBytesToPort(std::vector<char>* fuzzBytes, int serverport, bool waitForR
 }
 
 bool isServerAlive(int targetPort) {
-	std::vector<char> knownGood{ KNOWN_GOOD };
+	int n = sizeof(KNOWN_GOOD) / sizeof(KNOWN_GOOD[0]);
+	std::vector<char> knownGood(KNOWN_GOOD, KNOWN_GOOD + n);
 	return sendBytesToPort(&knownGood, targetPort, true);
 }
 
@@ -115,14 +115,14 @@ std::vector<char> readAllBytesFromFile(const std::string filename)
 	long fileSize = ftell(inputFile);
 	fseek(inputFile, 0, SEEK_SET);
 
-	if ((unsigned int)fileSize == 0) {
+	if (fileSize == 0) {
 		fclose(inputFile);
 		return{};
 	}
 
-	std::vector<char> result((unsigned int)fileSize);
+	std::vector<char> result(fileSize);
 
-	size_t bytesRead = static_cast<size_t>(fread((char*)&result[0], 1, fileSize, inputFile));
+	size_t bytesRead = static_cast<size_t>(fread(&result[0], 1, fileSize, inputFile));
 	if (bytesRead != static_cast<size_t>(fileSize)) {
 		std::cout << "readAllBytesFromFile failed to read all bytes! Bytes read: " << bytesRead << ". Filesize " << fileSize;
 	}
@@ -207,7 +207,7 @@ int main(int argc, char* argv[])
 			else {
 				std::string errorDesc = "Failed sending the fuzz file bytes to the target port";
 				std::cout << errorDesc << std::endl;
-				SharedMemMessage messageToFeeder(SHARED_MEM_MESSAGE_FUZZ_ERROR, errorDesc.c_str(), (int)errorDesc.length());
+				SharedMemMessage messageToFeeder(SHARED_MEM_MESSAGE_ERROR, errorDesc.c_str(), static_cast<int>(errorDesc.length()));
 				sharedMemIPC_ToRunner.sendMessageToServer(&messageToFeeder);
 			}
 		}

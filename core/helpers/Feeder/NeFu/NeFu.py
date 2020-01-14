@@ -70,6 +70,6 @@ while(True):
         message = SharedMemMessage(MessageTypes.SHARED_MEM_MESSAGE_FUZZ_DONE, "")
         ipc.sendMessageToServer(message)
     else:
-        message = SharedMemMessage(MessageTypes.SHARED_MEM_MESSAGE_FUZZ_ERROR, "")
+        message = SharedMemMessage(MessageTypes.SHARED_MEM_MESSAGE_ERROR, "")
         ipc.sendMessageToServer(message)
 
