@@ -56,13 +56,12 @@ Author(s): Pascal Eckmann
 - Every time you restart your Odroid-XU4, it will reinstall its OS
 - UART on Odroid-XU4 for debugging
     ```
-    ___________
-   |           |
-   |Pin 4 - GND|
-   |Pin 3 - RXD|
-   |Pin 2 - TXD|
-   |Pin 1 - VCC|
-    |          |
-     |_________|
-     
+     ___________
+    |           |
+    |Pin 4 - GND|
+    |Pin 3 - RXD|
+    |Pin 2 - TXD|
+    |Pin 1 - VCC|
+    |           |
+      |_________|
     ```
