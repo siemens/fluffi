@@ -64,7 +64,7 @@ Author(s): Pascal Eckmann
 ## Configure Windows for unattended installation
 - To automate the Windows installation an `unattend.xml` file should be created and copied in the [windows] directory on the SMB share, where `setup.exe` is.
 - You can use the provided `unattend.xml` files for [Windows Server 2008](windows/windowsServer2008/unattend.xml), [Windows Server 2016](windows/windowsServer2016/unattend.xml) or [Windows Server 2019](windows/windowsServer2019/unattend.xml)
-    - Change [username] to the same which you defined for _ansible_user_ and [password] to the same as _ansible_password_ in the section _[windows:vars]_ in your [hosts](../../srv/fluffi/data/polenext/projects/1/hosts) file for Polemarch, and [key] to your product key
+    - Change [username] to the same which you defined for _ansible_user_ and [password] to the same as _ansible_password_ in the section _[windows:vars]_ in your [hosts](../../srv/fluffi/data/polenext/projects/1/hosts) file for Polemarch, and [key] to your Windows product key
 - To create these files, use one of the many instructions which are available online, like this [one](https://www.virtualizationhowto.com/2019/05/create-unattend-answer-file-for-windows-server-2019-automated-packer-installation/) 
     - For automatic setup of the hostname, insert this into your `unattend.xml` in `<settings pass="oobeSystem">` as own component and turn AutoLogon on (`<LogonCount>1</LogonCount>`)   
         ```
@@ -94,7 +94,7 @@ Author(s): Pascal Eckmann
 - Add your prepared unattend.xml file to the extracted data
 
 ## Copy Windows image to infrastructure
-- Copy Windows data to _SMB_ share
+- Copy Windows data to SMB share
     ```
     install 
     ├── [windows]
@@ -112,10 +112,10 @@ Author(s): Pascal Eckmann
     │   └── ...
     └── ...
     ```
-- Note: Set all permissions for directories and files on _SMB_ share to 777
+- Note: Set all permissions for directories and files on the SMB share to 777
    
 ## Copy Windows PE image to infrastructure
-- Create a folder in `ftp.fluffi/tftp-root/`, e.g. `ftp.fluffi/tftp-root/windows` 
+- Create a folder in `ftp.fluffi/tftp-roots/`, e.g. `ftp.fluffi/tftp-roots/windows` 
 - Copy all PXE start files from `C:\PXE\boot\` to `ftp://ftp.fluffi/tftp-roots/windows`
 - Create two folders, `boot` and `Boot`, inside `windows`
     - Copy the following files into `boot` and `Boot`
@@ -124,7 +124,7 @@ Author(s): Pascal Eckmann
         - `BCD` (from `C:\PXE\`)
 - Your `tftp-roots` should now look like this
     ```
-    tftp-root 
+    tftp-roots 
     ├── windows
     │   ├── boot
     │   │   ├── boot.sdi

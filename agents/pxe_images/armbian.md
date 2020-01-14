@@ -15,17 +15,17 @@ Author(s): Pascal Eckmann
 1. Download and extract [Armbian](https://www.armbian.com/odroid-xu4/)
 2. Mount/open downloaded image
     - `sudo fdisk -l [image]`
-    - Calculate Offset between sector size * start: e.g. 512 * 8192 = 4194304
+    - Calculate the offset between sector size * start: e.g. 512 * 8192 = 4194304
     - `sudo mount -o loop,offset=[offset] [Image] /mnt/tmp`
-3. Navigate to `/mnt/tmp` and copy following files to another location, we will need them later
-    - `/boot/initrd.img-X.XX.XX-odroidxu4` (Ramdisk)   
+3. Navigate to `/mnt/tmp` and copy following files to another location, (you will need them later):
+    - `/boot/initrd.img-X.XX.XX-odroidxu4` (RAM disk)   
     - `/boot/vmlinuz-X.XX.XX-odroidxu4` (Kernel)   
     - `/boot/dtb--X.XX.XX-odroidxu4/exynos5422-odroidxu4.dtb` (Device Tree Blob)
-    - Also these two executables, we need them for the automatic deployment
+    - The following two executables, which are needed for automatic deployment
         - `/bin/tar` 
         - `/sbin/mke2fs` 
-4. Preperate ramdisk image `initrd.img-X.XX.XX-odroidxu4`
-    - Rename image to `initrd.gz`
+4. Prepare RAM disk image `initrd.img-X.XX.XX-odroidxu4`
+    - Rename the image to `initrd.gz`
     - Create directory `initrd` next to `initrd.gz`
     - Navigate to `initrd` 
     - Execute: `zcat ../initrd.gz | fakeroot -s ../initrd.fakeroot cpio -i`
@@ -38,9 +38,11 @@ Author(s): Pascal Eckmann
     run_scripts /scripts/init-top
     ```
     
-    > `# format eMMC`   
-    > `echo "format mmcblk0p2"`   
-    > `(echo y) | mke2fs -t ext4 /dev/mmcblk0p2`   
+    ```
+    # format eMMC
+    echo "format mmcblk0p2"
+    (echo y) | mke2fs -t ext4 /dev/mmcblk0p2
+    ```
     
     ```
     maybe_break modules
@@ -56,16 +58,19 @@ Author(s): Pascal Eckmann
     nfs_bottom
     local_bottom
     ```
-    > `# load Armbian`
-    > `echo "load Armbian"`
-    > `configure_networking`
-    > `rm -rf /root/*`
-    > `mkdir /root/storage`
-    > `wget -t 10 ftp://ftp.fluffi/odroid/armbian.tar -P /root/storage`
-    > `tar xf /root/storage/armbian.tar -C /root/ --warning=no-timestamp`
-    > `rm /root/storage/armbian.tar`
-    > `rmdir /root/storage`
-    > `echo "Armbian filesystem here"`
+    
+    ```
+    # load Armbian
+    echo "load Armbian"
+    configure_networking
+    rm -rf /root/*
+    mkdir /root/storage
+    wget -t 10 ftp://ftp.fluffi/odroid/armbian.tar -P /root/storage
+    tar xf /root/storage/armbian.tar -C /root/ --warning=no-timestamp
+    rm /root/storage/armbian.tar
+    rmdir /root/storage
+    echo "Armbian filesystem here"
+    ```
 
     ```
     maybe_break bottom
@@ -79,10 +84,10 @@ Author(s): Pascal Eckmann
 7. Copy the `tar` and `mke2fs` into `initrd/sbin` and set their permissions
     - Execute: `chmod 755 tar`
     - Execute: `chmod 755 mke2fs`
-8. Create new ramdisk image
+8. Create new RAM disk image
     - Execute: `find | fakeroot -i ../initrd.fakeroot cpio -o -H newc | gzip -c > ../initrd.gz`
 9. Rename kernel `vmlinuz-X.XX.XX-odroidxu4` to `zImage`
-10. Navigate into mounted Armbian image `/mnt/tmp` and copy following *.deb files to `/usr/local` of the image (Links of these files for Debian Buster)
+10. Navigate into the mounted Armbian image `/mnt/tmp` and copy the following *.deb files to `/usr/local` of the image (Links of these files for Debian Buster)
     - [libtalloc2_XX.deb](https://packages.debian.org/buster/armhf/libtalloc2/download)
         - Rename the file to `libtalloc2.deb`
     - [libwbclient0_XX.deb](https://packages.debian.org/buster/armhf/libwbclient0/download)
@@ -91,7 +96,7 @@ Author(s): Pascal Eckmann
         - Rename the file to `cifs-utils.deb`
     - [samba-common_XX.deb](https://packages.debian.org/buster/armhf/samba-common/download)
         - Rename the file to `samba-common.deb`
-    - Good to know: You can download these packages also with `sudo apt-get install --download-only <package_name>`
+    - Note: You can also download these packages with `sudo apt-get install --download-only <package_name>`
 11. Change `/etc/rc.local`
     ```
     #!/bin/sh -e
@@ -137,11 +142,11 @@ Author(s): Pascal Eckmann
         deb http://apt.fluffi/mirror/apt.armbian.com/ bionic main bionic-utils bionic-desktop
         #deb http://apt.armbian.com bionic main bionic-utils bionic-desktop
         ```
-13. Archive mounted image
+13. Archive the mounted image
     - Execute: `sudo tar --owner=root --group=root -p -cvf /home/armbian.tar */` (at / of mounted image)
     
-## Copy/Configure files to infrastructure
-- Create file `default-arm-exynos` with following content
+## Copy/configure files to infrastructure
+- Create file `default-arm-exynos` with the following content
     ```
     DEFAULT odroidxu4_default
 
@@ -153,22 +158,26 @@ Author(s): Pascal Eckmann
     PROMPT 1
     TIMEOUT 0
     ```
-- Create a folder in `ftp.fluffi/tftp-root/`, e.g. `ftp.fluffi/tftp-root/armbian` and copy all Armbian files (including the files from the image) in the new folder:
-    >&gt; __tftp-root__    
-    >|&emsp;&gt; __armbian__    
-    >|&emsp;|&emsp;&gt; __pxelinux.cfg__    
-    >|&emsp;|&emsp;|&emsp;&gt; default-arm-exynos    
-    >|&emsp;|&emsp;&gt; __odroidxu4__    
-    >|&emsp;|&emsp;|&emsp;&gt; exynos5422-odroidxu4.dtb    
-    >|&emsp;|&emsp;|&emsp;&gt; initrd.gz    
-    >|&emsp;|&emsp;|&emsp;&gt; zImage    
-    >|&emsp;&gt;	 __another_os__    
-    >|&emsp;|&emsp;&gt; ...    
-    >|&emsp;&gt; ...    
+- Create a folder in `ftp.fluffi/tftp-roots/`, e.g. `ftp.fluffi/tftp-roots/armbian` and copy all Armbian files (including the files from the image) to the new folder:
+    ```
+    tftp-roots 
+    ├── armbian
+    │   ├── pxelinux.cfg
+    │   │   └── default-arm-exynos
+    │   └── odroidxu4
+    │       ├── exynos5422-odroidxu4.dtb
+    │       ├── initrd.gz
+    │       └── zImage
+    ├── another_os
+    │   └── ...
+    └── ...
+    ```
 - Copy your generated `armbian.tar` to `ftp.fluffi/odroid/`
-    >&gt; __odroid__    
-    >|&emsp;&gt; armbian.tar     
-    >|&emsp;&gt; ...    
+    ```
+    odroid 
+    ├── armbian.tar
+    └── ...
+    ```
 
 
 

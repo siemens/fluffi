@@ -14,21 +14,22 @@ Author(s): Pascal Eckmann
 
 ## Infrastructure
 
-All required systems (FTP, TFTP, SMB) are available if _docker-compose_ has been started with the specified [configuration](../../srv/fluffi/docker-compose.yaml).    
+All required systems (FTP, TFTP, SMB) are available if docker-compose has been started with the specified [configuration](../../srv/fluffi/docker-compose.yaml).    
+
 __On _web.fluffi_ you can select the OS, which should be loaded over PXE.__    
 
 - ##### FTP
-    - USE `Binary` as transfer type for copying files to FTP
+    - Use `Binary` as transfer type for copying files to FTP
         - If you use _Filezilla_, open _Settings \> Transfers \> File Types_ and set the _Default transfer type_ to _Binary_
     - `ftp.fluffi/tftp-roots/...`    
-        - e.g. `ubuntuRoot/...`   
+        - e.g. `ftp.fluffi/tftp-roots/ubuntu/...`   
         -> copy your systems here. Detailed steps are in the instructions for each operating system.
 - ##### TFTP
     - If you select an OS on _web.fluffi_, it will be copied here and the system which should get a fresh OS will pick the necessary data from here
 - ##### SMB
     - `smb.fluffi/install/...`
-        - `initial/` -> configuration of hostname, etc., for freshly deployed systems
-        - e.g. `server2016/` -> Windows image; detailed steps are in the instructions for [Windows](windows.md)
+        - `smb.fluffi/install/initial/` -> configuration of hostname, etc., for freshly deployed systems
+        - e.g. `smb.fluffi/install/server2016/` -> Windows image; detailed steps are in the instructions for [Windows](windows.md)
 
 ## Agent systems OS
 - ##### Windows

@@ -14,8 +14,8 @@ Author(s): Pascal Eckmann
 
 ## Prepare Ubuntu image
 
-1. Download netinstall version of Ubuntu, e.g. [Bionic Beaver](http://archive.ubuntu.com/ubuntu/dists/bionic/main/installer-amd64/current/images/netboot/)
-    - e.g. `wget -r -np -R "index.html*" -P ./ http://archive.ubuntu.com/ubuntu/dists/bionic/main/installer-amd64/current/images/netboot/`
+1. Download NetInstall version of Ubuntu, e.g., [Bionic Beaver](http://archive.ubuntu.com/ubuntu/dists/bionic/main/installer-amd64/current/images/netboot/)
+    - e.g., `wget -r -np -R "index.html*" -P ./ http://archive.ubuntu.com/ubuntu/dists/bionic/main/installer-amd64/current/images/netboot/`
 2. Modify the file `\pxelinux.cfg\default` to boot the installer with a preseeding file
     ```
     prompt 0
@@ -30,24 +30,26 @@ Author(s): Pascal Eckmann
 3. To automate the installation, prepare a preseeding file and copy it to the root of the file `\ubuntu-installer\amd64\initrd.gz`. You can use the [script](ubuntu/embedPreseed.sh) `embedPreseed.sh` to copy the preseed file in the `initrd.gz`.    
 _e.g. execute: `sudo ./embedPreseed.sh ./initrd.gz /home/user/ubuntu_netinstall/ubuntu-installer/amd64/initrdNew /home/user/ubuntu_netinstall/ubuntu-installer/amd64/preseed.cfg`_    
 _Attention: The last two arguments have to be absolute paths._    
-After that, delete the old `initrd.gz` and rename the new ramdisk to `ìnitrd.gz` and place it into the same folder, where the old one was.    
-A example preseeding file for Ubuntu 18.04 is located in this [repository](ubuntu/preseed.cfg). You have only to change [username] to the same which you defined for _ansible_ssh_user_ and [password] to the same as _ansible_ssh_pass_ in the section _[linux:vars]_ in your [hosts](../../srv/fluffi/data/polenext/projects/1/hosts) file for Polemarch. If you want to create a new one, copy all necessary data from the provided example.    
+After that, delete the old `initrd.gz`. Rename the new RAM disk `initrd.gz` and place it into the same folder where the old one was.    
+An example preseeding file for Ubuntu 18.04 is located in this [repository](ubuntu/preseed.cfg). You only have to change [username] to the same which you defined for _ansible_ssh_user_ and [password] to the same as _ansible_ssh_pass_ in the section _[linux:vars]_ in your [hosts](../../srv/fluffi/data/polenext/projects/1/hosts) file for Polemarch. If you want to create a new one, copy all necessary data from the provided example.    
 
 ## Copy files to infrastructure
-- Create a folder in `ftp.fluffi/tftp-root/`, e.g. `ftp.fluffi/tftp-root/ubuntu` and copy all Ubuntu files in the new folder:
-    >&gt; __tftp-root__    
-    >|&emsp;&gt; __ubuntu__    
-    >|&emsp;|&emsp;&gt; __pxelinux.cfg__    
-    >|&emsp;|&emsp;|&emsp;&gt; default    
-    >|&emsp;|&emsp;&gt; __ubuntu-installer__    
-    >|&emsp;|&emsp;|&emsp;&gt; ...    
-    >|&emsp;|&emsp;&gt; boot.img.gz    
-    >|&emsp;|&emsp;&gt; ldlinux.c32    
-    >|&emsp;|&emsp;&gt; ...    
-    >|&emsp;|&emsp;&gt; pxelinux.0    
-    >|&emsp;&gt;	 __another_os__    
-    >|&emsp;|&emsp;&gt; ...    
-    >|&emsp;&gt; ...   
+- Create a folder in `ftp.fluffi/tftp-roots/`, e.g. `ftp.fluffi/tftp-roots/ubuntu`, and copy all Ubuntu files in the new folder:
+    ```
+    tftp-roots 
+    ├── ubuntu
+    │   ├── pxelinux.cfg
+    │   │   └── default
+    │   ├── ubuntu-installer
+    │   │   └── ...
+    │   ├── boot.img.gz
+    │   ├── ldlinux.c32
+    │   ├── ...
+    │   └── pxelinux.0
+    ├── another_os
+    │   └── ...
+    └── ...
+    ```
 - Rename `pxelinux.0` to `pxeboot.n12`
 
 
