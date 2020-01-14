@@ -17,14 +17,14 @@ Author(s): Pascal Eckmann
     - Install ADK
     - Install ADK-Windows PE-Addon 
 2. Run `Windows Kit/Deployment and Imaging Tools Environment` from the start menu to open the CLI ...
-3. ... and execute there following commands to create Windows PE step for step
+3. ... and execute the following commands step-by-step to create Windows PE
     - `copype.cmd amd64 C:\winpe_amd64`
     - `dism /mount-image /imagefile:c:\winpe_amd64\media\sources\boot.wim /index:1 /mountdir:C:\winpe_amd64\mount`
     - `xcopy c:\winpe_amd64\mount\windows\boot\pxe\*.* c:\PXE\boot\`
     - `copy C:\winpe_amd64\media\boot\boot.sdi c:\PXE\boot\`
     - `copy C:\winpe_amd64\media\sources\boot.wim c:\PXE\boot\`
     - `bcdedit /createstore C:\PXE\BCD`    
-    _-> maybe use other command line to get other version of bcedit_
+    _-> maybe use the other command line to get another version of bcedit_
     - `bcdedit /store c:\PXE\BCD /create {ramdiskoptions} /d "Ramdisk options"`
     - `bcdedit /store C:\PXE\BCD /set {ramdiskoptions} ramdisksdidevice boot`
     - `bcdedit /store C:\PXE\BCD /set {ramdiskoptions} ramdisksdipath \boot\boot.sdi`
@@ -49,7 +49,7 @@ Author(s): Pascal Eckmann
 	- Mount the image
 	    - Execute: `mkdir C:\mount\boot\`
 	    - Execute: `dism /Mount-Wim /wimfile:C:\PXE\boot\boot.wim /index:1 /MountDir:C:\mount\boot\`
-	- Navigate to `C:\mount\boot\Windows\System32\` and add/change a file `Startnet.cmd` with following content, based on your settings ([windows] is a placeholder for your folder containing the windows image on the SMB share):
+	- Navigate to `C:\mount\boot\Windows\System32\` and add/change a file `Startnet.cmd` with the following content, based on your settings (note: [windows] is a placeholder for your folder containing the windows image on the SMB share):
 		```
 		wpeinit
         Wpeutil initializenetwork
@@ -58,15 +58,15 @@ Author(s): Pascal Eckmann
 		Y:
 		setup.exe /Unattend:Y:\unattend.xml
 		```
-	- Normally you should use the address `smb.fluffi` here (`net use Y: \\smb.fluffi\install\[windows] /user:nobody pass`), but it always results in inconsistent behavior and therefore the IP address of the SMB share must be used here
-    - Unmout the image and commit changes by executing `dism /Unmount-Wim /MountDir:C:\mount\boot /commit`
+	- Typically you would use the address `smb.fluffi` here (`net use Y: \\smb.fluffi\install\[windows] /user:nobody pass`), but it always results in inconsistent behavior. Therefore the IP address of the SMB share must be used here
+    - Unmount the image and commit changes by executing `dism /Unmount-Wim /MountDir:C:\mount\boot /commit`
     
 ## Configure Windows for unattended installation
 - To automate the Windows installation an `unattend.xml` file should be created and copied in the [windows] directory on the SMB share, where `setup.exe` is.
-- You can use the provided `unattend.xml` files for [Windows Server 2008](windows/server2008/unattend.xml), [Windows Server 2016](windows/server2016/unattend.xml) or [Windows Server 2019](windows/server2019/unattend.xml)
-    - Change [username] to the same which you defined for _ansible_user_ and [password] to the same as _ansible_password_ in the section _[windows:vars]_ in your [hosts](../../srv/fluffi/data/polenext/projects/1/hosts) file for Polemarch and [key] to your product key
-- To create these files, use one of the many instructions which are online available, like this [one](https://www.virtualizationhowto.com/2019/05/create-unattend-answer-file-for-windows-server-2019-automated-packer-installation/) 
-    - For automatic setup of hostname insert this into your `unattend.xml` in `<settings pass="oobeSystem">` as own component and turn AutoLogon on (`<LogonCount>1</LogonCount>`)
+- You can use the provided `unattend.xml` files for [Windows Server 2008](windows/windowsServer2008/unattend.xml), [Windows Server 2016](windows/windowsServer2016/unattend.xml) or [Windows Server 2019](windows/windowsServer2019/unattend.xml)
+    - Change [username] to the same which you defined for _ansible_user_ and [password] to the same as _ansible_password_ in the section _[windows:vars]_ in your [hosts](../../srv/fluffi/data/polenext/projects/1/hosts) file for Polemarch, and [key] to your product key
+- To create these files, use one of the many instructions which are available online, like this [one](https://www.virtualizationhowto.com/2019/05/create-unattend-answer-file-for-windows-server-2019-automated-packer-installation/) 
+    - For automatic setup of the hostname, insert this into your `unattend.xml` in `<settings pass="oobeSystem">` as own component and turn AutoLogon on (`<LogonCount>1</LogonCount>`)   
         ```
         <FirstLogonCommands>
             <SynchronousCommand wcm:action="add">
@@ -95,46 +95,50 @@ Author(s): Pascal Eckmann
 
 ## Copy Windows image to infrastructure
 - Copy Windows data to _SMB_ share
-    >&gt; __install__    
-    >|&emsp;&gt; __[windows]__    
-    >|&emsp;|&emsp;&gt; __boot__    
-    >|&emsp;|&emsp;|&emsp;&gt; ...   
-    >|&emsp;|&emsp;&gt; __efi__    
-    >|&emsp;|&emsp;|&emsp;&gt; ...    
-    >|&emsp;|&emsp;&gt; __sources__    
-    >|&emsp;|&emsp;|&emsp;&gt; ...    
-    >|&emsp;|&emsp;&gt; __...__    
-    >|&emsp;|&emsp;|&emsp;&gt; ...    
-    >|&emsp;|&emsp;&gt; unattend.xml    
-    >|&emsp;|&emsp;&gt; ...    
-    >|&emsp;&gt; __another_os__    
-    >|&emsp;|&emsp;&gt; ...    
-    >|&emsp;&gt; ...   
-    - Good to know: Set all permissions for directories and files on _SMB_ share to 777
+    ```
+    install 
+    ├── [windows]
+    │   ├── boot
+    │   │   └── ...
+    │   ├── efi
+    │   │   └── ...
+    │   ├── sources
+    │   │   └── ...
+    │   ├── ...
+    │   │   └── ...
+    │   ├── unattend.xml
+    │   └── ...
+    ├── another_os
+    │   └── ...
+    └── ...
+    ```
+- Note: Set all permissions for directories and files on _SMB_ share to 777
    
 ## Copy Windows PE image to infrastructure
 - Create a folder in `ftp.fluffi/tftp-root/`, e.g. `ftp.fluffi/tftp-root/windows` 
 - Copy all PXE start files from `C:\PXE\boot\` to `ftp://ftp.fluffi/tftp-roots/windows`
-- Create two folders `boot` and `Boot` inside `windows`
-    - Copy following files into `boot` and `Boot`
+- Create two folders, `boot` and `Boot`, inside `windows`
+    - Copy the following files into `boot` and `Boot`
         - `boot.sdi`
         - `boot.wim`
         - `BCD` (from `C:\PXE\`)
 - Your `tftp-roots` should now look like this
-    >&gt; __tftp-root__    
-    >|&emsp;&gt; __windows__    
-    >|&emsp;|&emsp;&gt; __boot__    
-    >|&emsp;|&emsp;|&emsp;&gt; boot.sdi    
-    >|&emsp;|&emsp;|&emsp;&gt; boot.wim    
-    >|&emsp;|&emsp;|&emsp;&gt; BCD    
-    >|&emsp;|&emsp;&gt; __Boot__    
-    >|&emsp;|&emsp;|&emsp;&gt; boot.sdi    
-    >|&emsp;|&emsp;|&emsp;&gt; boot.wim    
-    >|&emsp;|&emsp;|&emsp;&gt; BCD    
-    >|&emsp;|&emsp;&gt; abortpxe.com    
-    >|&emsp;|&emsp;&gt; bootmgr.exe    
-    >|&emsp;|&emsp;&gt; ...    
-    >|&emsp;|&emsp;&gt; wdsnbp.com    
-    >|&emsp;&gt;	 __another_os__    
-    >|&emsp;|&emsp;&gt; ...    
-    >|&emsp;&gt; ...   
+    ```
+    tftp-root 
+    ├── windows
+    │   ├── boot
+    │   │   ├── boot.sdi
+    │   │   ├── boot.wim
+    │   │   └── BCD
+    │   ├── Boot
+    │   │   ├── boot.sdi
+    │   │   ├── boot.wim
+    │   │   └── BCD
+    │   ├── abortpxe.com
+    │   ├── bootmgr.exe
+    │   ├── ...
+    │   └── wdsnbp.com
+    ├── another_os
+    │   └── ...
+    └── ...
+    ```

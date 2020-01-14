@@ -22,13 +22,13 @@ __On _web.fluffi_ you can select the OS, which should be loaded over PXE.__
         - If you use _Filezilla_, open _Settings \> Transfers \> File Types_ and set the _Default transfer type_ to _Binary_
     - `ftp.fluffi/tftp-roots/...`    
         - e.g. `ubuntuRoot/...`   
-        -> copy your systems here, detailed steps are in the instructions for each operating system
+        -> copy your systems here. Detailed steps are in the instructions for each operating system.
 - ##### TFTP
     - If you select an OS on _web.fluffi_, it will be copied here and the system which should get a fresh OS will pick the necessary data from here
 - ##### SMB
     - `smb.fluffi/install/...`
-        - `initial/` -> hostname, etc. configuration for fresh deployed systems
-        - e.g. `server2016/` -> Windows image, detailed steps are in the instruction for [Windows](windows.md)
+        - `initial/` -> configuration of hostname, etc., for freshly deployed systems
+        - e.g. `server2016/` -> Windows image; detailed steps are in the instructions for [Windows](windows.md)
 
 ## Agent systems OS
 - ##### Windows
@@ -39,14 +39,14 @@ __On _web.fluffi_ you can select the OS, which should be loaded over PXE.__
     - [Install and configure Odroid-XU4 for PXE](odroid.md)
     - [Create and configure Armbian image for PXE](armbian.md)
     
-## Add MAC address and hostname for autmatic configuration
-- Add the MAC address with the associated hostname to the [MAC2Host.csv](../../srv/fluffi/data/smb/files/initial/MAC2Host.csv) file on SMB share
-    - _Attention: Only use upper case letters in MAC address_
-    - __Odroid__: Additional add your MAC adress and your hostname to the [ethers](../../srv/fluffi/data/dnsmasq/ethers) file from _dnsmasq_ with following style: `00:11:22:33:44:55 odroidHostname`
+## Add MAC address and hostname for automatic configuration
+- Add the MAC address with the associated hostname to the [MAC2Host.csv](../../srv/fluffi/data/smb/files/initial/MAC2Host.csv) file on the SMB share
+    - _Attention: Only use upper-case letters in the MAC address_
+    - __Odroid__: Additionally, add your MAC address and your hostname to the [ethers](../../srv/fluffi/data/dnsmasq/ethers) file from _dnsmasq_ in the following style: `00:11:22:33:44:55 odroidHostname`
     
 ## Add virtual machine to Fluffi
-- Setup VM (tested with VMware Workstation Pro)
+- Set up VM (tested with VMware Workstation Pro)
     - Use BIOS instead of UEFI
     - Bridge your network device to the VM to use PXE properly
-    - Select OS in _webgui_ and boot your emtpy VM (it should now load the OS over PXE)
+    - Select OS in _webgui_ and boot your empty VM (it should now load the OS over PXE)
 - Now you can integrate the system in Fluffi according to [usage.md](../../usage.md)
