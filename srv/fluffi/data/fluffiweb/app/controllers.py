@@ -1088,6 +1088,16 @@ def insertFormInputForProject(form, request):
         engine.dispose()
 
 
+def addTargetZipToFuzzjob(projId, targetFileName):
+    deployment_package = models.DeploymentPackages(name=targetFileName)
+    db.session.add(deployment_package)
+    db.session.commit()
+    fuzzjob_deployment_package = models.FuzzjobDeploymentPackages(Fuzzjob=projId,
+                                                                  DeploymentPackage=deployment_package.ID)
+    db.session.add(fuzzjob_deployment_package)
+    db.session.commit()
+
+
 def getGraphData(projId):
     project = models.Fuzzjob.query.filter_by(ID = projId).first()
     graphdata = dict()

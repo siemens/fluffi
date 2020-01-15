@@ -35,7 +35,7 @@ GET_MI_HOST_AND_PORT = (
 GET_MAX_LOCALID = (
     "SELECT MAX(CreatorLocalID) FROM interesting_testcases WHERE CreatorServiceDescriptorGUID='initial'")
 UPDATE_SETTINGS = (
-    "UPDATE settings SET SettingValue=:SettingValue WHERE ID=:Id")
+    "UPDATE settings SET SettingValue=:SettingValue WHERE ID=:ID")
 UPDATE_NICE_NAME_TESTCASE = (
     "UPDATE nice_names_testcase SET NiceName=:newName WHERE TestcaseID=:testcaseID")
 UPDATE_NICE_NAME_MANAGED_INSTANACE = (

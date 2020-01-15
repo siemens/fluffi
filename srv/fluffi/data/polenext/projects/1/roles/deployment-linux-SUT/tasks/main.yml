@@ -92,11 +92,6 @@
      deploymentScriptPath: "{{item.stat.path}}"
   with_items: "{{installScriptResults.results}}"
   when: item.stat.exists
-
-- name: Fail if no install script exists
-  fail: 
-    msg: "No install script found"
-  when: deploymentScriptPath is not defined
     
 - name: Ensure install script is executable
   file:
@@ -105,9 +100,11 @@
     state: file
     owner: "{{ansible_ssh_user}}"
     group: "{{ansible_ssh_user}}"
+  when: deploymentScriptPath is defined
 
 - name: Execute install script of the SUT on the remote machine
   shell: "{{deploymentScriptPath}}"
   args:
     chdir: "{{SUTPath}}/{{SUTDirName}}"
   become: yes
+  when: deploymentScriptPath is defined
