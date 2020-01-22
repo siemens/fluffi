@@ -27,6 +27,7 @@ $ pip install -r requirements.txt
 ```
 
 - Setup local mysql database with username `root` and password `toor` 
+- Run get_static_dependencies.bat or get_static_dependencies.sh 
 - Set LOCAL_DEV to True in [config.py](config.py)
 
 To run the app on localhost:5000: 

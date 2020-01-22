@@ -8,21 +8,6 @@
 :: 
 :: Author(s): Thomas Riedmaier
 
-:: Getting bootstrap
-
-RMDIR /Q/S  bootstrap
-RMDIR /Q/S static\bootstrap
-MKDIR static\bootstrap
-
-git clone https://github.com/twbs/bootstrap.git
-cd bootstrap
-git checkout 0b9c4a4007c44201dce9a6cc1a38407005c26c86
-cd ..
-
-xcopy bootstrap\dist\* static\bootstrap /sy
-
-RMDIR /Q/S  bootstrap
-
 :: Getting bootswatch
 
 RMDIR /Q/S  bootswatch

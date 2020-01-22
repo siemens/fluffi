@@ -10,91 +10,23 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier
 -->
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>FLUFFI Grafana Dashboard</title>
-    <meta charset="UTF-8">
-    <link href="/static/css/fluffi.css" rel="stylesheet"/>
-    <link href="/static/css/dashboard.css" rel="stylesheet"/>
-    <link href="/static/3rdParty/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
-    <script src="/static/3rdParty/jquery/jquery-2.1.4.js"></script>
-    <script src="/static/3rdParty/socket.io-client/socket.io.slim.js"></script>
-</head>
-<body>
+{%- extends "bootstrap/base.html" %}
+{% block title %}FLUFFI Dashboard{% endblock %}
 
-{% block content %}
+{% import "bootstrap/fixes.html" as fixes %}
 
-<script language="JavaScript">
-  //Grafana Dashboard
-  var socket;
-  var id = "#icontainer";
-  var i = 0;
+{% block head %}
+{{super()}}
+{{fixes.ie8()}}
+<link href="/static/images/favicon.ico" rel="shortcut icon">
+<link href="/static/css/fluffi.css" rel="stylesheet"/>
+<link href="/static/css/dashboard.css" rel="stylesheet"/>
+<script src="/static/3rdParty/jquery/jquery-2.1.4.js"></script>
+<script src="/static/3rdParty/socket.io-client/socket.io.slim.js"></script>
+<script src="{{ url_for('static', filename = 'javascript/dashboard.js') }}" type="text/javascript"></script>
+{% endblock %}
 
-  var send = "";
-  var myProjectID = "";
-  var myTime = "";
-  var myTime2 = "";
-
-  $(function () {
-    var socket = io.connect('http://dashsync.fluffi:4000' );    
-    // verify our websocket connection is established
-    socket.on('connect', function() {
-        console.log('Websocket connected!');
-    });
-
-    socket.on('syncevent', function(data) {
-        
-        console.log("websocket data: ", data['send'], data['project'], data['time'], data["time2"]); 
-        send = data['send'];
-        myProjectID = data["project"];
-        myTime = data["time"];
-        myTime2 = data["time2"];
-
-        if(send && myProjectID && myTime && myTime2){
-          if(send == 'load'){
-          //switch i to next icontainer
-          i = i == 0 ? ++i : --i;
-
-          //load next icontainer
-          console.log("loading icontainer" + i);
-          $(id + i).empty();
-          $(id + i).append("<iframe width='100%' src='" + getURL(myProjectID, myTime, myTime2) + "' allowfullscreen/>");   
-
-          //switch i back to current icontainer        
-          i = i == 0 ? ++i : --i;    
-          }
-          else if(send == 'show'){    
-            //hide current icontainer      
-            $(id + i).css('visibility','hidden');    
-            console.log("hide icontainer" + i);
-            //switch i to next icontainer and make next icontainer visible
-            i = i == 0 ? ++i : --i; 
-            
-            $(id + i).css('visibility','visible');    
-            console.log("show icontainer" + i);
-        } 
-
-      } else { console.log("Data of websocket is empty or undefined..."); }           
-    });
-
-  });
-
-  function getURL(myProjectName, from, to){
-    if(myProjectName == 'grafana1'){      
-      return "http://mon.fluffi/d/MAzsmLaik/fluffi-1?orgId=1&refresh=5s&kiosk";
-    } 
-    if(myProjectName == 'grafana2'){      
-      return "http://mon.fluffi/d/jlWq9GtWk/fluffi-2?orgId=1&refresh=5s&kiosk";
-    }    
-    
-    return "http://mon.fluffi/dashboard/script/scripted.js?fuzzjobname=" + myProjectName + "&from=" + from + "&to=" + to + "&orgId=1&kiosk";
-  }
-
-
-
-
-</script>
+{% block body %}
 
 <div class="container">
     <div class="embed-container" id="icontainer0" style="visibility: hidden"></div>
@@ -102,6 +34,3 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier
 </div>
 
 {% endblock %}
-
-</body>
-</html>
