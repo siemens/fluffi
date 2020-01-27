@@ -469,6 +469,8 @@ def getManagedInstancesAndSummary(projId):
             if instance["ServiceDescriptorHostAndPort"] is not None:
                 instance["kill"] = 0 if models.CommandQueue.query.filter_by(
                     Argument = instance["ServiceDescriptorHostAndPort"], Done = 0).first() is None else 1
+            if instance["LogMessage"]:
+                print(instance["LogMessage"])
             if instance["Status"] is not None:
                 keyValueStatuses = [s.strip() for s in instance["Status"].split('|')]
                 parsedStatuses = dict((k.strip(), float(v.strip())) for k, v in

@@ -908,6 +908,13 @@ def commands():
                           title="Commands",
                           commands=commands)
 
+@app.route("/logs")
+def logs():
+    logs = models.LocalManagerLog.query.all()
+    
+    return renderTemplate("viewLogs.html",
+                            logs=logs)
+
 
 @app.route("/systems")
 def systems():

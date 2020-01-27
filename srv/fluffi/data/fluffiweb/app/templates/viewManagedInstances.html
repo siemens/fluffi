@@ -62,6 +62,7 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
             <th style="text-align: center;">Host:Port</th>
             <th style="text-align: center;">Type</th>
             <th style="text-align: center;">Location</th>
+            <th style="text-align: center;">Log Message</th>
             <th style="text-align: center;">SysCPU</th>
             <th style="text-align: center;">ProcCPU</th>
             <th style="text-align: center;">AverageRTT</th>
@@ -85,6 +86,7 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
             <td></td>
             <td></td>
             <td></td>
+            <td></td>
             <td style="text-align: center;">{{ summarySection['AverageRTT'] }}</td>
             <td style="text-align: center;">{{ summarySection['SumOfTestCasesQueueSize'] }}</td>
             <td style="text-align: center;">{{ summarySection['SumOfTestEvaluationsQueueSize'] }}</td>
@@ -98,6 +100,7 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
             <td style="text-align: center;">{{ localManager['ServiceDescriptorGUID'] }}</td>
             <td style="text-align: center;">{{ localManager['ServiceDescriptorHostAndPort'] }}</td>
             <td style="text-align: center;">Local Manager</td>
+            <td style="text-align: center;"></td>
             <td style="text-align: center;"></td>
             <td style="text-align: center;"></td>
             <td style="text-align: center;"></td>
@@ -155,6 +158,7 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
         <!-- LM: agent type 3 -->
         {% endif %}
         <td style="text-align: center;">{{ instance["Location"] }}</td>
+        <td style="text-align: center;">{{ instance["LogMessage"] }}</td>
         <td style="text-align: center;">{{ instance["SysCPUUtil"] }}</td>
         <td style="text-align: center;">{{ instance["ProcCPUUtil"] }}</td>
         <td style="text-align: center;">{{ instance["AverageRTT"] }}</td>
