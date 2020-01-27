@@ -16,8 +16,8 @@ class TestUI(unittest.TestCase):
     def setUp(self):
         self.driver = webdriver.Firefox()
         fuzzjob = models.Fuzzjob.query.first()
-        if fuzzjob:
-            self.projId = fuzzjob.id
+        if fuzzjob and hasattr(fuzzjob, "ID"):
+            self.projId = fuzzjob.ID
         else:
             print("Error: No fuzzjob exists for testing!")  
 
