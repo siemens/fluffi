@@ -20,7 +20,8 @@
     "AFLMutator",
     "CaRRoTMutator",
     "HonggfuzzMutator",
-    "OedipusMutator"
+    "OedipusMutator",
+    "ExternalMutator"
   ],
   "EvaluatorTypes": [
     "CoverageEvaluator"
