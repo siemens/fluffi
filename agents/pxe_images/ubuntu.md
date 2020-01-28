@@ -28,10 +28,11 @@ Author(s): Pascal Eckmann
         append initrd=ubuntu-installer/amd64/initrd.gz auto=true priority=critical keyboard-configuration/layout=de keyboard-configuration/variant=de preseed/file=/preseed.cfg ---
     ```
 3. To automate the installation, prepare a preseeding file and copy it to the root of the file `\ubuntu-installer\amd64\initrd.gz`. You can use the [script](ubuntu/embedPreseed.sh) `embedPreseed.sh` to copy the preseed file in the `initrd.gz`.    
-_e.g. execute: `sudo ./embedPreseed.sh ./initrd.gz /home/user/ubuntu_netinstall/ubuntu-installer/amd64/initrdNew /home/user/ubuntu_netinstall/ubuntu-installer/amd64/preseed.cfg`_    
-_Attention: The last two arguments have to be absolute paths._    
-After that, delete the old `initrd.gz`. Rename the new RAM disk `initrd.gz` and place it into the same folder where the old one was.    
-An example preseeding file for Ubuntu 18.04 is located in this [repository](ubuntu/preseed.cfg). You only have to change [username] to the same which you defined for _ansible_ssh_user_ and [password] to the same as _ansible_ssh_pass_ in the section _[linux:vars]_ in your [hosts](../../srv/fluffi/data/polenext/projects/1/hosts) file for Polemarch. If you want to create a new one, copy all necessary data from the provided example.    
+    - Add `d-i preseed/late_command string in-target smbclient '//smb.fluffi/install' -c 'cd initial; get MAC2Host.csv; get initialConfiguration.sh' -U anonymous%pass; in-target chmod 777 /initialConfiguration.sh; in-target /bin/bash /initialConfiguration.sh; in-target rm MAC2Host.csv; in-target rm initialConfiguration.sh` at the end of the preseeding file
+    - An example preseeding file for Ubuntu 18.04 is located [here](https://help.ubuntu.com/lts/installation-guide/example-preseed.txt). You only have to change the user name to the same which you defined for _ansible_ssh_user_ and the user password to the same as _ansible_ssh_pass_ in the section _[linux:vars]_ in your [hosts](../../srv/fluffi/data/polenext/projects/1/hosts) file for Polemarch. 
+    - _e.g. execute: `sudo ./embedPreseed.sh ./initrd.gz /home/user/ubuntu_netinstall/ubuntu-installer/amd64/initrdNew /home/user/ubuntu_netinstall/ubuntu-installer/amd64/preseed.cfg`_    
+        - _Attention: The last two arguments have to be absolute paths._    
+    - After that, delete the old `initrd.gz`. Rename the new RAM disk `initrd.gz` and place it into the same folder where the old one was.    
 
 ## Copy files to infrastructure
 - Create a folder in `ftp.fluffi/tftp-roots/`, e.g. `ftp.fluffi/tftp-roots/ubuntu`, and copy all Ubuntu files in the new folder:
