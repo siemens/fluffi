@@ -7,7 +7,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-Author(s): Thomas Riedmaier, Abian Blome, Roman Bendt
+Author(s): Thomas Riedmaier, Abian Blome, Junes Najah, Roman Bendt
 -->
 
 # Usage
@@ -30,7 +30,7 @@ All FuzzJobs are run on dedicated Runner systems in the FLUFFI Utility Network (
     * `chmod 777 /initialConfiguration.sh`
     * `/bin/bash /initialConfiguration.sh`
     * `rm MAC2Host.csv`
-    * `rm initialConfiguration.sh `
+    * `rm initialConfiguration.sh`
 * Finally, you need to tell FLUFFI about the system. To do so you have two options: either add it to ansible's [hosts](srv/fluffi/data/polenext/projects/1/hosts) file, or use the `Add System` button in FLUFFI's web GUI.
 
 ## 2) Preparing your target
@@ -68,7 +68,11 @@ If you want to test your feeder, you can use the feeder tester implemented at [T
 
 You need a Feeder (see last section). Furthermore, you need a GDB client that speaks the same protocol version as your GDB server.
 
-#### 2.1.5) Everything else
+#### 2.1.5) Windows kernel modules (e.g. Windows drivers)
+
+You need a Feeder (see last section). Furthermore, you need to set up [kFuzz for FLUFFI](core/helpers/kfuzz).
+
+#### 2.1.6) Everything else
 
 Contact us if you need anything else. FLUFFI can be extended to a wide variety of targets types, if needed.
 
@@ -120,7 +124,7 @@ Currently the following Runner (aka Testcase Executors) are defined
 - `X86_Win_DynRioMulti`
 - `X86_Win_DynRioSingle`
 
-Which one to choose depends on how you prepared your target. The `QemuUserSingle` runner is used for emulated binaries (see section 2.1.2), `DynRioMulti` runners are used for server binaries (see section 2.1.3), `DynRioSingle` runners are used for native file parsers (see section 2.1.1), and `ALL_GDB` is used if you use GDB (see section 2.1.4).
+Which one to choose depends on how you prepared your target. The `QemuUserSingle` runner is used for emulated binaries (see section 2.1.2), `DynRioMulti` runners are used for server binaries (see section 2.1.3), `DynRioSingle` runners are used for native file parsers (see section 2.1.1), and `ALL_GDB` is used if you use GDB (see section 2.1.4), or WinDBG (see section 2.1.5).
 
 **Generator Types**
 
@@ -134,10 +138,12 @@ FLUFFI supports various test case generators. You can use as many of them as you
    in this case you need to specify an additional setting: `extGeneratorDirectory`
    This setting points to a directory, where FLUFFI will insert a file called `fuzzjob.name` containing the name of the current FuzzJob.
    It is the job of the external mutator to:
-      1. register on the GM with a new UUID (and a nice name)
-      2. create a subdirectory with that UUID
-      3. place new mutations in that subdirectory following this schema: `ParentGUID_ParentLocalID_GeneratorLocalID`
-      4. ensure that the hard drive does not fill up (e.g. by implementing a upper limit of files in the directory)
+  1. Come up with a unique ID (UUID)
+  2. Create a subdirectory in the `extGeneratorDirectory` named like that UUID
+  3. Connects to the GM database and extracts the connection parameters for the fuzzjob's database from the `fuzzjob` table
+  4. Connects to the fuzzjob's database and places a nice name in the fuzzjob's `nice_names_managed_instance` table for the chosen UUID
+  5. Place new mutations in the UUID subdirectory following this schema: `ParentGUID_ParentLocalID_GeneratorLocalID` (if you want you can use any information from the fuzzjob's database)
+  6. Ensure that the hard drive does not fill up (e.g. by implementing a upper limit of files in the directory)
 
 You need to set the percentage of how many generators should have which generator type. For example, if you only want `RadamsaMutators`, set `RadamsaMutator`=100 and all others to 0.
 
@@ -199,7 +205,7 @@ For ALL_Lin_QemuUserSingle:
 - **treatAnyAccessViolationAsFatal**: Some targets catch access violations. These access violations might be part of normal operation, or not. Setting this parameter to true makes FLUFFI treat each access violation as an access violation crash - even if the application would catch and handle it (defaults to false).
 
 For ALL_GDB:
-- **targetCMDLine**: The command line to start the GDB (e.g. `"C:\FLUFFI\SUT\my target\gdb.exe"` on Windows or `/home/<FluffiUser>/fluffi/persistent/SUT/my target/gdb` on Linux). It needs to be absolute!
+- **targetCMDLine**: The command line to start the GDB (e.g. `"C:\FLUFFI\SUT\my target\gdb.exe"` on Windows or `/home/<FluffiUser>/fluffi/persistent/SUT/my target/gdb` on Linux). If you you use [kFuzz for FLUFFI](core/helpers/kfuzz), specify the path of the GDBEmulator binary. Remember: The command line needs to be absolute in any case!
 - **hangTimeout**: Duration in milliseconds after which a test case execution will be considered to have timed out if it did not yet complete.
 - **suppressChildOutput**: Many targets and feeders output either to stdout or open windows. For debugging purposes, it makes sense to set this to false. For production it should be set to true.
 - **populationMinimization**: The database will mark population items with exactly the same covered blocks as duplicates and ignore them from then on. By default this is set to *false*, but can be set to *true*.

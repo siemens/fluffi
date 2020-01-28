@@ -64,6 +64,11 @@ call make_dep.bat
 IF errorlevel 1 goto errorDone
 cd ..
 
+cd WinDbgModel
+call make_dep.bat
+IF errorlevel 1 goto errorDone
+cd ..
+
 goto done
 
 :errorDone
