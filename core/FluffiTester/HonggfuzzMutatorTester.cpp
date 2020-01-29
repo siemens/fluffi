@@ -316,7 +316,33 @@ namespace HonggfuzzMutatorTester
 		TEST_METHOD(HonggfuzzMutator_nasty_strings)
 		{
 			//Test for some of the more trickier ones
-			Assert::Fail(L"Implement me");
+			std::deque<std::string> nasty = blns;
+
+			Assert::IsTrue(nasty.size() >= 512, L"Could not load the big list of naughty strings");
+
+			std::string t1s = "123456789012345678901234567890123456789";
+			char t2[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x0E, 0x0F, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F, 0x7F };
+			std::string t2s(t2, t2 + 27);
+			char t3[] = { 0xE2, 0x81, 0xB0, 0xE2, 0x81, 0xB4, 0xE2, 0x81, 0xB5 };
+			std::string t3s(t3, t3 + 9);
+
+			bool found1 = false;
+			bool found2 = false;
+			bool found3 = false;
+			for (int i = 0; i < nasty.size(); i++) {
+				if (nasty[i] == t1s) {
+					found1 = true;
+				}
+				if (nasty[i] == t2s) {
+					found2 = true;
+				}
+				if (nasty[i] == t3s) {
+					found3 = true;
+				}
+			}
+			Assert::IsTrue(found1, L"Could not find first test string");
+			Assert::IsTrue(found2, L"Could not find second test string");
+			Assert::IsTrue(found3, L"Could not find third test string");
 		}
 	};
 }
