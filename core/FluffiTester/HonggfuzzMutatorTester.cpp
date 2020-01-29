@@ -18,6 +18,7 @@ Author(s): Abian Blome, Thomas Riedmaier
 #include "TestcaseDescriptor.h"
 #include "GarbageCollectorWorker.h"
 
+#include "blns.h"
 #include "mangle.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -226,6 +227,96 @@ namespace HonggfuzzMutatorTester
 			for (int i = 0; i < 25; i++) {
 				mangle_CloneByte(&run);
 			}
+		}
+
+		TEST_METHOD(HonggfuzzMutator_mangle_Dictionary)
+		{
+			FluffiServiceDescriptor selfServiceDescriptor("myhap", "myguid");
+
+			std::vector<uint8_t> input = { 1,2,3,4,5,6,7,8,9,0 };
+
+			run_t run;
+			run.dynamicFileSz = input.size();
+			input.resize(HONGGFUZZ_MAXSIZE);
+			run.dynamicFile = &input[0];
+			run.global.cfg.only_printable = false;
+			run.global.mutate.maxFileSz = HONGGFUZZ_MAXSIZE - 1;
+			run.global.mutate.dict = blns;
+			run.global.mutate.mutationsPerRun = 6;
+
+			//just make sure it doesn't crash ;)
+			for (int i = 0; i < 25; i++) {
+				mangle_Dictionary(&run);
+			}
+		}
+
+		TEST_METHOD(HonggfuzzMutator_mangle_DictionaryInsert)
+		{
+			FluffiServiceDescriptor selfServiceDescriptor("myhap", "myguid");
+
+			std::vector<uint8_t> input = { 1,2,3,4,5,6,7,8,9,0 };
+
+			run_t run;
+			run.dynamicFileSz = input.size();
+			input.resize(HONGGFUZZ_MAXSIZE);
+			run.dynamicFile = &input[0];
+			run.global.cfg.only_printable = false;
+			run.global.mutate.maxFileSz = HONGGFUZZ_MAXSIZE - 1;
+			run.global.mutate.dict = blns;
+			run.global.mutate.mutationsPerRun = 6;
+
+			//just make sure it doesn't crash ;)
+			for (int i = 0; i < 25; i++) {
+				mangle_DictionaryInsert(&run);
+			}
+		}
+
+		TEST_METHOD(HonggfuzzMutator_mangle_DictionaryPrintable)
+		{
+			FluffiServiceDescriptor selfServiceDescriptor("myhap", "myguid");
+
+			std::vector<uint8_t> input = { 1,2,3,4,5,6,7,8,9,0 };
+
+			run_t run;
+			run.dynamicFileSz = input.size();
+			input.resize(HONGGFUZZ_MAXSIZE);
+			run.dynamicFile = &input[0];
+			run.global.cfg.only_printable = false;
+			run.global.mutate.maxFileSz = HONGGFUZZ_MAXSIZE - 1;
+			run.global.mutate.dict = blns;
+			run.global.mutate.mutationsPerRun = 6;
+
+			//just make sure it doesn't crash ;)
+			for (int i = 0; i < 25; i++) {
+				mangle_DictionaryPrintable(&run);
+			}
+		}
+
+		TEST_METHOD(HonggfuzzMutator_mangle_DictionaryInsertPrintable)
+		{
+			FluffiServiceDescriptor selfServiceDescriptor("myhap", "myguid");
+
+			std::vector<uint8_t> input = { 1,2,3,4,5,6,7,8,9,0 };
+
+			run_t run;
+			run.dynamicFileSz = input.size();
+			input.resize(HONGGFUZZ_MAXSIZE);
+			run.dynamicFile = &input[0];
+			run.global.cfg.only_printable = false;
+			run.global.mutate.maxFileSz = HONGGFUZZ_MAXSIZE - 1;
+			run.global.mutate.dict = blns;
+			run.global.mutate.mutationsPerRun = 6;
+
+			//just make sure it doesn't crash ;)
+			for (int i = 0; i < 25; i++) {
+				mangle_DictionaryInsertPrintable(&run);
+			}
+		}
+
+		TEST_METHOD(HonggfuzzMutator_nasty_strings)
+		{
+			//Test for some of the more trickier ones
+			Assert::Fail(L"Implement me");
 		}
 	};
 }

@@ -16,6 +16,7 @@ Author(s): Abian Blome, Thomas Riedmaier
 #include "TestcaseDescriptor.h"
 #include "Util.h"
 
+#include "blns.h"
 #include "mangle.h"
 
 HonggfuzzMutator::HonggfuzzMutator(FluffiServiceDescriptor selfServiceDescriptor, std::string testcaseDirectory)
@@ -60,6 +61,7 @@ std::deque<TestcaseDescriptor> HonggfuzzMutator::batchMutate(unsigned int numToG
 	run.global.cfg.only_printable = false;
 	run.global.mutate.maxFileSz = (HONGGFUZZ_MAXSIZE - 1) > (static_cast<double>(parentBytes.size())*1.1) ? static_cast<size_t>(static_cast<double>(parentBytes.size())*1.1) : (HONGGFUZZ_MAXSIZE - 1);
 	run.global.mutate.mutationsPerRun = 6;
+	run.global.mutate.dict = blns;
 	run.dynamicFileSz = parentBytes.size();
 
 	for (unsigned int i = 1; i <= numToGenerate; ++i)
