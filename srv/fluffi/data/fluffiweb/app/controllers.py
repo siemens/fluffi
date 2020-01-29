@@ -1098,6 +1098,14 @@ def addTargetZipToFuzzjob(projId, targetFileName):
     db.session.commit()
 
 
+def removeAgents(projId):
+    instances = models.SystemFuzzjobInstances.query.filter_by(Fuzzjob=projId).all()
+    for instance in instances:
+        if instance is not None:
+            db.session.delete(instance)
+    db.session.commit()
+
+
 def getGraphData(projId):
     project = models.Fuzzjob.query.filter_by(ID = projId).first()
     graphdata = dict()
