@@ -8,71 +8,40 @@
 :: 
 :: Author(s): Thomas Riedmaier
 
-:: Requirements for building these dependencies:
-:: - Visual Studio 2017 compile chain (needed for almost everything)
-:: - Strawberry Perl (needed for dynamorio and openssl)
-:: - Cygwin64 with 32 and 64 bit gcc and make (radamsa)
-:: - Network access to github and gitlab
+RMDIR /Q/S include
 
-cd zeromq
-call make_dep.bat
-IF errorlevel 1 goto errorDone
-cd ..
+MKDIR include
 
-cd libprotoc
-call make_dep.bat
-IF errorlevel 1 goto errorDone
-cd ..
 
-cd dynamorio
-call make_dep.bat
-IF errorlevel 1 goto errorDone
-cd ..
+REM Getting big-list-of-naughty-strings
 
-cd mariadb
-call make_dep.bat
-IF errorlevel 1 goto errorDone
-cd ..
+RMDIR /Q/S big-list-of-naughty-strings
 
-cd radamsa
-call make_dep.bat
-IF errorlevel 1 goto errorDone
-cd ..
-
-cd easylogging
-call make_dep.bat
-IF errorlevel 1 goto errorDone
-cd ..
-
-cd openssl
-call make_dep.bat
-IF errorlevel 1 goto errorDone
-cd ..
-
-cd base64
-call make_dep.bat
-IF errorlevel 1 goto errorDone
-cd ..
-
-cd afl
-call make_dep.bat
-IF errorlevel 1 goto errorDone
-cd ..
-
-cd honggfuzz
-call make_dep.bat
-IF errorlevel 1 goto errorDone
-cd ..
-
-cd WinDbgModel
-call make_dep.bat
-IF errorlevel 1 goto errorDone
-cd ..
-
+git clone https://github.com/minimaxir/big-list-of-naughty-strings.git
 cd big-list-of-naughty-strings
-call make_dep.bat
-IF errorlevel 1 goto errorDone
+git checkout e1968d982126f74569b7a2c8e50fe272d413a310
 cd ..
+
+
+REM Getting all lines that are not comments
+findstr /b "[^#]" big-list-of-naughty-strings\blns.txt > big-list-of-naughty-strings\blns-noComments.txt
+
+REM Transform it into something that can be included as a header file
+echo std::deque^<std::string^> nasty { > include\blns.h
+@echo off
+for /f "tokens=*" %%a in (big-list-of-naughty-strings\blns-noComments.txt) do (echo std::string^(R"FLUFFI(%%a)FLUFFI"^), >> include\blns.h)
+@echo on
+echo std::string^("")}; >> include\blns.h
+
+REM encode EOF characters differently (as VS can not handle this)
+powershell -Command "(Get-Content include\blns.h) | ForEach-Object {$_ -replace [char]0x001A,')FLUFFI"")+std::string(1,(char)0x1a)+std::string(R""""FLUFFI('} | Set-Content include\blns.h"
+
+
+waitfor SomethingThatIsNeverHappening /t 10 2>NUL
+::reset errorlevel
+ver > nul
+
+RMDIR /Q/S big-list-of-naughty-strings
 
 goto done
 
