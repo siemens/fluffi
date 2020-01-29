@@ -434,8 +434,10 @@ def getLocalManager(projId):
 
 
 def getManagedInstancesAndSummary(projId):
-    # new data in Status will be added to the instances in managedInstances automatically - you just need to add them in
-    # viewManagedInstances.html
+    """ 
+    New data in the status string will be added to the managedInstances automatically
+    They only need to be added to viewManagedInstances.html
+    """
     project = models.Fuzzjob.query.filter_by(ID = projId).first()
     managedInstances = {"instances": [], "project": project}
     localManagers = []
@@ -462,15 +464,26 @@ def getManagedInstancesAndSummary(projId):
 
         columnNames = resultMI.keys()
 
+        sdguids = []
         for row in resultMI:
-            instance = {}
+            instance = {}            
+            # if instance already exists                
+            if row["ServiceDescriptorGUID"] in sdguids:
+                # add log message to the already existing instance
+                index = [ mi["ServiceDescriptorGUID"] for mi in managedInstances["instances"]].index(row["ServiceDescriptorGUID"])
+                managedInstances["instances"][index]["LogMessages"].append(str(row["LogMessage"]))
+                continue
+            else:
+                instance["LogMessages"] = [str(row["LogMessage"])]         
+                sdguids.append(row["ServiceDescriptorGUID"])             
+
             for cn in columnNames:
-                instance[cn] = row[cn]
+                if cn != "LogMessage":                            
+                    instance[cn] = row[cn]                          
+
             if instance["ServiceDescriptorHostAndPort"] is not None:
                 instance["kill"] = 0 if models.CommandQueue.query.filter_by(
-                    Argument = instance["ServiceDescriptorHostAndPort"], Done = 0).first() is None else 1
-            if instance["LogMessage"]:
-                print(instance["LogMessage"])
+                    Argument = instance["ServiceDescriptorHostAndPort"], Done = 0).first() is None else 1           
             if instance["Status"] is not None:
                 keyValueStatuses = [s.strip() for s in instance["Status"].split('|')]
                 parsedStatuses = dict((k.strip(), float(v.strip())) for k, v in
@@ -489,7 +502,7 @@ def getManagedInstancesAndSummary(projId):
                             summarySection[key] += instance[statusKey]
                         else:
                             summarySection[key] = instance[statusKey]
-            managedInstances["instances"].append(instance)
+            managedInstances["instances"].append(instance)                
     except Exception as e:
         print(e)
         pass

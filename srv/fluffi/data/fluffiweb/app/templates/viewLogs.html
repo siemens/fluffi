@@ -31,12 +31,14 @@ Author(s): Junes Najah
     <table class="table table-hover" style="font-size: 18px;">
         <thead>
             <tr>
+                <th style="text-align: center;">ServiceDescriptorGUID</th>                
                 <th style="text-align: center;">Log Message</th>                
             </tr>
         </thead>
         <tbody>
             {% for log in logs %}
                 <tr>
+                    <td>{{ log.Servicedescriptorguid }}</td>
                     <td>{{ log.LogMessage }}</td>
                 </tr>
             {% endfor %}

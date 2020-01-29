@@ -158,7 +158,11 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
         <!-- LM: agent type 3 -->
         {% endif %}
         <td style="text-align: center;">{{ instance["Location"] }}</td>
-        <td style="text-align: center;">{{ instance["LogMessage"] }}</td>
+        {% if instance["LogMessages"][0] == "None" %}
+        <td style="text-align: center;">None</td>
+        {% else %}
+        <td style="text-align: center;"><a href="#" data-target="#logMessages{{loop.index}}" data-toggle="modal">Log Message(s)</a></td>
+        {% endif %}        
         <td style="text-align: center;">{{ instance["SysCPUUtil"] }}</td>
         <td style="text-align: center;">{{ instance["ProcCPUUtil"] }}</td>
         <td style="text-align: center;">{{ instance["AverageRTT"] }}</td>
@@ -174,10 +178,26 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
                                            role="button"><span class="glyphicon glyphicon-remove"></span></a></td>
         {% endif %}
         </tr>
+
+        <!-- Modal -->
+        <div class="modal fade" id="logMessages{{loop.index}}" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        {% for logMessage in instance["LogMessages"] %}
+                            <p>{{ logMessage }}</p><br>
+                        {% endfor %}
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-default" data-dismiss="modal" type="button">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>  
         {% endfor %}
 
         </tbody>
-    </table>
+    </table>      
 </div>
 
 {% endblock %}
