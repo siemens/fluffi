@@ -15,7 +15,8 @@ RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -yq python3-virtualenv python3.6 python3.6-dev python3-pip gcc libffi-dev libkrb5-dev libffi6 libssl-dev libyaml-dev libsasl2-dev libldap2-dev sshpass git redis-server openssh-client sshpass mysql-client vim screen tree htop net-tools iputils-ping wget curl
 
 # Install polemarch and everything we need in python
-RUN pip3 install -U polemarch polemarch-ansible django-redis requests mysql-connector
+RUN pip3 install -U django==2.2.3 polemarch==1.3.1 polemarch-ansible==1.3.2 django-redis==4.10.0 requests==2.22.0 mysql-connector==2.2.9
+
 
 
 #Prepare polemarch environment
