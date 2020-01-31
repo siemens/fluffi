@@ -10,7 +10,7 @@
 
 FROM tiangolo/uwsgi-nginx-flask:python3.6-alpine3.7
 RUN pip3 install --upgrade pip
-RUN pip3 install flask-socketio
+RUN pip3 install flask-socketio==4.1.0
 
 
 ENTRYPOINT ["/usr/local/bin/python3", "/app/main.py"]
