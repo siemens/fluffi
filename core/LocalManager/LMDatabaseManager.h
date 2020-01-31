@@ -76,6 +76,7 @@ public:
 	GetCurrentBlockCoverageResponse* generateGetCurrentBlockCoverageResponse();
 	GetNewCompletedTestcaseIDsResponse* generateGetNewCompletedTestcaseIDsResponse(time_t lastUpdateTimeStamp);
 	GetTestcaseToMutateResponse* generateGetTestcaseToMutateResponse(std::string testcaseTempDir, int ratingAdaption);
+	bool getParentTCID(const FluffiTestcaseID tcID, FluffiTestcaseID * parrentID);
 
 	bool setTestcaseType(const FluffiTestcaseID tcID, TestCaseType tcType);
 
