@@ -471,10 +471,10 @@ def getManagedInstancesAndSummary(projId):
             if row["ServiceDescriptorGUID"] in sdguids:
                 # add log message to the already existing instance
                 index = [ mi["ServiceDescriptorGUID"] for mi in managedInstances["instances"]].index(row["ServiceDescriptorGUID"])
-                managedInstances["instances"][index]["LogMessages"].append(str(row["LogMessage"]))
+                managedInstances["instances"][index]["LogMessages"].append((str(row["LogMessage"]), row["TimeOfInsertion"]))
                 continue
             else:
-                instance["LogMessages"] = [str(row["LogMessage"])]         
+                instance["LogMessages"] = [(str(row["LogMessage"]), row["TimeOfInsertion"])]         
                 sdguids.append(row["ServiceDescriptorGUID"])             
 
             for cn in columnNames:
@@ -512,8 +512,12 @@ def getManagedInstancesAndSummary(projId):
         connectionTwo.close()
         engineTwo.dispose()
 
-    # sort list of instances by AgentType 
-    managedInstances["instances"] = sorted(managedInstances["instances"], key = lambda k: k["AgentType"])
+    # TODO sort logs by timeOfInsertion
+    managedInstances["instances"] = sorted(managedInstances["instances"], key = lambda k: k["AgentType"])    
+    for instance in managedInstances["instances"]:
+        instance["LogMessages"] = sorted(instance["LogMessages"], key = lambda k: k[1], reverse=True)
+        instance["LogMessages"] = [ logM[0] for logM in instance["LogMessages"]]
+        instance["LogMessages"] = list(chunks(instance["LogMessages"], 10))
     average = sumOfAverageRTT / numOfRTT if numOfRTT != 0 else 0
     summarySection['AverageRTT'] = round(average, 1)
 

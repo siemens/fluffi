@@ -56,7 +56,7 @@ GET_LOCAL_MANAGERS = (
 GET_MANAGED_INSTANCES = (
     "SELECT managed_instances.ServiceDescriptorGUID, managed_instances.ServiceDescriptorHostAndPort, "
     "managed_instances.AgentType, managed_instances.Location, mis.TimeOfStatus, mis.Status,"
-    "nice_names_managed_instance.NiceName, managed_instances_logmessages.LogMessage FROM managed_instances "
+    "nice_names_managed_instance.NiceName, managed_instances_logmessages.LogMessage, managed_instances_logmessages.TimeOfInsertion FROM managed_instances "
     "LEFT JOIN (SELECT ServiceDescriptorGUID, Status, TimeOfStatus FROM  managed_instances_statuses t1 "
     "WHERE TimeOfStatus = (SELECT MAX(TimeOfStatus) "
     "FROM managed_instances_statuses "

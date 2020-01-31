@@ -16,6 +16,7 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
 {% block scripts  %}
 <script src="{{ url_for('static', filename = 'javascript/tooltip.js') }}" type="text/javascript"></script>
 <script src="{{ url_for('static', filename = 'javascript/renamer.js') }}" type="text/javascript"></script>
+<script src="{{ url_for('static', filename = 'javascript/pagination.js') }}" type="text/javascript"></script>
 {{super()}}
 {% endblock %}
 
@@ -158,7 +159,7 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
         <!-- LM: agent type 3 -->
         {% endif %}
         <td style="text-align: center;">{{ instance["Location"] }}</td>
-        {% if instance["LogMessages"][0] == "None" %}
+        {% if instance["LogMessages"][0][0] == "None" %}
         <td style="text-align: center;">None</td>
         {% else %}
         <td style="text-align: center;"><a href="#" data-target="#logMessages{{loop.index}}" data-toggle="modal">Log Message(s)</a></td>
@@ -184,9 +185,30 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-body">
-                        {% for logMessage in instance["LogMessages"] %}
-                            <p>{{ logMessage }}</p><br>
-                        {% endfor %}
+                        {% for page in instance["LogMessages"] %}
+                        {% if loop.index == 1 %}
+                        <div id="page{{loop.index}}" class="activePage">
+                        {% else %}
+                        <div id="page{{loop.index}}" style="display: none;">
+                        {% endif %}
+                            {% for logMessage in page %}
+                                <p>{{ logMessage }}</p><br>
+                            {% endfor %}
+                        </div>
+                        {% endfor %}                        
+                        {% if instance["LogMessages"] | length > 1 %} 
+                        <div class="text-center">  
+                            <ul class="pagination">                        
+                            {% for _ in instance["LogMessages"] %}
+                                {% if loop.index == 1 %}
+                                <li class="active" id="link{{loop.index}}"><a href="#" onclick="navigate({{ loop.index }})">{{ loop.index }}</a></li>
+                                {% else %}
+                                <li id="link{{loop.index}}"><a href="#" onclick="navigate({{ loop.index }})">{{ loop.index }}</a></li>
+                                {% endif %}                                                                                      
+                            {% endfor %}
+                            </ul>    
+                        </div>                                                        
+                        {% endif %}
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-default" data-dismiss="modal" type="button">Close</button>

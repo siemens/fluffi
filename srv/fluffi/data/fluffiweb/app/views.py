@@ -911,9 +911,10 @@ def commands():
 @app.route("/logs")
 def logs():
     logs = models.LocalManagerLog.query.all()
-    
+    sortedLogs = sorted(logs, key=lambda k: k.TimeOfInsertion, reverse=True)
+    pages = list(chunks(sortedLogs, 10))
     return renderTemplate("viewLogs.html",
-                            logs=logs)
+                            pages=pages)
 
 
 @app.route("/systems")
