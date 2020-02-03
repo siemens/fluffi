@@ -56,7 +56,7 @@ GET_LOCAL_MANAGERS = (
 GET_MANAGED_INSTANCES = (
     "SELECT managed_instances.ServiceDescriptorGUID, managed_instances.ServiceDescriptorHostAndPort, "
     "managed_instances.AgentType, managed_instances.Location, mis.TimeOfStatus, mis.Status,"
-    "nice_names_managed_instance.NiceName FROM managed_instances "
+    "nice_names_managed_instance.NiceName, managed_instances_logmessages.LogMessage, managed_instances_logmessages.TimeOfInsertion FROM managed_instances "
     "LEFT JOIN (SELECT ServiceDescriptorGUID, Status, TimeOfStatus FROM  managed_instances_statuses t1 "
     "WHERE TimeOfStatus = (SELECT MAX(TimeOfStatus) "
     "FROM managed_instances_statuses "
@@ -66,6 +66,8 @@ GET_MANAGED_INSTANCES = (
     "ON managed_instances.ServiceDescriptorGUID = mis.ServiceDescriptorGUID "
     "LEFT JOIN nice_names_managed_instance "
     "ON managed_instances.ServiceDescriptorGUID = nice_names_managed_instance.ServiceDescriptorGUID "
+    "LEFT JOIN managed_instances_logmessages "
+    "ON managed_instances.ServiceDescriptorGUID = managed_instances_logmessages.ServiceDescriptorGUID "
     "ORDER BY managed_instances.AgentType;")
 
 GET_VIOLATIONS_AND_CRASHES = (
