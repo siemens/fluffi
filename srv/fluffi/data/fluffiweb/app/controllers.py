@@ -815,13 +815,14 @@ def insertTestcases(projId, files):
         for f in files:
             connection.execute(text(INSERT_TESTCASE_POPULATION), {"rawData": f.read(), "localId": localId})
             testcaseID = connection.execute(text(GET_TESTCASE_ID), {"creatorlocalID": localId}).fetchone()[0]
-            connection.execute(text(INSERT_NICE_NAME_TESTCASE), {"testcaseID": testcaseID, "newName": f.filename})
+            connection.execute(text(INSERT_NICE_NAME_TESTCASE), {"testcaseID": testcaseID, "newName": f.filename})            
             localId += 1
 
         return "Added Testcase(s)", "success"
     except Exception as e:
         print(e)
-        abort(400)
+        if "Duplicate entry" in str(e):
+            return "SQLAlchemy Exception: Duplicate entry for key", "error"      
     finally:
         connection.close()
         engine.dispose()
@@ -973,11 +974,12 @@ def insertFormInputForProject(form, request):
 
     targetFileUpload = False
 
+    # TODO fix this - for empty name not working cause name is key
     if 'targetfile' in request.files:
         targetFile = request.files['targetfile']
         targetFileData = targetFile.read()
         targetFileName = targetFile.filename
-        FTP_CONNECTOR.saveTargetFileOnFTPServer(targetFileData, targetFileName)
+        # FTP_CONNECTOR.saveTargetFileOnFTPServer(targetFileData, targetFileName)
         targetFileUpload = True
 
     project = createNewDatabase(name=myProjName)

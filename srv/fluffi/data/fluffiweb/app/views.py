@@ -731,11 +731,16 @@ def addProjectLocation(projId):
 @app.route("/projects/<int:projId>/addTestcase", methods=["POST"])
 def addTestcase(projId):
     if 'addTestcase' in request.files:
-        msg, category = insertTestcases(projId, request.files.getlist('addTestcase'))
+        files = request.files.getlist('addTestcase')
+        if not files or not any(f for f in files):
+            msg, category = "Please select a file or multiple files", "error"
+        else:
+            msg, category = insertTestcases(projId, files)
+
         flash(msg, category)
         return redirect("/projects/{}/population/1".format(projId))
     else:
-        flash("Please select files to add ...", "error")
+        flash("Please select a file or multiple files", "error")
         return redirect("/projects/{}/population/1".format(projId))
 
 
@@ -783,8 +788,11 @@ def removeProjectTestcase(projId, testcaseId, tcType):
     (guid, localId) = testcaseId.split(":")
     msg, category = deleteElement(projId, "Testcase", DELETE_TC_WTIH_LOCALID, {"guid": guid, "localId": localId})
     flash(msg, category)
-
-    return redirect("/projects/{}/{}".format(projId, tcType))
+    print(tcType)
+    if "unique" in tcType or "Unique" in tcType:        
+        return redirect("/projects/{}/{}".format(projId, tcType))
+    else:
+        return redirect("/projects/{}/{}/1".format(projId, tcType))
 
 
 @app.route("/projects/<int:projId>/delModule/<int:moduleId>", methods=["GET"])
