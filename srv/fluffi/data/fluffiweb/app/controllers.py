@@ -512,7 +512,6 @@ def getManagedInstancesAndSummary(projId):
         connectionTwo.close()
         engineTwo.dispose()
 
-    # TODO sort logs by timeOfInsertion
     managedInstances["instances"] = sorted(managedInstances["instances"], key = lambda k: k["AgentType"])    
     for instance in managedInstances["instances"]:
         instance["LogMessages"] = sorted(instance["LogMessages"], key = lambda k: k[1], reverse=True)
@@ -993,13 +992,13 @@ def insertFormInputForProject(form, request):
 
     targetFileUpload = False
 
-    # TODO fix this - for empty name not working cause name is key
     if 'targetfile' in request.files:
         targetFile = request.files['targetfile']
-        targetFileData = targetFile.read()
-        targetFileName = targetFile.filename
-        # FTP_CONNECTOR.saveTargetFileOnFTPServer(targetFileData, targetFileName)
-        targetFileUpload = True
+        if targetFile:        
+            targetFileData = targetFile.read()
+            targetFileName = targetFile.filename
+            FTP_CONNECTOR.saveTargetFileOnFTPServer(targetFileData, targetFileName)
+            targetFileUpload = True
 
     project = createNewDatabase(name=myProjName)
     db.session.add(project)

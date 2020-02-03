@@ -439,6 +439,8 @@ def viewAccessVioUnique(projId):
     return renderTemplate("viewTCsTempl.html",
                           title="View Unique Access Violations",
                           data=data,
+                          actual_page=0,
+                          page_count=0,
                           show_occurences=True)
 
 
@@ -493,6 +495,8 @@ def viewUniqueCrashes(projId):
     return renderTemplate("viewTCsTempl.html",
                           title="View Unique Crashes",
                           data=data,
+                          actual_page=0,
+                          page_count=0,
                           show_occurences=True)
 
 
