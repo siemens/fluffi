@@ -344,7 +344,7 @@ def getGeneralInformationData(projId, stmt):
     return data
 
 
-def getRowCount(projId, stmt):
+def getRowCount(projId, stmt, params=None):
     project = models.Fuzzjob.query.filter_by(ID = projId).first()
     data = 0
 
@@ -352,7 +352,7 @@ def getRowCount(projId, stmt):
         'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
     connection = engine.connect()
     try:
-        result = connection.execute(stmt)
+        result = connection.execute(text(stmt), params) if params else connection.execute(stmt)
         data = result.fetchone()[0]
     except Exception as e:
         print(e)
@@ -362,6 +362,25 @@ def getRowCount(projId, stmt):
         engine.dispose()
 
     return data
+
+
+def getResultOfStatement(projId, stmt, params=None):
+    project = models.Fuzzjob.query.filter_by(ID = projId).first()
+    result = None
+
+    engine = create_engine(
+        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
+    connection = engine.connect()
+    try:
+        result = connection.execute(text(stmt), params) if params else connection.execute(stmt)
+    except Exception as e:
+        print(e)
+        pass
+    finally:
+        connection.close()
+        engine.dispose()
+        
+    return result
 
 
 def insertOrUpdateNiceName(projId, myId, newName, command, elemType):
@@ -437,6 +456,7 @@ def getManagedInstancesAndSummary(projId):
     """ 
     New data in the status string will be added to the managedInstances automatically
     They only need to be added to viewManagedInstances.html
+    TODO instance["LogMessagesRowCount"]
     """
     project = models.Fuzzjob.query.filter_by(ID = projId).first()
     managedInstances = {"instances": [], "project": project}
@@ -455,6 +475,7 @@ def getManagedInstancesAndSummary(projId):
         resultMI = connectionOne.execute(GET_MANAGED_INSTANCES)
         resultLM = connectionTwo.execute(text(GET_LOCAL_MANAGERS), {"fuzzjobID": projId})
 
+
         for row in resultLM:
             kill = 1 if models.CommandQueue.query.filter_by(Argument = row["ServiceDescriptorHostAndPort"],
                                                             Done = 0).first() else 0
@@ -464,22 +485,10 @@ def getManagedInstancesAndSummary(projId):
 
         columnNames = resultMI.keys()
 
-        sdguids = []
         for row in resultMI:
-            instance = {}            
-            # if instance already exists                
-            if row["ServiceDescriptorGUID"] in sdguids:
-                # add log message to the already existing instance
-                index = [ mi["ServiceDescriptorGUID"] for mi in managedInstances["instances"]].index(row["ServiceDescriptorGUID"])
-                managedInstances["instances"][index]["LogMessages"].append((str(row["LogMessage"]), row["TimeOfInsertion"]))
-                continue
-            else:
-                instance["LogMessages"] = [(str(row["LogMessage"]), row["TimeOfInsertion"])]         
-                sdguids.append(row["ServiceDescriptorGUID"])             
-
+            instance = {}                   
             for cn in columnNames:
-                if cn != "LogMessage":                            
-                    instance[cn] = row[cn]                          
+                instance[cn] = row[cn]                          
 
             if instance["ServiceDescriptorHostAndPort"] is not None:
                 instance["kill"] = 0 if models.CommandQueue.query.filter_by(
@@ -512,12 +521,7 @@ def getManagedInstancesAndSummary(projId):
         connectionTwo.close()
         engineTwo.dispose()
 
-    # TODO sort logs by timeOfInsertion
-    managedInstances["instances"] = sorted(managedInstances["instances"], key = lambda k: k["AgentType"])    
-    for instance in managedInstances["instances"]:
-        instance["LogMessages"] = sorted(instance["LogMessages"], key = lambda k: k[1], reverse=True)
-        instance["LogMessages"] = [ logM[0] for logM in instance["LogMessages"]]
-        instance["LogMessages"] = list(chunks(instance["LogMessages"], 10))
+    managedInstances["instances"] = sorted(managedInstances["instances"], key = lambda k: k["AgentType"])
     average = sumOfAverageRTT / numOfRTT if numOfRTT != 0 else 0
     summarySection['AverageRTT'] = round(average, 1)
 

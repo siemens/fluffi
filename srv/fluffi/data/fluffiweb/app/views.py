@@ -625,7 +625,31 @@ def viewManagedInstances(projId):
                           localManagers=localManagers
                           )
 
- 
+
+@app.route("/projects/<int:projId>/managedInstanceLogs",methods=["POST"])
+def getLogsOfManagedInstance(projId):
+    sdguid = ""
+    rowCount = 0    
+    start = 0
+    end = 10
+    
+    if "sdguid" in request.json:
+        sdguid = request.json["sdguid"]
+    else:
+        print("No ServiceDescriptorGuid in request.json")
+    
+    if "start" and "end" in request.json:
+        start, end = request.json["start"], request.json["end"]
+
+    rowCount = getRowCount(projId, GET_COUNT_OF_MANAGED_INSTANCE_LOGS, {"sdguid": sdguid})      
+    pageCount = (rowCount // 10) + 1
+
+    result = getResultOfStatement(projId, GET_MANAGED_INSTANCE_LOGS, {"sdguid": sdguid, "start": start, "end": end})
+    miLogs = [ row["LogMessage"] for row in result ]  
+
+    return json.dumps({"status": "OK", "pageCount": pageCount, "miLogs": miLogs})
+
+
 @app.route("/projects/<int:projId>/configSystemInstances")
 def viewConfigSystemInstances(projId):
     # initialize forms
