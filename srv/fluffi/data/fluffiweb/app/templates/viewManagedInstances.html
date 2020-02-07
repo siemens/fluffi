@@ -181,7 +181,7 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-body">
-                        <div id="buildLogs{{loop.index}}" style="height: 500px"></div>
+                        <div id="buildLogs{{loop.index}}"></div>
                         <div style="text-align: center;"><ul class="pagination" id="buildLinks{{loop.index}}"></ul></div>                        
                     </div>
                     <div class="modal-footer">
@@ -190,7 +190,7 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
                 </div>
             </div>
         </div>
-        <script>$(document).ready(function(){loadPagination({{ managedInstances['project'].ID }}, {{ instance['ServiceDescriptorGUID'] }}, {{loop.index}});});</script>  
+        <script>$(document).ready(function(){loadPagination({{ managedInstances['project'].ID }}, "{{ instance['ServiceDescriptorGUID'] }}", {{loop.index}});});</script>  
         {% endfor %}
 
         </tbody>

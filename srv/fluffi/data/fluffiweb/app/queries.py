@@ -70,7 +70,7 @@ GET_MANAGED_INSTANCES = (
 
 GET_MANAGED_INSTANCE_LOGS = (
     "SELECT ServiceDescriptorGUID, TimeOfInsertion, LogMessage FROM managed_instances_logmessages "
-    "WHERE ServiceDescriptorGUID=:sdguid ORDER BY TimeOfInsertion DESC LIMIT :start,:end;")
+    "WHERE ServiceDescriptorGUID=:sdguid ORDER BY TimeOfInsertion DESC LIMIT :limit OFFSET :offset;")
 
 GET_COUNT_OF_MANAGED_INSTANCE_LOGS = (
     "SELECT COUNT(ServiceDescriptorGUID) FROM managed_instances_logmessages "
