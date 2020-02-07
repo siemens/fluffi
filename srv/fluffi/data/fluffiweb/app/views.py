@@ -626,7 +626,7 @@ def viewManagedInstances(projId):
                           )
 
 
-@app.route("/projects/<int:projId>/managedInstanceLogs",methods=["POST"])
+@app.route("/projects/<int:projId>/managedInstanceLogs", methods=["POST"])
 def getLogsOfManagedInstance(projId):
     sdguid = ""
     rowCount = 0    

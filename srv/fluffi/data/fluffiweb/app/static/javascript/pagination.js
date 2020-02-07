@@ -1,7 +1,11 @@
 
-function loadPagination(projId, sdguid, loopIndex, start=0, end=10){
+function loadPagination(projId, sdguid, loopIndex, start=0, end=10, currentPage=1){
     var URL = "/projects/" + projId + "/managedInstanceLogs";
-    var data = { "sdguid":  sdguid };
+    var data = { "sdguid":  sdguid, "start": start, "end": end };
+    var miLogs = [];
+    var pageCount = 1;
+    var linkElem = "";
+    var navigateFuncStr = "";
 
     $.ajax({
         url: URL,
@@ -9,15 +13,16 @@ function loadPagination(projId, sdguid, loopIndex, start=0, end=10){
         data: JSON.stringify(data),
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
+        async: false,
         success: function(response) {            
-            buildPage(projId, sdguid, loopIndex, response["miLogs"], response["pageCount"]);
+            miLogs = response["miLogs"];
+            pageCount = response["pageCount"];
         }
-    });
-}
+    });    
 
-function buildPage(projId, sdguid, loopIndex, miLogs, pageCount){
-    var linkElem = "";
-    var navigateFuncStr = "";
+    console.log("miLogs", miLogs);
+    console.log("pageCount", pageCount);
+    console.log("currentPage", currentPage);
 
     // build log message elements
     $("#buildLogs" + loopIndex).empty();
@@ -28,8 +33,8 @@ function buildPage(projId, sdguid, loopIndex, miLogs, pageCount){
     // build pagination link elements
     $("#buildLinks" + loopIndex).empty();
     for (var index = 1; index <= pageCount; index++) {
-        navigateFuncStr = "navigate(" + projId + ", " + sdguid + ", " + index + ", " + loopIndex + ")";
-        if (index == 1){
+        navigateFuncStr = "navigate(" + projId + ", " + sdguid + ", " + loopIndex + ", " + index + ")";
+        if (index == currentPage){
             linkElem = "<li id='link" + index + "' class='active'><a href='#' onclick='" + navigateFuncStr + "'>" + index + "</a></li>";
         }            
         else {
@@ -39,11 +44,15 @@ function buildPage(projId, sdguid, loopIndex, miLogs, pageCount){
     }
 }
 
-function navigate(projId, sdguid, pageNumber, loopIndex){  
-    var start = (pageNumber * 10) + 1;
-    var end = (pageNumber * 10) + 10;
-    loadPagination(projId, sdguid, loopIndex, start, end);
+
+function navigate(projId, sdguid, loopIndex, currentPage){  
+    console.log("currentPage: ", currentPage);
+    var start = (currentPage-1) * 10;
+    var end = currentPage * 10;
+    console.log("start end: ", start, end);
+
+    loadPagination(projId, sdguid, loopIndex, start, end, currentPage);
 
     $(".active").removeClass("active");
-    $("#link" + pageNumber).addClass("active");
+    $("#link" + currentPage).addClass("active");
 }
