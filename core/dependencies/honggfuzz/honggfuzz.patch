@@ -17,7 +17,7 @@ diff --git a/honggfuzz.h b/honggfuzz.h
 index d0a219e6..13e77b1b 100644
 --- honggfuzz.h
 +++ honggfuzz.h
-@@ -24,16 +24,12 @@
+@@ -24,16 +24,13 @@
  #ifndef _HF_HONGGFUZZ_H_
  #define _HF_HONGGFUZZ_H_
  
@@ -32,10 +32,11 @@ index d0a219e6..13e77b1b 100644
 -#include <sys/types.h>
  #include <time.h>
 +#include <deque>
++#include <string>
 
  #include "libhfcommon/util.h"
 
-@@ -118,30 +114,10 @@
+@@ -118,30 +115,10 @@
      uint32_t nChunks;
  } bitmap_t;
  
@@ -70,7 +71,7 @@ index d0a219e6..13e77b1b 100644
  
  /* EOF Sanitizer coverage specific data structures */
 
-@@ -153,20 +129,6 @@
+@@ -153,20 +130,6 @@
      _HF_STATE_DYNAMIC_MAIN = 4,
  } fuzzState_t;
  
@@ -91,7 +92,7 @@ index d0a219e6..13e77b1b 100644
  typedef struct {
      bool pcGuardMap[_HF_PC_GUARD_MAX];
      uint8_t bbMapPc[_HF_PERF_BITMAP_SIZE_16M];
-@@ -178,131 +140,13 @@
+@@ -178,131 +141,13 @@
 
  typedef struct {
      struct {
@@ -224,7 +225,7 @@ index d0a219e6..13e77b1b 100644
  } honggfuzz_t;
 
  typedef enum {
-@@ -313,51 +157,10 @@
+@@ -313,51 +158,10 @@
  } runState_t;
  
  typedef struct {

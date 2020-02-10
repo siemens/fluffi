@@ -58,7 +58,7 @@ cd build$ARCH
 
 g++ -std=c++11 -c -fPIC ../blns.cpp -o blns.o
 
-ar rcs blns.a blns.o
+ar rcs libblns.a blns.o
 cd ../..
 
 cp big-list-of-naughty-strings/build${ARCH}/blns.a lib/${ARCH}/blns.a
