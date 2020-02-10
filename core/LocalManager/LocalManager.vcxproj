@@ -255,6 +255,7 @@ Author(s): Roman Bendt, Thomas Riedmaier
     <ClInclude Include="GetFuzzJobConfigurationRequestHandler.h" />
     <ClInclude Include="GetNewCompletedTestcaseIDsRequestHandler.h" />
     <ClInclude Include="LMGetStatusRequestHandler.h" />
+    <ClInclude Include="ReportNewMutationsRequestHandler.h" />
     <ClInclude Include="ReportTestcaseWithNoResultRequestHandler.h" />
     <ClInclude Include="GetTestcaseToMutateRequestHandler.h" />
     <ClInclude Include="InstanceControlWorker.h" />
@@ -277,6 +278,7 @@ Author(s): Roman Bendt, Thomas Riedmaier
     <ClCompile Include="GetFuzzJobConfigurationRequestHandler.cpp" />
     <ClCompile Include="GetNewCompletedTestcaseIDsRequestHandler.cpp" />
     <ClCompile Include="LMGetStatusRequestHandler.cpp" />
+    <ClCompile Include="ReportNewMutationsRequestHandler.cpp" />
     <ClCompile Include="ReportTestcaseWithNoResultRequestHandler.cpp" />
     <ClCompile Include="GetTestcaseToMutateRequestHandler.cpp" />
     <ClCompile Include="InstanceControlWorker.cpp" />

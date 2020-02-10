@@ -7,33 +7,37 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-Author(s): Thomas Riedmaier, Fabian Russwurm, Abian Blome
+Author(s): Thomas Riedmaier, Abian Blome
 */
 
 #include "stdafx.h"
-#include "GetTestcaseToMutateRequestHandler.h"
+#include "ReportNewMutationsRequestHandler.h"
 #include "LMWorkerThreadState.h"
 #include "LMDatabaseManager.h"
+#include "FluffiTestcaseID.h"
 
-GetTestcaseToMutateRequestHandler::GetTestcaseToMutateRequestHandler(std::string testcaseTempDir)
-{
-	m_testcaseTempDir = testcaseTempDir;
-}
-
-GetTestcaseToMutateRequestHandler::~GetTestcaseToMutateRequestHandler()
+ReportNewMutationsRequestHandler::ReportNewMutationsRequestHandler()
 {
 }
 
-void GetTestcaseToMutateRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp)
+ReportNewMutationsRequestHandler::~ReportNewMutationsRequestHandler()
+{
+}
+
+void ReportNewMutationsRequestHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadState, FLUFFIMessage* req, FLUFFIMessage* resp)
 {
 	LMWorkerThreadState* lmWorkerThreadState = dynamic_cast<LMWorkerThreadState*>(workerThreadState);
 	if (lmWorkerThreadState == nullptr) {
-		LOG(ERROR) << "GetTestcaseToMutateRequestHandler::handleFLUFFIMessage - workerThreadState cannot be accessed";
+		LOG(ERROR) << "ReportNewMutationsRequestHandler::handleFLUFFIMessage - workerThreadState cannot be accessed";
 		return;
 	}
 
-	const GetTestcaseToMutateRequest retTestcaseToMutateRequest = req->gettestcasetomutaterequest();
+	const ReportNewMutationsRequest* reportNewMutationsRequest = &req->reportnewmutationsrequest();
 
-	GetTestcaseToMutateResponse* getTestcaseToMutateResponse = lmWorkerThreadState->dbManager->generateGetTestcaseToMutateResponse(m_testcaseTempDir);
-	resp->set_allocated_gettestcasetomutateresponse(getTestcaseToMutateResponse);
+	FluffiTestcaseID tcID = FluffiTestcaseID(reportNewMutationsRequest->id());
+	bool success = lmWorkerThreadState->dbManager->addDeltaToTestcaseRating(tcID, -1 * reportNewMutationsRequest->numofnewmutationsinqueue());
+
+	ReportNewMutationsResponse *  reportNewMutationsResponse = new ReportNewMutationsResponse();
+	reportNewMutationsResponse->set_success(success);
+	resp->set_allocated_reportnewmutationsresponse(reportNewMutationsResponse);
 }

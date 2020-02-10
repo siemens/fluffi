@@ -29,14 +29,14 @@ Author(s): Thomas Riedmaier, Abian Blome, Roman Bendt
 #include "FluffiMutator.h"
 #include "AFLMutator.h"
 
-QueueFillerWorker::QueueFillerWorker(CommInt* commInt, TGWorkerThreadStateBuilder* workerThreadStateBuilder, int delayToWaitUntilConfigIsCompleteInMS, size_t desiredQueueFillLevel, std::string testcaseDirectory, std::string queueFillerTempDir, TGTestcaseManager* testcaseManager, std::set<std::string> myAgentSubTypes, GarbageCollectorWorker* garbageCollectorWorker, int howManyWillBeGeneratedFromParent) :
+QueueFillerWorker::QueueFillerWorker(CommInt* commInt, TGWorkerThreadStateBuilder* workerThreadStateBuilder, int delayToWaitUntilConfigIsCompleteInMS, size_t desiredQueueFillLevel, std::string testcaseDirectory, std::string queueFillerTempDir, TGTestcaseManager* testcaseManager, std::set<std::string> myAgentSubTypes, GarbageCollectorWorker* garbageCollectorWorker, int bulkGenerationSize) :
 	m_gotConfigFromLM(false),
 	m_commInt(commInt),
 	m_workerThreadStateBuilder(workerThreadStateBuilder),
 	m_desiredQueueFillLevel(desiredQueueFillLevel),
 	m_queueFillerTempDir(queueFillerTempDir),
 	m_testcaseManager(testcaseManager),
-	m_howManyWillBeGeneratedFromParent(howManyWillBeGeneratedFromParent),
+	m_bulkGenerationSize(bulkGenerationSize),
 	m_mySelfServiceDescriptor(commInt->getOwnServiceDescriptor()),
 	m_workerThreadState(nullptr),
 	m_garbageCollectorWorker(garbageCollectorWorker),
@@ -105,11 +105,12 @@ void QueueFillerWorker::workerMain() {
 
 		try
 		{
-			std::deque<TestcaseDescriptor> children = m_mutator->batchMutate(m_howManyWillBeGeneratedFromParent, parentID, parentPathAndFileName);
+			std::deque<TestcaseDescriptor> children = m_mutator->batchMutate(m_bulkGenerationSize, parentID, parentPathAndFileName);
 
 			if (children.size() > 0)
 			{
 				m_testcaseManager->pushNewGeneratedTestcases(children);
+				reportNewMutations(parentID, children.size());
 			}
 			else
 			{
@@ -137,7 +138,6 @@ FluffiTestcaseID QueueFillerWorker::getNewParent()
 {
 	FLUFFIMessage req;
 	GetTestcaseToMutateRequest* getTestcaseToMutateRequest = new GetTestcaseToMutateRequest();
-	getTestcaseToMutateRequest->set_howmanywillbegeneratedfromparent(m_howManyWillBeGeneratedFromParent);
 	req.set_allocated_gettestcasetomutaterequest(getTestcaseToMutateRequest);
 	FLUFFIMessage resp = FLUFFIMessage();
 
@@ -263,4 +263,23 @@ bool QueueFillerWorker::tryGetConfigFromLM() {
 	}
 
 	return true;
+}
+
+void QueueFillerWorker::reportNewMutations(FluffiTestcaseID id, int numOfNewMutations) {
+	FLUFFIMessage req;
+	ReportNewMutationsRequest* reportNewMutationsRequest = new ReportNewMutationsRequest();
+
+	TestcaseID* mutableTestcaseId = new TestcaseID();
+	mutableTestcaseId->CopyFrom(id.getProtobuf());
+
+	reportNewMutationsRequest->set_allocated_id(mutableTestcaseId);
+	reportNewMutationsRequest->set_numofnewmutationsinqueue(numOfNewMutations);
+	req.set_allocated_reportnewmutationsrequest(reportNewMutationsRequest);
+	FLUFFIMessage resp = FLUFFIMessage();
+
+	bool respReceived = m_commInt->sendReqAndRecvResp(&req, &resp, m_workerThreadState, m_commInt->getMyLMServiceDescriptor().m_serviceHostAndPort, CommInt::timeoutNormalMessage);
+	if (!respReceived) {
+		LOG(ERROR) << "No response to our sending of a new ReportNewMutationsRequest received!";
+		return;
+	}
 }

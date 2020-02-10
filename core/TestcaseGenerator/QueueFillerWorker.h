@@ -23,7 +23,7 @@ class FluffiMutator;
 class QueueFillerWorker
 {
 public:
-	QueueFillerWorker(CommInt* commInt, TGWorkerThreadStateBuilder* workerThreadStateBuilder, int delayToWaitUntilConfigIsCompleteInMS, size_t desiredQueueFillLevel, std::string testcaseDirectory, std::string queueFillerTempDir, TGTestcaseManager*  testcaseManager, std::set<std::string> myAgentSubTypes, GarbageCollectorWorker* garbageCollectorWorker, int howManyWillBeGeneratedFromParent = 50);
+	QueueFillerWorker(CommInt* commInt, TGWorkerThreadStateBuilder* workerThreadStateBuilder, int delayToWaitUntilConfigIsCompleteInMS, size_t desiredQueueFillLevel, std::string testcaseDirectory, std::string queueFillerTempDir, TGTestcaseManager*  testcaseManager, std::set<std::string> myAgentSubTypes, GarbageCollectorWorker* garbageCollectorWorker, int bulkGenerationSize = 50);
 	virtual ~QueueFillerWorker();
 
 	void workerMain();
@@ -33,6 +33,7 @@ public:
 
 private:
 	FluffiTestcaseID getNewParent();
+	void reportNewMutations(FluffiTestcaseID id, int numOfNewMutations);
 	bool tryGetConfigFromLM();
 
 	bool m_gotConfigFromLM;
@@ -41,7 +42,7 @@ private:
 	size_t m_desiredQueueFillLevel;
 	std::string m_queueFillerTempDir;
 	TGTestcaseManager* m_testcaseManager;
-	int m_howManyWillBeGeneratedFromParent;
+	int m_bulkGenerationSize;
 	FluffiServiceDescriptor m_mySelfServiceDescriptor;
 	TGWorkerThreadState* m_workerThreadState;
 	GarbageCollectorWorker* m_garbageCollectorWorker;

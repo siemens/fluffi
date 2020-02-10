@@ -144,6 +144,7 @@ FLUFFI supports various test case generators. You can use as many of them as you
   4. Connect to the fuzzjob's database and place a nice name in the fuzzjob's `nice_names_managed_instance` table for the chosen UUID
   5. Place new mutations in the UUID subdirectory following this schema: `ParentGUID_ParentLocalID_GeneratorLocalID`. `GeneratorLocalID` needs to be a decimal number that is unique for the current mutator instance (i.e. you must ensure that the touple (`UUID`,`GeneratorLocalID`) is unique). If you want you can use any information from the fuzzjob's database to generate good testcases.
   6. Ensure that the hard drive does not fill up (e.g. by implementing a upper limit of files in the directory)
+  7. Adapt ratings of Testcases that were used for mutations. Rule of thumb: each mutation that was done based on a parent should decrease the parent's rating by one.
 
 You need to set the percentage of how many generators should have which generator type. For example, if you only want `RadamsaMutators`, set `RadamsaMutator`=100 and all others to 0.
 
