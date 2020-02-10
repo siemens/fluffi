@@ -110,7 +110,7 @@ void QueueFillerWorker::workerMain() {
 			if (children.size() > 0)
 			{
 				m_testcaseManager->pushNewGeneratedTestcases(children);
-				reportNewMutations(parentID, children.size());
+				reportNewMutations(parentID, static_cast<int>(children.size()));
 			}
 			else
 			{
