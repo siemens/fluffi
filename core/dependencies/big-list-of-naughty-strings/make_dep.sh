@@ -61,6 +61,6 @@ g++ -std=c++11 -c -fPIC ../blns.cpp -o blns.o
 ar rcs libblns.a blns.o
 cd ../..
 
-cp big-list-of-naughty-strings/build${ARCH}/blns.a lib/${ARCH}/blns.a
+cp big-list-of-naughty-strings/build${ARCH}/libblns.a lib/${ARCH}/libblns.a
 
 rm -rf big-list-of-naughty-strings
