@@ -69,6 +69,11 @@ call make_dep.bat
 IF errorlevel 1 goto errorDone
 cd ..
 
+cd big-list-of-naughty-strings
+call make_dep.bat
+IF errorlevel 1 goto errorDone
+cd ..
+
 goto done
 
 :errorDone
