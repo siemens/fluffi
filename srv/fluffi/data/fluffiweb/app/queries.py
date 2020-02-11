@@ -56,7 +56,7 @@ GET_LOCAL_MANAGERS = (
 GET_MANAGED_INSTANCES = (
     "SELECT managed_instances.ServiceDescriptorGUID, managed_instances.ServiceDescriptorHostAndPort, "
     "managed_instances.AgentType, managed_instances.Location, mis.TimeOfStatus, mis.Status,"
-    "nice_names_managed_instance.NiceName, managed_instances_logmessages.LogMessage, managed_instances_logmessages.TimeOfInsertion FROM managed_instances "
+    "nice_names_managed_instance.NiceName FROM managed_instances "
     "LEFT JOIN (SELECT ServiceDescriptorGUID, Status, TimeOfStatus FROM  managed_instances_statuses t1 "
     "WHERE TimeOfStatus = (SELECT MAX(TimeOfStatus) "
     "FROM managed_instances_statuses "
@@ -65,10 +65,16 @@ GET_MANAGED_INSTANCES = (
     "ORDER BY TimeOfStatus DESC) AS mis "
     "ON managed_instances.ServiceDescriptorGUID = mis.ServiceDescriptorGUID "
     "LEFT JOIN nice_names_managed_instance "
-    "ON managed_instances.ServiceDescriptorGUID = nice_names_managed_instance.ServiceDescriptorGUID "
-    "LEFT JOIN managed_instances_logmessages "
-    "ON managed_instances.ServiceDescriptorGUID = managed_instances_logmessages.ServiceDescriptorGUID "
+    "ON managed_instances.ServiceDescriptorGUID = nice_names_managed_instance.ServiceDescriptorGUID "    
     "ORDER BY managed_instances.AgentType;")
+
+GET_MANAGED_INSTANCE_LOGS = (
+    "SELECT ServiceDescriptorGUID, TimeOfInsertion, LogMessage FROM managed_instances_logmessages "
+    "WHERE ServiceDescriptorGUID=:sdguid ORDER BY TimeOfInsertion DESC LIMIT :limit OFFSET :offset;")
+
+GET_COUNT_OF_MANAGED_INSTANCE_LOGS = (
+    "SELECT COUNT(ServiceDescriptorGUID) FROM managed_instances_logmessages "
+    "WHERE ServiceDescriptorGUID=:sdguid;")
 
 GET_VIOLATIONS_AND_CRASHES = (
     "SELECT count(*), cd.CrashFootprint, it.TestCaseType, MIN(it.ID) AS group_min FROM interesting_testcases AS it "
