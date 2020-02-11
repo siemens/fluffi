@@ -65,6 +65,7 @@ def projects():
 def archiveProject(projId):
     project = models.Fuzzjob.query.filter_by(ID=projId).first()
     nice_name = project.name
+    removeAgents(projId)
 
     if lock.check_file():
         proc = subprocess.Popen(["/usr/bin/python3.6", "./app/utils/downloader.py", lock.file_path, str(projId), nice_name, "archive"])
@@ -140,7 +141,9 @@ def createSetting(projId):
 @app.route("/projects/<int:projId>/uploadNewTargetZip", methods=["GET", "POST"])
 def uploadNewTargetZip(projId):
     if request.method == "POST":
+        addTarget = request.form.get("addTargetToFuzzjob") == "addTarget"
         targetFile = request.files["uploadFile"]
+        targetFileName = targetFile.filename
         if not targetFile:
             flash("Invalid file", "error")
             return redirect(request.url)
@@ -148,6 +151,8 @@ def uploadNewTargetZip(projId):
             flash("Only *.zip files are allowed!", "error")
             return redirect(request.url)
         msg, category = uploadNewTarget(targetFile)
+        if addTarget:
+            addTargetZipToFuzzjob(projId, targetFileName)
         flash(msg, category)
         return redirect("/projects/view/%d" % projId)
     return redirect("/projects/view/%d" % projId)

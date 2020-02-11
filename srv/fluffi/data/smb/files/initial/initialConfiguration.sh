@@ -67,22 +67,24 @@ if [[ $hostname == *"lemming"* ]]; then
 	rm -f /root/.not_logged_in_yet
 	trap - INT
 	
-	#systemctl stop systemd-networkd.service
-	#systemctl stop systemd-resolved.service
-	#systemctl disable systemd-networkd.service
-	#systemctl disable systemd-resolved.service
-	#systemctl mask systemd-networkd.service
-	#systemctl mask systemd-resolved.service
-	
-	rm -f /etc/resolv.conf
-	echo "search fluffi" > /etc/resolv.conf
-	echo "nameserver 10.66.0.1" >> /etc/resolv.conf
-	# /etc/network/interfaces /etc/network/interfaces.unused
-	#DEBIAN_FRONTEND=noninteractive apt-get install -yq network-manager
-	#sed -i ':a;N;$!ba;s/\[main\]\n/[main]\ndns=default\n/g' /etc/NetworkManager/NetworkManager.conf
-	#sed -i 's/renderer: networkd/renderer: NetworkManager/g' /etc/netplan/01-netcfg.yaml
-	#netplan apply
-	#systemctl restart network-manager
+    # UBUNTU
+    # Fix apt-get mirror
+    # sudo sed -i "s/http/ftp/g" /etc/apt/sources.list
+    # fix systemd stuff (aka kill it with fire)
+
+    systemctl stop systemd-networkd.service
+    systemctl stop systemd-resolved.service
+    systemctl disable systemd-networkd.service
+    systemctl disable systemd-resolved.service
+    systemctl mask systemd-networkd.service
+    systemctl mask systemd-resolved.service
+
+    rm -f /etc/resolv.conf
+    echo "search fluffi" > /etc/resolv.conf
+    echo "nameserver 10.66.0.1" >> /etc/resolv.conf
+    DEBIAN_FRONTEND=noninteractive apt-get install -yq network-manager
+    sed -i ':a;N;$!ba;s/\[main\]\n/[main]\ndns=default\n/g' /etc/NetworkManager/NetworkManager.conf
+    systemctl restart network-manager
 	
 	#maclow="enx${MAC,,}"
 	#echo "${maclow//:}"
@@ -106,25 +108,26 @@ if [[ $hostname == *"lemming"* ]]; then
 	(echo -e "y") | apt-get install python
 	dhclient
 else
-	# UBUNTU
-	# Fix apt-get mirror
-	# sudo sed -i "s/http/ftp/g" /etc/apt/sources.list
-	# fix systemd stuff (aka kill it with fire)
-	
-	systemctl stop systemd-networkd.service
-	systemctl stop systemd-resolved.service
-	systemctl disable systemd-networkd.service
-	systemctl disable systemd-resolved.service
-	systemctl mask systemd-networkd.service
-	systemctl mask systemd-resolved.service
-	
-	rm -f /etc/resolv.conf
-	echo "search fluffi" > /etc/resolv.conf
-	echo "nameserver 10.66.0.1" >> /etc/resolv.conf
-	mv /etc/network/interfaces /etc/network/interfaces.unused
-	DEBIAN_FRONTEND=noninteractive apt-get install -yq network-manager
-	sed -i ':a;N;$!ba;s/\[main\]\n/[main]\ndns=default\n/g' /etc/NetworkManager/NetworkManager.conf
-	sed -i 's/renderer: networkd/renderer: NetworkManager/g' /etc/netplan/01-netcfg.yaml
-	netplan apply
-	systemctl restart network-manager
+    # UBUNTU
+    # Fix apt-get mirror
+    # sudo sed -i "s/http/ftp/g" /etc/apt/sources.list
+    # fix systemd stuff (aka kill it with fire)
+
+    systemctl stop systemd-networkd.service
+    systemctl stop systemd-resolved.service
+    systemctl disable systemd-networkd.service
+    systemctl disable systemd-resolved.service
+    systemctl mask systemd-networkd.service
+    systemctl mask systemd-resolved.service
+
+    rm -f /etc/resolv.conf
+    echo "search fluffi" > /etc/resolv.conf
+    echo "nameserver 10.66.0.1" >> /etc/resolv.conf
+    mv /etc/network/interfaces /etc/network/interfaces.unused
+    DEBIAN_FRONTEND=noninteractive apt-get install -yq network-manager
+    sed -i ':a;N;$!ba;s/\[main\]\n/[main]\ndns=default\n/g' /etc/NetworkManager/NetworkManager.conf
+    sed -i 's/renderer: networkd/renderer: NetworkManager/g' /etc/netplan/01-netcfg.yaml
+    netplan apply
+    systemctl restart network-manager
+
 fi

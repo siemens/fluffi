@@ -14,9 +14,9 @@ from app import app, models
 class TestURLs(unittest.TestCase):
     def setUp(self):        
         self.client = app.test_client()
-        fuzzjob = models.Fuzzjob.query.first()
-        if fuzzjob:
-            self.projId = fuzzjob.id
+        fuzzjob = models.Fuzzjob.query.first()        
+        if fuzzjob and hasattr(fuzzjob, "ID"):
+            self.projId = fuzzjob.ID
         else:
             print("Error: No fuzzjob exists for testing!")            
 

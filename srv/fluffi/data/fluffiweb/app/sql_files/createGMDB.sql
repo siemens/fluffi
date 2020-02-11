@@ -7,7 +7,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-Author(s): Michael Kraus, Junes Najah, Thomas Riedmaier, Abian Blome, Pascal Eckmann
+Author(s): Thomas Riedmaier, Michael Kraus, Junes Najah, Abian Blome
 */
 
 CREATE DATABASE IF NOT EXISTS fluffi_gm;
@@ -129,15 +129,14 @@ CREATE TABLE IF NOT EXISTS fluffi_gm.gm_options (
 CREATE TABLE IF NOT EXISTS fluffi_gm.system_fuzzjob_instances (
 	`ID` INT NOT NULL AUTO_INCREMENT,
 	`System` INT NOT NULL,
-	`Fuzzjob` INT NOT NULL,
+	`Fuzzjob` INT DEFAULT NULL,
 	`AgentType` INT(1) NOT NULL,
 	`InstanceCount` INT NOT NULL,
 	`Architecture` VARCHAR(10) NOT NULL,
 	PRIMARY KEY (`ID`),
 	UNIQUE KEY(`System`, `Fuzzjob`, `AgentType`),
 	INDEX `system_fuzzjob_instances_FK1` (`System`),
-	CONSTRAINT `system_fuzzjob_instances_FK1` FOREIGN KEY (`System`) REFERENCES `systems` (`ID`) ON UPDATE CASCADE ON DELETE CASCADE,
-	CONSTRAINT `system_fuzzjob_instances_FK2` FOREIGN KEY (`Fuzzjob`) REFERENCES `fuzzjob` (`ID`) ON UPDATE CASCADE ON DELETE CASCADE
+	CONSTRAINT `system_fuzzjob_instances_FK1` FOREIGN KEY (`System`) REFERENCES `systems` (`ID`) ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT IGNORE INTO fluffi_gm.gm_options (`Setting`, `Value`) VALUES ('bootsystemdir', 'odroidRoot');
