@@ -63,9 +63,9 @@ Author(s): Junes Najah
         <ul class="pagination">                        
         {% for _ in pages %}
             {% if loop.index == 1 %}
-            <li class="active" id="link{{loop.index}}"><a href="#" onclick="navigate({{ loop.index }})">{{ loop.index }}</a></li>
+            <li class="active" id="link{{loop.index}}"><a href="#" onclick="staticNavigateForLMlogs({{ loop.index }})">{{ loop.index }}</a></li>
             {% else %}
-            <li id="link{{loop.index}}"><a href="#" onclick="navigate({{ loop.index }})">{{ loop.index }}</a></li>
+            <li id="link{{loop.index}}"><a href="#" onclick="staticNavigateForLMlogs({{ loop.index }})">{{ loop.index }}</a></li>
             {% endif %}                                                                                      
         {% endfor %}
         </ul>    

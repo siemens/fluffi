@@ -159,7 +159,7 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
         <!-- LM: agent type 3 -->
         {% endif %}
         <td style="text-align: center;">{{ instance["Location"] }}</td>
-        <td style="text-align: center;"><a href="#" data-target="#logMessages{{loop.index}}" data-toggle="modal">Log Message(s)</a></td>
+        <td style="text-align: center;"><a href="#" id="modalLink{{loop.index}}" data-target="#logMessages{{loop.index}}" data-toggle="modal"><div class="loader"></div></a></td>
         <td style="text-align: center;">{{ instance["SysCPUUtil"] }}</td>
         <td style="text-align: center;">{{ instance["ProcCPUUtil"] }}</td>
         <td style="text-align: center;">{{ instance["AverageRTT"] }}</td>

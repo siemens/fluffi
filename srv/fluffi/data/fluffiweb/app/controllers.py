@@ -456,7 +456,6 @@ def getManagedInstancesAndSummary(projId):
     """ 
     New data in the status string will be added to the managedInstances automatically
     They only need to be added to viewManagedInstances.html
-    TODO instance["LogMessagesRowCount"]
     """
     project = models.Fuzzjob.query.filter_by(ID = projId).first()
     managedInstances = {"instances": [], "project": project}
