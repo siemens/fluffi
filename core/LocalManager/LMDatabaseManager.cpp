@@ -723,7 +723,7 @@ std::string LMDatabaseManager::getRegisteredInstanceSubType(std::string ServiceD
 		return re;
 }
 
-GetTestcaseToMutateResponse* LMDatabaseManager::generateGetTestcaseToMutateResponse(std::string testcaseTempDir, int ratingAdaption) {
+GetTestcaseToMutateResponse* LMDatabaseManager::generateGetTestcaseToMutateResponse(std::string testcaseTempDir) {
 	PERFORMANCE_WATCH_FUNCTION_ENTRY
 		GetTestcaseToMutateResponse* response = new GetTestcaseToMutateResponse();
 	long long int testcaseID = 0;
@@ -791,41 +791,8 @@ GetTestcaseToMutateResponse* LMDatabaseManager::generateGetTestcaseToMutateRespo
 
 		mysql_free_result(result);
 	}
-	//#################### Second part: decrease testcase rating ####################
-	{
-		int preparedRatingAdaption = ratingAdaption;
 
-		//// prepared Statement
-		MYSQL_STMT* sql_stmt = mysql_stmt_init(getDBConnection());
-
-		const char* stmt = "UPDATE interesting_testcases SET Rating = Rating - ? WHERE ID = ?";
-		mysql_stmt_prepare(sql_stmt, stmt, static_cast<unsigned long>(strlen(stmt)));
-
-		//params
-		MYSQL_BIND bind[2];
-		memset(bind, 0, sizeof(bind));
-
-		bind[0].buffer_type = MYSQL_TYPE_LONG;
-		bind[0].buffer = &preparedRatingAdaption;
-		bind[0].is_null = 0;
-		bind[0].is_unsigned = false;
-		bind[0].length = NULL;
-
-		bind[1].buffer_type = MYSQL_TYPE_LONGLONG;
-		bind[1].buffer = &testcaseID;
-		bind[1].is_null = 0;
-		bind[1].is_unsigned = true;
-		bind[1].length = NULL;
-
-		mysql_stmt_bind_param(sql_stmt, bind);
-		bool re = mysql_stmt_execute(sql_stmt) == 0;
-		if (!re) {
-			LOG(ERROR) << "generateGetTestcaseToMutateResponse encountered the following error (1): " << mysql_stmt_error(sql_stmt);
-		}
-
-		mysql_stmt_close(sql_stmt);
-	}
-	//#################### Third part: check if we already have coverage for this testcase ####################
+	//#################### Second part: check if we already have coverage for this testcase ####################
 	{
 		//// prepared Statement
 		MYSQL_STMT* sql_stmt = mysql_stmt_init(getDBConnection());
