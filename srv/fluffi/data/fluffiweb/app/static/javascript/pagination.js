@@ -29,11 +29,11 @@ function loadPagination(projId, sdguid, loopIndex, offset=0, currentPage=1, init
                 for (var index = 1; index <= pageCount; index++) {
                     navigateFuncStr = "navigate(" + projId + ", \"" + sdguid + "\", " + loopIndex + ", " + index + ")";
                     if (index == currentPage){
-                        linkElem = "<li id='link" + index + "' class='active'><a href='#' onclick='" + navigateFuncStr + "'>" + index + "</a></li>";                        
+                        linkElem = "<li id='" + loopIndex + "link" + index + "' class='active'><a href='#' onclick='" + navigateFuncStr + "'>" + index + "</a></li>";                        
                     }            
                     else {
                         var style = index > 5 && index < pageCount ? "style='display:none'" : "";
-                        linkElem = "<li id='link" + index + "' " + style + "><a href='#' onclick='" + navigateFuncStr + "'>" + index + "</a></li>";
+                        linkElem = "<li id='" + loopIndex + "link" + index + "' " + style + "><a href='#' onclick='" + navigateFuncStr + "'>" + index + "</a></li>";
                     }            
                     $("#buildLinks" + loopIndex).append(linkElem); 
 
@@ -54,7 +54,7 @@ function navigate(projId, sdguid, loopIndex, currentPage){
 
     loadPagination(projId, sdguid, loopIndex, offset, currentPage, false);
     $("#buildLinks" + loopIndex).children().removeClass("active");
-    $("#link" + currentPage).addClass("active");
+    $("#" + loopIndex + "link" + currentPage).addClass("active");
 }
 
 function next(loopIndex){
