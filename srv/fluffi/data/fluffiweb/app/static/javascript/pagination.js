@@ -1,4 +1,16 @@
+/*
+Copyright 2017-2019 Siemens AG
 
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Author(s): Junes Najah, Thomas Riedmaier
+*/
+
+var MARGIN = 5;
 
 function loadPagination(projId, sdguid, loopIndex, offset=0, currentPage=1, init=true){
     var URL = "/projects/" + projId + "/managedInstanceLogs";
@@ -22,27 +34,35 @@ function loadPagination(projId, sdguid, loopIndex, offset=0, currentPage=1, init
             miLogs.forEach(function(log){        
                 $("#buildLogs" + loopIndex).append("<p>" + log + "</p>");
             });
-
+            
+            if (miLogs.length == 0){
+                $("#modalLink" + loopIndex).text("None");                               
+                $("#modalLink" + loopIndex).css({ "pointer-events": "none", "cursor": "default", "color": "inherit" });
+            }
             // build pagination link elements only the first time
-            if(init){
+            else if(init){
                 $("#buildLinks" + loopIndex).append("<li onclick='prev(" + loopIndex + ")' class='leftArrow'><a href='#' aria-label='Previous'><span aria-hidden='true'>&laquo;</span></a></li>");                
                 for (var index = 1; index <= pageCount; index++) {
                     navigateFuncStr = "navigate(" + projId + ", \"" + sdguid + "\", " + loopIndex + ", " + index + ")";
                     if (index == currentPage){
-                        linkElem = "<li id='link" + index + "' class='active'><a href='#' onclick='" + navigateFuncStr + "'>" + index + "</a></li>";                        
+                        linkElem = "<li id='" + loopIndex + "link" + index + "' class='active'><a href='#' onclick='" + navigateFuncStr + "'>" + index + "</a></li>";                        
                     }            
                     else {
                         var style = index > 5 && index < pageCount ? "style='display:none'" : "";
-                        linkElem = "<li id='link" + index + "' " + style + "><a href='#' onclick='" + navigateFuncStr + "'>" + index + "</a></li>";
+                        linkElem = "<li id='" + loopIndex + "link" + index + "' " + style + "><a href='#' onclick='" + navigateFuncStr + "'>" + index + "</a></li>";
                     }            
                     $("#buildLinks" + loopIndex).append(linkElem); 
 
                     if(index == 1) { $("#buildLinks" + loopIndex).append("<li class='startDots' style='display:none;'><a href='#'>...</a></li>"); }                  
-                    if(index == (pageCount-1)){ $("#buildLinks" + loopIndex).append("<li class='endDots'><a href='#'>...</a></li>"); }         
+                    if(index == (pageCount-1)){ 
+                        var liTagEndDots = pageCount <= MARGIN ? "<li class='endDots' style='display:none;'><a href='#'>...</a></li>" : "<li class='endDots'><a href='#'>...</a></li>";
+                        $("#buildLinks" + loopIndex).append(liTagEndDots);
+                    }         
                 }                
                 $("#buildLinks" + loopIndex).append("<li onclick='next(" + loopIndex + ")' class='rightArrow'><a href='#' aria-label='Next'><span aria-hidden='true'>&raquo;</span></a></li>");
+                $("#modalLink" + loopIndex).text("LogMessage(s)");
             }
-            else {
+            else if(pageCount > MARGIN) {
                 updatePageLinks(loopIndex);
             }            
         }
@@ -54,24 +74,24 @@ function navigate(projId, sdguid, loopIndex, currentPage){
 
     loadPagination(projId, sdguid, loopIndex, offset, currentPage, false);
     $("#buildLinks" + loopIndex).children().removeClass("active");
-    $("#link" + currentPage).addClass("active");
+    $("#" + loopIndex + "link" + currentPage).addClass("active");
 }
 
 function next(loopIndex){
-    var links = $("#buildLinks" + loopIndex).children();        
+    var links = $("#buildLinks" + loopIndex).children();  
     for (var index = 1; index < links.length-1; index++) {
-        var nextIndex = links.eq(index+1).hasClass("startDots") ? index + 2 : index + 1;
-        if(links.eq(index).hasClass("active") && links.eq(nextIndex).length){             
+        var nextIndex = links.eq(index+1).hasClass("startDots") || links.eq(index+1).hasClass("endDots") ? index + 2 : index + 1;        
+        if(links.eq(index).hasClass("active") && links.eq(nextIndex).length){                    
             links.eq(nextIndex).children().first().click();    
             break;                
-        }        
+        }               
     }    
 }
 
 function prev(loopIndex){
     var links = $("#buildLinks" + loopIndex).children();        
     for (var index = 1; index < links.length-1; index++) {
-        var nextIndex = links.eq(index-1).hasClass("endDots") ? index - 2 : index - 1;
+        var nextIndex = links.eq(index-1).hasClass("endDots") || links.eq(index-1).hasClass("startDots") ? index - 2 : index - 1;
         if(links.eq(index).hasClass("active") && links.eq(nextIndex).length){             
             links.eq(nextIndex).children().first().click();    
             break;                
@@ -79,8 +99,7 @@ function prev(loopIndex){
     } 
 }
 
-function updatePageLinks(loopIndex){
-    var MARGIN = 5;
+function updatePageLinks(loopIndex){    
     // Used for distance from indexOfActiveLink to last element
     var distance = 0;
     var links = $("#buildLinks" + loopIndex).children();
@@ -88,6 +107,9 @@ function updatePageLinks(loopIndex){
     links.each(function(i){ if($(this).hasClass("active")){ indexOfActiveLink = i; }}); 
     var endIndex = links.length-2; 
     distance = (links.length-2) - indexOfActiveLink;
+
+    // Disable (...)-buttons if active link is next to it
+
 
     // Ending of pages  
     if (distance >= 0 && distance <= MARGIN) {
@@ -141,4 +163,17 @@ function updatePageLinks(loopIndex){
             }            
         }
     }        
+}
+
+function staticNavigateForLMlogs(index){
+    var pageId = "#page" + index;  
+    var linkId = "#link" + index;
+
+    $(".activePage").hide();
+    $(".activePage").removeClass("activePage");
+    $(".active").removeClass("active");
+
+    $(pageId).show();
+    $(pageId).addClass("activePage");
+    $(linkId).addClass("active");
 }

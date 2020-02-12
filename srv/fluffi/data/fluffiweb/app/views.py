@@ -647,9 +647,9 @@ def getLogsOfManagedInstance(projId):
     if "offset" in request.json:
         offset = request.json["offset"]
 
-    if "init" in request.json and request.json["init"]:
-        rowCount = getRowCount(projId, GET_COUNT_OF_MANAGED_INSTANCE_LOGS, {"sdguid": sdguid})      
-        pageCount = (rowCount // 10) + 1
+    if "init" in request.json:
+        rowCount = getRowCount(projId, GET_COUNT_OF_MANAGED_INSTANCE_LOGS, {"sdguid": sdguid}) 
+        pageCount = (rowCount // 10) + 1 if rowCount % 10 != 0 else rowCount // 10
 
     result = getResultOfStatement(projId, GET_MANAGED_INSTANCE_LOGS, {"sdguid": sdguid, "limit": limit, "offset": offset})
     miLogs = [ row["LogMessage"] for row in result ]  
