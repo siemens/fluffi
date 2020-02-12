@@ -78,7 +78,7 @@ std::deque<TestcaseDescriptor> RadamsaMutator::batchMutate(unsigned int numToGen
 		std::string pathAndFilename = Util::generateTestcasePathAndFilename(testcaseID, m_testcaseDir);
 		if (!std::experimental::filesystem::exists(currentRadamsaFile)) {
 			//Sometimes radamsa fails to generate the desired amount of mutations. In order to avoid error message polution, we will simply break here and re-run radamsa
-			LOG(WARNING) << "Radamsa failed to generate the expected file " << pathAndFilename << ". We will break here.";
+			LOG(WARNING) << "Radamsa failed to generate the expected file " << currentRadamsaFile << ". We will break here.";
 			break;
 		}
 
