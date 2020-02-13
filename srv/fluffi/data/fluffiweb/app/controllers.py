@@ -382,6 +382,23 @@ def getResultOfStatement(projId, stmt, params=None):
         
     return result
 
+def getResultOfStatementForGlobalManager(stmt, params=None):
+    result = None
+
+    engine = create_engine(
+        'mysql://%s:%s@%s/%s' % (config.DBUSER, config.DBPASS, fluffiResolve(config.DBHOST), "fluffi_gm"))
+    connection = engine.connect()
+    try:
+        result = connection.execute(text(stmt), params) if params else connection.execute(stmt)
+    except Exception as e:
+        print(e)
+        pass
+    finally:
+        connection.close()
+        engine.dispose()
+        
+    return result
+
 
 def insertOrUpdateNiceName(projId, myId, newName, command, elemType):
     project = models.Fuzzjob.query.filter_by(ID = projId).first()
