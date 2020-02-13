@@ -936,9 +936,9 @@ def commands():
 
 @app.route("/logs")
 def logs():
-    logs = models.LocalManagerLog.query.all()
-    sortedLogs = sorted(logs, key=lambda k: k.TimeOfInsertion, reverse=True)
-    pages = list(chunks(sortedLogs, 10))
+    result = getResultOfStatementForGlobalManager(GET_LOCALMANAGER_LOGS)
+    logs = [ row for row in result ]
+    pages = list(chunks(logs, 10))
     return renderTemplate("viewLogs.html",
                             pages=pages)
 

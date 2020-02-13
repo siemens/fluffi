@@ -42,15 +42,21 @@ Author(s): Junes Najah
         <table class="table table-hover" style="font-size: 18px;">
             <thead>
                 <tr>
-                    <th style="text-align: center;">ServiceDescriptorGUID</th>                
-                    <th style="text-align: center;">Log Message</th>                
+                    <th style="text-align: center;">Fuzzjob / GUID</th>                
+                    <th style="text-align: center;">Host:Port</th>                
+                    <th style="text-align: center;">Log Message</th>             
                 </tr>
             </thead>
             <tbody>    
             {% for log in page %}
             <tr>
-                <td>{{ log.Servicedescriptorguid }}</td>
-                <td>{{ log.LogMessage }}</td>
+                {% if log["name"] %}
+                <td>{{ log["name"] }}</td>
+                {% else %}
+                <td>{{ log["ServiceDescriptorGUID"] }}</td>
+                {% endif %}
+                <td>{% if log["ServiceDescriptorHostAndPort"] %} {{ log["ServiceDescriptorHostAndPort"] }} {% else %} Not active {% endif %}</td>
+                <td>{{ log["LogMessage"] }}</td>
             </tr>
             {% endfor %}
             </tbody>

@@ -72,6 +72,15 @@ GET_MANAGED_INSTANCE_LOGS = (
     "SELECT ServiceDescriptorGUID, TimeOfInsertion, LogMessage FROM managed_instances_logmessages "
     "WHERE ServiceDescriptorGUID=:sdguid ORDER BY TimeOfInsertion DESC LIMIT :limit OFFSET :offset;")
 
+GET_LOCALMANAGER_LOGS = (
+    "SELECT lmlogs.ServiceDescriptorGUID, fj.name, lm.ServiceDescriptorHostAndPort, lmlogs.LogMessage "
+    "FROM localmanagers_logmessages AS lmlogs "
+    "LEFT JOIN localmanagers AS lm "
+    "ON lm.ServiceDescriptorGUID = lmlogs.ServiceDescriptorGUID "
+    "LEFT JOIN fuzzjob AS fj "
+    "ON fj.ID = lm.FuzzJob "
+    "ORDER BY lmlogs.TimeOfInsertion DESC;")
+
 GET_COUNT_OF_MANAGED_INSTANCE_LOGS = (
     "SELECT COUNT(ServiceDescriptorGUID) FROM managed_instances_logmessages "
     "WHERE ServiceDescriptorGUID=:sdguid;")
