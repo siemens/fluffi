@@ -84,12 +84,20 @@ class LocationFuzzjobs(db.Model):
 
 class CommandQueue(db.Model):
     __tablename__ = 'command_queue'
-    ID= db.Column(db.Integer, primary_key = True)
+    ID = db.Column(db.Integer, primary_key = True)
     Command = db.Column(db.String(256))
     Argument = db.Column(db.String(4096))
     CreationDate = db.Column(db.DateTime)
     Done = db.Column(db.Integer)
     Error = db.Column(db.String(4096))
+
+
+class LocalManagerLog(db.Model):
+    __tablename__ = 'localmanagers_logmessages'
+    ID = db.Column(db.Integer, primary_key = True)
+    Servicedescriptorguid = db.Column(db.String(50))
+    TimeOfInsertion = db.Column(db.DateTime)
+    LogMessage = db.Column(db.String(2000))
 
 
 class DeploymentPackages(db.Model):

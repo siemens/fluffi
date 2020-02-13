@@ -65,8 +65,25 @@ GET_MANAGED_INSTANCES = (
     "ORDER BY TimeOfStatus DESC) AS mis "
     "ON managed_instances.ServiceDescriptorGUID = mis.ServiceDescriptorGUID "
     "LEFT JOIN nice_names_managed_instance "
-    "ON managed_instances.ServiceDescriptorGUID = nice_names_managed_instance.ServiceDescriptorGUID "
+    "ON managed_instances.ServiceDescriptorGUID = nice_names_managed_instance.ServiceDescriptorGUID "    
     "ORDER BY managed_instances.AgentType;")
+
+GET_MANAGED_INSTANCE_LOGS = (
+    "SELECT ServiceDescriptorGUID, TimeOfInsertion, LogMessage FROM managed_instances_logmessages "
+    "WHERE ServiceDescriptorGUID=:sdguid ORDER BY TimeOfInsertion DESC LIMIT :limit OFFSET :offset;")
+
+GET_LOCALMANAGER_LOGS = (
+    "SELECT lmlogs.ServiceDescriptorGUID, fj.name, lm.ServiceDescriptorHostAndPort, lmlogs.LogMessage "
+    "FROM localmanagers_logmessages AS lmlogs "
+    "LEFT JOIN localmanagers AS lm "
+    "ON lm.ServiceDescriptorGUID = lmlogs.ServiceDescriptorGUID "
+    "LEFT JOIN fuzzjob AS fj "
+    "ON fj.ID = lm.FuzzJob "
+    "ORDER BY lmlogs.TimeOfInsertion DESC;")
+
+GET_COUNT_OF_MANAGED_INSTANCE_LOGS = (
+    "SELECT COUNT(ServiceDescriptorGUID) FROM managed_instances_logmessages "
+    "WHERE ServiceDescriptorGUID=:sdguid;")
 
 GET_VIOLATIONS_AND_CRASHES = (
     "SELECT count(*), cd.CrashFootprint, it.TestCaseType, MIN(it.ID) AS group_min FROM interesting_testcases AS it "

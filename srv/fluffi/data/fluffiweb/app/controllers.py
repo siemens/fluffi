@@ -344,7 +344,7 @@ def getGeneralInformationData(projId, stmt):
     return data
 
 
-def getRowCount(projId, stmt):
+def getRowCount(projId, stmt, params=None):
     project = models.Fuzzjob.query.filter_by(ID = projId).first()
     data = 0
 
@@ -352,7 +352,7 @@ def getRowCount(projId, stmt):
         'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
     connection = engine.connect()
     try:
-        result = connection.execute(stmt)
+        result = connection.execute(text(stmt), params) if params else connection.execute(stmt)
         data = result.fetchone()[0]
     except Exception as e:
         print(e)
@@ -362,6 +362,42 @@ def getRowCount(projId, stmt):
         engine.dispose()
 
     return data
+
+
+def getResultOfStatement(projId, stmt, params=None):
+    project = models.Fuzzjob.query.filter_by(ID = projId).first()
+    result = None
+
+    engine = create_engine(
+        'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
+    connection = engine.connect()
+    try:
+        result = connection.execute(text(stmt), params) if params else connection.execute(stmt)
+    except Exception as e:
+        print(e)
+        pass
+    finally:
+        connection.close()
+        engine.dispose()
+        
+    return result
+
+def getResultOfStatementForGlobalManager(stmt, params=None):
+    result = None
+
+    engine = create_engine(
+        'mysql://%s:%s@%s/%s' % (config.DBUSER, config.DBPASS, fluffiResolve(config.DBHOST), "fluffi_gm"))
+    connection = engine.connect()
+    try:
+        result = connection.execute(text(stmt), params) if params else connection.execute(stmt)
+    except Exception as e:
+        print(e)
+        pass
+    finally:
+        connection.close()
+        engine.dispose()
+        
+    return result
 
 
 def insertOrUpdateNiceName(projId, myId, newName, command, elemType):
@@ -434,8 +470,10 @@ def getLocalManager(projId):
 
 
 def getManagedInstancesAndSummary(projId):
-    # new data in Status will be added to the instances in managedInstances automatically - you just need to add them in
-    # viewManagedInstances.html
+    """ 
+    New data in the status string will be added to the managedInstances automatically
+    They only need to be added to viewManagedInstances.html
+    """
     project = models.Fuzzjob.query.filter_by(ID = projId).first()
     managedInstances = {"instances": [], "project": project}
     localManagers = []
@@ -453,6 +491,7 @@ def getManagedInstancesAndSummary(projId):
         resultMI = connectionOne.execute(GET_MANAGED_INSTANCES)
         resultLM = connectionTwo.execute(text(GET_LOCAL_MANAGERS), {"fuzzjobID": projId})
 
+
         for row in resultLM:
             kill = 1 if models.CommandQueue.query.filter_by(Argument = row["ServiceDescriptorHostAndPort"],
                                                             Done = 0).first() else 0
@@ -463,12 +502,13 @@ def getManagedInstancesAndSummary(projId):
         columnNames = resultMI.keys()
 
         for row in resultMI:
-            instance = {}
+            instance = {}                   
             for cn in columnNames:
-                instance[cn] = row[cn]
+                instance[cn] = row[cn]                          
+
             if instance["ServiceDescriptorHostAndPort"] is not None:
                 instance["kill"] = 0 if models.CommandQueue.query.filter_by(
-                    Argument = instance["ServiceDescriptorHostAndPort"], Done = 0).first() is None else 1
+                    Argument = instance["ServiceDescriptorHostAndPort"], Done = 0).first() is None else 1           
             if instance["Status"] is not None:
                 keyValueStatuses = [s.strip() for s in instance["Status"].split('|')]
                 parsedStatuses = dict((k.strip(), float(v.strip())) for k, v in
@@ -487,7 +527,7 @@ def getManagedInstancesAndSummary(projId):
                             summarySection[key] += instance[statusKey]
                         else:
                             summarySection[key] = instance[statusKey]
-            managedInstances["instances"].append(instance)
+            managedInstances["instances"].append(instance)                
     except Exception as e:
         print(e)
         pass
@@ -497,7 +537,6 @@ def getManagedInstancesAndSummary(projId):
         connectionTwo.close()
         engineTwo.dispose()
 
-    # sort list of instances by AgentType 
     managedInstances["instances"] = sorted(managedInstances["instances"], key = lambda k: k["AgentType"])
     average = sumOfAverageRTT / numOfRTT if numOfRTT != 0 else 0
     summarySection['AverageRTT'] = round(average, 1)
@@ -815,13 +854,14 @@ def insertTestcases(projId, files):
         for f in files:
             connection.execute(text(INSERT_TESTCASE_POPULATION), {"rawData": f.read(), "localId": localId})
             testcaseID = connection.execute(text(GET_TESTCASE_ID), {"creatorlocalID": localId}).fetchone()[0]
-            connection.execute(text(INSERT_NICE_NAME_TESTCASE), {"testcaseID": testcaseID, "newName": f.filename})
+            connection.execute(text(INSERT_NICE_NAME_TESTCASE), {"testcaseID": testcaseID, "newName": f.filename})            
             localId += 1
 
         return "Added Testcase(s)", "success"
     except Exception as e:
         print(e)
-        abort(400)
+        if "Duplicate entry" in str(e):
+            return "SQLAlchemy Exception: Duplicate entry for key", "error"      
     finally:
         connection.close()
         engine.dispose()
@@ -975,10 +1015,11 @@ def insertFormInputForProject(form, request):
 
     if 'targetfile' in request.files:
         targetFile = request.files['targetfile']
-        targetFileData = targetFile.read()
-        targetFileName = targetFile.filename
-        FTP_CONNECTOR.saveTargetFileOnFTPServer(targetFileData, targetFileName)
-        targetFileUpload = True
+        if targetFile:        
+            targetFileData = targetFile.read()
+            targetFileName = targetFile.filename
+            FTP_CONNECTOR.saveTargetFileOnFTPServer(targetFileData, targetFileName)
+            targetFileUpload = True
 
     project = createNewDatabase(name=myProjName)
     db.session.add(project)
