@@ -702,7 +702,7 @@ def insertModules(projId, f):
                         moduleName = f.get(str(targetNum) + '_targetname')
                         modulePath = f.get(str(targetNum) + '_targetpath')
                         if len(moduleName) > 0 and len(modulePath) > 0:
-                            data = {"ModuleName": moduleName, "ModulePath": modulePath}
+                            data = {"ModuleName": moduleName, "ModulePath": modulePath, "RawBytes": ""}
                             statement = text(INSERT_MODULE)
                             connection.execute(statement, data)
                         else:
@@ -712,7 +712,7 @@ def insertModules(projId, f):
             if len(f.getlist('targetModules')) > 0 and f.getlist('targetModules')[0]:
                 isEmpty = False
                 for moduleName in f.getlist('targetModules'):
-                    data = {"ModuleName": moduleName, "ModulePath": "*"}
+                    data = {"ModuleName": moduleName, "ModulePath": "*", "RawBytes": f.read()}
                     statement = text(INSERT_MODULE)
                     connection.execute(statement, data)
             if isEmpty:
@@ -1018,7 +1018,7 @@ def insertFormInputForProject(form, request):
         if targetFile:        
             targetFileData = targetFile.read()
             targetFileName = targetFile.filename
-            FTP_CONNECTOR.saveTargetFileOnFTPServer(targetFileData, targetFileName)
+            # FTP_CONNECTOR.saveTargetFileOnFTPServer(targetFileData, targetFileName)
             targetFileUpload = True
 
     project = createNewDatabase(name=myProjName)
@@ -1082,20 +1082,9 @@ def insertFormInputForProject(form, request):
                         statement = text(INSERT_SETTINGS)
                         connection.execute(statement, data)
 
-        for key in f.keys():
-            if '_targetname' in key:
-                if len(f.getlist(key)[0]) > 1:
-                    targetNum = key.split("_")[0]
-                    nextTarget = request.form.get(str(targetNum) + '_targetname')
-                    nextTargetPath = request.form.get(str(targetNum) + '_targetpath')
-                    if nextTarget is not None:
-                        data = {"ModuleName": nextTarget, "ModulePath": nextTargetPath}
-                        statement = text(INSERT_MODULE)
-                        connection.execute(statement, data)
-
         if 'targetModulesOnCreate' in request.files:
             for module in request.files.getlist("targetModulesOnCreate"):
-                data = {"ModuleName": module.filename, "ModulePath": "*"}
+                data = {"ModuleName": module.filename, "ModulePath": "*", "RawBytes": module.read()}
                 statement = text(INSERT_MODULE)
                 connection.execute(statement, data)
 

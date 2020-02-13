@@ -844,7 +844,7 @@ def removeProjectSetting(projId, settingId):
 @app.route("/projects/createProject", methods=["GET", "POST"])
 def createProject():
     form = CreateProjectForm()
-    # msg, category = "", ""
+    # msg, category = "", "" 
 
     if request.method == 'POST' and form.is_submitted:
         result = []
