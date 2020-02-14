@@ -235,10 +235,10 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
                         </select>
                     </td>
                     <td>
-                        <input onclick="updateSetting({{ project.ID }}, {{ setting.ID }}, {{ loop.index }})"
+                        <input  onclick="updateSetting({{ project.ID }}, {{ setting.ID }}, {{ loop.index }})"
                                type="button"
                                value="Update"/>
-                        <input id="deleteSetting{{ setting.name }}{{ project.ID }}"
+                        <input  id="deleteSetting{{ setting.name }}{{ project.ID }}"
                                onclick="deleteSetting({{ project.ID }}, {{ setting.ID }})" type="button"
                                value="Delete"/>
                     </td>
@@ -254,8 +254,8 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
                         <div>{{ setting.value }}</div>
                     </td>
                     <td>
-                        <input data-target="#updateGeneratorTypes" data-toggle="modal" type="button" value="Update"/>
-                        <input id="deleteSetting{{ setting.name }}{{ project.ID }}"
+                        <input  data-target="#updateGeneratorTypes" data-toggle="modal" type="button" value="Update"/>
+                        <input  id="deleteSetting{{ setting.name }}{{ project.ID }}"
                                onclick="deleteSetting({{ project.ID }}, {{ setting.ID }})" type="button"
                                value="Delete"/>
                     </td>
@@ -303,8 +303,8 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
                         <div>{{ setting.value }}</div>
                     </td>
                     <td>
-                        <input data-target="#updateevaluatorTypes" data-toggle="modal" type="button" value="Update"/>
-                        <input id="deleteSetting{{ setting.name }}{{ project.ID }}"
+                        <input  data-target="#updateevaluatorTypes" data-toggle="modal" type="button" value="Update"/>
+                        <input  id="deleteSetting{{ setting.name }}{{ project.ID }}"
                                onclick="deleteSetting({{ project.ID }}, {{ setting.ID }})" type="button"
                                value="Delete"/>
                     </td>
@@ -351,10 +351,10 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
                     <td><input id="SettingValue-{{ setting.ID }}" size="98" type="text" value="{{ setting.value }}"/>
                     </td>
                     <td>
-                        <input onclick="updateSetting({{ project.ID }}, {{ setting.ID }}, {{ loop.index }})"
+                        <input  onclick="updateSetting({{ project.ID }}, {{ setting.ID }}, {{ loop.index }})"
                                type="button"
                                value="Update"/>
-                        <input id="deleteSetting{{ setting.name }}{{ project.ID }}"
+                        <input  id="deleteSetting{{ setting.name }}{{ project.ID }}"
                                onclick="deleteSetting({{ project.ID }}, {{ setting.ID }})" type="button"
                                value="Delete"/>
                     </td>
@@ -401,13 +401,13 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
 
 <div class="container">
     <h2>Target Modules</h2>
-    <div data-toggle="fieldset" id="phone-fieldset">
-        <form action="{{ url_for('createProjectModule', projId=project.ID) }}" method="POST" name="addModule">
+    <div>
+        <form action="{{ url_for('createProjectModule', projId=project.ID) }}" enctype="multipart/form-data" method="POST" name="addModule">
             <table class="table">
                 <thead>
                 <tr>
-                    <th><label for="target_module">Name</label></th>
-                    <th><label for="target_module_path">Path</label></th>
+                    <th><label>Name</label></th>
+                    <th><label>Path</label></th>
                     <th>Operations</th>
                 </tr>
                 </thead>
@@ -417,38 +417,52 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
                     <td>{{ module.name }}</td>
                     <td>{{ module.path }}</td>
                     <td>
-                        <input id="deleteModule{{ module.name }}{{ project.ID }}"
+                        <input class="btn" id="deleteModule{{ module.name }}{{ project.ID }}"
                                onclick="deleteModule({{ project.ID }}, {{ module.ID }})" type="button"
                                value="Delete"/>
+                        <input class="btn" id="setModuleBinary{{ module.name }}{{ project.ID }}"
+                                data-target="#setModuleBinary{{ module.ID }}" data-toggle="modal" type="button"
+                                value="Set Module"/>
                     </td>
                 </tr>
-                {% endfor %}
-                <tr data-toggle="fieldset-entry">
-                    <td><input class="form-control" id="1_targetname" name="1_targetname" placeholder="example.dll"
-                               type="text"></td>
-                    <td><input class="form-control" id="1_targetpath" name="1_targetpath" type="text" value="*"></td>
-                    <td>
-                        <button data-toggle="fieldset-remove-row" id="phone-remove" type="button" type="button"><span
-                                class="glyphicon glyphicon-remove-circle"></span></button>
-                    </td>
-                </tr>
+                <!-- setModuleBinary Modal -->
+                <div class="modal fade" id="setModuleBinary{{ module.ID }}" role="dialog">
+                    <div class="modal-dialog">
+                        <!-- Modal content-->
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button class="close" data-dismiss="modal" type="button">&times;</button>
+                                <h4 class="modal-title">Set Module {{ module.name }}</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div>
+                                    <input class="btn btn-primary "
+                                        onclick="setModuleBinary({{ project.ID }}, {{ module.ID }})"
+                                        type="button"
+                                        value="Set"/>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-default" data-dismiss="modal" type="button">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}                
                 </tbody>
-            </table>
-            <button data-target="#phone-fieldset" data-toggle="fieldset-add-row" type="button">
-                <span class="glyphicon glyphicon-plus"></span>
-            </button>
+            </table>            
             <div class="row" style="margin-bottom: 40px">
                 <div class="col-md-4">
-                    <p>Or select multiple Target Modules:</p>
+                    <p>Select Target Modules to add</p>
                     <input id="targetModules" multiple name="targetModules" type="file">
-                </div>
+                </div> 
                 <div class="col-md-7" style="text-align: right">
                     <input class="btn btn-primary" id="addTargetModules" type="submit" value="Add Target Modules"/>
                 </div>
                 <div class="col-md-1"></div>
             </div>
         </form>
-    </div>
+    </div>    
 </div>
 
 {% set glob = {} %}

@@ -686,37 +686,22 @@ def executeResetFuzzjobStmts(projId, deletePopulation):
         engine.dispose()
 
 
-def insertModules(projId, f):
+def insertModules(projId, request):
     project = models.Fuzzjob.query.filter_by(ID = projId).first()
 
     if project is not None:
         engine = create_engine(
             'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
         connection = engine.connect()
-        try:
-            isEmpty = False
-            for key in f.keys():
-                if '_targetname' in key:
-                    if len(f.getlist(key)[0]) > 1:
-                        targetNum = key.split("_")[0]
-                        moduleName = f.get(str(targetNum) + '_targetname')
-                        modulePath = f.get(str(targetNum) + '_targetpath')
-                        if len(moduleName) > 0 and len(modulePath) > 0:
-                            data = {"ModuleName": moduleName, "ModulePath": modulePath, "RawBytes": ""}
-                            statement = text(INSERT_MODULE)
-                            connection.execute(statement, data)
-                        else:
-                            isEmpty = True
+        try:            
+            if 'targetModules' in request.files:                
+                for module in request.files.getlist("targetModules"):
+                    if module.filename:
+                        data = {"ModuleName": module.filename, "ModulePath": "*", "RawBytes": module.read()}
+                        statement = text(INSERT_MODULE)
+                        connection.execute(statement, data)
                     else:
-                        isEmpty = True
-            if len(f.getlist('targetModules')) > 0 and f.getlist('targetModules')[0]:
-                isEmpty = False
-                for moduleName in f.getlist('targetModules'):
-                    data = {"ModuleName": moduleName, "ModulePath": "*", "RawBytes": f.read()}
-                    statement = text(INSERT_MODULE)
-                    connection.execute(statement, data)
-            if isEmpty:
-                return "Error: Input cannot be empty", "error"
+                        return "Error: Filename cannot be empty", "error"            
         except Exception as e:
             print(e)
             return "Error: Failed to add module", "error"

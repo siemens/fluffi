@@ -40,6 +40,8 @@ UPDATE_NICE_NAME_TESTCASE = (
     "UPDATE nice_names_testcase SET NiceName=:newName WHERE TestcaseID=:testcaseID")
 UPDATE_NICE_NAME_MANAGED_INSTANACE = (
     "UPDATE nice_names_managed_instance SET NiceName=:newName WHERE ServiceDescriptorGUID=:sdguid")
+UPDATE_TARGET_MODULE = (
+    "UPDATE target_modules SET ModulePath=:ModulePath, RawBytes=:RawBytes WHERE ID=:ID;")
 DELETE_TC_WTIH_LOCALID = (
     "DELETE FROM interesting_testcases WHERE CreatorServiceDescriptorGUID=:guid AND CreatorLocalID=:localId")
 DELETE_MODULE_BY_ID = (

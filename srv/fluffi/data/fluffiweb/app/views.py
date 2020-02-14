@@ -189,7 +189,7 @@ def createProjectModule(projId):
     moduleForm = CreateProjectModuleForm()
 
     if request.method == "POST" and moduleForm.is_submitted:
-        msg, category = insertModules(projId, request.form)
+        msg, category = insertModules(projId, request)
         flash(msg, category)
         return redirect("/projects/view/%d" % projId)
 
