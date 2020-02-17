@@ -80,3 +80,9 @@ cd openssl
 ./make_dep.sh
 rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
 )
+
+(
+cd big-list-of-naughty-strings
+./make_dep.sh
+rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
+)

@@ -150,3 +150,4 @@ core/helpers/kfuzz/kfuzz-windbg/x64/
 core/helpers/kfuzz/x64/
 core/helpers/kfuzz/Win32/
 core/dependencies/WinDbgModel/include/
+core/dependencies/big-list-of-naughty-strings/lib/

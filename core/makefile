@@ -38,8 +38,9 @@ GENOBJS := $(addprefix $(ARCH)/buildtmp/genobj/,$(notdir $(GENSRCS:.cpp=.o)))
 GENINCLUDE = $(SHINCLUDE) \
 -I $(FLUFFIPATH)/SharedCode \
 -I $(FLUFFIPATH)/dependencies/afl/include \
--I $(FLUFFIPATH)/dependencies/honggfuzz/include
-GENLIBOBJS = $(ARCH)/lib/sharedcode.a $(FLUFFIPATH)/dependencies/libprotoc/lib/$(ARCH)/libprotobuf.a $(FLUFFIPATH)/dependencies/easylogging/lib/$(ARCH)/libeasyloggingpp.a $(FLUFFIPATH)/dependencies/afl/lib/$(ARCH)/libafl.a $(FLUFFIPATH)/dependencies/honggfuzz/lib/$(ARCH)/libhonggfuzz.a $(FLUFFIPATH)/dependencies/libuuid/lib/$(ARCH)/libuuid.a
+-I $(FLUFFIPATH)/dependencies/honggfuzz/include \
+-I $(FLUFFIPATH)/dependencies/big-list-of-naughty-strings/include
+GENLIBOBJS = $(ARCH)/lib/sharedcode.a $(FLUFFIPATH)/dependencies/libprotoc/lib/$(ARCH)/libprotobuf.a $(FLUFFIPATH)/dependencies/easylogging/lib/$(ARCH)/libeasyloggingpp.a $(FLUFFIPATH)/dependencies/afl/lib/$(ARCH)/libafl.a $(FLUFFIPATH)/dependencies/honggfuzz/lib/$(ARCH)/libhonggfuzz.a $(FLUFFIPATH)/dependencies/big-list-of-naughty-strings/lib/$(ARCH)/libblns.a  $(FLUFFIPATH)/dependencies/libuuid/lib/$(ARCH)/libuuid.a
 
 # vars for TestcaseEvaluator
 EVALSRCS := $(shell find $(FLUFFIPATH)/TestcaseEvaluator/ -iname '*.cpp' -not -name '*Win*')

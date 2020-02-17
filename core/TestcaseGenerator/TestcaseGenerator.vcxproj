@@ -110,37 +110,37 @@ Author(s): Roman Bendt, Thomas Riedmaier, Abian Blome
     <LinkIncremental>true</LinkIncremental>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IncludePath>$(SolutionDir)\dependencies\honggfuzz\include;$(SolutionDir)\dependencies\afl\include;$(SolutionDir)\dependencies\zeromq\include;$(SolutionDir)\SharedCode;$(SolutionDir)\dependencies\libprotoc\include\siemens\cpp;$(SolutionDir)\dependencies\libprotoc\include;$(SolutionDir)\dependencies\easylogging\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\dependencies\honggfuzz\lib\x86;$(SolutionDir)\dependencies\afl\lib\x86;$(SolutionDir)\dependencies\zeromq\lib\x86;$(OutDir);$(SolutionDir)\dependencies\easylogging\lib\x86;$(SolutionDir)\dependencies\libprotoc\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\dependencies\big-list-of-naughty-strings\include;$(SolutionDir)\dependencies\honggfuzz\include;$(SolutionDir)\dependencies\afl\include;$(SolutionDir)\dependencies\zeromq\include;$(SolutionDir)\SharedCode;$(SolutionDir)\dependencies\libprotoc\include\siemens\cpp;$(SolutionDir)\dependencies\libprotoc\include;$(SolutionDir)\dependencies\easylogging\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\dependencies\big-list-of-naughty-strings\lib\x86;$(SolutionDir)\dependencies\honggfuzz\lib\x86;$(SolutionDir)\dependencies\afl\lib\x86;$(SolutionDir)\dependencies\zeromq\lib\x86;$(OutDir);$(SolutionDir)\dependencies\easylogging\lib\x86;$(SolutionDir)\dependencies\libprotoc\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IncludePath>$(SolutionDir)\dependencies\honggfuzz\include;$(SolutionDir)\dependencies\afl\include;$(SolutionDir)\dependencies\zeromq\include;$(SolutionDir)\SharedCode;$(SolutionDir)\dependencies\libprotoc\include\siemens\cpp;$(SolutionDir)\dependencies\libprotoc\include;$(SolutionDir)\dependencies\easylogging\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\dependencies\honggfuzz\lib\x86;$(SolutionDir)\dependencies\afl\lib\x86;$(SolutionDir)\dependencies\zeromq\lib\x86;$(OutDir);$(SolutionDir)\dependencies\easylogging\lib\x86;$(SolutionDir)\dependencies\libprotoc\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\dependencies\big-list-of-naughty-strings\include;$(SolutionDir)\dependencies\honggfuzz\include;$(SolutionDir)\dependencies\afl\include;$(SolutionDir)\dependencies\zeromq\include;$(SolutionDir)\SharedCode;$(SolutionDir)\dependencies\libprotoc\include\siemens\cpp;$(SolutionDir)\dependencies\libprotoc\include;$(SolutionDir)\dependencies\easylogging\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\dependencies\big-list-of-naughty-strings\lib\x86;$(SolutionDir)\dependencies\honggfuzz\lib\x86;$(SolutionDir)\dependencies\afl\lib\x86;$(SolutionDir)\dependencies\zeromq\lib\x86;$(OutDir);$(SolutionDir)\dependencies\easylogging\lib\x86;$(SolutionDir)\dependencies\libprotoc\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)\dependencies\honggfuzz\include;$(SolutionDir)\dependencies\afl\include;$(SolutionDir)\dependencies\zeromq\include;$(SolutionDir)\SharedCode;$(SolutionDir)\dependencies\libprotoc\include\siemens\cpp;$(SolutionDir)\dependencies\libprotoc\include;$(SolutionDir)\dependencies\easylogging\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\dependencies\honggfuzz\lib\x64;$(SolutionDir)\dependencies\afl\lib\x64;$(SolutionDir)\dependencies\zeromq\lib\x64;$(OutDir);$(SolutionDir)\dependencies\easylogging\lib\x64;$(SolutionDir)\dependencies\libprotoc\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\dependencies\big-list-of-naughty-strings\include;$(SolutionDir)\dependencies\honggfuzz\include;$(SolutionDir)\dependencies\afl\include;$(SolutionDir)\dependencies\zeromq\include;$(SolutionDir)\SharedCode;$(SolutionDir)\dependencies\libprotoc\include\siemens\cpp;$(SolutionDir)\dependencies\libprotoc\include;$(SolutionDir)\dependencies\easylogging\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\dependencies\big-list-of-naughty-strings\lib\x64;$(SolutionDir)\dependencies\honggfuzz\lib\x64;$(SolutionDir)\dependencies\afl\lib\x64;$(SolutionDir)\dependencies\zeromq\lib\x64;$(OutDir);$(SolutionDir)\dependencies\easylogging\lib\x64;$(SolutionDir)\dependencies\libprotoc\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)\dependencies\honggfuzz\include;$(SolutionDir)\dependencies\afl\include;$(SolutionDir)\dependencies\zeromq\include;$(SolutionDir)\SharedCode;$(SolutionDir)\dependencies\libprotoc\include\siemens\cpp;$(SolutionDir)\dependencies\libprotoc\include;$(SolutionDir)\dependencies\easylogging\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\dependencies\honggfuzz\lib\x64;$(SolutionDir)\dependencies\afl\lib\x64;$(SolutionDir)\dependencies\zeromq\lib\x64;$(OutDir);$(SolutionDir)\dependencies\easylogging\lib\x64;$(SolutionDir)\dependencies\libprotoc\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\dependencies\big-list-of-naughty-strings\include;$(SolutionDir)\dependencies\honggfuzz\include;$(SolutionDir)\dependencies\afl\include;$(SolutionDir)\dependencies\zeromq\include;$(SolutionDir)\SharedCode;$(SolutionDir)\dependencies\libprotoc\include\siemens\cpp;$(SolutionDir)\dependencies\libprotoc\include;$(SolutionDir)\dependencies\easylogging\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\dependencies\big-list-of-naughty-strings\lib\x64;$(SolutionDir)\dependencies\honggfuzz\lib\x64;$(SolutionDir)\dependencies\afl\lib\x64;$(SolutionDir)\dependencies\zeromq\lib\x64;$(OutDir);$(SolutionDir)\dependencies\easylogging\lib\x64;$(SolutionDir)\dependencies\libprotoc\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)\dependencies\honggfuzz\include;$(SolutionDir)\dependencies\zeromq\include;$(SolutionDir)\SharedCode;$(SolutionDir)\dependencies\libprotoc\include\siemens\cpp;$(SolutionDir)\dependencies\libprotoc\include;$(SolutionDir)\dependencies\afl\include;$(SolutionDir)\dependencies\easylogging\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\dependencies\honggfuzz\lib\x86;$(SolutionDir)\dependencies\afl\lib\x86;$(SolutionDir)\dependencies\zeromq\lib\x86;$(SolutionDir)$(Platform)\$(Configuration)\;$(SolutionDir)\dependencies\easylogging\lib\x86;$(SolutionDir)\dependencies\libprotoc\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\dependencies\big-list-of-naughty-strings\include;$(SolutionDir)\dependencies\honggfuzz\include;$(SolutionDir)\dependencies\zeromq\include;$(SolutionDir)\SharedCode;$(SolutionDir)\dependencies\libprotoc\include\siemens\cpp;$(SolutionDir)\dependencies\libprotoc\include;$(SolutionDir)\dependencies\afl\include;$(SolutionDir)\dependencies\easylogging\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\dependencies\big-list-of-naughty-strings\lib\x86;$(SolutionDir)\dependencies\honggfuzz\lib\x86;$(SolutionDir)\dependencies\afl\lib\x86;$(SolutionDir)\dependencies\zeromq\lib\x86;$(SolutionDir)$(Platform)\$(Configuration)\;$(SolutionDir)\dependencies\easylogging\lib\x86;$(SolutionDir)\dependencies\libprotoc\lib\x86;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)\dependencies\honggfuzz\include;$(SolutionDir)\dependencies\zeromq\include;$(SolutionDir)\SharedCode;$(SolutionDir)\dependencies\libprotoc\include\siemens\cpp;$(SolutionDir)\dependencies\libprotoc\include;$(SolutionDir)\dependencies\easylogging\include;$(SolutionDir)\dependencies\afl\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\dependencies\honggfuzz\lib\x64;$(SolutionDir)\dependencies\afl\lib\x64;$(SolutionDir)\dependencies\zeromq\lib\x64;$(OutDir);$(SolutionDir)\dependencies\easylogging\lib\x64;$(SolutionDir)\dependencies\libprotoc\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\dependencies\big-list-of-naughty-strings\include;$(SolutionDir)\dependencies\honggfuzz\include;$(SolutionDir)\dependencies\zeromq\include;$(SolutionDir)\SharedCode;$(SolutionDir)\dependencies\libprotoc\include\siemens\cpp;$(SolutionDir)\dependencies\libprotoc\include;$(SolutionDir)\dependencies\easylogging\include;$(SolutionDir)\dependencies\afl\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\dependencies\big-list-of-naughty-strings\lib\x64;$(SolutionDir)\dependencies\honggfuzz\lib\x64;$(SolutionDir)\dependencies\afl\lib\x64;$(SolutionDir)\dependencies\zeromq\lib\x64;$(OutDir);$(SolutionDir)\dependencies\easylogging\lib\x64;$(SolutionDir)\dependencies\libprotoc\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -155,7 +155,7 @@ Author(s): Roman Bendt, Thomas Riedmaier, Abian Blome
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>honggfuzzd.lib;afl-fuzzd.lib;easyloggingppd.lib;libprotobufd.lib;libzmq-v141-mt-gd-4_3_1.lib;SharedCoded.lib;Ws2_32.lib;Iphlpapi.lib;Pdh.lib;Rpcrt4.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>blnsd.lib;honggfuzzd.lib;afl-fuzzd.lib;easyloggingppd.lib;libprotobufd.lib;libzmq-v141-mt-gd-4_3_1.lib;SharedCoded.lib;Ws2_32.lib;Iphlpapi.lib;Pdh.lib;Rpcrt4.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>robocopy "$(SolutionDir)dependencies\radamsa\bin\x86" "$(TargetDir)." 
@@ -205,7 +205,7 @@ exit 0</Command>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>honggfuzzd.lib;afl-fuzzd.lib;easyloggingppd.lib;libprotobufd.lib;libzmq-v141-mt-gd-4_3_1.lib;SharedCoded.lib;Ws2_32.lib;Iphlpapi.lib;Pdh.lib;Rpcrt4.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>blnsd.lib;honggfuzzd.lib;afl-fuzzd.lib;easyloggingppd.lib;libprotobufd.lib;libzmq-v141-mt-gd-4_3_1.lib;SharedCoded.lib;Ws2_32.lib;Iphlpapi.lib;Pdh.lib;Rpcrt4.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>robocopy "$(SolutionDir)dependencies\radamsa\bin\x64" "$(TargetDir)."
@@ -259,7 +259,7 @@ exit 0</Command>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>No</GenerateDebugInformation>
-      <AdditionalDependencies>honggfuzz.lib;afl-fuzz.lib;easyloggingpp.lib;libprotobuf.lib;libzmq-v141-mt-4_3_1.lib;SharedCode.lib;Ws2_32.lib;Iphlpapi.lib;Pdh.lib;Rpcrt4.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>blns.lib;honggfuzz.lib;afl-fuzz.lib;easyloggingpp.lib;libprotobuf.lib;libzmq-v141-mt-4_3_1.lib;SharedCode.lib;Ws2_32.lib;Iphlpapi.lib;Pdh.lib;Rpcrt4.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>robocopy "$(SolutionDir)dependencies\radamsa\bin\x86" "$(TargetDir)."
@@ -288,7 +288,7 @@ exit 0</Command>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>No</GenerateDebugInformation>
-      <AdditionalDependencies>honggfuzz.lib;afl-fuzz.lib;easyloggingpp.lib;libprotobuf.lib;libzmq-v141-mt-4_3_1.lib;SharedCode.lib;Ws2_32.lib;Iphlpapi.lib;Pdh.lib;Rpcrt4.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>blns.lib;honggfuzz.lib;afl-fuzz.lib;easyloggingpp.lib;libprotobuf.lib;libzmq-v141-mt-4_3_1.lib;SharedCode.lib;Ws2_32.lib;Iphlpapi.lib;Pdh.lib;Rpcrt4.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>robocopy "$(SolutionDir)dependencies\radamsa\bin\x64" "$(TargetDir)."

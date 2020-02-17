@@ -84,6 +84,9 @@ oneof fluff {
   GetLMConfigurationRequest getLMConfigurationRequest = 33;
   GetLMConfigurationResponse getLMConfigurationResponse = 34;
 
+  ReportNewMutationsRequest reportNewMutationsRequest = 35;
+  ReportNewMutationsResponse reportNewMutationsResponse = 36;
+
 }
 }
 
@@ -252,7 +255,6 @@ message GetNewCompletedTestcaseIDsResponse{
 }
 
 message GetTestcaseToMutateRequest{
-  int32 howManyWillBeGeneratedFromParent = 1;
 }
 
 message GetTestcaseToMutateResponse{
@@ -328,4 +330,13 @@ message GetLMConfigurationRequest{
 
 message GetLMConfigurationResponse{
   LMConfiguration lmConfiguration = 1;
+}
+
+message ReportNewMutationsRequest{
+  TestcaseID id = 1;
+  int32 numOfNewMutationsInQueue = 2;
+}
+
+message ReportNewMutationsResponse{
+  bool success = 1;
 }

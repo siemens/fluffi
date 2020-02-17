@@ -78,7 +78,7 @@ std::deque<TestcaseDescriptor> CaRRoTMutator::batchMutate(unsigned int numToGene
 		FluffiTestcaseID testcaseID = genNewLocalFluffiTestcaseID();
 		std::string pathAndFilename = Util::generateTestcasePathAndFilename(testcaseID, m_testcaseDir);
 		if (!std::experimental::filesystem::exists(currentCaRRoTFile)) {
-			LOG(WARNING) << "CaRRoT failed to generate the expected file " << pathAndFilename << ". We will break here.";
+			LOG(WARNING) << "CaRRoT failed to generate the expected file " << currentCaRRoTFile << ". We will break here.";
 			break;
 		}
 

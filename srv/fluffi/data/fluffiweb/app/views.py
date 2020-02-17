@@ -439,6 +439,8 @@ def viewAccessVioUnique(projId):
     return renderTemplate("viewTCsTempl.html",
                           title="View Unique Access Violations",
                           data=data,
+                          actual_page=0,
+                          page_count=0,
                           show_occurences=True)
 
 
@@ -493,6 +495,8 @@ def viewUniqueCrashes(projId):
     return renderTemplate("viewTCsTempl.html",
                           title="View Unique Crashes",
                           data=data,
+                          actual_page=0,
+                          page_count=0,
                           show_occurences=True)
 
 
@@ -626,7 +630,33 @@ def viewManagedInstances(projId):
                           localManagers=localManagers
                           )
 
- 
+
+@app.route("/projects/<int:projId>/managedInstanceLogs", methods=["POST"])
+def getLogsOfManagedInstance(projId):
+    sdguid = ""
+    rowCount = 0    
+    limit = 10
+    offset = 0   
+    pageCount = 1 
+    
+    if "sdguid" in request.json:
+        sdguid = request.json["sdguid"]
+    else:
+        print("No ServiceDescriptorGuid in request.json")
+    
+    if "offset" in request.json:
+        offset = request.json["offset"]
+
+    if "init" in request.json:
+        rowCount = getRowCount(projId, GET_COUNT_OF_MANAGED_INSTANCE_LOGS, {"sdguid": sdguid}) 
+        pageCount = (rowCount // 10) + 1 if rowCount % 10 != 0 else rowCount // 10
+
+    result = getResultOfStatement(projId, GET_MANAGED_INSTANCE_LOGS, {"sdguid": sdguid, "limit": limit, "offset": offset})
+    miLogs = [ row["LogMessage"] for row in result ]  
+
+    return json.dumps({"status": "OK", "pageCount": pageCount, "miLogs": miLogs})
+
+
 @app.route("/projects/<int:projId>/configSystemInstances")
 def viewConfigSystemInstances(projId):
     # initialize forms
@@ -731,11 +761,16 @@ def addProjectLocation(projId):
 @app.route("/projects/<int:projId>/addTestcase", methods=["POST"])
 def addTestcase(projId):
     if 'addTestcase' in request.files:
-        msg, category = insertTestcases(projId, request.files.getlist('addTestcase'))
+        files = request.files.getlist('addTestcase')
+        if not files or not any(f for f in files):
+            msg, category = "Please select a file or multiple files", "error"
+        else:
+            msg, category = insertTestcases(projId, files)
+
         flash(msg, category)
         return redirect("/projects/{}/population/1".format(projId))
     else:
-        flash("Please select files to add ...", "error")
+        flash("Please select a file or multiple files", "error")
         return redirect("/projects/{}/population/1".format(projId))
 
 
@@ -783,8 +818,11 @@ def removeProjectTestcase(projId, testcaseId, tcType):
     (guid, localId) = testcaseId.split(":")
     msg, category = deleteElement(projId, "Testcase", DELETE_TC_WTIH_LOCALID, {"guid": guid, "localId": localId})
     flash(msg, category)
-
-    return redirect("/projects/{}/{}".format(projId, tcType))
+    print(tcType)
+    if "unique" in tcType or "Unique" in tcType:        
+        return redirect("/projects/{}/{}".format(projId, tcType))
+    else:
+        return redirect("/projects/{}/{}/1".format(projId, tcType))
 
 
 @app.route("/projects/<int:projId>/delModule/<int:moduleId>", methods=["GET"])
@@ -908,6 +946,14 @@ def commands():
     return renderTemplate("viewCommandQueue.html",
                           title="Commands",
                           commands=commands)
+
+@app.route("/logs")
+def logs():
+    result = getResultOfStatementForGlobalManager(GET_LOCALMANAGER_LOGS)
+    logs = [ row for row in result ]
+    pages = list(chunks(logs, 10))
+    return renderTemplate("viewLogs.html",
+                            pages=pages)
 
 
 @app.route("/systems")

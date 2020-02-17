@@ -22,13 +22,16 @@ Author(s): Pascal Eckmann, Junes Najah, Thomas Riedmaier
 {% block content %}
 
 <script>
+    
 function deleteTestcase(testcaseId, tcType) {
     var deleteUrl = "/projects/" + "{{ data.project.ID }}" + "/delTestcase/" + testcaseId + "/" + tcType;
     window.location.replace(deleteUrl);
 }
 
 $( document ).ready(function() {
-    addPages({{actual_page}}, {{page_count}});
+    if({{actual_page}} && {{page_count}}){
+        addPages({{actual_page}}, {{page_count}});
+    }    
 });
 
 function addSinglePage(i, actualPage){
