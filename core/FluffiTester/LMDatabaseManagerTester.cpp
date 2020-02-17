@@ -553,7 +553,7 @@ namespace LMDatabaseManagerTester
 			std::ifstream f(testfile);
 			Assert::IsFalse(f.good());
 
-			//duplicate insert should result in an update of type and delete dependants such as worst case scenarios and coverage
+			//duplicate insert should result in an update and delete dependants such as worst case scenarios and coverage
 			Assert::IsTrue(dbman->addEntryToCrashDescriptionsTable(ftid2, "here a crash fp"));
 			Assert::IsTrue(stoi(dbman->EXECUTE_TEST_STATEMENT("SELECT Count(*) from crash_descriptions")) == 1);
 			std::set<FluffiBasicBlock> blocks;
@@ -568,6 +568,13 @@ namespace LMDatabaseManagerTester
 			Assert::IsTrue(stoi(dbman->EXECUTE_TEST_STATEMENT("SELECT TestCaseType from interesting_testcases WHERE CreatorServiceDescriptorGUID = \"" + guid2 + "\"")) == LMDatabaseManager::TestCaseType::Exception_AccessViolation);
 			Assert::IsTrue(stoi(dbman->EXECUTE_TEST_STATEMENT("SELECT Count(*) from crash_descriptions")) == 0);
 			Assert::IsTrue(stoi(dbman->EXECUTE_TEST_STATEMENT("SELECT Count(*) from covered_blocks")) == 0);
+
+			//Inserting a testcase with a "special" parent should not keep the current parent
+			FluffiServiceDescriptor specialSD{ "special","special" };
+			FluffiTestcaseID specialTestcase{ specialSD,182 };
+			Assert::IsTrue(dbman->addEntryToInterestingTestcasesTable(ftid2, specialTestcase, 200, "", LMDatabaseManager::TestCaseType::Exception_AccessViolation));
+			Assert::IsTrue(stoi(dbman->EXECUTE_TEST_STATEMENT("SELECT ParentLocalID from interesting_testcases WHERE CreatorServiceDescriptorGUID = \"" + guid2 + "\"")) == 1, L"The ParentLocalID of a testcase with a special parent was not set correctly");
+			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT ParentServiceDescriptorGUID from interesting_testcases WHERE CreatorServiceDescriptorGUID = \"" + guid2 + "\"") == "guid1", L"The ParentServiceDescriptorGUID of a testcase with a special parent was not set correctly");
 		}
 
 		TEST_METHOD(LMDatabaseManager_generateGetCurrentBlockCoverageResponse)
@@ -1072,6 +1079,40 @@ namespace LMDatabaseManagerTester
 			Assert::IsTrue(dbman->EXECUTE_TEST_STATEMENT("SELECT COUNT(*) from managed_instances_logmessages") == "3", L"We got more or less log messages than expected (4)");
 
 			dbman->EXECUTE_TEST_STATEMENT("TRUNCATE TABLE managed_instances_logmessages;");
+		}
+
+		TEST_METHOD(LMDatabaseManager_getParentTCID)
+		{
+			dbman->EXECUTE_TEST_STATEMENT("TRUNCATE TABLE interesting_testcases;");
+
+			std::string guid1 = "guid1";
+			std::string hap1 = "hap1";
+			FluffiServiceDescriptor sd1{ hap1 ,guid1 };
+
+			uint64_t localid1 = 1;
+			FluffiTestcaseID ftid1{ sd1,localid1 };
+
+			std::string guid2 = "guid2";
+			std::string hap2 = "hap2";
+			FluffiServiceDescriptor sd2{ hap2 ,guid2 };
+
+			uint64_t localid2 = 2;
+			FluffiTestcaseID ftid2{ sd2,localid2 };
+
+			uint64_t localid3 = 3;
+			FluffiTestcaseID ftid3{ sd2,localid3 };
+
+			Assert::IsTrue(dbman->addEntryToInterestingTestcasesTable(ftid1, ftid1, 10, ".", LMDatabaseManager::TestCaseType::Population));
+			Assert::IsTrue(dbman->addEntryToInterestingTestcasesTable(ftid2, ftid1, 20, ".", LMDatabaseManager::TestCaseType::Hang));
+
+			FluffiTestcaseID result{ FluffiServiceDescriptor{"",""},0 };
+			Assert::IsFalse(dbman->getParentTCID(ftid3, &result), L"Finding a parent for a non existing testcase should have failed");
+
+			Assert::IsTrue(dbman->getParentTCID(ftid2, &result), L"Finding a parent for an existing testcase should have succeeded");
+
+			Assert::IsTrue(result == ftid1, L"The returned parent was not the expected one");
+
+			dbman->EXECUTE_TEST_STATEMENT("TRUNCATE TABLE interesting_testcases;");
 		}
 
 	private:

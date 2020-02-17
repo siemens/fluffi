@@ -1006,6 +1006,7 @@ std::vector<StatusOfInstance> LMDatabaseManager::getStatusOfManagedInstances(std
 		return re;
 }
 
+//Add testcase to database (Testacase file gets deleted here)
 bool LMDatabaseManager::addEntryToInterestingTestcasesTable(const FluffiTestcaseID tcID, const FluffiTestcaseID tcparentID, int rating, const std::string testcaseDir, TestCaseType tcType) {
 	PERFORMANCE_WATCH_FUNCTION_ENTRY
 		const char* cStrCreatorServiceDescriptorGUID = tcID.m_serviceDescriptor.m_guid.c_str();
@@ -1013,10 +1014,17 @@ bool LMDatabaseManager::addEntryToInterestingTestcasesTable(const FluffiTestcase
 
 	uint64_t preparedCreatorLocalID = tcID.m_localID;
 
-	const char* cStrParentServiceDescriptorGUID = tcparentID.m_serviceDescriptor.m_guid.c_str();
-	unsigned long parentGUIDLength = static_cast<unsigned long>(tcparentID.m_serviceDescriptor.m_guid.length());
+	FluffiTestcaseID tcparentIDToSet = tcparentID;
+	if (tcparentID.m_serviceDescriptor.m_guid == "special") {
+		if (!getParentTCID(tcID, &tcparentIDToSet)) {
+			LOG(ERROR) << "Failed to replace a \"special\" parent with the actual parent";
+		}
+	}
 
-	uint64_t preparedParentLocalID = tcparentID.m_localID;
+	const char* cStrParentServiceDescriptorGUID = tcparentIDToSet.m_serviceDescriptor.m_guid.c_str();
+	unsigned long parentGUIDLength = static_cast<unsigned long>(tcparentIDToSet.m_serviceDescriptor.m_guid.length());
+
+	uint64_t preparedParentLocalID = tcparentIDToSet.m_localID;
 
 	int preparedRating = rating;
 
@@ -2116,5 +2124,96 @@ bool LMDatabaseManager::deleteManagedInstanceLogMessagesOlderThanXSec(int olderT
 	mysql_stmt_close(sql_stmt);
 
 	PERFORMANCE_WATCH_FUNCTION_EXIT("deleteManagedInstanceLogMessagesOlderThanXSec")
+		return re;
+}
+
+bool LMDatabaseManager::getParentTCID(const FluffiTestcaseID tcID, FluffiTestcaseID * parrentID) {
+	PERFORMANCE_WATCH_FUNCTION_ENTRY
+		bool re = false;
+
+	const char* cStrCreatorServiceDescriptorGUID = tcID.m_serviceDescriptor.m_guid.c_str();
+	unsigned long creatorGUIDLength = static_cast<unsigned long>(tcID.m_serviceDescriptor.m_guid.length());
+
+	uint64_t preparedCreatorLocalID = tcID.m_localID;
+
+	//// prepared Statement
+	MYSQL_STMT* sql_stmt = mysql_stmt_init(getDBConnection());
+	const char* stmt = "SELECT ParentServiceDescriptorGUID, ParentLocalID FROM interesting_testcases WHERE CreatorServiceDescriptorGUID = ? AND CreatorLocalID = ?";
+	mysql_stmt_prepare(sql_stmt, stmt, static_cast<unsigned long>(strlen(stmt)));
+
+	//params
+	MYSQL_BIND bind[2];
+	memset(bind, 0, sizeof(bind));
+
+	bind[0].buffer_type = MYSQL_TYPE_VAR_STRING;
+	bind[0].buffer = const_cast<char*>(cStrCreatorServiceDescriptorGUID);
+	bind[0].buffer_length = creatorGUIDLength;
+	bind[0].length = &creatorGUIDLength;
+
+	bind[1].buffer_type = MYSQL_TYPE_LONGLONG;
+	bind[1].buffer = &preparedCreatorLocalID;
+	bind[1].is_null = 0;
+	bind[1].is_unsigned = true;
+	bind[1].length = NULL;
+
+	mysql_stmt_bind_param(sql_stmt, bind);
+	if (mysql_stmt_execute(sql_stmt) != 0) {
+		LOG(ERROR) << "getParentTCID encountered the following error: " << mysql_stmt_error(sql_stmt);
+		mysql_stmt_close(sql_stmt);
+		return re;
+	}
+
+	MYSQL_BIND resultBIND[2];
+	memset(resultBIND, 0, sizeof(resultBIND));
+
+	unsigned long lineLengthCol0 = 0;
+
+	resultBIND[0].buffer_type = MYSQL_TYPE_VAR_STRING;
+	resultBIND[1].buffer_type = MYSQL_TYPE_LONGLONG;
+
+	resultBIND[0].length = &lineLengthCol0;
+
+	uint64_t parentLocalID;
+
+	resultBIND[1].buffer = &(parentLocalID);
+
+	resultBIND[1].buffer_length = sizeof(parentLocalID);
+
+	mysql_stmt_bind_result(sql_stmt, resultBIND);
+
+	mysql_stmt_store_result(sql_stmt);
+	unsigned long long resultRows = mysql_stmt_num_rows(sql_stmt);
+	if (resultRows == 0) {
+		LOG(DEBUG) << "getParentTCID was supposed to return a parent tc id but was not able to do so!";
+		//It's not there! Return false
+	}
+	else if (resultRows != 1) {
+		LOG(ERROR) << "getParentTCID received more than one result line!";
+		//It's not there! Return false
+	}
+	else {
+		mysql_stmt_fetch(sql_stmt);
+
+		char* responseCol0 = new char[lineLengthCol0 + 1];
+		memset(responseCol0, 0, lineLengthCol0 + 1);
+
+		resultBIND[0].buffer = responseCol0;
+
+		resultBIND[0].buffer_length = lineLengthCol0;
+
+		mysql_stmt_fetch_column(sql_stmt, &resultBIND[0], 0, 0);
+
+		parrentID->m_localID = parentLocalID;
+		parrentID->m_serviceDescriptor.m_guid = std::string(responseCol0);
+		parrentID->m_serviceDescriptor.m_serviceHostAndPort = "not set";
+		re = true;
+
+		delete[] responseCol0;
+	}
+
+	mysql_stmt_free_result(sql_stmt);
+	mysql_stmt_close(sql_stmt);
+
+	PERFORMANCE_WATCH_FUNCTION_EXIT("getParentTCID")
 		return re;
 }

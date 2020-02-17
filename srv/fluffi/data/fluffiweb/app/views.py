@@ -65,6 +65,7 @@ def projects():
 def archiveProject(projId):
     project = models.Fuzzjob.query.filter_by(ID=projId).first()
     nice_name = project.name
+    removeAgents(projId)
 
     if lock.check_file():
         proc = subprocess.Popen(["/usr/bin/python3.6", "./app/utils/downloader.py", lock.file_path, str(projId), nice_name, "archive"])
