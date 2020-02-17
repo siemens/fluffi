@@ -93,7 +93,7 @@ std::deque<TestcaseDescriptor> OedipusMutator::batchMutate(unsigned int numToGen
 
 	LOG(DEBUG) << "CMD: " << cmdline;
 
-	if (!executeProcessAndWaitForCompletion(cmdline, 60 * 1000))
+	if (!executeProcessAndWaitForCompletion(cmdline, 5 * 60 * 1000))
 	{
 		if (!std::experimental::filesystem::exists(parentPathAndFilename))
 		{
