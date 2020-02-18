@@ -34,6 +34,15 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+var debug = false
+var fNonDeterministic *bool
+func coin() bool {
+	if *fNonDeterministic {
+		return rand.Intn(2) == 1
+	}
+	return true
+}
+
 const (
 	LEFT uint8 = 1 << iota
 	RIGHT
@@ -66,16 +75,19 @@ func (m *Mutation) NumChildren() int {
 }
 
 func main() {
+	start := time.Now()
 
 	fNum := flag.Int("n", 1, "how many mutations to produce")
 	fPrefix := flag.String("o", "oede_", "output folder and file name prefix")
 	fDbstring := flag.String("d", "", "connect string for fuzzjob database")
 	fVerbose := flag.Bool("v", false, "print pretty diffs to stdout")
+	fTimeout := flag.Int("t", 270, "terminate before getting killed by fluffi")
 	fLogOutput := flag.Bool("f", false, "print log to file instead of console")
 	fLeft:= flag.Bool("l", false, "merge strategy left")
 	fRight := flag.Bool("r", false, "merge strategy right")
 	fInsert := flag.Bool("i", false, "merge strategy insert")
 	fDelete := flag.Bool("m", false, "merge strategy delete")
+	fNonDeterministic = flag.Bool("g", false, "genetic or deterministic behavior")
 
 	flag.Usage = func() {
 		log.Println("Οἰδίπους - a dual parent testcase mutator")
@@ -92,6 +104,8 @@ func main() {
 	flag.Parse()
 	filenames := flag.Args()
 	numMutations := *fNum
+	maxtime := time.Duration(*fTimeout)* time.Second
+
 	files := make([][]byte, 1+numMutations)
 	var strategy uint8
 	if *fLeft {
@@ -112,6 +126,12 @@ func main() {
 		defer errs.FlogClose()
 	}
 	foe, f := errs.Foe("Oedipus:")
+	timeout := func () {
+		if time.Since(start) > maxtime {
+			f("timeout reached, exiting preemptively.")
+			os.Exit(2)
+		}
+	}
 
 	rand.Seed(time.Now().UnixNano())
 
@@ -129,6 +149,7 @@ func main() {
 		db, e := sql.Open("mysql", string(bstr))
 		foe(e, "error opening sql connection")
 
+		if debug {log.Println("querying database") }
 		// build cases of all mutations
 		// meanwhile, keep track of all initial testcases
 		var cases []Mutation
@@ -136,13 +157,18 @@ func main() {
 		r, e := db.Query("SELECT ID,CreatorServiceDescriptorGUID,CreatorLocalID,ParentServiceDescriptorGUID,ParentLocalID,Rating FROM interesting_testcases")
 		foe(e, "error executing query 2")
 		defer r.Close()
+		cnt := 0
 		for r.Next() {
 			var m Mutation
 			e = r.Scan(&m.ID, &m.CreatorGUID, &m.CreatorLID, &m.ParentGUID, &m.ParentLID, &m.Rating)
 			foe(e, "error scanning rows returned from query")
 			cases = append(cases, m)
+			cnt++
+			if cnt%1000 == 0 { timeout() }
 		}
 		r.Close()
+		if debug { log.Println("got back", cnt, "rows from database") }
+		timeout()
 
 		// find root parent of given testcase
 		// ./testcaseFiles/88e83b91-997d-464f-810f-8940e0a0995f/queueFillerTempDir/b58f8aa6-be79-4ccb-972e-789f0e163909-9726
@@ -152,6 +178,7 @@ func main() {
 		var first *Mutation
 
 		// stupidly build some trees (n²)
+		if debug { log.Println("building trees") }
 		for i, node := range cases {
 			if node.CreatorGUID == "initial" {
 				initials = append(initials, &cases[i])
@@ -174,8 +201,10 @@ func main() {
 				}
 			}
 			// if i % 5000 == 0 { log.Println("reached:", i) }
+			if i%1000 == 0 { timeout() }
 		}
 
+		if debug { log.Println("filtering trees") }
 		// get parent of first and remove it from initials list (if there are more than one initial testcases)
 		if first != nil {
 			var firstsParent *Mutation
@@ -186,7 +215,7 @@ func main() {
 			for i := range initials {
 				if initials[i] == firstsParent {
 					log.Println("file was child of", "(", initials[i].CreatorGUID, "-", initials[i].CreatorLID, ")")
-					if len(initials) > 1 {
+					if len(initials) > 1 && coin() {
 						initials = append(initials[:i], initials[i+1:]...)
 					}
 					break
@@ -194,9 +223,11 @@ func main() {
 			}
 		}
 		// print info on trees
+		if debug { log.Println("listing initials:") }
 		for n, node := range initials {
 			log.Println(node.Pretty(), "children: ", cases[n].NumChildren())
 		}
+		timeout()
 
 		// for as many as needed walk over the initial list and go down a tree
 		for i := 0; i < numMutations; i++ {
@@ -219,15 +250,18 @@ func main() {
 					}
 				}
 				// remove the target from possible reruns into this tree
-				if target == initials[i%len(initials)] {
-					// if target is still the initial one, it does not have children.
-					initials = append(initials[:i%len(initials)], initials[1+(i%len(initials)):]...)
-				} else { // this whole thing should only trigger on initials that do not have children
-					last.Children = last.Children[1:]
+				if !*fNonDeterministic {
+					if target == initials[i%len(initials)] {
+						// if target is still the initial one, it does not have children.
+						initials = append(initials[:i%len(initials)], initials[1+(i%len(initials)):]...)
+					} else { // this whole thing should only trigger on initials that do not have children
+						last.Children = last.Children[1:]
+					}
+
 				}
 			}
 			// load target bytes to file structure
-			log.Println("selected:", target.Pretty())
+			log.Println("selected", target.Pretty(), "for mutation", i)
 			r, e = db.Query("SELECT RawBytes FROM interesting_testcases WHERE CreatorServiceDescriptorGUID = ? AND CreatorLocalID = ?", target.CreatorGUID, target.CreatorLID)
 			foe(e, "error executing query 1")
 			defer r.Close()
@@ -246,6 +280,7 @@ func main() {
 				files = files[:1+i]
 				break
 			}
+			timeout()
 		}
 		db.Close()
 
@@ -266,15 +301,19 @@ func main() {
 	}
 
 	for i := 1; i <= len(files)-1; i++ {
+		log.Println("creating mutation", i)
 		fp, e := os.OpenFile((*fPrefix)+strconv.Itoa(i), os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
 		foe(e, "could not open target mutation file for writing")
 		_, e = fp.Write(mergeInputs(files[0], files[i], *fVerbose, strategy))
 		foe(e, "could not write to target mutation file")
 		_ = fp.Close()
+		timeout()
 	}
 }
 
 func mergeInputs(a1, a2 []byte, verbose bool, strat uint8 ) []byte {
+	if debug { log.Println("diffpatching over range") }
+
 	foe, f := errs.Foe("mergeInputs:")
 	d := diffmatchpatch.New()
 
@@ -303,11 +342,11 @@ func mergeInputs(a1, a2 []byte, verbose bool, strat uint8 ) []byte {
 	for _, d := range diffs {
 		switch d.Type {
 		case diffmatchpatch.DiffInsert:
-			if strat&INSERT != 0 {
+			if coin() && strat&INSERT != 0 {
 				_, e = b.WriteString(d.Text)
 			}
 		case diffmatchpatch.DiffDelete:
-			if strat&DELETE != 0 {
+			if coin() && strat&DELETE != 0 {
 				_, e = b.WriteString(d.Text)
 			}
 		case diffmatchpatch.DiffEqual:
@@ -319,5 +358,6 @@ func mergeInputs(a1, a2 []byte, verbose bool, strat uint8 ) []byte {
 	}
 
 	ret, e := hex.DecodeString(b.String())
+	if debug { log.Println("diffpatching done") }
 	return ret
 }
