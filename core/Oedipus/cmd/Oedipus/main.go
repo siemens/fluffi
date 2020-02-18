@@ -34,6 +34,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+var debug = false
 var fNonDeterministic *bool
 func coin() bool {
 	if *fNonDeterministic {
@@ -148,7 +149,7 @@ func main() {
 		db, e := sql.Open("mysql", string(bstr))
 		foe(e, "error opening sql connection")
 
-		log.Println("querying database")
+		if debug {log.Println("querying database") }
 		// build cases of all mutations
 		// meanwhile, keep track of all initial testcases
 		var cases []Mutation
@@ -166,7 +167,7 @@ func main() {
 			if cnt%1000 == 0 { timeout() }
 		}
 		r.Close()
-		log.Println("got back", cnt, "rows from database")
+		if debug { log.Println("got back", cnt, "rows from database") }
 		timeout()
 
 		// find root parent of given testcase
@@ -177,7 +178,7 @@ func main() {
 		var first *Mutation
 
 		// stupidly build some trees (n²)
-		log.Println("building trees")
+		if debug { log.Println("building trees") }
 		for i, node := range cases {
 			if node.CreatorGUID == "initial" {
 				initials = append(initials, &cases[i])
@@ -203,7 +204,7 @@ func main() {
 			if i%1000 == 0 { timeout() }
 		}
 
-		log.Println("filtering trees")
+		if debug { log.Println("filtering trees") }
 		// get parent of first and remove it from initials list (if there are more than one initial testcases)
 		if first != nil {
 			var firstsParent *Mutation
@@ -222,7 +223,7 @@ func main() {
 			}
 		}
 		// print info on trees
-		log.Println("listing initials:")
+		if debug { log.Println("listing initials:") }
 		for n, node := range initials {
 			log.Println(node.Pretty(), "children: ", cases[n].NumChildren())
 		}
@@ -230,7 +231,6 @@ func main() {
 
 		// for as many as needed walk over the initial list and go down a tree
 		for i := 0; i < numMutations; i++ {
-			log.Println("mutation number", i)
 			var target, last *Mutation
 			if i < len(initials) {
 				// first, we apply the mutation to all the initial testcases.
@@ -261,7 +261,7 @@ func main() {
 				}
 			}
 			// load target bytes to file structure
-			log.Println("selected:", target.Pretty())
+			log.Println("selected", target.Pretty(), "for mutation", i)
 			r, e = db.Query("SELECT RawBytes FROM interesting_testcases WHERE CreatorServiceDescriptorGUID = ? AND CreatorLocalID = ?", target.CreatorGUID, target.CreatorLID)
 			foe(e, "error executing query 1")
 			defer r.Close()
@@ -301,7 +301,7 @@ func main() {
 	}
 
 	for i := 1; i <= len(files)-1; i++ {
-		log.Println("writing file number", i)
+		log.Println("creating mutation", i)
 		fp, e := os.OpenFile((*fPrefix)+strconv.Itoa(i), os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
 		foe(e, "could not open target mutation file for writing")
 		_, e = fp.Write(mergeInputs(files[0], files[i], *fVerbose, strategy))
@@ -312,7 +312,7 @@ func main() {
 }
 
 func mergeInputs(a1, a2 []byte, verbose bool, strat uint8 ) []byte {
-	log.Println("diffpatching over range")
+	if debug { log.Println("diffpatching over range") }
 
 	foe, f := errs.Foe("mergeInputs:")
 	d := diffmatchpatch.New()
@@ -358,6 +358,6 @@ func mergeInputs(a1, a2 []byte, verbose bool, strat uint8 ) []byte {
 	}
 
 	ret, e := hex.DecodeString(b.String())
-	log.Println("diffpatching done")
+	if debug { log.Println("diffpatching done") }
 	return ret
 }
