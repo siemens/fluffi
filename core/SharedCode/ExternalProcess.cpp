@@ -117,7 +117,7 @@ void ExternalProcess::updateTimeSpent() {
 			m_lastTimeSpentInKernelmode.QuadPart = jobInfo.TotalKernelTime.QuadPart;
 		}
 		else {
-			LOG(ERROR) << "QueryInformationJobObject failed";
+			LOG(WARNING) << "ExternalProcess::updateTimeSpent: QueryInformationJobObject failed (" << GetLastError() << ")";
 		}
 	}
 }
@@ -1749,7 +1749,7 @@ void ExternalProcess::debug(unsigned long timeoutMilliseconds, std::shared_ptr<D
 				}
 
 				//The big question here is what should happen upon an exception. Should we try to let the program solve this situation or report the exception
-				if (WSTOPSIG(status) == SIGSEGV  && treatAnyAccessViolationAsFatal) {
+				if (WSTOPSIG(status) == SIGSEGV && treatAnyAccessViolationAsFatal) {
 					// Option 1) Report the exception, as it might be an exploitable access violation
 					if (doPostMortemAnalysis) {
 						exResult->m_lastCrash = addrToRVAString(m_childPID, instructionPointer);

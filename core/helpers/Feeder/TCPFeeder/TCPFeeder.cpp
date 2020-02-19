@@ -25,7 +25,7 @@ Author(s): Thomas Riedmaier, Abian Blome
 #define SOCKET_ERROR -1
 #endif
 
-void preprocess(std::vector<char> bytes) {
+void preprocess(std::vector<char>* bytes) {
 	// Add preprocession steps here as needed, e.g. for HTTP:
 	// dropNoDoubleLinebreak(&bytes);
 	// fixHTTPContentLength(&bytes);
@@ -134,7 +134,7 @@ int main(int argc, char* argv[])
 		std::string fuzzFileName = getNewFuzzFileOrDie(sharedMemIPC_ToRunner, feederTimeoutMS);
 		std::vector<char> fuzzBytes = readAllBytesFromFile(fuzzFileName);
 
-		preprocess(fuzzBytes);
+		preprocess(&fuzzBytes);
 		if (sendBytesToHostAndPort(fuzzBytes, targethost, targetport)) {
 			SharedMemMessage fuzzDoneMessage(SHARED_MEM_MESSAGE_FUZZ_DONE, nullptr, 0);
 			sharedMemIPC_ToRunner.sendMessageToServer(&fuzzDoneMessage);
