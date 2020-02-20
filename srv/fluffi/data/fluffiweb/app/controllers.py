@@ -645,7 +645,7 @@ def setNewBasicBlocks(targetFile, projId):
             for targetModule in targetModules:
                 if row[0] == targetModule[0]:
                     row[0] = targetModule[1]
-                    data = {"ModuleID": row[0], "Offset": row[1]}
+                    data = {"ModuleID": row[0], "Offset": int(row[1],0)}
                     statement = text(INSERT_BLOCK_TO_COVER)
                     connection.execute(statement, data)
 
