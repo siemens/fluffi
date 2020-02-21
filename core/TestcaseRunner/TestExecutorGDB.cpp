@@ -1109,7 +1109,7 @@ bool TestExecutorGDB::gdbPrepareForDebug(std::shared_ptr<GDBThreadCommunication>
 			numOfDummyBreakpoint = std::stoi(resp.c_str() + 11);
 		}
 		catch (...) {
-			LOG(ERROR) << "std::stoi failed";
+			LOG(ERROR) << "std::stoi of " << (resp.c_str() + 11) << " failed";
 			google::protobuf::ShutdownProtobufLibrary();
 			_exit(EXIT_FAILURE); //make compiler happy
 		}
@@ -1186,7 +1186,7 @@ bool TestExecutorGDB::gdbPrepareForDebug(std::shared_ptr<GDBThreadCommunication>
 				gDBThreadCommunication->m_exOutput.m_PID = std::stoi(resp.c_str() + isPos + 7);
 			}
 			catch (...) {
-				LOG(ERROR) << "std::stoi failed";
+				LOG(ERROR) << "std::stoi of " << (resp.c_str() + isPos + 7) << " failed";
 				google::protobuf::ShutdownProtobufLibrary();
 				_exit(EXIT_FAILURE); //make compiler happy
 			}
@@ -1251,7 +1251,7 @@ bool TestExecutorGDB::gdbPrepareForDebug(std::shared_ptr<GDBThreadCommunication>
 			}
 		}
 		catch (...) {
-			LOG(ERROR) << "std::stoi/stoll failed";
+			LOG(ERROR) << "std::stoi/stoll of " << linesIt << " failed";
 			google::protobuf::ShutdownProtobufLibrary();
 			_exit(EXIT_FAILURE); //make compiler happy
 		}
@@ -1374,11 +1374,11 @@ bool TestExecutorGDB::parseInfoFiles(std::vector<tModuleInformation>& loadedFile
 
 			uint64_t currentStartAddress, currentEndAddress;
 			try {
-				currentStartAddress = std::stoll(trimmedLine, NULL, 16);
-				currentEndAddress = std::stoll(trimmedLine.substr(trimmedLine.find("-") + 1), NULL, 16);
+				currentStartAddress = std::stoull(trimmedLine, NULL, 16);
+				currentEndAddress = std::stoull(trimmedLine.substr(trimmedLine.find("-") + 1), NULL, 16);
 			}
 			catch (...) {
-				LOG(ERROR) << "std::stoi/stoll failed";
+				LOG(ERROR) << "std::stoi/stoll of " << trimmedLine << ", or of " << trimmedLine.substr(trimmedLine.find("-") + 1) << " failed";
 				google::protobuf::ShutdownProtobufLibrary();
 				_exit(EXIT_FAILURE); //make compiler happy
 			}
