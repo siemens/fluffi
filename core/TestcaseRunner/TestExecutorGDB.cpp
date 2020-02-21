@@ -578,7 +578,11 @@ void TestExecutorGDB::debuggerThreadMain(const std::string targetCMDline, std::s
 		gDBThreadCommunication->m_exOutput.m_debuggerThreadDone = true;
 		return;
 	}
-	*gDBThreadCommunication->m_ostreamToGdb << initCommandFile.rdbuf();
+	if (initCommandFile.rdbuf()->pubseekoff(0, std::ios_base::end) > 0) {
+		//Only pipe GDBInitfile if it has any content
+		initCommandFile.rdbuf()->pubseekpos(std::ios_base::beg);
+		*gDBThreadCommunication->m_ostreamToGdb << initCommandFile.rdbuf();
+	}
 	//*gDBThreadCommunication->m_ostreamToGdb << "set stop-on-solib-events 1" << std::endl; //stop on module load
 	*gDBThreadCommunication->m_ostreamToGdb << "set new-console on" << std::endl; //do not print the debugees output in our console
 	gDBThreadCommunication->m_ostreamToGdb->flush();
