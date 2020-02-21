@@ -1407,7 +1407,12 @@ void TestExecutorGDB::gdbLinereaderThread(std::shared_ptr<GDBThreadCommunication
 		if (totalBytesAvail != bytesRead) {
 #else
 	int nbytes = 0;
-	while (!gDBThreadCommunication->get_gdbThreadShouldTerminate() && 0 != ioctl(inputHandleFromGdb, FIONREAD, &nbytes)) {
+	while (!gDBThreadCommunication->get_gdbThreadShouldTerminate() && -1 != ioctl(inputHandleFromGdb, FIONREAD, &nbytes)) {
+		if (nbytes == 0) {
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			continue;
+		}
+
 		char* buff = new char[nbytes];
 		ssize_t bytesRead = read(inputHandleFromGdb, buff, nbytes);
 		if (bytesRead != nbytes) {
