@@ -45,6 +45,7 @@ namespace Debugger::DataModel::Libraries::Kfuzz
 		KfuzzEventCallback m_eventCallback;
 
 		static SharedMemMessage processMessage(ComPtr<IDebugControl> dbgControl, ComPtr<IDebugRegisters> dbgRegisters, ComPtr<IDebugDataSpaces3> dbgData, ComPtr<IDebugSymbols> dbgSymbols, ComPtr<IDebugSystemObjects> dbgSystemObj, const SharedMemMessage& message);
+		static bool ends_with(std::string const & value, std::string const & ending);
 		static void handleSet(std::string command, std::stringstream& responseSS, ComPtr<IDebugDataSpaces3> dbgData);
 		static void handleX(std::string command, std::stringstream& responseSS, ComPtr<IDebugDataSpaces3> dbgData);
 		static void handleC(std::stringstream& responseSS, ComPtr<IDebugControl> dbgControl);

@@ -320,6 +320,12 @@ namespace Debugger::DataModel::Libraries::Kfuzz
 		dbgControl->SetInterrupt(DEBUG_INTERRUPT_ACTIVE);
 	}
 
+	bool KfuzzProvider::ends_with(std::string const & value, std::string const & ending)
+	{
+		if (ending.size() > value.size()) return false;
+		return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
+	}
+
 	void KfuzzProvider::handleInfo(std::string command, std::stringstream& responseSS, ComPtr<IDebugSymbols> dbgSymbols, ComPtr<IDebugSystemObjects> dbgSystemObj, ComPtr<IDebugDataSpaces3> dbgData) {
 		char nameBuffer[MAX_PATH + 1];
 
@@ -327,8 +333,12 @@ namespace Debugger::DataModel::Libraries::Kfuzz
 			responseSS << "  Num  Description       Executable" << std::endl;
 
 			dbgSymbols->GetModuleNames(0, NULL, nameBuffer, sizeof(nameBuffer) - 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-			unsigned long systemID;
-			dbgSystemObj->GetProcessIdsByIndex(0, 1, NULL, &systemID);
+			unsigned long systemID = 0;
+			if (!ends_with(nameBuffer, ".sys")) {
+				if (S_OK != dbgSystemObj->GetProcessIdsByIndex(0, 1, NULL, &systemID)) {
+					systemID = 0;
+				}
+			}
 			responseSS << "* 1    process " << systemID << "     " << nameBuffer;
 			return;
 		}
