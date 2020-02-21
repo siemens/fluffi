@@ -794,14 +794,14 @@ bool TestExecutorGDB::handleSignal(std::shared_ptr<GDBThreadCommunication> gDBTh
 
 	uint64_t signalAddress;
 	try {
-		signalAddress = std::stoll(addressLine.c_str(), 0, 0x10);
+		signalAddress = std::stoull(addressLine.c_str(), 0, 0x10);
 
 		if (signalAddress == 0) {
 			LOG(WARNING) << "handleSignal could not parse line " << addressLine << " as address";
 		}
 	}
 	catch (...) {
-		LOG(ERROR) << "handleSignal could not parse line " << addressLine << " as address: std::stoi/stoll failed";
+		LOG(ERROR) << "handleSignal could not parse line " << addressLine << " as address: std::stoi/stoull failed";
 		google::protobuf::ShutdownProtobufLibrary();
 		_exit(EXIT_FAILURE); //make compiler happy
 	}
@@ -1251,7 +1251,7 @@ bool TestExecutorGDB::gdbPrepareForDebug(std::shared_ptr<GDBThreadCommunication>
 			}
 		}
 		catch (...) {
-			LOG(ERROR) << "std::stoi/stoll of " << linesIt << " failed";
+			LOG(ERROR) << "std::stoi/stoull of " << linesIt << " failed";
 			google::protobuf::ShutdownProtobufLibrary();
 			_exit(EXIT_FAILURE); //make compiler happy
 		}
@@ -1378,7 +1378,7 @@ bool TestExecutorGDB::parseInfoFiles(std::vector<tModuleInformation>& loadedFile
 				currentEndAddress = std::stoull(trimmedLine.substr(trimmedLine.find("-") + 1), NULL, 16);
 			}
 			catch (...) {
-				LOG(ERROR) << "std::stoi/stoll of " << trimmedLine << ", or of " << trimmedLine.substr(trimmedLine.find("-") + 1) << " failed";
+				LOG(ERROR) << "std::stoi/stoull of " << trimmedLine << ", or of " << trimmedLine.substr(trimmedLine.find("-") + 1) << " failed";
 				google::protobuf::ShutdownProtobufLibrary();
 				_exit(EXIT_FAILURE); //make compiler happy
 			}
