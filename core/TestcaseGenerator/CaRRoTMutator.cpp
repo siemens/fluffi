@@ -58,7 +58,7 @@ std::deque<TestcaseDescriptor> CaRRoTMutator::batchMutate(unsigned int numToGene
 
 	LOG(DEBUG) << "Executing CaRRoT";
 	std::string cmdline = "CaRRoT -d -n " + std::to_string(numToGenerate) + " -o " + m_testcaseDir + Util::pathSeperator + "CaRRoT_ " + parentPathAndFilename;
-	if (!executeProcessAndWaitForCompletion(cmdline, 60 * 1000))
+	if (!executeProcessAndWaitForCompletion(cmdline, 5 * 60 * 1000))
 	{
 		if (!std::experimental::filesystem::exists(parentPathAndFilename))
 		{

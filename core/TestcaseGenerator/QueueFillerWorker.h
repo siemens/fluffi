@@ -23,7 +23,7 @@ class FluffiMutator;
 class QueueFillerWorker
 {
 public:
-	QueueFillerWorker(CommInt* commInt, TGWorkerThreadStateBuilder* workerThreadStateBuilder, int delayToWaitUntilConfigIsCompleteInMS, size_t desiredQueueFillLevel, std::string testcaseDirectory, std::string queueFillerTempDir, TGTestcaseManager*  testcaseManager, std::set<std::string> myAgentSubTypes, GarbageCollectorWorker* garbageCollectorWorker, int bulkGenerationSize = 50);
+	QueueFillerWorker(CommInt* commInt, TGWorkerThreadStateBuilder* workerThreadStateBuilder, int delayToWaitUntilConfigIsCompleteInMS, size_t desiredQueueFillLevel, std::string testcaseDirectory, std::string queueFillerTempDir, TGTestcaseManager*  testcaseManager, std::set<std::string> myAgentSubTypes, GarbageCollectorWorker* garbageCollectorWorker, int maxBulkGenerationSize = 50);
 	virtual ~QueueFillerWorker();
 
 	void workerMain();
@@ -43,6 +43,7 @@ private:
 	std::string m_queueFillerTempDir;
 	TGTestcaseManager* m_testcaseManager;
 	int m_bulkGenerationSize;
+	int m_maxBulkGenerationSize;
 	FluffiServiceDescriptor m_mySelfServiceDescriptor;
 	TGWorkerThreadState* m_workerThreadState;
 	GarbageCollectorWorker* m_garbageCollectorWorker;

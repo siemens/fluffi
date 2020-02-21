@@ -1,0 +1,84 @@
+<!--
+Copyright 2017-2019 Siemens AG
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Author(s): Junes Najah
+-->
+
+{% extends "base.html" %}
+{% block title %}FLUFFI - Logs{% endblock %}
+
+{% block scripts  %}
+<script src="{{ url_for('static', filename = 'javascript/pagination.js') }}" type="text/javascript"></script>
+{{super()}}
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <h1><u>Local Manager Logs:</u></h1>
+</div>
+
+<hr/>
+<div class="jumbotron">
+    <div class="container"></div>
+</div>
+
+<br>
+<br>
+
+<div class="container">       
+    {% for page in pages %}
+        {% if loop.index == 1 %}
+        <div id="page{{loop.index}}" class="activePage">
+        {% else %}
+        <div id="page{{loop.index}}" style="display: none;">
+        {% endif %}
+        <table class="table table-hover" style="font-size: 18px;">
+            <thead>
+                <tr>
+                    <th style="text-align: center;">Fuzzjob / GUID</th>                
+                    <th style="text-align: center;">Host:Port</th>                
+                    <th style="text-align: center;">Log Message</th>             
+                </tr>
+            </thead>
+            <tbody>    
+            {% for log in page %}
+            <tr>
+                {% if log["name"] %}
+                <td>{{ log["name"] }}</td>
+                {% else %}
+                <td>{{ log["ServiceDescriptorGUID"] }}</td>
+                {% endif %}
+                <td>{% if log["ServiceDescriptorHostAndPort"] %} {{ log["ServiceDescriptorHostAndPort"] }} {% else %} Not active {% endif %}</td>
+                <td>{{ log["LogMessage"] }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    {% endfor %}  
+
+    {% if pages | length > 1 %} 
+    <div class="text-center">  
+        <ul class="pagination">                        
+        {% for _ in pages %}
+            {% if loop.index == 1 %}
+            <li class="active" id="link{{loop.index}}"><a href="#" onclick="staticNavigateForLMlogs({{ loop.index }})">{{ loop.index }}</a></li>
+            {% else %}
+            <li id="link{{loop.index}}"><a href="#" onclick="staticNavigateForLMlogs({{ loop.index }})">{{ loop.index }}</a></li>
+            {% endif %}                                                                                      
+        {% endfor %}
+        </ul>    
+    </div> 
+    {% endif %}
+</div>
+
+
+{% endblock %}
+

@@ -74,3 +74,8 @@ def createDefaultSubtypesList(subTypes):
             default_count = "0"
         default.append(default_count)
     return default
+
+def chunks(l, n):
+    """ Yield n-sized chunks from l """
+    for i in range(0, len(l), n):
+        yield l[i:i + n]

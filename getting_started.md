@@ -23,6 +23,7 @@ Furthermore, you need to have a subnet that is entirely under your control, no o
 
 ## 2) Compiling FLUFFI core
 
+
 ### Windows
 On Windows use  [the windows build file](build/windows/buildAll.bat). When you compile FLUFFI for the first time, call 
 ```
@@ -43,22 +44,50 @@ buildAll.bat -DEPLOY_TO_FTP TRUE
 ```
 
 ### Linux
-On Linux use  [the linux build file](build/ubuntu_based/buildAll.sh). When you compile FLUFFI for the first time, call 
-```
-./buildAll.sh PREPARE_ENV=TRUE WITH_DEPS=TRUE
-```
-PREPARE_ENV=TRUE will build the docker continers.  This needs to be done only once.
 
-WITH_DEPS=TRUE will build all of FLUFFI's dependencies from sources. Please keep in mind that this will take a long time.
+These instructions assume you have a fresh and clean install of **Ubuntu 18.04**.
+Make sure you run the build on a machine/vm that has **at least 1.5 GB of memory for every core** installed, otherwise the system will not be able to build.
+So for a machine/vm with 4 cpu cores, please install/allocate at least 6 GB of RAM to it.
+Note, that the build is optimized to make heavy use of parallel processing, so the more cores the system has, the faster your build will be done.
 
-For all future compiles you can use 
-```
-./buildAll.sh PREPARE_ENV=FALSE WITH_DEPS=FALSE
+Become root and setup the environment:
+```bash
+sudo -s # to run these steps as root
+apt update
+apt install git git-lfs python3-pip apt-transport-https ca-certificates curl gnupg-agent software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+apt update
+apt install docker-ce docker-ce-cli containerd.io
+pip3 install --upgrade docker-compose
 ```
 
+Drop root privileges now, so file permissions are correct afterwards. then we clone the repository:
+```bash
+exit # to get back to normal user
+git clone https://github.com/siemens/fluffi
+cd fluffi
+git lfs pull
+```
+
+Now use the [linux build file](build/ubuntu_based/buildAll.sh) to compile the core binaries:
+```bash
+cd build/ubuntu_based
+sudo ./buildAll.sh PREPARE_ENV=TRUE WITH_DEPS=TRUE
+```
+Please note that we rely on _sudo_ here to correctly set things like the effective `uid` and `gid`.
+If you directly run this as root (without sudo), you will get errors and the build will likely not work correctly.
+
+When you compile FLUFFI for the first time, use the parameters `PREPARE_ENV=TRUE` and `WITH_DEPS=TRUE`:
+- `PREPARE_ENV` will build the docker continers, this needs to be done only once.
+- `WITH_DEPS` will build all of FLUFFI's dependencies from sources - please keep in mind that this will take a long time. This step needs to be repeated only if the dependencies change or get updated.
+For any other future compile run you can simply do:
+```
+sudo ./buildAll.sh
+```
 If you have already set up the FUN (see next section), you can directly upload your binaries to FUN by calling
 ```
-./buildAll.sh PREPARE_ENV=FALSE WITH_DEPS=FALSE DEPLOY_TO_FTP=TRUE
+sudo ./buildAll.sh DEPLOY_TO_FTP=TRUE
 ```
 
 ## 3) Setting up the FUN
