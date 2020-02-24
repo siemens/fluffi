@@ -77,7 +77,7 @@ git clone --depth 1 --branch master https://github.com/siemens/fluffi.git ./fluf
 If you are doing this for the very first time, create an empty dnsmasq.leases file and create directories for FTP (Do not do this if you just update FLUFFI): 
 ``` 
 touch /srv/fluffi/data/dnsmasq/dnsmasq.leases
-mkdir -p /srv/fluffi/data/ftp/files/fluffi/linux/{x64,x86,arm32,arm64} /srv/fluffi/data/ftp/files/fluffi/windows/{x64,x86}
+mkdir -p /srv/fluffi/data/ftp/files/fluffi/linux/{x64,x86,arm32,arm64} /srv/fluffi/data/ftp/files/fluffi/windows/{x64,x86} /srv/fluffi/data/tftp
 ```
 
 Copy the server part to /srv/fluffi (You can execute this command even after you set up FLUFFI,e.g., to update server components):
