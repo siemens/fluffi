@@ -117,6 +117,25 @@ def locationRemoveProject(locId, projId):
     return redirect("/locations/view/%s" % locId)
 
 
+@app.route("/projects/<int:projId>/setModuleBinaryAndPath/<int:moduleId>", methods=["GET", "POST"])
+def setModuleBinaryAndPath(projId, moduleId):       
+    if request.method == 'POST' and "moduleBinaryFile" in request.files:
+        moduleBinaryFile = request.files["moduleBinaryFile"]
+        path = request.form.get("path")
+        msg, category = updateModuleBinaryAndPath(projId, moduleBinaryFile, path, moduleId)
+        flash(msg, category)
+        return redirect("/projects/view/%d" % projId)
+
+    project = getProject(projId)
+    locationForm = getLocationFormWithChoices(projId, AddProjectLocationForm())
+    moduleForm = CreateProjectModuleForm()
+
+    return renderTemplate("viewProject.html",
+                          title="Project details",
+                          project=project,
+                          locationForm=locationForm)
+
+
 @app.route("/projects/<int:projId>/addSetting", methods=["GET", "POST"])
 def createSetting(projId):
     settingForm = CreateProjectSettingForm()

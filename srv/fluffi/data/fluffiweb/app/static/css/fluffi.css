@@ -386,6 +386,11 @@ Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Thomas Riedmaier
     -webkit-animation: spin 2s linear infinite; /* Safari */
     animation: spin 2s linear infinite;
   }
+
+.targetModuleMargin {
+    margin-bottom: 30px; 
+    margin-top: 20px;
+  }
   
   /* Safari */
   @-webkit-keyframes spin {

@@ -401,63 +401,65 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
 
 <div class="container">
     <h2>Target Modules</h2>
-    <div>
-        <form action="{{ url_for('createProjectModule', projId=project.ID) }}" enctype="multipart/form-data" method="POST" name="addModule">
-            <table class="table">
-                <thead>
-                <tr>
-                    <th><label>Name</label></th>
-                    <th><label>Path</label></th>
-                    <th>Operations</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for module in project.modules %}
-                <tr>
-                    <td>{{ module.name }}</td>
-                    <td>{{ module.path }}</td>
-                    <td>
-                        <input class="btn" id="deleteModule{{ module.name }}{{ project.ID }}"
-                               onclick="deleteModule({{ project.ID }}, {{ module.ID }})" type="button"
-                               value="Delete"/>
-                        <input class="btn" id="setModuleBinary{{ module.name }}{{ project.ID }}"
-                                data-target="#setModuleBinary{{ module.ID }}" data-toggle="modal" type="button"
-                                value="Set Module"/>
-                    </td>
-                </tr>
-                <!-- setModuleBinary Modal -->
-                <div class="modal fade" id="setModuleBinary{{ module.ID }}" role="dialog">
-                    <div class="modal-dialog">
-                        <!-- Modal content-->
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button class="close" data-dismiss="modal" type="button">&times;</button>
-                                <h4 class="modal-title">Set Module {{ module.name }}</h4>
+    <div>        
+        <table class="table">
+            <thead>
+            <tr>
+                <th><label>Name</label></th>
+                <th><label>Path</label></th>
+                <th>Operations</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for module in project.modules %}
+            <tr>
+                <td>{{ module.name }}</td>
+                <td>{{ module.path }}</td>
+                <td>
+                    <input class="btn" id="deleteModule{{ module.name }}{{ project.ID }}"
+                            onclick="deleteModule({{ project.ID }}, {{ module.ID }})" type="button"
+                            value="Delete"/>
+                    <input class="btn" id="setModuleBinary{{ module.name }}{{ project.ID }}"
+                            data-target="#setModuleBinary{{ module.ID }}" data-toggle="modal" type="button"
+                            value="Set Module"/>
+                </td>
+            </tr>
+            <!-- setModuleBinary Modal -->
+            <div class="modal fade" id="setModuleBinary{{ module.ID }}" role="dialog">
+                <div class="modal-dialog">
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button class="close" data-dismiss="modal" type="button">&times;</button>
+                            <h4 class="modal-title">Set Module {{ module.name }}</h4>
+                        </div>
+                        <div class="modal-body">                                
+                            <div class="form-group">
+                                <form action="{{ url_for('setModuleBinaryAndPath', projId=project.ID, moduleId=module.ID) }}" enctype="multipart/form-data" method="POST" name="setModuleBinaryAndPath">
+                                    <label for="path">Path:</label>
+                                    <input type="text" class="form-control" name="path">
+                                    <input class="targetModuleMargin" name="moduleBinaryFile" type="file">
+                                    <input class="btn btn-primary" type="submit" value="Set"/>
+                                </form>
                             </div>
-                            <div class="modal-body">
-                                <div>
-                                    <input class="btn btn-primary "
-                                        onclick="setModuleBinary({{ project.ID }}, {{ module.ID }})"
-                                        type="button"
-                                        value="Set"/>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button class="btn btn-default" data-dismiss="modal" type="button">Close</button>
-                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-default" data-dismiss="modal" type="button">Close</button>
                         </div>
                     </div>
                 </div>
-                {% endfor %}                
-                </tbody>
-            </table>            
+            </div>
+            {% endfor %}                
+            </tbody>
+        </table>                        
+        <form action="{{ url_for('createProjectModule', projId=project.ID) }}" enctype="multipart/form-data" method="POST" name="addModule">
             <div class="row" style="margin-bottom: 40px">
                 <div class="col-md-4">
                     <p>Select Target Modules to add</p>
                     <input id="targetModules" multiple name="targetModules" type="file">
                 </div> 
                 <div class="col-md-7" style="text-align: right">
-                    <input class="btn btn-primary" id="addTargetModules" type="submit" value="Add Target Modules"/>
+                    <input class="btn btn-primary" id="addTargetModules" type="submit" value="Add new Target Modules"/>
                 </div>
                 <div class="col-md-1"></div>
             </div>

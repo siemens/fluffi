@@ -572,6 +572,34 @@ def getViolationsAndCrashes(projId):
     return violationsAndCrashes
 
 
+def updateModuleBinaryAndPath(projId, moduleBinaryFile, path, moduleId):
+    project = models.Fuzzjob.query.filter_by(ID = projId).first()
+
+    if project is not None:
+        try:            
+            engine = create_engine(
+                'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
+            connection = engine.connect()
+            if path:
+                data = { "ModulePath": path, "RawBytes": moduleBinaryFile.read(), "ID": moduleId }
+                statement = text(UPDATE_TARGET_MODULE_WITH_PATH)                
+            else:
+                print("path is empty")
+                data = { "RawBytes": moduleBinaryFile.read(), "ID": moduleId }
+                statement = text(UPDATE_TARGET_MODULE)   
+            connection.execute(statement, data)                                     
+        except Exception as e:
+            print(e)
+            return "Error: Could not set module binary and path", "error"
+        finally:
+            connection.close()
+            engine.dispose()
+    else:
+        return "Error: Could not find project", "error"
+
+    return "Set module binary and/or path", "success"
+
+
 def insertSettings(projId, request, settingForm):
     project = models.Fuzzjob.query.filter_by(ID = projId).first()
 
