@@ -436,8 +436,14 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
                         <div class="modal-body">                                
                             <div class="form-group">
                                 <form action="{{ url_for('setModuleBinaryAndPath', projId=project.ID, moduleId=module.ID) }}" enctype="multipart/form-data" method="POST" name="setModuleBinaryAndPath">
-                                    <label for="path">Path:</label>
-                                    <input type="text" class="form-control" name="path">
+                                    <div>
+                                        <label for="moduleName">Module Name:</label>
+                                        <input type="text" class="form-control" name="moduleName">
+                                    </div>
+                                    <div class="targetModuleMargin">
+                                        <label for="modulePath">Module Path:</label>
+                                        <input type="text" class="form-control" name="modulePath">
+                                    </div>                                                                        
                                     <input class="targetModuleMargin" name="moduleBinaryFile" type="file">
                                     <input class="btn btn-primary" type="submit" value="Set"/>
                                 </form>

@@ -119,10 +119,18 @@ def locationRemoveProject(locId, projId):
 
 @app.route("/projects/<int:projId>/setModuleBinaryAndPath/<int:moduleId>", methods=["GET", "POST"])
 def setModuleBinaryAndPath(projId, moduleId):       
-    if request.method == 'POST' and "moduleBinaryFile" in request.files:
+    if request.method == 'POST' and "moduleBinaryFile" in request.files:         
+        moduleName = request.form.get("moduleName")
+        modulePath = request.form.get("modulePath")
         moduleBinaryFile = request.files["moduleBinaryFile"]
-        path = request.form.get("path")
-        msg, category = updateModuleBinaryAndPath(projId, moduleBinaryFile, path, moduleId)
+
+        if moduleName or modulePath or moduleBinaryFile:
+            formData = { "ModuleName": moduleName, "ModulePath": modulePath }  
+            rawBytesData = { "RawBytes": moduleBinaryFile.read() }    
+            msg, category = updateModuleBinaryAndPath(projId, moduleId, formData, rawBytesData)
+        else:
+            msg, category = "Error: Form was empty.", "error"
+
         flash(msg, category)
         return redirect("/projects/view/%d" % projId)
 
