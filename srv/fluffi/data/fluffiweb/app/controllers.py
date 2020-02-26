@@ -595,14 +595,14 @@ def updateModuleBinaryAndPath(projId, moduleId, formData, rawBytesData):
                 connection.execute(statement)                                                          
         except Exception as e:
             print(e)
-            return "Error: Could not set module binary and path", "error"
+            return "Error: Could not edit module", "error"
         finally:
             connection.close()
             engine.dispose()
     else:
         return "Error: Could not find project", "error"
 
-    return "Set module was successful", "success"
+    return "Edit module was successful", "success"
 
 
 def insertSettings(projId, request, settingForm):
@@ -1036,7 +1036,7 @@ def insertFormInputForProject(form, request):
         if targetFile:        
             targetFileData = targetFile.read()
             targetFileName = targetFile.filename
-            # FTP_CONNECTOR.saveTargetFileOnFTPServer(targetFileData, targetFileName)
+            FTP_CONNECTOR.saveTargetFileOnFTPServer(targetFileData, targetFileName)
             targetFileUpload = True
 
     project = createNewDatabase(name=myProjName)

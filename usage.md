@@ -225,6 +225,8 @@ FLUFFI is a coverage-based evolutionary fuzzer. In order to reduce the noise in 
 
 If there are several modules with the same name but different paths, you can specify which one should be used for coverage calculation by specifying the path. If it is left to `*`, the path of a module is ignored.
 
+Every target module can be edited in the project view by renaming the filename, path and/or uploading a new binary.
+
 **PLEASE NOTE**: If you are using a GDB runner, the module name is actually a segment name. An example therefore is `target.exe/.text` 
 
 **Population**
