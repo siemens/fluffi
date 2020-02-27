@@ -572,6 +572,39 @@ def getViolationsAndCrashes(projId):
     return violationsAndCrashes
 
 
+def updateModuleBinaryAndPath(projId, moduleId, formData, rawBytesData):
+    project = models.Fuzzjob.query.filter_by(ID = projId).first()
+
+    if project is not None:
+        try:            
+            engine = create_engine(
+                'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
+            connection = engine.connect()
+            statement = "UPDATE target_modules SET "
+
+            for key in formData: 
+                if formData[key]:
+                    statement += "{}='{}', ".format(key, formData[key])                
+            
+            if rawBytesData["RawBytes"]:
+                statement += "RawBytes=:RawBytes WHERE ID={};".format(moduleId)
+                statement = text(statement)
+                connection.execute(statement, rawBytesData) 
+            else:
+                statement = statement[:-2] + " WHERE ID={};".format(moduleId)   
+                connection.execute(statement)                                                          
+        except Exception as e:
+            print(e)
+            return "Error: Could not edit module", "error"
+        finally:
+            connection.close()
+            engine.dispose()
+    else:
+        return "Error: Could not find project", "error"
+
+    return "Edit module was successful", "success"
+
+
 def insertSettings(projId, request, settingForm):
     project = models.Fuzzjob.query.filter_by(ID = projId).first()
 
@@ -686,37 +719,22 @@ def executeResetFuzzjobStmts(projId, deletePopulation):
         engine.dispose()
 
 
-def insertModules(projId, f):
+def insertModules(projId, request):
     project = models.Fuzzjob.query.filter_by(ID = projId).first()
 
     if project is not None:
         engine = create_engine(
             'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
         connection = engine.connect()
-        try:
-            isEmpty = False
-            for key in f.keys():
-                if '_targetname' in key:
-                    if len(f.getlist(key)[0]) > 1:
-                        targetNum = key.split("_")[0]
-                        moduleName = f.get(str(targetNum) + '_targetname')
-                        modulePath = f.get(str(targetNum) + '_targetpath')
-                        if len(moduleName) > 0 and len(modulePath) > 0:
-                            data = {"ModuleName": moduleName, "ModulePath": modulePath}
-                            statement = text(INSERT_MODULE)
-                            connection.execute(statement, data)
-                        else:
-                            isEmpty = True
+        try:            
+            if 'targetModules' in request.files:                
+                for module in request.files.getlist("targetModules"):
+                    if module.filename:
+                        data = {"ModuleName": module.filename, "ModulePath": "*", "RawBytes": module.read()}
+                        statement = text(INSERT_MODULE)
+                        connection.execute(statement, data)
                     else:
-                        isEmpty = True
-            if len(f.getlist('targetModules')) > 0 and f.getlist('targetModules')[0]:
-                isEmpty = False
-                for moduleName in f.getlist('targetModules'):
-                    data = {"ModuleName": moduleName, "ModulePath": "*"}
-                    statement = text(INSERT_MODULE)
-                    connection.execute(statement, data)
-            if isEmpty:
-                return "Error: Input cannot be empty", "error"
+                        return "Error: Filename cannot be empty", "error"            
         except Exception as e:
             print(e)
             return "Error: Failed to add module", "error"
@@ -1082,20 +1100,9 @@ def insertFormInputForProject(form, request):
                         statement = text(INSERT_SETTINGS)
                         connection.execute(statement, data)
 
-        for key in f.keys():
-            if '_targetname' in key:
-                if len(f.getlist(key)[0]) > 1:
-                    targetNum = key.split("_")[0]
-                    nextTarget = request.form.get(str(targetNum) + '_targetname')
-                    nextTargetPath = request.form.get(str(targetNum) + '_targetpath')
-                    if nextTarget is not None:
-                        data = {"ModuleName": nextTarget, "ModulePath": nextTargetPath}
-                        statement = text(INSERT_MODULE)
-                        connection.execute(statement, data)
-
         if 'targetModulesOnCreate' in request.files:
             for module in request.files.getlist("targetModulesOnCreate"):
-                data = {"ModuleName": module.filename, "ModulePath": "*"}
+                data = {"ModuleName": module.filename, "ModulePath": "*", "RawBytes": module.read()}
                 statement = text(INSERT_MODULE)
                 connection.execute(statement, data)
 

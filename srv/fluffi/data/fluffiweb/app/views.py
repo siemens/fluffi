@@ -117,6 +117,33 @@ def locationRemoveProject(locId, projId):
     return redirect("/locations/view/%s" % locId)
 
 
+@app.route("/projects/<int:projId>/setModuleBinaryAndPath/<int:moduleId>", methods=["GET", "POST"])
+def setModuleBinaryAndPath(projId, moduleId):       
+    if request.method == 'POST' and "moduleBinaryFile" in request.files:         
+        moduleName = request.form.get("moduleName")
+        modulePath = request.form.get("modulePath")
+        moduleBinaryFile = request.files["moduleBinaryFile"]
+
+        if moduleName or modulePath or moduleBinaryFile:
+            formData = { "ModuleName": moduleName, "ModulePath": modulePath }  
+            rawBytesData = { "RawBytes": moduleBinaryFile.read() }    
+            msg, category = updateModuleBinaryAndPath(projId, moduleId, formData, rawBytesData)
+        else:
+            msg, category = "Error: Form was empty.", "error"
+
+        flash(msg, category)
+        return redirect("/projects/view/%d" % projId)
+
+    project = getProject(projId)
+    locationForm = getLocationFormWithChoices(projId, AddProjectLocationForm())
+    moduleForm = CreateProjectModuleForm()
+
+    return renderTemplate("viewProject.html",
+                          title="Project details",
+                          project=project,
+                          locationForm=locationForm)
+
+
 @app.route("/projects/<int:projId>/addSetting", methods=["GET", "POST"])
 def createSetting(projId):
     settingForm = CreateProjectSettingForm()
@@ -189,7 +216,7 @@ def createProjectModule(projId):
     moduleForm = CreateProjectModuleForm()
 
     if request.method == "POST" and moduleForm.is_submitted:
-        msg, category = insertModules(projId, request.form)
+        msg, category = insertModules(projId, request)
         flash(msg, category)
         return redirect("/projects/view/%d" % projId)
 
@@ -844,7 +871,7 @@ def removeProjectSetting(projId, settingId):
 @app.route("/projects/createProject", methods=["GET", "POST"])
 def createProject():
     form = CreateProjectForm()
-    # msg, category = "", ""
+    # msg, category = "", "" 
 
     if request.method == 'POST' and form.is_submitted:
         result = []

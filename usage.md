@@ -223,6 +223,10 @@ For ALL_GDB:
 
 FLUFFI is a coverage-based evolutionary fuzzer. In order to reduce the noise in the coverage, only those modules that are listed here will be used to calculate the coverage. Examples for modules are `test.dll`, or `target.exe`.
 
+When creating or modifying a project, you can upload the target modules as files. Their filename and binary will be saved and their path will be initialized with a `*`.
+Therefore, you can edit them in the project view by renaming the filename, path and/or uploading a new binary. 
+FLUFFI itself only uses the filename but some generators will use the binary. 
+
 If there are several modules with the same name but different paths, you can specify which one should be used for coverage calculation by specifying the path. If it is left to `*`, the path of a module is ignored.
 
 **PLEASE NOTE**: If you are using a GDB runner, the module name is actually a segment name. An example therefore is `target.exe/.text` 
