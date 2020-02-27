@@ -1039,6 +1039,8 @@ def systems():
                         h.InstanceRun = h.InstanceRun + 1
                         if w.Agenttype == 4:
                             h.lms = h.lms + 1
+                if not hasattr(h, 'confLM'):
+                    h.confLM = 0
 
         for group in groups:
             for h in group.hosts:
