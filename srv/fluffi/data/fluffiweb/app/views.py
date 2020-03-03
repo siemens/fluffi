@@ -1035,6 +1035,7 @@ def systems():
             models.SystemsLocation.Location == models.Locations.ID).all()
 
         for system in systemLocations:
+            print(system)
             for group in groups:
                 for h in group.hosts:
                     h.confLM = 0
@@ -1185,24 +1186,24 @@ def removeSystemFromPolemarch(hostName):
 
 @app.route("/systems/<string:hostName>/updateSystemLocation/<int:locationId>", methods=["POST"])
 def updateSystemLocation(hostName, locationId):
+    print(hostName, locationId)
     if (len(hostName) > 0) and (locationId > 0):
         try:
             sys = models.Systems.query.filter_by(Name=hostName).first()
             if sys is not None:
                 systemloc = models.SystemsLocation.query.filter_by(System=sys.ID).first()
-                #systemloc.Location = locationId
+                systemloc.Location = locationId
             db.session.commit()
             message = "Setting modified"
             flash("Changed location for " + hostName, "success")
             return json.dumps({"message": message, "status": "OK"})
         except Exception as e:
-            print(e)
             message = "Could not modify setting"
             flash("Error changing location for " + hostName, "error")
+            return json.dumps({"message": message, "status": "Error"})
     else:
         message = "Value cannot be empty!"
-
-    return json.dumps({"message": message, "status": "Error"})
+        return json.dumps({"message": message, "status": "Error"})
 
 
 @app.route("/systems/view/<string:hostname>/<string:group>", methods=["GET"])
