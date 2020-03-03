@@ -1125,20 +1125,32 @@ def addNewSystemToPolemarch():
         flash("Error adding new system! System already exists (or check database)!", "error")
         return redirect(url_for('systems'))
 
-    addResult = ANSIBLE_REST_CONNECTOR.addNewSystem(hostname, hostgroup)
+    addResult = ANSIBLE_REST_CONNECTOR.addNewSystem(hostname, hostgroup) 
 
-    if addResult is False:
-        flash("Error adding new system! PoleMarch does not accept special characters like _underscore!", "error")
-        return redirect(url_for('systems'))
-    else:
+    if addResult:
         loc = models.Locations.query.first()
+        if loc is None:
+            flash("Error adding new system! No location exists!", "error")
+            return redirect(url_for('systems'))
+
         sys = models.Systems(Name="dev-" + hostname)
-        db.session.add(sys)
-        db.session.commit()
-        sysloc = models.SystemsLocation(System=sys.ID, Location=loc.ID)
-        db.session.add(sysloc)
-        db.session.commit()
-        flash("Added new system!", "success")
+        if sys is None:
+            flash("Error adding new system: dev-" + hostname + " does not exist in systems!", "error")
+            return redirect(url_for('systems'))
+        
+        try:
+            db.session.add(sys)
+            db.session.commit()
+            sysloc = models.SystemsLocation(System=sys.ID, Location=loc.ID)
+            db.session.add(sysloc)
+            db.session.commit()
+            flash("Added new system!", "success")
+            return redirect(url_for('systems'))
+        except AttributeError:
+            flash("Error adding new system: system and/or location has no attribute ID!", "error")
+            return redirect(url_for('systems'))
+    else:
+        flash("Error adding new system! PoleMarch does not accept special characters like _underscore!", "error")
         return redirect(url_for('systems'))
 
 
