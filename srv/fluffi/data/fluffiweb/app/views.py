@@ -275,16 +275,18 @@ def createLocation():
 @app.route("/locations/removeLocation/<int:locId>")
 def removeLocation(locId):
     location = models.Locations.query.filter_by(ID=locId).first()
+    sysLocation = models.SystemsLocation.query.filter_by(Location=location.ID).first()
     location_fuzzjobs = models.LocationFuzzjobs.query.filter_by(Location=location.ID)
-    db.session.delete(location)
-
-    for location_fuzzjob in location_fuzzjobs:
-        db.session.delete(location_fuzzjob)
-
-    db.session.commit()
-    flash("Location deleted", "success")
-
-    return redirect("/locations")
+    if sysLocation is None:
+        db.session.delete(location)
+        for location_fuzzjob in location_fuzzjobs:
+            db.session.delete(location_fuzzjob)
+        db.session.commit()
+        flash("Location deleted", "success")
+        return redirect("/locations")
+    else:
+        flash("Location couldn't be deleted, because it's being used", "error")
+        return redirect("/locations")
 
 
 @app.route("/projects/<int:projId>/renameElement", methods=["POST"])
@@ -1069,11 +1071,6 @@ def systems():
                 if not hasattr(h, 'confLM'):
                     h.confLM = 0
 
-        for group in groups:
-            for h in group.hosts:
-                if h.Name.startswith('dev-'):
-                    h.isNotPersistentDevSys = True
-                    h.Name = h.Name[4:]
         locations = models.Locations.query.all()
     except Exception as e:
         print(e)
@@ -1119,38 +1116,36 @@ def changePXEBootSystemPolemarch():
 def addNewSystemToPolemarch():
     hostname = str(request.form.getlist('hostname')[0])
     hostgroup = str(request.form.getlist('hostgroup')[0])
-    numberOfexistingSystems = models.Systems.query.filter_by(Name="dev-" + hostname).all()
 
-    if (len(numberOfexistingSystems) > 0):
+    if len(models.Systems.query.filter_by(Name=hostname).all()) > 0:
         flash("Error adding new system! System already exists (or check database)!", "error")
         return redirect(url_for('systems'))
 
-    addResult = ANSIBLE_REST_CONNECTOR.addNewSystem(hostname, hostgroup) 
-
-    if addResult:
-        loc = models.Locations.query.first()
-        if loc is None:
-            flash("Error adding new system! No location exists!", "error")
-            return redirect(url_for('systems'))
-
-        sys = models.Systems(Name="dev-" + hostname)
-        if sys is None:
-            flash("Error adding new system: dev-" + hostname + " does not exist in systems!", "error")
-            return redirect(url_for('systems'))
-        
-        try:
-            db.session.add(sys)
-            db.session.commit()
-            sysloc = models.SystemsLocation(System=sys.ID, Location=loc.ID)
-            db.session.add(sysloc)
-            db.session.commit()
-            flash("Added new system!", "success")
-            return redirect(url_for('systems'))
-        except AttributeError:
-            flash("Error adding new system: system and/or location has no attribute ID!", "error")
-            return redirect(url_for('systems'))
+    loc = models.Locations.query.first()
+    if loc is None:
+        flash("Error adding new system! No location exists!", "error")
+        return redirect(url_for('systems'))
     else:
-        flash("Error adding new system! PoleMarch does not accept special characters like _underscore!", "error")
+        addResult = ANSIBLE_REST_CONNECTOR.addNewSystem(hostname, hostgroup)
+        if not addResult:
+            flash("Error adding new system! PoleMarch does not accept special characters like _underscore!", "error")
+            return redirect(url_for('systems'))
+
+    sys = models.Systems(Name=hostname)
+    if sys is None:
+        flash("Error adding new system: " + hostname + " does not exist in systems!", "error")
+        return redirect(url_for('systems'))
+
+    try:
+        db.session.add(sys)
+        db.session.commit()
+        sysloc = models.SystemsLocation(System=sys.ID, Location=loc.ID)
+        db.session.add(sysloc)
+        db.session.commit()
+        flash("Added new system!", "success")
+        return redirect(url_for('systems'))
+    except AttributeError:
+        flash("Error adding new system: system and/or location has no attribute ID!", "error")
         return redirect(url_for('systems'))
 
 
@@ -1171,15 +1166,15 @@ def changeAgentStarterMode():
     return redirect(url_for('systems'))
 
 
-@app.route("/systems/removeDevSystem/<string:hostName>/<string:hostId>", methods=["GET"])
-def removeDevSystemFromPolemarch(hostName, hostId):
-    removeResult = ANSIBLE_REST_CONNECTOR.removeDevSystem(hostId)
+@app.route("/systems/removeSystem/<string:hostName>", methods=["GET"])
+def removeSystemFromPolemarch(hostName):
+    removeResult = ANSIBLE_REST_CONNECTOR.removeSystem(hostName)
 
-    if removeResult is False:
-        flash("Error removing dev system!", "error")
+    if not removeResult:
+        flash("Error removing system!", "error")
         return redirect(url_for('systems'))
     else:
-        sys = models.Systems.query.filter_by(Name="dev-" + hostName).first()
+        sys = models.Systems.query.filter_by(Name=hostName).first()
         sysloc = models.SystemsLocation.query.filter_by(System=sys.ID).first()
         db.session.delete(sysloc)
         db.session.delete(sys)
@@ -1195,18 +1190,15 @@ def updateSystemLocation(hostName, locationId):
             sys = models.Systems.query.filter_by(Name=hostName).first()
             if sys is not None:
                 systemloc = models.SystemsLocation.query.filter_by(System=sys.ID).first()
-            if sys is None:
-                sys = models.Systems.query.filter_by(Name="dev-" + hostName).first()
-                systemloc = models.SystemsLocation.query.filter_by(System=sys.ID).first()
-            systemloc.Location = locationId
+                #systemloc.Location = locationId
             db.session.commit()
             message = "Setting modified"
-            flash("Changed Location for " + hostName, "success")
+            flash("Changed location for " + hostName, "success")
             return json.dumps({"message": message, "status": "OK"})
         except Exception as e:
             print(e)
             message = "Could not modify setting"
-            flash("Error changing Location for " + hostName, "error")
+            flash("Error changing location for " + hostName, "error")
     else:
         message = "Value cannot be empty!"
 

@@ -58,7 +58,6 @@ class AnsibleRESTConnector:
             return "http://" + self.ansibleURL.split("/")[2] + "/?history/" + str(historyID)
         else:
             return None
-        print(str(jsonResult))
 
     def getSystemObjectByName(self, hostname):
         system = type('', (), {})()
@@ -69,6 +68,19 @@ class AnsibleRESTConnector:
             system.IsGroup=True
 
         return system
+
+    def getSystems(self):
+        systems = []
+        url = self.ansibleURL + "host/"
+        try:
+            response = requests.get(url, auth=self.auth)
+            jsonResult = json.loads(response.text)
+            for entry in jsonResult['results']:
+                systems.append((entry['name'], entry['id']))
+
+            return systems
+        except Exception as e:
+            return None
 
     def getSystemsOfGroup(self, group):
         systems = []
@@ -99,7 +111,7 @@ class AnsibleRESTConnector:
     def addNewSystem(self, hostname, group):
         url = self.ansibleURL + "group/"+group+"/host/"
         data = {}
-        data['name'] = "dev-" + hostname
+        data['name'] = hostname
         data['type'] = "HOST"
 
         result = ""
@@ -127,17 +139,22 @@ class AnsibleRESTConnector:
         
         return True
 
-    # calls Polemarch REST API to remove a self created dev system to fluffi network
-    def removeDevSystem(self, hostId):
-        url = self.ansibleURL + "host/" + hostId + "/"
-        data = {}
+    # calls Polemarch REST API to remove a system from fluffi network
+    def removeSystem(self, hostName):
+        systems = self.getSystems()
+        url = ""
+        for system in systems:
+            if system[0] == hostName:
+                url = self.ansibleURL + "host/" + str(system[1])
+                break
+        if url != "":
+            try:
+                response = requests.delete(url, auth = self.auth)
+                return True
 
-        try:                                              
-            # Sending post request to execute playbook to add new system
-            response = requests.delete(url, json = data, auth = self.auth)
-            return True            
-            
-        except Exception as e:
+            except Exception as e:
+                return False
+        else:
             return False
 
     def getHostAliveState(self):
@@ -153,7 +170,7 @@ class AnsibleRESTConnector:
 
         response = requests.get(lastHostCheckResultURL, auth=self.auth, headers = {'User-Agent':'Python', 'Connection':'close'})
         jsonResults = json.loads(response.text)
-        getResultURL = jsonResults['raw_stdout']# --> get result
+        getResultURL = jsonResults['raw_stdout']  # --> get result
         response = requests.get(getResultURL, auth = self.auth, headers = {'User-Agent':'Python', 'Connection':'close'})
 
         hosts = []
@@ -162,7 +179,7 @@ class AnsibleRESTConnector:
         for p in resultHostData:
             if "RECAP" in p:
                 break
-            aliveProtocol+=1
+            aliveProtocol += 1
         for i, line in enumerate(resultHostData[aliveProtocol].split("\n")):
             line = line.strip()
             parts = line.split()
@@ -218,8 +235,8 @@ class AnsibleRESTConnector:
                                 else:
                                     host.Status = "Failed"
                         group.hosts.append(host)
+                resHosts.close()
             response.close()
             res.close()
-            resHosts.close()
             requests.session().close()
             return groups
