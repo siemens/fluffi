@@ -140,6 +140,29 @@ class AnsibleRESTConnector:
         except Exception as e:
             return False
 
+    def execHostAlive(self):
+        fluffiProjectURL = self.getFluffiProjectURL()
+        fluffiPeriodicTasksURL = fluffiProjectURL + "periodic_task/"
+        response = requests.get(fluffiPeriodicTasksURL, auth=self.auth,
+                                headers={'User-Agent': 'Python', 'Connection': 'close'})
+        jsonResults = json.loads(response.text)
+
+        taskId = '0'
+        for result in jsonResults['results']:
+            if result['name'] == 'checkHostsAlive':
+                taskId = str(result['id'])
+                break
+
+        if taskId != '0':
+            execCheckHostAliveURL = fluffiPeriodicTasksURL + taskId + '/execute/'
+            try:
+                response = requests.post(execCheckHostAliveURL, auth=self.auth)
+                return True
+            except Exception as e:
+                return False
+        else:
+            return False
+
     def getHostAliveState(self):
         url = self.ansibleURL + "history/?mode=checkHostAlive.yml"
         requests.session().close()
