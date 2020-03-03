@@ -9,6 +9,19 @@
 # 
 # Author(s): Thomas Riedmaier, Roman Bendt
 
+# Getting bootstrap
+
+(
+rm -rf bootstrap static/bootstrap
+mkdir -p static/bootstrap
+git clone https://github.com/twbs/bootstrap.git
+cd bootstrap
+git checkout 0b9c4a4007c44201dce9a6cc1a38407005c26c86
+cd ..
+cp -a bootstrap/dist/. static/bootstrap
+rm -rf  bootstrap
+)&
+
 # Getting bootswatch
 
 (
@@ -71,6 +84,7 @@ cd jquery
 git checkout 7751e69b615c6eca6f783a81e292a55725af6b85
 cd ..
 cp jquery/dist/jquery.js static/3rdParty/jquery/jquery-2.1.4.js
+cp jquery/dist/jquery.min.js static/bootstrap/jquery.min.js
 rm -rf  jquery
 )&
 
