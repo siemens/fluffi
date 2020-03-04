@@ -32,7 +32,7 @@ def checkSystemsLoaded(f):
     def wrapper(*args, **kwargs):
         if not app.SYSTEMS_LOADED or len(models.Locations.query.all()) is 0:
             newFlash = 0
-            for messages in get_flashed_messages(with_categories=true):
+            for messages in get_flashed_messages(with_categories=True):
                 if "addLocation" == messages[0]:
                     newFlash += 1
             if newFlash < 2:

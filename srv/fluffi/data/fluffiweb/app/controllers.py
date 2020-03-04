@@ -27,8 +27,19 @@ from .queries import *
 @app.before_first_request
 def loadSystems():
     if not app.SYSTEMS_LOADED:
-        systemsDB = [s for s, in models.Systems.query.with_entities(models.Systems.Name).all()]
-        systemsPM = [system[0] for system in ANSIBLE_REST_CONNECTOR.getSystems()]
+        systemsDB = []
+        systemsPM = []
+
+        try:
+            systemsDB = [s for s, in models.Systems.query.with_entities(models.Systems.Name).all()]
+        except Exception as e:
+            print("Cannot get systems from DB.", e)
+
+        try:
+            systemsPM = [system[0] for system in ANSIBLE_REST_CONNECTOR.getSystems()]
+        except Exception as e:
+            print("Cannot get systems from ANSIBLE_REST_CONNECTOR.", e)
+
         for persSystem in systemsPM:
             if persSystem not in systemsDB:
                 sys = models.Systems(Name=persSystem)
@@ -54,7 +65,7 @@ def loadSystems():
                     print("Error removing system: ", e)
         if set([s for s, in models.Systems.query.with_entities(models.Systems.Name).all()]) == set(
                 [system[0] for system in ANSIBLE_REST_CONNECTOR.getSystems()]):
-            app.SYSTEMS_LOADED = True
+            app.SYSTEMS_LOADED = True        
 
 
 def createNewDatabase(name):
