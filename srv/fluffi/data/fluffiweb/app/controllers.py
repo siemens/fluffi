@@ -24,6 +24,39 @@ from .helpers import *
 from .queries import *
 
 
+@app.before_first_request
+def loadSystems():
+    if not app.SYSTEMS_LOADED:
+        systemsDB = [s for s, in models.Systems.query.with_entities(models.Systems.Name).all()]
+        systemsPM = [system[0] for system in ANSIBLE_REST_CONNECTOR.getSystems()]
+        for persSystem in systemsPM:
+            if persSystem not in systemsDB:
+                sys = models.Systems(Name=persSystem)
+                loc = models.Locations.query.first()
+                if sys is not None and loc is not None:
+                    try:
+                        db.session.add(sys)
+                        db.session.commit()
+                        sysloc = models.SystemsLocation(System=sys.ID, Location=loc.ID)
+                        db.session.add(sysloc)
+                        db.session.commit()
+                    except AttributeError as e:
+                        print("Error adding new system: ", e)
+        for system in systemsDB:
+            if system not in systemsPM:
+                try:
+                    sys = models.Systems.query.filter_by(Name=system).first()
+                    sysloc = models.SystemsLocation.query.filter_by(System=sys.ID).first()
+                    db.session.delete(sysloc)
+                    db.session.delete(sys)
+                    db.session.commit()
+                except AttributeError as e:
+                    print("Error removing system: ", e)
+        if set([s for s, in models.Systems.query.with_entities(models.Systems.Name).all()]) == set(
+                [system[0] for system in ANSIBLE_REST_CONNECTOR.getSystems()]):
+            app.SYSTEMS_LOADED = True
+
+
 def createNewDatabase(name):
     dbName = config.DBPREFIX + name
     sqlFile = open(os.path.join(app.root_path, config.DBFILE), "r")
@@ -78,7 +111,7 @@ def listFuzzJobs():
             result = connection.execute(getITCountOfTypeQuery(5))
             project.numMinimizedPop = result.fetchone()[0]
 
-            result = connection.execute(getITCountOfTypeQuery(1)) 
+            result = connection.execute(getITCountOfTypeQuery(1))
             project.numHang = result.fetchone()[0]
 
             result = connection.execute(NUM_UNIQUE_ACCESS_VIOLATION)
@@ -379,7 +412,7 @@ def getResultOfStatement(projId, stmt, params=None):
     finally:
         connection.close()
         engine.dispose()
-        
+
     return result
 
 def getResultOfStatementForGlobalManager(stmt, params=None):
@@ -396,7 +429,7 @@ def getResultOfStatementForGlobalManager(stmt, params=None):
     finally:
         connection.close()
         engine.dispose()
-        
+
     return result
 
 
@@ -502,13 +535,13 @@ def getManagedInstancesAndSummary(projId):
         columnNames = resultMI.keys()
 
         for row in resultMI:
-            instance = {}                   
+            instance = {}
             for cn in columnNames:
-                instance[cn] = row[cn]                          
+                instance[cn] = row[cn]
 
             if instance["ServiceDescriptorHostAndPort"] is not None:
                 instance["kill"] = 0 if models.CommandQueue.query.filter_by(
-                    Argument = instance["ServiceDescriptorHostAndPort"], Done = 0).first() is None else 1           
+                    Argument = instance["ServiceDescriptorHostAndPort"], Done = 0).first() is None else 1
             if instance["Status"] is not None:
                 keyValueStatuses = [s.strip() for s in instance["Status"].split('|')]
                 parsedStatuses = dict((k.strip(), float(v.strip())) for k, v in
@@ -527,7 +560,7 @@ def getManagedInstancesAndSummary(projId):
                             summarySection[key] += instance[statusKey]
                         else:
                             summarySection[key] = instance[statusKey]
-            managedInstances["instances"].append(instance)                
+            managedInstances["instances"].append(instance)
     except Exception as e:
         print(e)
         pass
@@ -576,23 +609,23 @@ def updateModuleBinaryAndPath(projId, moduleId, formData, rawBytesData):
     project = models.Fuzzjob.query.filter_by(ID = projId).first()
 
     if project is not None:
-        try:            
+        try:
             engine = create_engine(
                 'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
             connection = engine.connect()
             statement = "UPDATE target_modules SET "
 
-            for key in formData: 
+            for key in formData:
                 if formData[key]:
-                    statement += "{}='{}', ".format(key, formData[key])                
-            
+                    statement += "{}='{}', ".format(key, formData[key])
+
             if rawBytesData["RawBytes"]:
                 statement += "RawBytes=:RawBytes WHERE ID={};".format(moduleId)
                 statement = text(statement)
-                connection.execute(statement, rawBytesData) 
+                connection.execute(statement, rawBytesData)
             else:
-                statement = statement[:-2] + " WHERE ID={};".format(moduleId)   
-                connection.execute(statement)                                                          
+                statement = statement[:-2] + " WHERE ID={};".format(moduleId)
+                connection.execute(statement)
         except Exception as e:
             print(e)
             return "Error: Could not edit module", "error"
@@ -726,15 +759,15 @@ def insertModules(projId, request):
         engine = create_engine(
             'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
         connection = engine.connect()
-        try:            
-            if 'targetModules' in request.files:                
+        try:
+            if 'targetModules' in request.files:
                 for module in request.files.getlist("targetModules"):
                     if module.filename:
                         data = {"ModuleName": module.filename, "ModulePath": "*", "RawBytes": module.read()}
                         statement = text(INSERT_MODULE)
                         connection.execute(statement, data)
                     else:
-                        return "Error: Filename cannot be empty", "error"            
+                        return "Error: Filename cannot be empty", "error"
         except Exception as e:
             print(e)
             return "Error: Failed to add module", "error"
@@ -872,14 +905,14 @@ def insertTestcases(projId, files):
         for f in files:
             connection.execute(text(INSERT_TESTCASE_POPULATION), {"rawData": f.read(), "localId": localId})
             testcaseID = connection.execute(text(GET_TESTCASE_ID), {"creatorlocalID": localId}).fetchone()[0]
-            connection.execute(text(INSERT_NICE_NAME_TESTCASE), {"testcaseID": testcaseID, "newName": f.filename})            
+            connection.execute(text(INSERT_NICE_NAME_TESTCASE), {"testcaseID": testcaseID, "newName": f.filename})
             localId += 1
 
         return "Added Testcase(s)", "success"
     except Exception as e:
         print(e)
         if "Duplicate entry" in str(e):
-            return "SQLAlchemy Exception: Duplicate entry for key", "error"      
+            return "SQLAlchemy Exception: Duplicate entry for key", "error"
     finally:
         connection.close()
         engine.dispose()
@@ -1021,11 +1054,11 @@ def insertFormInputForConfiguredFuzzjobInstances(request, fuzzjob):
         print(e)
         return "Error: Could not configure Instances!", "error"
 
- 
+
 def insertFormInputForProject(form, request):
     myProjName = form.name.data.replace(" ", "_")
     targetFileName = ""
-    
+
     if not myProjName or not form.targetCMDLine.data or form.option_module.data is None or not form.option_module_value.data:
         return ["Error: Could not create project! Check input data!", "error"]
 
@@ -1033,7 +1066,7 @@ def insertFormInputForProject(form, request):
 
     if 'targetfile' in request.files:
         targetFile = request.files['targetfile']
-        if targetFile:        
+        if targetFile:
             targetFileData = targetFile.read()
             targetFileName = targetFile.filename
             FTP_CONNECTOR.saveTargetFileOnFTPServer(targetFileData, targetFileName)

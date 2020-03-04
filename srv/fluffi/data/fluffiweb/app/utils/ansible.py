@@ -10,6 +10,7 @@
 
 import requests, json
 
+
 class AnsibleRESTConnector:
 
     def __init__(self, ansibleURL, username, password):
@@ -51,7 +52,6 @@ class AnsibleRESTConnector:
             data['extra_vars'] = extraVarsString
         # Sending post request to execute a playbook
         response = requests.post(fluffiProjectURL, json = data, auth = self.auth)
-        print(str(data))
         jsonResult = json.loads(response.text)
         if 'history_id' in jsonResult:
             historyID = jsonResult['history_id']
@@ -71,13 +71,18 @@ class AnsibleRESTConnector:
 
     def getSystems(self):
         systems = []
-        url = self.ansibleURL + "host/"
+        url = self.ansibleURL + "group/"
         try:
+            # Sending post request to execute playbook to add new system
             response = requests.get(url, auth=self.auth)
             jsonResult = json.loads(response.text)
             for entry in jsonResult['results']:
-                systems.append((entry['name'], entry['id']))
-
+                if entry['name'] in self.SHOWN_GROUPS:
+                    url = self.ansibleURL + "group/" + str(entry['id']) + "/host/"
+                    response = requests.get(url, auth=self.auth)
+                    jsonResult = json.loads(response.text)
+                    for host in jsonResult['results']:
+                        systems.append((host['name'], host['id']))
             return systems
         except Exception as e:
             return None
@@ -92,12 +97,9 @@ class AnsibleRESTConnector:
             jsonResult = json.loads(response.text)
             for entry in jsonResult['results']:
                 if entry['name'] == group:
-                    print(entry['id'])
                     url = self.ansibleURL + "group/" + str(entry['id']) + "/host/"
-                    print(url)
                     response = requests.get(url, auth=self.auth)
                     jsonResult = json.loads(response.text)
-                    print(jsonResult)
                     for entry in jsonResult['results']:
                         systems.append(entry['name'])
 
@@ -120,7 +122,6 @@ class AnsibleRESTConnector:
             # Sending post request to execute playbook to add new system
             response = requests.post(url, json = data, auth = self.auth)
             jsonResult = json.loads(response.text)
-            print(jsonResult)
 
             # get id of newly created host
             newHostId = jsonResult['id']

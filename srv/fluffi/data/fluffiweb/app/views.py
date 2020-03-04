@@ -8,8 +8,10 @@
 # 
 # Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Abian Blome, Fabian Russwurm, Thomas Riedmaier
 
-from flask import flash, redirect, url_for, request, send_file, Markup
+from flask import flash, get_flashed_messages, redirect, url_for, request, send_file, Markup
 from werkzeug.exceptions import HTTPException
+from functools import wraps
+
 
 from .controllers import *
 from .queries import *
@@ -24,8 +26,24 @@ import requests
 lock = LockFile()
 
 
+def checkSystemsLoaded(f):
+
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        if not app.SYSTEMS_LOADED or len(models.Locations.query.all()) is 0:
+            newFlash = 0
+            for messages in get_flashed_messages(with_categories=true):
+                if "addLocation" == messages[0]:
+                    newFlash += 1
+            if newFlash < 2:
+                flash("To add systems to the database is a location necessary.", "addLocation")
+        return f(*args, **kwargs)
+    return wrapper
+
+
 @app.route("/")
 @app.route("/index")
+@checkSystemsLoaded
 def index():
     fuzzjobs = listFuzzJobs()
     inactivefuzzjobs = []
@@ -53,6 +71,7 @@ def index():
 
 
 @app.route("/projects")
+@checkSystemsLoaded
 def projects():
     projects = getProjects()
 
@@ -118,6 +137,7 @@ def locationRemoveProject(locId, projId):
 
 
 @app.route("/projects/<int:projId>/setModuleBinaryAndPath/<int:moduleId>", methods=["GET", "POST"])
+@checkSystemsLoaded
 def setModuleBinaryAndPath(projId, moduleId):       
     if request.method == 'POST' and "moduleBinaryFile" in request.files:         
         moduleName = request.form.get("moduleName")
@@ -145,6 +165,7 @@ def setModuleBinaryAndPath(projId, moduleId):
 
 
 @app.route("/projects/<int:projId>/addSetting", methods=["GET", "POST"])
+@checkSystemsLoaded
 def createSetting(projId):
     settingForm = CreateProjectSettingForm()
 
@@ -212,6 +233,7 @@ def resetFuzzjob(projId):
 
 
 @app.route("/projects/<int:projId>/addModule", methods=["GET", "POST"])
+@checkSystemsLoaded
 def createProjectModule(projId):
     moduleForm = CreateProjectModuleForm()
 
@@ -233,6 +255,7 @@ def createProjectModule(projId):
 
 
 @app.route("/locations/<int:locId>/addProject", methods=["GET", "POST"])
+@checkSystemsLoaded
 def addLocationProject(locId):
     projects = []
 
@@ -257,6 +280,7 @@ def addLocationProject(locId):
 
 
 @app.route("/locations/createLocation", methods=["GET", "POST"])
+@checkSystemsLoaded
 def createLocation():
     form = CreateLocationForm()
 
@@ -264,6 +288,7 @@ def createLocation():
         location = models.Locations(Name=form.name.data)
         db.session.add(location)
         db.session.commit()
+        loadSystems()
         flash("Added Location", "success")
         return redirect("/locations")
 
@@ -394,6 +419,7 @@ def downloadArchive(archive):
 
 
 @app.route("/projects/<int:projId>/population/<int:page>")
+@checkSystemsLoaded
 def viewPopulation(projId, page):
     count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["population"]))
     if count % 1000 == 0:
@@ -427,6 +453,7 @@ def downloadPopulation(projId):
 
 
 @app.route("/projects/<int:projId>/accessVioTotal/<int:page>")
+@checkSystemsLoaded
 def viewAccessVioTotal(projId, page):
     count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["accessViolations"]))
     if count % 1000 == 0:
@@ -459,6 +486,7 @@ def downloadAccessVioTotal(projId):
 
 
 @app.route("/projects/<int:projId>/accessVioUnique")
+@checkSystemsLoaded
 def viewAccessVioUnique(projId):
     data = getGeneralInformationData(projId, UNIQUE_ACCESS_VIOLATION_NO_RAW)
     data.name = "Unique Access Violations"
@@ -483,6 +511,7 @@ def downloadAccessVioUnique(projId):
 
 
 @app.route("/projects/<int:projId>/totalCrashes/<int:page>")
+@checkSystemsLoaded
 def viewTotalCrashes(projId, page):
     count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["crashes"]))
     if count % 1000 == 0:
@@ -515,6 +544,7 @@ def downloadTotalCrashes(projId):
 
 
 @app.route("/projects/<int:projId>/uniqueCrashes")
+@checkSystemsLoaded
 def viewUniqueCrashes(projId):
     data = getGeneralInformationData(projId, UNIQUE_CRASHES_NO_RAW)
     data.name = "Unique Crashes"
@@ -539,6 +569,7 @@ def downloadUniqueCrashes(projId):
 
 
 @app.route("/projects/<int:projId>/hangs/<int:page>")
+@checkSystemsLoaded
 def viewHangs(projId, page):
     count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["hangs"]))
     if count % 1000 == 0:
@@ -571,6 +602,7 @@ def downloadHangs(projId):
 
 
 @app.route("/projects/<int:projId>/noResponse/<int:page>")
+@checkSystemsLoaded
 def viewNoResponses(projId, page):
     count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["noResponses"]))
     if count % 1000 == 0:
@@ -604,6 +636,7 @@ def downloadNoResponses(projId):
 
 
 @app.route("/projects/<int:projId>/violations")
+@checkSystemsLoaded
 def viewViolations(projId):
     violationsAndCrashes = getViolationsAndCrashes(projId)
 
@@ -649,6 +682,7 @@ def getSmallestVioOrCrashTestcase(projId, footprint):
 
 
 @app.route("/projects/<int:projId>/managedInstances")
+@checkSystemsLoaded
 def viewManagedInstances(projId):
     managedInstances, summarySection, localManagers = getManagedInstancesAndSummary(projId)
 
@@ -687,6 +721,7 @@ def getLogsOfManagedInstance(projId):
 
 
 @app.route("/projects/<int:projId>/configSystemInstances")
+@checkSystemsLoaded
 def viewConfigSystemInstances(projId):
     # initialize forms
     systemInstanceConfigForm = SystemInstanceConfigForm()
@@ -761,6 +796,7 @@ def killInstanceType(projId, myType):
 
 
 @app.route("/projects/<int:projId>/addLocation", methods=["GET", "POST"])
+@checkSystemsLoaded
 def addProjectLocation(projId):
     locationForm = getLocationFormWithChoices(projId, AddProjectLocationForm())
 
@@ -871,6 +907,7 @@ def removeProjectSetting(projId, settingId):
 
 
 @app.route("/projects/createProject", methods=["GET", "POST"])
+@checkSystemsLoaded
 def createProject():
     form = CreateProjectForm()
     # msg, category = "", "" 
@@ -901,6 +938,7 @@ def createProject():
 
 
 @app.route("/projects/createCustomProject", methods=["GET", "POST"])
+@checkSystemsLoaded
 def createCustomProject():
     form = CreateCustomProjectForm()
 
@@ -935,6 +973,7 @@ def viewTestcaseGraph(projId):
 
 
 @app.route("/locations/view/<int:locId>")
+@checkSystemsLoaded
 def viewLocation(locId):
     location = getLocation(locId)
 
@@ -944,6 +983,7 @@ def viewLocation(locId):
 
 
 @app.route("/projects/view/<int:projId>")
+@checkSystemsLoaded
 def viewProject(projId):
     project = getProject(projId)
     locationForm = getLocationFormWithChoices(projId, AddProjectLocationForm())
@@ -960,6 +1000,7 @@ def viewProject(projId):
 
 
 @app.route("/locations")
+@checkSystemsLoaded
 def locations():
     locations = models.Locations.query.all()
 
@@ -969,6 +1010,7 @@ def locations():
 
 
 @app.route("/commands")
+@checkSystemsLoaded
 def commands():
     commands = models.CommandQueue.query.all()
 
@@ -977,6 +1019,7 @@ def commands():
                           commands=commands)
 
 @app.route("/logs")
+@checkSystemsLoaded
 def logs():
     result = getResultOfStatementForGlobalManager(GET_LOCALMANAGER_LOGS)
     logs = [ row for row in result ]
@@ -986,6 +1029,7 @@ def logs():
 
 
 @app.route("/systems")
+@checkSystemsLoaded
 def systems():
     groups = []
     addNewSystemToPolemarchForm = AddNewSystemForm()
@@ -1035,7 +1079,6 @@ def systems():
             models.SystemsLocation.Location == models.Locations.ID).all()
 
         for system in systemLocations:
-            print(system)
             for group in groups:
                 for h in group.hosts:
                     h.confLM = 0
@@ -1207,6 +1250,7 @@ def updateSystemLocation(hostName, locationId):
 
 
 @app.route("/systems/view/<string:hostname>/<string:group>", methods=["GET"])
+@checkSystemsLoaded
 def viewSystem(hostname, group):
     if group == "odroids":
         group = "linux"
@@ -1555,3 +1599,4 @@ def dashboard():
     return renderTemplate("dashboard.html",
                           title="Home",
                           user=user)
+
