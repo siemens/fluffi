@@ -15,7 +15,7 @@ Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Thomas Riedmaier
 }
 
 .jumbotron {
-    margin-bottom: 0px;
+    margin: 20px 0px 0px 0px;
     background-image: url(/static/images/ci2.jpeg);
     background-position: 0% 25%;
     background-size: cover;
@@ -390,15 +390,19 @@ Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Thomas Riedmaier
 .targetModuleMargin {
     margin-bottom: 30px; 
     margin-top: 20px;
-  }
-  
-  /* Safari */
-  @-webkit-keyframes spin {
-    0% { -webkit-transform: rotate(0deg); }
-    100% { -webkit-transform: rotate(360deg); }
-  }
-  
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
+}
+
+.initialLoading {
+    margin: 50px 0;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+0% { -webkit-transform: rotate(0deg); }
+100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+0% { transform: rotate(0deg); }
+100% { transform: rotate(360deg); }
+}

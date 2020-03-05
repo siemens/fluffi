@@ -8,8 +8,10 @@
 # 
 # Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Abian Blome, Fabian Russwurm, Thomas Riedmaier
 
-from flask import flash, redirect, url_for, request, send_file, Markup
+from flask import flash, get_flashed_messages, redirect, url_for, request, send_file, Markup
 from werkzeug.exceptions import HTTPException
+from functools import wraps
+
 
 from .controllers import *
 from .queries import *
@@ -29,8 +31,25 @@ def updateSystems():
     ANSIBLE_REST_CONNECTOR.execHostAlive()
 
 
+@app.before_first_request
+def checkSystemsLoaded(f):
+
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        if not app.SYSTEMS_LOADED or len(models.Locations.query.all()) is 0:
+            newFlash = 0
+            for messages in get_flashed_messages(with_categories=True):
+                if "addLocation" == messages[0]:
+                    newFlash += 1
+            if newFlash < 2:
+                flash("To add systems to the database is a location necessary.", "addLocation")
+        return f(*args, **kwargs)
+    return wrapper
+
+
 @app.route("/")
 @app.route("/index")
+@checkSystemsLoaded
 def index():
     fuzzjobs = listFuzzJobs()
     inactivefuzzjobs = []
@@ -58,6 +77,7 @@ def index():
 
 
 @app.route("/projects")
+@checkSystemsLoaded
 def projects():
     projects = getProjects()
 
@@ -123,6 +143,7 @@ def locationRemoveProject(locId, projId):
 
 
 @app.route("/projects/<int:projId>/setModuleBinaryAndPath/<int:moduleId>", methods=["GET", "POST"])
+@checkSystemsLoaded
 def setModuleBinaryAndPath(projId, moduleId):       
     if request.method == 'POST' and "moduleBinaryFile" in request.files:         
         moduleName = request.form.get("moduleName")
@@ -150,6 +171,7 @@ def setModuleBinaryAndPath(projId, moduleId):
 
 
 @app.route("/projects/<int:projId>/addSetting", methods=["GET", "POST"])
+@checkSystemsLoaded
 def createSetting(projId):
     settingForm = CreateProjectSettingForm()
 
@@ -217,6 +239,7 @@ def resetFuzzjob(projId):
 
 
 @app.route("/projects/<int:projId>/addModule", methods=["GET", "POST"])
+@checkSystemsLoaded
 def createProjectModule(projId):
     moduleForm = CreateProjectModuleForm()
 
@@ -238,6 +261,7 @@ def createProjectModule(projId):
 
 
 @app.route("/locations/<int:locId>/addProject", methods=["GET", "POST"])
+@checkSystemsLoaded
 def addLocationProject(locId):
     projects = []
 
@@ -262,6 +286,7 @@ def addLocationProject(locId):
 
 
 @app.route("/locations/createLocation", methods=["GET", "POST"])
+@checkSystemsLoaded
 def createLocation():
     form = CreateLocationForm()
 
@@ -269,6 +294,7 @@ def createLocation():
         location = models.Locations(Name=form.name.data)
         db.session.add(location)
         db.session.commit()
+        loadSystems()
         flash("Added Location", "success")
         return redirect("/locations")
 
@@ -280,16 +306,18 @@ def createLocation():
 @app.route("/locations/removeLocation/<int:locId>")
 def removeLocation(locId):
     location = models.Locations.query.filter_by(ID=locId).first()
+    sysLocation = models.SystemsLocation.query.filter_by(Location=location.ID).first()
     location_fuzzjobs = models.LocationFuzzjobs.query.filter_by(Location=location.ID)
-    db.session.delete(location)
-
-    for location_fuzzjob in location_fuzzjobs:
-        db.session.delete(location_fuzzjob)
-
-    db.session.commit()
-    flash("Location deleted", "success")
-
-    return redirect("/locations")
+    if sysLocation is None:
+        db.session.delete(location)
+        for location_fuzzjob in location_fuzzjobs:
+            db.session.delete(location_fuzzjob)
+        db.session.commit()
+        flash("Location deleted", "success")
+        return redirect("/locations")
+    else:
+        flash("Location couldn't be deleted, because it's being used", "error")
+        return redirect("/locations")
 
 
 @app.route("/projects/<int:projId>/renameElement", methods=["POST"])
@@ -397,6 +425,7 @@ def downloadArchive(archive):
 
 
 @app.route("/projects/<int:projId>/population/<int:page>")
+@checkSystemsLoaded
 def viewPopulation(projId, page):
     count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["population"]))
     if count % 1000 == 0:
@@ -430,6 +459,7 @@ def downloadPopulation(projId):
 
 
 @app.route("/projects/<int:projId>/accessVioTotal/<int:page>")
+@checkSystemsLoaded
 def viewAccessVioTotal(projId, page):
     count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["accessViolations"]))
     if count % 1000 == 0:
@@ -462,6 +492,7 @@ def downloadAccessVioTotal(projId):
 
 
 @app.route("/projects/<int:projId>/accessVioUnique")
+@checkSystemsLoaded
 def viewAccessVioUnique(projId):
     data = getGeneralInformationData(projId, UNIQUE_ACCESS_VIOLATION_NO_RAW)
     data.name = "Unique Access Violations"
@@ -486,6 +517,7 @@ def downloadAccessVioUnique(projId):
 
 
 @app.route("/projects/<int:projId>/totalCrashes/<int:page>")
+@checkSystemsLoaded
 def viewTotalCrashes(projId, page):
     count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["crashes"]))
     if count % 1000 == 0:
@@ -518,6 +550,7 @@ def downloadTotalCrashes(projId):
 
 
 @app.route("/projects/<int:projId>/uniqueCrashes")
+@checkSystemsLoaded
 def viewUniqueCrashes(projId):
     data = getGeneralInformationData(projId, UNIQUE_CRASHES_NO_RAW)
     data.name = "Unique Crashes"
@@ -542,6 +575,7 @@ def downloadUniqueCrashes(projId):
 
 
 @app.route("/projects/<int:projId>/hangs/<int:page>")
+@checkSystemsLoaded
 def viewHangs(projId, page):
     count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["hangs"]))
     if count % 1000 == 0:
@@ -574,6 +608,7 @@ def downloadHangs(projId):
 
 
 @app.route("/projects/<int:projId>/noResponse/<int:page>")
+@checkSystemsLoaded
 def viewNoResponses(projId, page):
     count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["noResponses"]))
     if count % 1000 == 0:
@@ -607,6 +642,7 @@ def downloadNoResponses(projId):
 
 
 @app.route("/projects/<int:projId>/violations")
+@checkSystemsLoaded
 def viewViolations(projId):
     violationsAndCrashes = getViolationsAndCrashes(projId)
 
@@ -652,6 +688,7 @@ def getSmallestVioOrCrashTestcase(projId, footprint):
 
 
 @app.route("/projects/<int:projId>/managedInstances")
+@checkSystemsLoaded
 def viewManagedInstances(projId):
     managedInstances, summarySection, localManagers = getManagedInstancesAndSummary(projId)
 
@@ -690,6 +727,7 @@ def getLogsOfManagedInstance(projId):
 
 
 @app.route("/projects/<int:projId>/configSystemInstances")
+@checkSystemsLoaded
 def viewConfigSystemInstances(projId):
     # initialize forms
     systemInstanceConfigForm = SystemInstanceConfigForm()
@@ -764,6 +802,7 @@ def killInstanceType(projId, myType):
 
 
 @app.route("/projects/<int:projId>/addLocation", methods=["GET", "POST"])
+@checkSystemsLoaded
 def addProjectLocation(projId):
     locationForm = getLocationFormWithChoices(projId, AddProjectLocationForm())
 
@@ -874,6 +913,7 @@ def removeProjectSetting(projId, settingId):
 
 
 @app.route("/projects/createProject", methods=["GET", "POST"])
+@checkSystemsLoaded
 def createProject():
     form = CreateProjectForm()
     # msg, category = "", "" 
@@ -904,6 +944,7 @@ def createProject():
 
 
 @app.route("/projects/createCustomProject", methods=["GET", "POST"])
+@checkSystemsLoaded
 def createCustomProject():
     form = CreateCustomProjectForm()
 
@@ -938,6 +979,7 @@ def viewTestcaseGraph(projId):
 
 
 @app.route("/locations/view/<int:locId>")
+@checkSystemsLoaded
 def viewLocation(locId):
     location = getLocation(locId)
 
@@ -947,6 +989,7 @@ def viewLocation(locId):
 
 
 @app.route("/projects/view/<int:projId>")
+@checkSystemsLoaded
 def viewProject(projId):
     project = getProject(projId)
     locationForm = getLocationFormWithChoices(projId, AddProjectLocationForm())
@@ -963,6 +1006,7 @@ def viewProject(projId):
 
 
 @app.route("/locations")
+@checkSystemsLoaded
 def locations():
     locations = models.Locations.query.all()
 
@@ -972,6 +1016,7 @@ def locations():
 
 
 @app.route("/commands")
+@checkSystemsLoaded
 def commands():
     commands = models.CommandQueue.query.all()
 
@@ -980,6 +1025,7 @@ def commands():
                           commands=commands)
 
 @app.route("/logs")
+@checkSystemsLoaded
 def logs():
     result = getResultOfStatementForGlobalManager(GET_LOCALMANAGER_LOGS)
     logs = [ row for row in result ]
@@ -989,6 +1035,7 @@ def logs():
 
 
 @app.route("/systems")
+@checkSystemsLoaded
 def systems():
     groups = []
     addNewSystemToPolemarchForm = AddNewSystemForm()
@@ -1074,11 +1121,6 @@ def systems():
                 if not hasattr(h, 'confLM'):
                     h.confLM = 0
 
-        for group in groups:
-            for h in group.hosts:
-                if h.Name.startswith('dev-'):
-                    h.isNotPersistentDevSys = True
-                    h.Name = h.Name[4:]
         locations = models.Locations.query.all()
     except Exception as e:
         print(e)
@@ -1124,39 +1166,37 @@ def changePXEBootSystemPolemarch():
 def addNewSystemToPolemarch():
     hostname = str(request.form.getlist('hostname')[0])
     hostgroup = str(request.form.getlist('hostgroup')[0])
-    numberOfexistingSystems = models.Systems.query.filter_by(Name="dev-" + hostname).all()
 
-    if (len(numberOfexistingSystems) > 0):
+    if len(models.Systems.query.filter_by(Name=hostname).all()) > 0:
         flash("Error adding new system! System already exists (or check database)!", "error")
         return redirect(url_for('systems'))
 
-    addResult = ANSIBLE_REST_CONNECTOR.addNewSystem(hostname, hostgroup) 
-
-    if addResult:
-        loc = models.Locations.query.first()
-        if loc is None:
-            flash("Error adding new system! No location exists!", "error")
-            return redirect(url_for('systems'))
-
-        sys = models.Systems(Name="dev-" + hostname)
-        if sys is None:
-            flash("Error adding new system: dev-" + hostname + " does not exist in systems!", "error")
-            return redirect(url_for('systems'))
-        
-        try:
-            db.session.add(sys)
-            db.session.commit()
-            sysloc = models.SystemsLocation(System=sys.ID, Location=loc.ID)
-            db.session.add(sysloc)
-            db.session.commit()
-            flash("Added new system!", "success")
-            updateSystems()
-            return redirect(url_for('systems'))
-        except AttributeError:
-            flash("Error adding new system: system and/or location has no attribute ID!", "error")
-            return redirect(url_for('systems'))
+    loc = models.Locations.query.first()
+    if loc is None:
+        flash("Error adding new system! No location exists!", "error")
+        return redirect(url_for('systems'))
     else:
-        flash("Error adding new system! PoleMarch does not accept special characters like _underscore!", "error")
+        addResult = ANSIBLE_REST_CONNECTOR.addNewSystem(hostname, hostgroup)
+        if not addResult:
+            flash("Error adding new system! PoleMarch does not accept special characters like _underscore!", "error")
+            return redirect(url_for('systems'))
+
+    sys = models.Systems(Name=hostname)
+    if sys is None:
+        flash("Error adding new system: " + hostname + " does not exist in systems!", "error")
+        return redirect(url_for('systems'))
+
+    try:
+        db.session.add(sys)
+        db.session.commit()
+        sysloc = models.SystemsLocation(System=sys.ID, Location=loc.ID)
+        db.session.add(sysloc)
+        db.session.commit()
+        updateSystems()
+        flash("Added new system!", "success")
+        return redirect(url_for('systems'))
+    except AttributeError:
+        flash("Error adding new system: system and/or location has no attribute ID!", "error")
         return redirect(url_for('systems'))
 
 
@@ -1177,15 +1217,15 @@ def changeAgentStarterMode():
     return redirect(url_for('systems'))
 
 
-@app.route("/systems/removeDevSystem/<string:hostName>/<string:hostId>", methods=["GET"])
-def removeDevSystemFromPolemarch(hostName, hostId):
-    removeResult = ANSIBLE_REST_CONNECTOR.removeDevSystem(hostId)
+@app.route("/systems/removeSystem/<string:hostName>", methods=["GET"])
+def removeSystemFromPolemarch(hostName):
+    removeResult = ANSIBLE_REST_CONNECTOR.removeSystem(hostName)
 
-    if removeResult is False:
-        flash("Error removing dev system!", "error")
+    if not removeResult:
+        flash("Error removing system!", "error")
         return redirect(url_for('systems'))
     else:
-        sys = models.Systems.query.filter_by(Name="dev-" + hostName).first()
+        sys = models.Systems.query.filter_by(Name=hostName).first()
         sysloc = models.SystemsLocation.query.filter_by(System=sys.ID).first()
         db.session.delete(sysloc)
         db.session.delete(sys)
@@ -1196,30 +1236,28 @@ def removeDevSystemFromPolemarch(hostName, hostId):
 
 @app.route("/systems/<string:hostName>/updateSystemLocation/<int:locationId>", methods=["POST"])
 def updateSystemLocation(hostName, locationId):
+    print(hostName, locationId)
     if (len(hostName) > 0) and (locationId > 0):
         try:
             sys = models.Systems.query.filter_by(Name=hostName).first()
             if sys is not None:
                 systemloc = models.SystemsLocation.query.filter_by(System=sys.ID).first()
-            if sys is None:
-                sys = models.Systems.query.filter_by(Name="dev-" + hostName).first()
-                systemloc = models.SystemsLocation.query.filter_by(System=sys.ID).first()
-            systemloc.Location = locationId
+                systemloc.Location = locationId
             db.session.commit()
             message = "Setting modified"
-            flash("Changed Location for " + hostName, "success")
+            flash("Changed location for " + hostName, "success")
             return json.dumps({"message": message, "status": "OK"})
         except Exception as e:
-            print(e)
             message = "Could not modify setting"
-            flash("Error changing Location for " + hostName, "error")
+            flash("Error changing location for " + hostName, "error")
+            return json.dumps({"message": message, "status": "Error"})
     else:
         message = "Value cannot be empty!"
-
-    return json.dumps({"message": message, "status": "Error"})
+        return json.dumps({"message": message, "status": "Error"})
 
 
 @app.route("/systems/view/<string:hostname>/<string:group>", methods=["GET"])
+@checkSystemsLoaded
 def viewSystem(hostname, group):
     if group == "odroids":
         group = "linux"
@@ -1568,3 +1606,4 @@ def dashboard():
     return renderTemplate("dashboard.html",
                           title="Home",
                           user=user)
+
