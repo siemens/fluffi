@@ -24,6 +24,11 @@ import requests
 lock = LockFile()
 
 
+@app.before_first_request
+def updateSystems():
+    ANSIBLE_REST_CONNECTOR.execHostAlive()
+
+
 @app.route("/")
 @app.route("/index")
 def index():
@@ -1145,6 +1150,7 @@ def addNewSystemToPolemarch():
             db.session.add(sysloc)
             db.session.commit()
             flash("Added new system!", "success")
+            updateSystems()
             return redirect(url_for('systems'))
         except AttributeError:
             flash("Error adding new system: system and/or location has no attribute ID!", "error")
