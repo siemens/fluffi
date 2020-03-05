@@ -50,6 +50,21 @@ Author(s): Junes Najah, Thomas Riedmaier, Abian Blome
     {{ message }}
 </div>
 
+{% elif category == "warning" %}
+
+<div class="alert alert-danger">
+    {{ message }}
+</div>
+
+{% elif category == "addLocation" %}
+
+<div class="alert alert-danger">
+    <h4 class="alert-heading">Missing location!</h4>
+    <p>{{ message }}</p>
+    <br>
+    <div class="mb-0 text-right"><a href="/locations/createLocation" type="button" class="btn btn-danger">Add location</a></div>
+</div>
+
 {% endif %}
 {% endfor %}
 {% endif %}

@@ -23,11 +23,10 @@ Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Thomas Riedmaier
 
 <div class="container">
     <h1>Systems in FluffiNET</h1>
-    <hr>
+</div>
+<div class="container">
     {{ flashMessages() }}
 </div>
-
-
 <div class="jumbotron">
     <div class="container"></div>
 </div>
@@ -64,7 +63,7 @@ Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Thomas Riedmaier
                         {{addNewSystemToPolemarchForm.hostgroup(class='form-control modal-form')}}
                         {{addNewSystemToPolemarchForm.add_host(class='btn btn-primary modal-button')}}
                     </form>
-                    <p>The extension .fluffi to reach the system is set automatically. Ex. TestVM1</p>
+                    <p>The extension <b>.fluffi</b> to reach the system is set automatically.</p>
                     <hr>
                     <p>
                     <h3>HowTo:</h3>
@@ -110,7 +109,7 @@ Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Thomas Riedmaier
                     </p>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-default" data-dismiss="modal" type="button">Close</button>
+                    <button class="btn btn-danger" data-dismiss="modal" type="button">Close</button>
                 </div>
             </div>
         </div>
@@ -209,13 +208,7 @@ Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Thomas Riedmaier
             <tbody>
             {% for host in group.hosts %}
             <tr>
-                {% if host.isNotPersistentDevSys == True %}
-                <td style="text-align: left; width: 20%;"><a href="/systems/view/dev-{{ host.Name }}/{{ group.Name }}">{{
-                    host.Name }}</a></td>
-                {% else %}
-                <td style="text-align: left; width: 20%;"><a href="/systems/view/{{ host.Name }}/{{ group.Name }}">{{
-                    host.Name }}</a></td>
-                {% endif %}
+                <td style="text-align: left; width: 20%;"><a href="/systems/view/{{ host.Name }}/{{ group.Name }}">{{ host.Name }}</a></td>
                 <td style="text-align: left; width: 15%;">{{ host.Status }}</td>
                 <td style="text-align: left; width: 15%;">
                     {{ host.InstanceCount }} {% if host.confLM > 0 %} <div class="systems-lm-text">({{host.confLM}} LM)</div> {% endif %}
@@ -228,8 +221,8 @@ Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Thomas Riedmaier
                 <td class="instance-run-error">{{ host.InstanceRun }}</td>
                 {% endif %}
                 <td class="update-system-loc">
-                    <select class="form-control" id="SystemLocationValue-{{ host.ID }}"
-                            name="SystemLocationValue-{{ host.ID }}"
+                    <select class="form-control" id="SystemLocationValue"
+                            name="SystemLocationValue"
                             onchange="updateSystemLocation('{{ host.Name }}', this.value)">
                         <option selected="selected">{{ host.Location }}</option>
                         {% for location in locations %}
@@ -244,12 +237,10 @@ Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Thomas Riedmaier
                                                              role="button"><span
                         class="glyphicon glyphicon-repeat"></span></a></td>
                 <td class="remove">
-                {% if host.isNotPersistentDevSys == True %}
                 <a class="btn btn-secondary"
-                                                             href="/systems/removeDevSystem/{{ host.Name }}/{{ host.ID }}"
+                                                             href="/systems/removeSystem/{{ host.Name }}"
                                                              role="button"><span
                         class="glyphicon glyphicon-remove"></span></a>
-                {% endif %}
                 </td>
             </tr>
             {% endfor %}
