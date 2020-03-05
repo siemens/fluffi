@@ -28,22 +28,38 @@ lock = LockFile()
 
 @app.before_first_request
 def updateSystems():
-    ANSIBLE_REST_CONNECTOR.execHostAlive()
+    try:
+        ANSIBLE_REST_CONNECTOR.execHostAlive()
+    except Exception as e:
+        print("Polemarch ist Mist")
 
 
 def checkSystemsLoaded(f):
 
     @wraps(f)
     def wrapper(*args, **kwargs):
-        if not app.SYSTEMS_LOADED or len(models.Locations.query.all()) is 0:
+        if not app.SYSTEMS_LOADED and len(models.Locations.query.all()) is 0:
             newFlash = 0
             for messages in get_flashed_messages(with_categories=True):
                 if "addLocation" == messages[0]:
                     newFlash += 1
             if newFlash < 2:
                 flash("To add systems to the database is a location necessary.", "addLocation")
+        elif not app.SYSTEMS_LOADED and len(models.Locations.query.all()) is not 0:
+            newFlash = 0
+            for messages in get_flashed_messages(with_categories=True):
+                if "syncSystems" == messages[0]:
+                    newFlash += 1
+            if newFlash < 2:
+                flash("Something went wrong at the inital synchronization between PoleMarch and the database. Pleasy retry!", "syncSystems")
         return f(*args, **kwargs)
     return wrapper
+
+
+@app.route("/syncSystems")
+def syncSystems():
+    loadSystems()
+    return redirect("/")
 
 
 @app.route("/")
@@ -1123,6 +1139,10 @@ def systems():
         locations = models.Locations.query.all()
     except Exception as e:
         print(e)
+        try:
+            ANSIBLE_REST_CONNECTOR.execHostAlive()
+        except Exception as e:
+            print(e)
         flash(
             "Error retrieving or parsing data from polemarch! Check polemarch history if polemarch is busy or other "
             "error occured. Attach to webui docker container....",
@@ -1514,11 +1534,18 @@ def viewInstallFuzzjobPackage(hostname):
 def startFluffi(hostname, groupName):
     relevantHostnames = []
     if not groupName == '-':
-        groups = ANSIBLE_REST_CONNECTOR.getHostAliveState()
-        for group in groups:
-            if group.Name == groupName:
-                for h in group.hosts:
-                    relevantHostnames.append(h.Name)
+        try:
+            groups = ANSIBLE_REST_CONNECTOR.getHostAliveState()
+            for group in groups:
+                if group.Name == groupName:
+                    for h in group.hosts:
+                        relevantHostnames.append(h.Name)
+        except Exception as e:
+            try:
+                ANSIBLE_REST_CONNECTOR.execHostAlive()
+            except Exception as e:
+                print(e)
+            print(e)
     else:
         relevantHostnames.append(hostname)
 
