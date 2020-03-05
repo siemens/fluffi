@@ -84,8 +84,9 @@ function addPages(actualPage, pageCount){
 <div class="container">
     <h1><a href="/projects/view/{{data.project.ID}}">{{ data.name }} details: {{ data.project.name }}</a></h1>
 </div>
-{{ flashMessages() }}
-<hr>
+<div class="container">
+    {{ flashMessages() }}
+</div>
 
 <div class="container">
     <div class="row">

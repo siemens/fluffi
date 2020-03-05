@@ -21,10 +21,11 @@ Author(s): Junes Najah, Pascal Eckmann, Thomas Riedmaier, Michael Kraus, Abian B
 
 {% block content %}
 <div class="container">
-    <h1><u>Create new Project:</u></h1>
+    <h1>Create new Project:</h1>
 </div>
-{{ flashMessages() }}
-<hr>
+<div class="container">
+    {{ flashMessages() }}
+</div>
 <div class="jumbotron">
     <div class="container"></div>
 </div>
@@ -214,51 +215,10 @@ Author(s): Junes Najah, Pascal Eckmann, Thomas Riedmaier, Michael Kraus, Abian B
 
             </br>
             <hr>
-            <h3>Targets:</h3>
-            <div data-toggle="fieldset" id="phone-fieldset">
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th>
-                            <label for="target_module">Module Name:</label>
-                        </th>
-                        <th>
-                            <label for="target_module_path">Module Path:
-                                <span class="glyphicon glyphicon-info-sign"
-                                      onMouseOut="document.getElementById('infobox2').style.visibility = 'hidden'"
-                                      onMouseOver="document.getElementById('infobox2').style.visibility = 'visible'"></span>
-                                <span class="text-danger" id="infobox2">&emsp;Specify Path to Target Module, Use * as Wildcard, At least 1 target</span>
-                            </label>
-                        </th>
-                        <th>
-                            <span class="glyphicon glyphicon-remove"></span>
-                        </th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr data-toggle="fieldset-entry">
-                        <td>
-                            <input class="form-control" id="1_targetname" name="1_targetname" placeholder="example.dll"
-                                   type="text">
-                        </td>
-                        <td>
-                            <input class="form-control" id="1_targetpath" name="1_targetpath" type="text" value="*">
-                        </td>
-                        <td>
-                            <button data-toggle="fieldset-remove-row" id="phone-remove" type="button" class="btn">
-                                <span class="glyphicon glyphicon-remove-circle"></span>
-                            </button>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-                <button data-target="#phone-fieldset" data-toggle="fieldset-add-row" type="button" class="btn">
-                    <span class="glyphicon glyphicon-plus"></span>
-                </button>
-                <div style="margin-top: 30px">
-                    <label for="targetModulesOnCreate">Or select multiple Target Modules:</label>
-                    <input id="targetModulesOnCreate" multiple name="targetModulesOnCreate" type="file">
-                </div>
+            <h3>Target Modules:</h3>
+            <div data-toggle="fieldset" id="phone-fieldset">                
+                <label for="targetModulesOnCreate">Select Target Modules:</label>
+                <input id="targetModulesOnCreate" multiple name="targetModulesOnCreate" type="file">
             </div>
 
             </br>
@@ -272,7 +232,6 @@ Author(s): Junes Najah, Pascal Eckmann, Thomas Riedmaier, Michael Kraus, Abian B
             <hr>
             <h3>Population:</h3>
             <p>
-
                 <label for="filename">Initial Testcase(s) / Population</label>
                 <br> {{ form.filename(multiple="multiple") }}
                 <br>

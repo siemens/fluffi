@@ -11,7 +11,7 @@
 INSERT_SETTINGS = (
     "INSERT INTO settings(SettingName, SettingValue) VALUES(:SettingName, :SettingValue)")
 INSERT_MODULE = (
-    "INSERT INTO target_modules(ModuleName, ModulePath) VALUES(:ModuleName, :ModulePath)")
+    "INSERT INTO target_modules(ModuleName, ModulePath, RawBytes) VALUES(:ModuleName, :ModulePath, :RawBytes)")
 INSERT_BLOCK_TO_COVER = (
     "INSERT INTO blocks_to_cover(ModuleID, Offset) VALUES(:ModuleID, :Offset) ON DUPLICATE KEY UPDATE ModuleID = :ModuleID, Offset = :Offset")
 NUMBER_OF_NO_LONGER_LISTED = (
