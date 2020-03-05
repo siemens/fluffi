@@ -31,7 +31,6 @@ def updateSystems():
     ANSIBLE_REST_CONNECTOR.execHostAlive()
 
 
-@app.before_first_request
 def checkSystemsLoaded(f):
 
     @wraps(f)
