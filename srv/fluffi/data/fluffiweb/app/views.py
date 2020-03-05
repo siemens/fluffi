@@ -26,6 +26,12 @@ import requests
 lock = LockFile()
 
 
+@app.before_first_request
+def updateSystems():
+    ANSIBLE_REST_CONNECTOR.execHostAlive()
+
+
+@app.before_first_request
 def checkSystemsLoaded(f):
 
     @wraps(f)
@@ -1186,6 +1192,7 @@ def addNewSystemToPolemarch():
         sysloc = models.SystemsLocation(System=sys.ID, Location=loc.ID)
         db.session.add(sysloc)
         db.session.commit()
+        updateSystems()
         flash("Added new system!", "success")
         return redirect(url_for('systems'))
     except AttributeError:
