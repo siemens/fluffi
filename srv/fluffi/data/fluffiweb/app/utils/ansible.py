@@ -36,6 +36,15 @@ class AnsibleRESTConnector:
             if result['name'].lower() == "fluffi":
                 return url + str(result['id']) + "/"
 
+    def checkFluffiInventory(self):
+        url = self.ansibleURL + "inventory/"
+        response = requests.get(url, auth = self.auth)
+        jsonResults = json.loads(response.text)
+        for result in jsonResults['results']:
+            if result['name'].lower() == "fluffi":
+                return True
+        return False
+
     def executePlaybook(self, playbookName, limit, arguments = None):
         inventoryID = self.getFluffiInventoryID()
         fluffiProjectURL = self.getFluffiProjectURL()

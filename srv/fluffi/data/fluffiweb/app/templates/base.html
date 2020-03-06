@@ -65,6 +65,15 @@ Author(s): Junes Najah, Thomas Riedmaier, Abian Blome
     <div class="mb-0 text-right"><a href="/locations/createLocation" type="button" class="btn btn-danger">Add location</a></div>
 </div>
 
+{% elif category == "syncSystems" %}
+
+<div class="alert alert-danger">
+    <h4 class="alert-heading">Sync systems failed!</h4>
+    <p>{{ message }}</p>
+    <br>
+    <div class="mb-0 text-right"><a href="/syncSystems" type="button" class="btn btn-danger">Sync systems</a></div>
+</div>
+
 {% endif %}
 {% endfor %}
 {% endif %}
