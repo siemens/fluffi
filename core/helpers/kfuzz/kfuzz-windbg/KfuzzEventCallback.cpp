@@ -17,9 +17,28 @@ namespace Debugger::DataModel::Libraries::Kfuzz
 {
 	KfuzzEventCallback::KfuzzEventCallback() :
 		m_cRef(0),
-		m_publisherIPC("kfuzz_windbg_publish_subscribe")
+		m_publisherIPC("kfuzz_windbg_publish_subscribe"),
+		m_breakpointfunctions()
 	{
 		m_publisherIPC.initializeAsServer();
+
+		//Try to identify those breakpoints that are triggered by breaking into
+		//Get a pointer to the symbols interface
+		IDebugHost * dbgHost = Debugger::DataModel::ClientEx::GetHost();
+		ComPtr<IUnknown> spPrivate;
+		if (SUCCEEDED(dbgHost->GetHostDefinedInterface(&spPrivate)))
+		{
+			ComPtr<IDebugSymbols> dbgSymbols;
+			if (SUCCEEDED(spPrivate.As(&dbgSymbols))) {
+				uint64_t DbgBreakPointWithStatus_Address = 0;
+				dbgSymbols->GetOffsetByName("DbgBreakPointWithStatus", &DbgBreakPointWithStatus_Address);
+				m_breakpointfunctions.push_back(DbgBreakPointWithStatus_Address);
+
+				uint64_t DbgBreakPoint_Address = 0;
+				dbgSymbols->GetOffsetByName("DbgBreakPoint", &DbgBreakPoint_Address);
+				m_breakpointfunctions.push_back(DbgBreakPoint_Address);
+			}
+		}
 	}
 	KfuzzEventCallback::~KfuzzEventCallback() {
 	}
@@ -65,8 +84,21 @@ namespace Debugger::DataModel::Libraries::Kfuzz
 			whatHappened << "Program received signal SIGSEGV, Segmentation fault." << std::endl;
 		}
 		else {
+			//Evaluate if the breakpoint that was triggered is caused by breaking into the target
+			int isBreakInto = false;
+			for (std::vector<uint64_t>::iterator it = m_breakpointfunctions.begin(); it != m_breakpointfunctions.end(); ++it) {
+				if (Exception->ExceptionAddress - *it < 0x50) {
+					isBreakInto = true;
+					break;
+				}
+			}
 			//It's not necessarily true, that we received a SIGTRAP. However, for FLUFFI compatibility, this is enough.
-			whatHappened << "Program received signal SIGTRAP, Trace/breakpoint trap." << std::endl;
+			if (isBreakInto) {
+				whatHappened << "Program received signal SIGTRAP, Trace/breakpoint trap(DbgBreakPoint)." << std::endl;
+			}
+			else {
+				whatHappened << "Program received signal SIGTRAP, Trace/breakpoint trap." << std::endl;
+			}
 		}
 		whatHappened << "0x" << std::hex << std::setw(16) << std::setfill('0') << Exception->ExceptionAddress << " in ?? ()";
 		int timeoutMilliseconds = 1000;

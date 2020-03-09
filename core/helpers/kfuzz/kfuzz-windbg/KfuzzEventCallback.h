@@ -32,6 +32,7 @@ namespace Debugger::DataModel::Libraries::Kfuzz
 	private:
 		volatile ULONG m_cRef;
 		SharedMemIPC m_publisherIPC;
+		std::vector<uint64_t> m_breakpointfunctions;
 
 		SharedMemMessage stringToMessage(std::string command);
 	};
