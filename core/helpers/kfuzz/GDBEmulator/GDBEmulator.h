@@ -34,7 +34,7 @@ private:
 
 	SharedMemIPC m_requestIPC;
 	SharedMemIPC m_subscriberIPC;
-	std::mutex m_mutex_;
+	std::recursive_mutex m_mutex_;
 	std::unique_ptr<std::thread> m_WinDbgMessageDispatcher;
 	bool m_stopRequested;
 	HANDLE m_SharedMemIPCInterruptEvent;
