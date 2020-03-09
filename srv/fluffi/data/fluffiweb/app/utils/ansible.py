@@ -36,6 +36,15 @@ class AnsibleRESTConnector:
             if result['name'].lower() == "fluffi":
                 return url + str(result['id']) + "/"
 
+    def checkFluffiInventory(self):
+        url = self.ansibleURL + "inventory/"
+        response = requests.get(url, auth = self.auth)
+        jsonResults = json.loads(response.text)
+        for result in jsonResults['results']:
+            if result['name'].lower() == "fluffi":
+                return True
+        return False
+
     def executePlaybook(self, playbookName, limit, arguments = None):
         inventoryID = self.getFluffiInventoryID()
         fluffiProjectURL = self.getFluffiProjectURL()
@@ -153,6 +162,29 @@ class AnsibleRESTConnector:
                 response = requests.delete(url, auth = self.auth)
                 return True
 
+            except Exception as e:
+                return False
+        else:
+            return False
+
+    def execHostAlive(self):
+        fluffiProjectURL = self.getFluffiProjectURL()
+        fluffiPeriodicTasksURL = fluffiProjectURL + "periodic_task/"
+        response = requests.get(fluffiPeriodicTasksURL, auth=self.auth,
+                                headers={'User-Agent': 'Python', 'Connection': 'close'})
+        jsonResults = json.loads(response.text)
+
+        taskId = '0'
+        for result in jsonResults['results']:
+            if result['name'] == 'checkHostsAlive':
+                taskId = str(result['id'])
+                break
+
+        if taskId != '0':
+            execCheckHostAliveURL = fluffiPeriodicTasksURL + taskId + '/execute/'
+            try:
+                response = requests.post(execCheckHostAliveURL, auth=self.auth)
+                return True
             except Exception as e:
                 return False
         else:
