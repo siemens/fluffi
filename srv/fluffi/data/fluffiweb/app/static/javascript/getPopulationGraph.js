@@ -39,7 +39,10 @@ function getPopulationGraph(projId) {
             boxSelectionEnabled: false,
             autounselectify: true,
             layout: {
-                name: 'dagre'
+                name: 'dagre',
+                avoidOverlap: true,
+                avoidOverlapPadding: 10,
+                nodeDimensionsIncludeLabels: true
             },
             style: [ {
                 selector: 'node',
