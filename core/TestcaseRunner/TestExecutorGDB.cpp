@@ -1013,11 +1013,13 @@ void TestExecutorGDB::gdbDebug(std::shared_ptr<GDBThreadCommunication> gDBThread
 		switch (cstate) {
 		case GDBThreadCommunication::COVERAGE_STATE::SHOULD_RESET_HARD: //Reset coverage to NULL and enable all breakpoints
 		{
+			std::string enableAllCommand = generateEnableAllCommand(allBreakpoints, bpInstr, bpInstrBytes);
+
 			//As there might be leftover commands we might need to clean that first
 			std::string resp;
 			bool noProblem = false;
 			while (true) {
-				noProblem = sendCommandToGDBAndWaitForResponse(generateEnableAllCommand(allBreakpoints, bpInstr, bpInstrBytes), &resp, gDBThreadCommunication, true);
+				noProblem = sendCommandToGDBAndWaitForResponse(enableAllCommand, &resp, gDBThreadCommunication, true);
 				if (noProblem) {
 					break;
 				}
