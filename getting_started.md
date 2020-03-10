@@ -25,7 +25,18 @@ Furthermore, you need to have a subnet that is entirely under your control, no o
 
 
 ### Windows
-On Windows use  [the windows build file](build/windows/buildAll.bat). When you compile FLUFFI for the first time, call 
+These instructions assume you have a fresh and clean install of **Windows 10 64-bit**.
+The following tools are needed to build and deploy a FLUFFI installation:
+- git and the [git-lfs extention](https://git-lfs.github.com/)
+- Visual Studio 2017 or the standalone [build tools](https://download.visualstudio.microsoft.com/download/pr/3e542575-929e-4297-b6c6-bef34d0ee648/639c868e1219c651793aff537a1d3b77/vs_buildtools.exe) for Visual Studio 2017
+- cmake
+- perl (e.g. [Strawberry Perl for Windows](http://strawberryperl.com/))
+- cygwin64 with make, gcc-i86, and gcc installed
+- go (1.12 or newer) with [mysql driver](https://github.com/go-sql-driver/mysql) and [godiff](github.com/sergi/go-diff)
+- 7zip
+- Winscp
+
+On Windows use [the windows build file](build/windows/buildAll.bat). When you compile FLUFFI for the first time, call
 ```
 buildAll.bat -WITH_DEPS TRUE
 ```
