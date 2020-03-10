@@ -197,21 +197,24 @@ namespace Debugger::DataModel::Libraries::Kfuzz
 
 			unsigned long bytesWritten = 0;
 			HRESULT res = E_UNEXPECTED;
-			while (res == E_UNEXPECTED) {
+			while (res != S_OK) {
 				switch (width) {
 				case'b':
 				{
 					res = dbgData->WriteVirtualUncached(address, &value, 1, &bytesWritten);
+					res |= dbgData->WriteVirtual(address, &value, 1, &bytesWritten);
 					break;
 				}
 				case'h':
 				{
 					res = dbgData->WriteVirtualUncached(address, &value, 2, &bytesWritten);
+					res |= dbgData->WriteVirtual(address, &value, 2, &bytesWritten);
 					break;
 				}
 				case'w':
 				{
 					res = dbgData->WriteVirtualUncached(address, &value, 4, &bytesWritten);
+					res |= dbgData->WriteVirtual(address, &value, 4, &bytesWritten);
 					break;
 				}
 				default:
