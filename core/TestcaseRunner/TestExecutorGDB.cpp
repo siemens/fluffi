@@ -802,6 +802,8 @@ bool TestExecutorGDB::handleSignal(std::shared_ptr<GDBThreadCommunication> gDBTh
 
 		if (breakPointKnown || breakPointKnownOffByOne) {
 			//Yep, this is one of our breakpoints
+			LOG(DEBUG) << "This is one of our breakpoints";
+
 			GDBBreakpoint gdbb = allBreakpoints->at(signalAddress - (breakPointKnown ? 0 : 1));
 			blocksCoveredSinceLastReset->insert(gdbb.m_fbb);
 
@@ -832,6 +834,8 @@ bool TestExecutorGDB::handleSignal(std::shared_ptr<GDBThreadCommunication> gDBTh
 			return true;
 		}
 	}
+	//This is not one of our breakpoints!
+	LOG(DEBUG) << "This is some strange bp";
 
 	std::vector<tModuleAddressesAndSizes> baseAddressesAndSizes;
 	std::string infoFilesResp;
