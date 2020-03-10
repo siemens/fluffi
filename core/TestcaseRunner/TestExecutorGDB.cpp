@@ -668,21 +668,22 @@ bool TestExecutorGDB::sendCommandToGDBAndWaitForResponse(const std::string comma
 			*response = "ERROR";
 			return false;
 		}
+
+		//Avoid race conditions (command processed before Ctrl+z is processed)
+		std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+		//Re-enable Ctrl-C handling or any subsequently started programs will inherit the disabled state.
+		SetConsoleCtrlHandler(NULL, false);
+
 #else
 		kill(gDBThreadCommunication->m_gdbPid, SIGINT);
 #endif
 	}
 
+	//Send the actual command
 	for (size_t i = 0; i < command.length(); i += 1000) {
 		//Handle gdbThreadShouldTerminate
 		if (gDBThreadCommunication->get_gdbThreadShouldTerminate()) {
-#if defined(_WIN32) || defined(_WIN64)
-			if (sendCtrlZ) {
-				//Re-enable Ctrl-C handling or any subsequently started
-				//programs will inherit the disabled state.
-				SetConsoleCtrlHandler(NULL, false);
-			}
-#endif
 			*response = "INTERRUPTED";
 			return false;
 		}
@@ -695,17 +696,11 @@ bool TestExecutorGDB::sendCommandToGDBAndWaitForResponse(const std::string comma
 	std::stringstream responseSS;
 	bool firstLine = true;
 	while (true) {
+		//Wait for response
 		gDBThreadCommunication->waitForTerminateMessageOrCovStateChange(nullptr, 0);
 
 		//Handle gdbThreadShouldTerminate
 		if (gDBThreadCommunication->get_gdbThreadShouldTerminate()) {
-#if defined(_WIN32) || defined(_WIN64)
-			if (sendCtrlZ) {
-				//Re-enable Ctrl-C handling or any subsequently started
-				//programs will inherit the disabled state.
-				SetConsoleCtrlHandler(NULL, false);
-			}
-#endif
 			*response = "INTERRUPTED";
 			return false;
 		}
@@ -714,13 +709,6 @@ bool TestExecutorGDB::sendCommandToGDBAndWaitForResponse(const std::string comma
 		while (gDBThreadCommunication->get_gdbOutputQueue_size() > 0) {
 			std::string line = gDBThreadCommunication->gdbOutputQueue_pop_front();
 			if (line.find("Undefined command") != std::string::npos) {
-#if defined(_WIN32) || defined(_WIN64)
-				if (sendCtrlZ) {
-					//Re-enable Ctrl-C handling or any subsequently started
-					//programs will inherit the disabled state.
-					SetConsoleCtrlHandler(NULL, false);
-				}
-#endif
 				*response = responseSS.str();
 				return true;
 			}
