@@ -95,13 +95,13 @@ if moduleList[selected_module-1][1] == 'NULL':
     rawModule = True
 
 # Step Nr. 5: Let user change offset (optional)
-offset = ida_kernwin.ask_long(0, "Add offset")
+offset = ida_kernwin.ask_long(0, "Add offset (if it's hex prepend a 0x)")
 
 # Step Nr. 6: Retrieve covered blocks
 engine = create_engine(database_string)
 with engine.connect() as con:
     #blocksDB = con.execute('SELECT Offset FROM covered_blocks WHERE ModuleID = %d' % selected_module)
-    blocksDistinctDB = con.execute('SELECT DISTINCT Offset FROM covered_blocks WHERE ModuleID = %d' % selected_module)
+    blocksDistinctDB = con.execute('SELECT DISTINCT Offset FROM covered_blocks WHERE ModuleID = %d ORDER BY Offset ASC' % selected_module)
 print "Found ? block(s) (%d distinct)" % (blocksDistinctDB.rowcount)
 
 # Step Nr. 7: Color the currently loaded binary
