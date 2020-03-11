@@ -40,8 +40,6 @@ On Windows use [the windows build file](build/windows/buildAll.bat). When you co
 ```
 buildAll.bat -WITH_DEPS TRUE
 ```
-PREPARE_ENV=TRUE will build the docker continers.  This needs to be done only once.
-
 WITH_DEPS=TRUE will build all of FLUFFI's dependencies from sources. Please keep in mind that this will take a long time.
 
 For all future compiles you can use 
