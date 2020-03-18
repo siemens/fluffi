@@ -77,6 +77,7 @@ function getPopulationGraph(projId) {
         cy.filter('node[type="5"]').style('background-color', "grey");
         cy.filter('node[type="FOOTPRINT"]').style('background-color', "orange");    
 
+        // Download the testcase by clicking on the node
         cy.on('tap', 'node', function(evt){
             var nodeData = evt.target.data();
             

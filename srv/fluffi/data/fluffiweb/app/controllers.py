@@ -1196,6 +1196,7 @@ def getGraphData(projId):
     project = models.Fuzzjob.query.filter_by(ID = projId).first()
     graphdata = dict()
     nodes = []
+    nodesIds = []
     edges = []
 
     engine = create_engine('mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, project.DBHost, project.DBName))
@@ -1214,11 +1215,13 @@ def getGraphData(projId):
             testcase["parent"] = "%s-%d" % (row["ParentServiceDescriptorGUID"], row["ParentLocalID"])
             testcase["type"] = "%d" % row["TestCaseType"]
             nodes.append(testcase)
+            nodesIds.append(testcase["cyId"])
             edge = {"parent": testcase["parent"], "child": testcase["cyId"], "label": 0}
             edges.append(edge)
 
         result = connection.execute(GET_CRASH_DETAILS)
 
+        # cluster by CrashFootprint
         for row in result:
             if row["CrashFootprint"]:
                 footprintNode = dict()
@@ -1238,6 +1241,11 @@ def getGraphData(projId):
                     edge = {"parent": parentCyID, "child": footprintNode["cyId"], "label": numEdges}
                     edges.append(edge)
 
+        removeEdges = edges.copy()
+        for edge in removeEdges:
+            if edge["parent"] not in nodesIds:
+                edges.remove(edge)
+
     except Exception as e:
         print(e)
         pass
@@ -1247,7 +1255,7 @@ def getGraphData(projId):
 
     graphdata["nodes"] = nodes
     graphdata["edges"] = edges
-
+    
     return graphdata
 
 
