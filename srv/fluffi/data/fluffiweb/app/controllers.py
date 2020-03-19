@@ -1195,9 +1195,9 @@ def removeAgents(projId):
 def getGraphData(projId):
     project = models.Fuzzjob.query.filter_by(ID = projId).first()
     graphdata = dict()
-    nodes = []
-    nodesIds = []
+    nodes = []    
     edges = []
+    nodeIds = []
 
     engine = create_engine('mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, project.DBHost, project.DBName))
     connection = engine.connect()
@@ -1215,13 +1215,13 @@ def getGraphData(projId):
             testcase["parent"] = "%s-%d" % (row["ParentServiceDescriptorGUID"], row["ParentLocalID"])
             testcase["type"] = "%d" % row["TestCaseType"]
             nodes.append(testcase)
-            nodesIds.append(testcase["cyId"])
+            nodeIds.append(testcase["cyId"])
             edge = {"parent": testcase["parent"], "child": testcase["cyId"], "label": 0}
             edges.append(edge)
 
         result = connection.execute(GET_CRASH_DETAILS)
 
-        # cluster by CrashFootprint
+        # cluster crashes by footprint
         for row in result:
             if row["CrashFootprint"]:
                 footprintNode = dict()
@@ -1240,11 +1240,15 @@ def getGraphData(projId):
                     numEdges = crashParentRow["NumberEdges"]
                     edge = {"parent": parentCyID, "child": footprintNode["cyId"], "label": numEdges}
                     edges.append(edge)
-
+      
         removeEdges = edges.copy()
         for edge in removeEdges:
-            if edge["parent"] not in nodesIds:
+            if edge["parent"] not in nodeIds:
                 edges.remove(edge)
+                # remove child node of removed edge
+                index = nodeIds.index(edge["child"])
+                del nodes[index]
+                del nodeIds[index]
 
     except Exception as e:
         print(e)
@@ -1255,7 +1259,7 @@ def getGraphData(projId):
 
     graphdata["nodes"] = nodes
     graphdata["edges"] = edges
-    
+
     return graphdata
 
 
