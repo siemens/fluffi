@@ -1218,7 +1218,7 @@ def getGraphData(projId):
             nodeIds.append(testcase["cyId"])
             edge = {"parent": testcase["parent"], "child": testcase["cyId"], "label": 0}
             edges.append(edge)
-
+        
         result = connection.execute(GET_CRASH_DETAILS)
 
         # cluster crashes by footprint
@@ -1244,11 +1244,7 @@ def getGraphData(projId):
         removeEdges = edges.copy()
         for edge in removeEdges:
             if edge["parent"] not in nodeIds:
-                edges.remove(edge)
-                # remove child node of removed edge
-                index = nodeIds.index(edge["child"])
-                del nodes[index]
-                del nodeIds[index]
+                edges.remove(edge)                
 
     except Exception as e:
         print(e)
@@ -1259,7 +1255,7 @@ def getGraphData(projId):
 
     graphdata["nodes"] = nodes
     graphdata["edges"] = edges
-
+    
     return graphdata
 
 
