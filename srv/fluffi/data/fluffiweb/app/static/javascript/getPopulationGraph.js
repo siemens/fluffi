@@ -12,8 +12,8 @@ Author(s): Junes Najah, Thomas Riedmaier, Abian Blome
 
 function getPopulationGraph(projId) {
     var changeUrl = "/projects/" + projId + "/testcaseGraph";
-    nodes = [];
-    edges = [];
+    var nodes = [];
+    var edges = [];
     
     $.getJSON(changeUrl, function(data) {
         $.each(data["nodes"], function(index) {
@@ -32,74 +32,76 @@ function getPopulationGraph(projId) {
         });
         $.each(data["edges"], function(index) {
             edges.push( {data: {source: data["edges"][index]["parent"], target: data["edges"][index]["child"], label: data["edges"][index]["label"]} });
-        });
+        });  
           
-        var cy = window.cy = cytoscape({
-            container: document.getElementById('cy'),
-            boxSelectionEnabled: false,
-            autounselectify: true,
-            layout: {
-                name: 'dagre',
-                avoidOverlap: true,
-                avoidOverlapPadding: 10,
-                nodeDimensionsIncludeLabels: true
-            },
-            style: [ {
-                selector: 'node',
-                style: {
-                    'content': 'data(nodeName)',
-                    'text-opacity': 0.5,
-                    'text-valign': 'center',
-                    'text-halign': 'right',
-                    'background-color': '#11479e'
-                }},
-                {
-                selector: 'edge',
-                style: {
-                    'curve-style': 'bezier',
-                    'width': 4,
-                    'target-arrow-shape': 'triangle',
-                    'line-color': '#9dbaea',
-                    'target-arrow-color': '#9dbaea',
-                    'label': function(element){
-                        if(element.data('label') > 0){
-                            return element.data('label');
-                        }                        
-                    }
+        buildPopulationGraph(nodes, edges);           
+    });    
+}
+
+function buildPopulationGraph(nodes, edges){    
+    var cy = window.cy = cytoscape({
+        container: document.getElementById('cy'),
+        boxSelectionEnabled: false,
+        autounselectify: true,        
+        style: [ {
+            selector: 'node',
+            style: {
+                'content': 'data(nodeName)',
+                'text-opacity': 0.5,
+                'text-valign': 'center',
+                'text-halign': 'right',
+                'background-color': '#11479e'
+            }},
+            {
+            selector: 'edge',
+            style: {
+                'curve-style': 'bezier',
+                'width': 4,
+                'target-arrow-shape': 'triangle',
+                'line-color': '#9dbaea',
+                'target-arrow-color': '#9dbaea',
+                'label': function(element){
+                    if(element.data('label') > 0){
+                        return element.data('label');
+                    }                        
                 }
-                } ],
-            elements: {
-                nodes: nodes,
-                edges: edges
-            },
-        });
-
-        cy.filter('node[type="5"]').style('background-color', "grey");
-        cy.filter('node[type="FOOTPRINT"]').style('background-color', "orange");    
-
-        // Download the testcase by clicking on the node
-        cy.on('tap', 'node', function(evt){
-            var nodeData = evt.target.data();
-            
-            if(nodeData["type"] == "FOOTPRINT"){
-                window.location = '/projects/' + projId + '/crashesorvio/download/' + nodeData["id"]
-            } else {
-                window.location = '/projects/' + projId + '/getTestcase/' + nodeData["downloadId"];                
-            }        
-        });
-
-        cy.on('tap', 'node', function(evt){
-            var nodeData = evt.target.data();
-            
-            if(nodeData["type"] == "FOOTPRINT"){
-                window.location = '/projects/' + projId + '/crashesorvio/download/' + nodeData["id"]
-            } else {
-                window.location = '/projects/' + projId + '/getTestcase/' + nodeData["downloadId"];
             }
-        });
-        cy.on('cxttap', 'node', function(evt){
-            var nodeData = evt.target;
-            nodeData.style('display', "none");
-        });
+            } ],
+        elements: {
+            nodes: nodes,
+            edges: edges
+        },
+    });
+
+    var layout = cy.layout({
+        name: 'dagre',
+        avoidOverlap: true,
+        avoidOverlapPadding: 10,
+        nodeDimensionsIncludeLabels: true
+    });
+
+    layout.pon('layoutstop').then(function(){
+        $("#loader").css('display', "none");
+    });
+    layout.run();
+
+    cy.filter('node[type="5"]').style('background-color', "grey");
+    cy.filter('node[type="FOOTPRINT"]').style('background-color', "orange");    
+
+    // Download the testcase by clicking on the node
+    cy.on('tap', 'node', function(evt){
+        var nodeData = evt.target.data();
+        
+        if(nodeData["type"] == "FOOTPRINT"){
+            window.location = '/projects/' + projId + '/crashesorvio/download/' + nodeData["id"];
+        } else {
+            window.location = '/projects/' + projId + '/getTestcase/' + nodeData["downloadId"];                
+        }        
+    });
+
+    //Delete node by right click
+    cy.on('cxttap', 'node', function(evt){
+        var nodeData = evt.target;
+        nodeData.style('display', "none");
     });
 }
