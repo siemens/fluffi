@@ -1061,8 +1061,13 @@ def systems():
     changeAgentStarterModeForm = ChangeAgentStarterModeForm()
     changePXEForm = ChangePXEForm()
     bootsystemdir = models.GmOptions.query.filter_by(setting="bootsystemdir").first().value
-    availablePXEsystems = FTP_CONNECTOR.getListOfFilesOnFTPServer("tftp-roots/")
-    changePXEForm.pxesystem.choices = availablePXEsystems
+
+    try:
+        changePXEForm.pxesystem.choices = FTP_CONNECTOR.getListOfFilesOnFTPServer("tftp-roots/")
+        ftpConnectionWorks = True
+    except:
+        ftpConnectionWorks = False
+        changePXEForm.pxesystem.choices = []
 
     for project in projIds:
         managedInstances, summarySection, localmanagers = getManagedInstancesAndSummary(project.ID)
@@ -1143,10 +1148,10 @@ def systems():
             ANSIBLE_REST_CONNECTOR.execHostAlive()
         except Exception as e:
             print(e)
-        flash(
-            "Error retrieving or parsing data from polemarch! Check polemarch history if polemarch is busy or other "
-            "error occured. Attach to webui docker container....",
-            "error")
+        # flash(
+        #     "Error retrieving or parsing data from polemarch! Check polemarch history if polemarch is busy or other "
+        #     "error occured. Attach to webui docker container....",
+        #     "error")
         locations = []
 
     return renderTemplate("systems.html",
@@ -1154,9 +1159,9 @@ def systems():
                           systems=groups,
                           locations=locations,
                           addNewSystemToPolemarchForm=addNewSystemToPolemarchForm,
+                          ftpConnectionWorks=ftpConnectionWorks,
                           changePXEForm=changePXEForm,
                           bootsystemdir=bootsystemdir,
-                          availablePXEsystems=availablePXEsystems,
                           agentStarterMode=actualAgentStarterMode,
                           changeAgentStarterModeForm=changeAgentStarterModeForm)
 

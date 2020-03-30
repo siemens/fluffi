@@ -34,48 +34,48 @@ Author(s): Junes Najah, Thomas Riedmaier, Abian Blome
 {% macro flashMessages() %}
 {% with messages = get_flashed_messages(with_categories=true) %}
 {% if messages %}
-{% for category, message in messages %}
-{% if category == "error" %}
+    {% for category, message in messages %}
+        {% if category == "error" %}
 
-<div class="alert alert-warning">
-    {{ message }}
-</div>
+            <div class="alert alert-warning">
+                {{ message }}
+            </div>
 
-{% elif category == "success" %}
+        {% elif category == "success" %}
 
-<div class="alert alert-info">
-    <strong>
-        Success!
-    </strong>
-    {{ message }}
-</div>
+            <div class="alert alert-info">
+                <strong>
+                    Success!
+                </strong>
+                {{ message }}
+            </div>
 
-{% elif category == "warning" %}
+        {% elif category == "warning" %}
 
-<div class="alert alert-danger">
-    {{ message }}
-</div>
+            <div class="alert alert-danger">
+                {{ message }}
+            </div>
 
-{% elif category == "addLocation" %}
+        {% elif category == "addLocation" %}
 
-<div class="alert alert-danger">
-    <h4 class="alert-heading">Missing location!</h4>
-    <p>{{ message }}</p>
-    <br>
-    <div class="mb-0 text-right"><a href="/locations/createLocation" type="button" class="btn btn-danger">Add location</a></div>
-</div>
+            <div class="alert alert-danger">
+                <h4 class="alert-heading">Missing location!</h4>
+                <p>{{ message }}</p>
+                <br>
+                <div class="mb-0 text-right"><a href="/locations/createLocation" type="button" class="btn btn-danger">Add location</a></div>
+            </div>
 
-{% elif category == "syncSystems" %}
+        {% elif category == "syncSystems" %}
 
-<div class="alert alert-danger">
-    <h4 class="alert-heading">Sync systems failed!</h4>
-    <p>{{ message }}</p>
-    <br>
-    <div class="mb-0 text-right"><a href="/syncSystems" type="button" class="btn btn-danger">Sync systems</a></div>
-</div>
+            <div class="alert alert-danger">
+                <h4 class="alert-heading">Sync systems failed!</h4>
+                <p>{{ message }}</p>
+                <br>
+                <div class="mb-0 text-right"><a href="/syncSystems" type="button" class="btn btn-danger">Sync systems</a></div>
+            </div>
 
-{% endif %}
-{% endfor %}
+        {% endif %}
+    {% endfor %}
 {% endif %}
 {% endwith %}
 {% endmacro %}
