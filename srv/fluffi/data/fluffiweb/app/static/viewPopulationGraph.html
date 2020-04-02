@@ -21,14 +21,17 @@ Author(s): Junes Najah, Thomas Riedmaier, Abian Blome
     <link href="/static/images/favicon.ico" rel="shortcut icon">
     <link href="/static/css/fluffi.css" rel="stylesheet" type="text/css"/>
 </head>
+
 <body onload="getPopulationGraph(parseInt(window.location.hash.substr(1)))">
-<!-- Add labels of colors --> 
-<div class="label-boxes">
-    <span class="label population-color">Population</span>
-    <span class="label minimized-color">Minimized</span>
-    <span class="label footprint-color">Footprint</span>
-</div>
-<div id="cy"></div>
+    <!-- Add labels of colors --> 
+    <div class="label-boxes">    
+        <span class="label population-color">Population</span>
+        <span class="label minimized-color">Minimized</span>
+        <span class="label footprint-color">Footprint</span>
+    </div>
+
+    <div id="loader" class="centered-big-loader"></div>
+    <div id="cy"></div>
 </body>
 </html>
 
