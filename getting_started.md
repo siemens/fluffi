@@ -34,6 +34,7 @@ Then you can further scale up your fuzzing capabilities by adding more and more 
 ## Common Steps
 These steps are needed to compile FLUFFI core, as well as to build the FLUFFI master for the FUN (FLUFFI utility network).
 Ensure you prepared both machines this way should you want to compile FLUFFI on another server than your master.
+These instructions assume you have a fresh and clean install of **Ubuntu 18.04**.
 
 become root and setup the environment:
 ```bash
@@ -57,8 +58,6 @@ git lfs pull
 
 ## Compiling FLUFFI core
 ### Linux
-
-These instructions assume you have a fresh and clean install of **Ubuntu 18.04**.
 Make sure you run the build on a machine/vm that has **at least 1.5 GB of memory for every core** installed, otherwise the system will not be able to build.
 So for a machine/vm with 4 cpu cores, please install/allocate at least 6 GB of RAM to it.
 Note, that the build is optimized to make heavy use of parallel processing, so the more cores the system has, the faster your build will be done.
@@ -146,14 +145,19 @@ EOF
 sed -i 's/NetworkManager/networkd/' /etc/netplan/01-network-manager-all.yaml
 sudo systemctl restart systemd-networkd
 ```
-### FUN Services
 
-Next, create the live encironment that serves all the core services:
+### FUN Services
+Next, create the live environment that serves all the core services:
 ```
-sudo mkdir -p /srv/fluffi/data/ftp/files/fluffi/linux/{x64,x86,arm32,arm64} /srv/fluffi/data/ftp/files/fluffi/windows/{x64,x86} /srv/fluffi/data/tftp /srv/fluffi/data/dnsmasq
+sudo mkdir -p \
+	/srv/fluffi/data/ftp/files/{SUT,archive} \
+	/srv/fluffi/data/ftp/files/initial/linux/activePackages \
+	/srv/fluffi/data/ftp/files/fluffi/linux/{x64,x86,arm32,arm64} \
+	/srv/fluffi/data/ftp/files/fluffi/windows/{x64,x86} \
+	/srv/fluffi/data/tftp \
+	/srv/fluffi/data/dnsmasq
 
 sudo touch /srv/fluffi/data/dnsmasq/dnsmasq.leases
-
 ```
 Change to the base of the FLUFFI git folder and copy the services to /srv/fluffi.
 You can execute this command again to update the server components in the future.
