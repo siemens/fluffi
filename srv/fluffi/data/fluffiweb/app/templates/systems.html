@@ -165,8 +165,15 @@ Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Thomas Riedmaier
                     <p>This image is loaded from the FTP server when the PXE-boot is triggered.</p>
                     <form action="{{ url_for('changePXEBootSystemPolemarch', pxebootsystem=pxesystem) }}" method="post">
                         {{changePXEForm.pxesystem.label }}
+
                         {{changePXEForm.pxesystem(class='form-control modal-form')}}
-                        {{changePXEForm.execute_change_pxe(class='btn btn-primary modal-button')}}
+
+                        {% if ftpConnectionWorks %}                            
+                            {{changePXEForm.execute_change_pxe(class='btn btn-primary modal-button')}}
+                        {% else %}
+                            <div class="alert alert-danger">Error: Failed to get files from FTP-Server</div>
+                            {{changePXEForm.execute_change_pxe(class='btn btn-primary modal-button disabled')}}
+                        {% endif %}                        
                     </form>
                     <hr>
                     <p>
@@ -187,6 +194,9 @@ Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Thomas Riedmaier
 <hr>
 
 <div class="container">
+    {% if not ansibleConnectionWorks %}
+    <div class="alert alert-danger">Ansible connector failed</div>
+    {% endif %}
     {% for group in systems %}
     <h2>Group: <a href="/systems/view/{{ group.Name }}/{{ group.Name }}">{{ group.Name }}</a></h2>
     <div class="container" style="padding-left: 50px">

@@ -1052,6 +1052,9 @@ def logs():
 @app.route("/systems")
 @checkSystemsLoaded
 def systems():
+    ansibleConnectionWorks = True
+    ftpConnectionWorks = True  
+
     groups = []
     addNewSystemToPolemarchForm = AddNewSystemForm()
     projIds = models.Fuzzjob.query.all()
@@ -1061,8 +1064,13 @@ def systems():
     changeAgentStarterModeForm = ChangeAgentStarterModeForm()
     changePXEForm = ChangePXEForm()
     bootsystemdir = models.GmOptions.query.filter_by(setting="bootsystemdir").first().value
-    availablePXEsystems = FTP_CONNECTOR.getListOfFilesOnFTPServer("tftp-roots/")
-    changePXEForm.pxesystem.choices = availablePXEsystems
+
+    try:
+        changePXEForm.pxesystem.choices = FTP_CONNECTOR.getListOfFilesOnFTPServer("tftp-roots/")              
+    except Exception as e:
+        print("Error", e)
+        ftpConnectionWorks = False
+        changePXEForm.pxesystem.choices = []
 
     for project in projIds:
         managedInstances, summarySection, localmanagers = getManagedInstancesAndSummary(project.ID)
@@ -1136,27 +1144,25 @@ def systems():
                 if not hasattr(h, 'confLM'):
                     h.confLM = 0
 
-        locations = models.Locations.query.all()
+        locations = models.Locations.query.all()        
     except Exception as e:
         print(e)
+        ansibleConnectionWorks = False
+        locations = []
         try:
             ANSIBLE_REST_CONNECTOR.execHostAlive()
         except Exception as e:
-            print(e)
-        flash(
-            "Error retrieving or parsing data from polemarch! Check polemarch history if polemarch is busy or other "
-            "error occured. Attach to webui docker container....",
-            "error")
-        locations = []
+            print(e)        
 
     return renderTemplate("systems.html",
                           title="Systems",
                           systems=groups,
                           locations=locations,
                           addNewSystemToPolemarchForm=addNewSystemToPolemarchForm,
+                          ftpConnectionWorks=ftpConnectionWorks,
+                          ansibleConnectionWorks=ansibleConnectionWorks,
                           changePXEForm=changePXEForm,
                           bootsystemdir=bootsystemdir,
-                          availablePXEsystems=availablePXEsystems,
                           agentStarterMode=actualAgentStarterMode,
                           changeAgentStarterModeForm=changeAgentStarterModeForm)
 
