@@ -99,17 +99,30 @@ function prev(loopIndex){
     } 
 }
 
-function updatePageLinks(loopIndex){    
-    // Used for distance from indexOfActiveLink to last element
-    var distance = 0;
+function updatePageLinks(loopIndex){        
     var links = $("#buildLinks" + loopIndex).children();
     var indexOfActiveLink = null;
+    var indexOfRightArrowLink = null;
+    var indexOfLeftArrowLink = null;
     links.each(function(i){ if($(this).hasClass("active")){ indexOfActiveLink = i; }}); 
+    links.each(function(i){ if($(this).hasClass("rightArrow")){ indexOfRightArrowLink = i; }}); 
+    links.each(function(i){ if($(this).hasClass("leftArrow")){ indexOfLeftArrowLink = i; }}); 
     var endIndex = links.length-2; 
-    distance = (links.length-2) - indexOfActiveLink;
 
-    // Disable (...)-buttons if active link is next to it
+    // Used for distance from indexOfActiveLink to last element
+    var distance = (links.length-2) - indexOfActiveLink;
 
+    //disable arrow buttons if there are no more pages
+    if (links.eq(indexOfActiveLink+1).hasClass("rightArrow")) {
+        links.eq(indexOfActiveLink+1).addClass("disabled");
+    } else {
+        links.eq(indexOfRightArrowLink).removeClass("disabled");
+    }
+    if (links.eq(indexOfActiveLink-1).hasClass("leftArrow")) {
+        links.eq(indexOfActiveLink-1).addClass("disabled");
+    } else {
+        links.eq(indexOfLeftArrowLink).removeClass("disabled");
+    }
 
     // Ending of pages  
     if (distance >= 0 && distance <= MARGIN) {
