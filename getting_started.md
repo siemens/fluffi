@@ -186,7 +186,7 @@ Get the GlobalManager components from where you [compiled FLUFFI core](#compilin
 
 Set file permissions correctly:
 ```
-sudo chown -R 1000:1000 /srv/fluffi/data/{ftp/files,tfpt,smb/files}
+sudo chown -R 1000:1000 /srv/fluffi/data/{ftp/files,tftp,smb/files}
 
 sudo find /srv/fluffi/data/smb/files -type d -exec chmod 777 {} \;
 sudo find /srv/fluffi/data/ftp/files -type d -exec chmod 777 {} \;
