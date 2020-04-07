@@ -180,6 +180,7 @@ There are several necessary binary files we cannot provide in this repository.
 The following directories and their subdirectories contain a number of placeholder files that need to be replaced:
 - `/srv/fluffi/data/smb/files/initial/updatesWS2008`
 - `/srv/fluffi/data/ftp/files/initial/windows/ansible`
+
 All the files in there are dummy files named like the real files that have to go in there, but they are actually just textfiles that contain a download link.
 Download the binaries from these links and replace the placeholder textfiles with their respective binaries.
 
