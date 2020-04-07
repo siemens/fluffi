@@ -176,9 +176,12 @@ We recommend you customize the following files:
 - `/srv/fluffi/data/smb/files/initial/odroid_userpasswd` - add user password for your odroid executor machines applicable
 - `/srv/fluffi/data/smb/files/initial/MAC2Host.csv` - list MAC addresses and hostnames of your executor machines if you want to set host names during automatic deployment
 
-Replace the following dummy textfiles with their respective binaries. A link to obtain these is contained in the dummy files:
+There are several necessary binary files we cannot provide in this repository.
+The following directories and their subdirectories contain a number of placeholder files that need to be replaced:
 - `/srv/fluffi/data/smb/files/initial/updatesWS2008`
 - `/srv/fluffi/data/ftp/files/initial/windows/ansible`
+All the files in there are dummy files named like the real files that have to go in there, but they are actually just textfiles that contain a download link.
+Download the binaries from these links and replace the placeholder textfiles with their respective binaries.
 
 Get the GlobalManager components from where you [compiled FLUFFI core](#compiling-fluffi-core) - specifically, you need to copy
 `core/{ARCH}/bin/{GlobalManager,lib*.so*}` to `/srv/fluffi/data/fluffigm/`
