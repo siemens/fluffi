@@ -20,6 +20,9 @@ function loadPagination(projId, sdguid, loopIndex, offset=0, currentPage=1, init
     var linkElem = "";
     var navigateFuncStr = "";
 
+    $(".modal-loader").css("display", "inline");
+    $("#buildLogs" + loopIndex).css("visibility", "hidden");
+
     $.ajax({
         url: URL,
         type: 'POST',
@@ -64,9 +67,11 @@ function loadPagination(projId, sdguid, loopIndex, offset=0, currentPage=1, init
             }
             else if(pageCount > MARGIN) {
                 updatePageLinks(loopIndex);
-            }            
-        }
-    });         
+            } 
+            $(".modal-loader").css("display", "none");
+            $("#buildLogs" + loopIndex).css("visibility", "visible");
+        }        
+    });    
 }
 
 function navigate(projId, sdguid, loopIndex, currentPage){      
