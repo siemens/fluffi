@@ -21,7 +21,8 @@ GDBEmulator::GDBEmulator() :
 	m_mutex_(),
 	m_WinDbgMessageDispatcher(nullptr),
 	m_stopRequested(false),
-	m_SharedMemIPCInterruptEvent(NULL)
+	m_SharedMemIPCInterruptEvent(NULL),
+	m_waitingForForcedBreak(false)
 {
 }
 
@@ -72,7 +73,7 @@ std::string GDBEmulator::sendCommandToWinDbgAndGetResponse(std::string command) 
 	SharedMemMessage response;
 	SharedMemMessage request = stringToMessage(command);
 	if (!m_requestIPC.sendMessageToServer(&request) || !m_requestIPC.waitForNewMessageToClient(&response, timeoutMilliseconds)) {
-		return "ERROR: Could not forward a command to WinDbg, or WinDbg did not respond in time!";
+		return "ERROR: Could not forward a command to WinDbg, or WinDbg did not respond in time for command \"" + command + "\"";
 	}
 	SharedMemMessageType messageType = response.getMessageType();
 	if (messageType != SHARED_MEM_MESSAGE_KFUZZ_RESPONSE) {
@@ -166,8 +167,16 @@ void GDBEmulator::winDbgMessageDispatcher() {
 			continue;
 		}
 		std::string newMsg = messageToString(message);
-		if (newMsg.find("(DbgBreakPoint)") != std::string::npos) {
-			//Our Ctrl+c got processed by windbg, it is now safe to send more messages
+
+		if (newMsg.find("Program received signal SIGTRAP") != std::string::npos) {
+			//Check if we hit a ctrl+c induced breakpoint while not waiting for a forced break (happens if we request a break with ctrl+c but then hit another breakpoint)
+			if (newMsg.find("(DbgBreakPoint)") != std::string::npos && !m_waitingForForcedBreak) {
+				sendCommandToWinDbgAndGetResponse("c");
+				newMsg = "Continuing obsolete debug break";
+			}
+
+			//The target is in breaked state - it is now safe to send more messages
+			m_waitingForForcedBreak = false;
 			m_mutex_.unlock();
 		}
 		std::cout << newMsg << std::endl;
@@ -190,6 +199,7 @@ BOOL WINAPI GDBEmulator::consoleHandler(DWORD dwCtrlType) {
 	if (dwCtrlType == CTRL_C_EVENT) {
 		std::shared_ptr<GDBEmulator> gdbEmu = GDBEmulator::getInstance();
 		gdbEmu->m_mutex_.lock();
+		gdbEmu->m_waitingForForcedBreak = true;
 		gdbEmu->sendCommandToWinDbgAndGetResponse("ctrl+c");
 		return TRUE;
 	}
