@@ -20,11 +20,11 @@ COPY ./requirements.txt /requirements.txt
 RUN pip3 install -r /requirements.txt
 
 #Prepare polemarch environment
-RUN ln -s /usr/bin/python3 /usr/bin/python
-RUN mkdir -p /tmp/polemarch/logs
-RUN mkdir -p /tmp/polemarch/pid
-RUN mkdir -p /root/.ssh
-RUN ln -fs /dev/null /root/.ssh/known_hosts
+RUN ln -s /usr/bin/python3 /usr/bin/python \
+&& mkdir -p /tmp/polemarch/logs \
+&& mkdir -p /tmp/polemarch/pid \
+&& mkdir -p /root/.ssh \
+&& ln -fs /dev/null /root/.ssh/known_hosts
 
 # kill community nav item, since it DOSes our installation in a separate network
 RUN echo ' li[data-url="/community_template"] { visibility:hidden; height:0px;}' >> /usr/local/lib/python3.6/dist-packages/polemarch/static/css/polemarch-gui.css
