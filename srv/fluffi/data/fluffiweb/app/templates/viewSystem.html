@@ -44,7 +44,7 @@ Author(s): Pascal Eckmann, Fabian Russwurm, Junes Najah, Michael Kraus, Thomas R
         <li class="active"><a data-toggle="tab" href="#menu1">1. Initial setup</a></li>
         <li><a data-toggle="tab" href="#menu2">2. Deploy Fluffi</a></li>
         <li><a data-toggle="tab" href="#menu3">3. Deploy SUT/Dependency</a></li>
-        <li><a data-toggle="tab" href="#menu4">4. Configure Instances</a></li>
+        {% if not system.IsGroup %}<li><a data-toggle="tab" href="#menu4">4. Configure Instances</a></li>{% endif %}
     </ul>
 
     <div class="tab-content">

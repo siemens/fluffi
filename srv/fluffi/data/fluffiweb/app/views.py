@@ -1052,6 +1052,9 @@ def logs():
 @app.route("/systems")
 @checkSystemsLoaded
 def systems():
+    ansibleConnectionWorks = True
+    ftpConnectionWorks = True  
+
     groups = []
     addNewSystemToPolemarchForm = AddNewSystemForm()
     projIds = models.Fuzzjob.query.all()
@@ -1061,8 +1064,13 @@ def systems():
     changeAgentStarterModeForm = ChangeAgentStarterModeForm()
     changePXEForm = ChangePXEForm()
     bootsystemdir = models.GmOptions.query.filter_by(setting="bootsystemdir").first().value
-    availablePXEsystems = FTP_CONNECTOR.getListOfFilesOnFTPServer("tftp-roots/")
-    changePXEForm.pxesystem.choices = availablePXEsystems
+
+    try:
+        changePXEForm.pxesystem.choices = FTP_CONNECTOR.getListOfFilesOnFTPServer("tftp-roots/")              
+    except Exception as e:
+        print("Error", e)
+        ftpConnectionWorks = False
+        changePXEForm.pxesystem.choices = []
 
     for project in projIds:
         managedInstances, summarySection, localmanagers = getManagedInstancesAndSummary(project.ID)
@@ -1136,27 +1144,25 @@ def systems():
                 if not hasattr(h, 'confLM'):
                     h.confLM = 0
 
-        locations = models.Locations.query.all()
+        locations = models.Locations.query.all()        
     except Exception as e:
         print(e)
+        ansibleConnectionWorks = False
+        locations = []
         try:
             ANSIBLE_REST_CONNECTOR.execHostAlive()
         except Exception as e:
-            print(e)
-        flash(
-            "Error retrieving or parsing data from polemarch! Check polemarch history if polemarch is busy or other "
-            "error occured. Attach to webui docker container....",
-            "error")
-        locations = []
+            print(e)        
 
     return renderTemplate("systems.html",
                           title="Systems",
                           systems=groups,
                           locations=locations,
                           addNewSystemToPolemarchForm=addNewSystemToPolemarchForm,
+                          ftpConnectionWorks=ftpConnectionWorks,
+                          ansibleConnectionWorks=ansibleConnectionWorks,
                           changePXEForm=changePXEForm,
                           bootsystemdir=bootsystemdir,
-                          availablePXEsystems=availablePXEsystems,
                           agentStarterMode=actualAgentStarterMode,
                           changeAgentStarterModeForm=changeAgentStarterModeForm)
 
@@ -1504,18 +1510,27 @@ def viewInstallPackage(hostname):
 @app.route("/systems/view/<string:hostname>/deployFuzzPackage", methods=["POST"])
 def viewInstallFuzzjobPackage(hostname):
     # validate and execute playbook 
-    historyURL = None
     selectedFuzzJob = str(request.form.getlist('fuzzingJob')[0])
+
+    historyURL = None
     packages = []
-    res = db.session.query(models.Fuzzjob, models.FuzzjobDeploymentPackages, models.DeploymentPackages).filter_by(
-        name=selectedFuzzJob).join(models.FuzzjobDeploymentPackages).filter(
-        models.Fuzzjob.ID == models.FuzzjobDeploymentPackages.Fuzzjob).join(models.DeploymentPackages).filter(
-        models.FuzzjobDeploymentPackages.DeploymentPackage == models.DeploymentPackages.ID)
+    
+    fuzzjob = db.session.query(models.Fuzzjob).filter_by(name=selectedFuzzJob).first()
+        
+    if fuzzjob is None:
+        flash("Fuzzjob {} does not exist in db.".format(selectedFuzzJob), "error")
+        return redirect(url_for('systems'))
+    
 
-    for package in res:
-        packages.append(package[2].name)
+    result = (db.session.query(models.FuzzjobDeploymentPackages, models.DeploymentPackages)
+                    .join(models.DeploymentPackages, models.FuzzjobDeploymentPackages.DeploymentPackage == models.DeploymentPackages.ID)
+                    .filter(models.FuzzjobDeploymentPackages.Fuzzjob == fuzzjob.ID)
+                    .all())        
 
-    if len(packages) < 1:
+    for row in result:        
+        packages.append(row[1].name)
+
+    if len(packages) == 0:
         flash("No package found to deploy!", "error")
         return redirect(url_for('systems'))
 
@@ -1528,7 +1543,6 @@ def viewInstallFuzzjobPackage(hostname):
         return redirect(historyURL, code=302)
     else:
         return redirect(url_for('viewSystem', hostname=hostname))
-
 
 @app.route("/systems/view/<string:hostname>/<string:groupName>/startFluffi", methods=["POST"])
 def startFluffi(hostname, groupName):
