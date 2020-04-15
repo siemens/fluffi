@@ -14,7 +14,7 @@
 # $3 = preseeding file to copy to initrd
 # this script adds the given preseeding file to the initrd.gz
 
-function print_usage {
+print_usage() {
  echo "Usage: sudo embedPreseed.sh <FILEPATH_TO_BASE_INITRD> <FILEPATH_TO_NEW_INITRD_FILE> <FILEPATH_TO_INSTALLFILE>\nThe last two arguments have to be absolute paths.\nExample: sudo ./embedPreseed.sh ./initrd.gz /home/user/ubuntu_netinstall/ubuntu-installer/amd64/initrdNew /home/user/ubuntu_netinstall/ubuntu-installer/amd64/preseed.cfg"
 }
 
