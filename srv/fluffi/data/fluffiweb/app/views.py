@@ -1039,6 +1039,7 @@ def commands():
                           title="Commands",
                           commands=commands)
 
+
 @app.route("/logs")
 @checkSystemsLoaded
 def logs():
