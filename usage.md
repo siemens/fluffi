@@ -32,7 +32,8 @@ To add new systems:
     * `/bin/bash initialConfiguration.sh`
     * `rm MAC2Host.csv`
     * `rm initialConfiguration.sh`
-* Tell FLUFFI about the system. To do so you have two options: either add it to ansible's [hosts](srv/fluffi/data/polenext/projects/1/hosts) file (persistent), or use the `Add System` button in FLUFFI's web GUI. When adding it, just use the system's host name without any domain suffix.
+* Tell FLUFFI about the system. To do so you have two options: either add it as a new windows/linux/odroid host to ansible's [hosts](srv/fluffi/data/polenext/projects/1/hosts) file (persistent), or use the `Add System` button in FLUFFI's web GUI. When adding it, just use the system's host name without any domain suffix. Remember: When modifying the hosts file, you need to restart the polemarch and fluffi_web containers.
++ Assign a location to the system. An explication of the location concept can be found [here](technical_details.md).
 
 ## 2) Preparing your target
 
