@@ -13,25 +13,26 @@ Author(s): Thomas Riedmaier, Abian Blome, Junes Najah, Roman Bendt
 # Usage
 
 ## 1) Adding runner systems to FUN
-All FuzzJobs are run on dedicated Runner systems in the FLUFFI Utility Network (FUN). To add new systems:
+All FuzzJobs are run on dedicated Runner systems in the FLUFFI Utility Network (FUN). You can bring your own system or use the FLUFFI PXE images (recommended). How to build these images is documented [here](agents/pxe_images).
+
+To add new systems:
 
 * Physically plug your system into FUN
-* Assign a host name. (Other systems within FUN must be able to reach your system with that hostname. The DNS server should be able to handle this). On linux: `sudo hostnamectl set-hostname mysystem`
-* Check connectivity to `gm.fluffi`
-* For problems: check the firewall
+* Check connectivity to `gm.fluffi`. For problems: check the firewall
+* Decide on the host name for that system, and put it in the [MAC2Host.csv](srv/fluffi/data/smb/files/initial/MAC2Host.csv).  Other systems within FUN must be able to reach your system with that hostname.
 * Create a user for ansible. To do so you need to create a user that matches whatever username and password you specified in ansible's [hosts](srv/fluffi/data/polenext/projects/1/hosts) file (see [the getting started section](getting_started.md)). On Linux, this user needs to be a sudoer. On Windows, this user needs to be local administrator.
-* Prepare the system for ansible: 
+* Prepare the system for ansible. To do so run the following commands on the new agent system:
   * Windows:
     * `net use y: \\smb.fluffi\install\initial /user:nobody pass`
     * `y:\initialConfiguration.bat`
     * `net use y: /Delete /yes`
   * Linux:
     * `smbclient '//smb.fluffi/install' -c 'cd initial; get MAC2Host.csv; get initialConfiguration.sh' -U anonymous%pass;`
-    * `chmod 777 /initialConfiguration.sh`
-    * `/bin/bash /initialConfiguration.sh`
+    * `chmod 777 initialConfiguration.sh`
+    * `/bin/bash initialConfiguration.sh`
     * `rm MAC2Host.csv`
     * `rm initialConfiguration.sh`
-* Finally, you need to tell FLUFFI about the system. To do so you have two options: either add it to ansible's [hosts](srv/fluffi/data/polenext/projects/1/hosts) file, or use the `Add System` button in FLUFFI's web GUI.
+* Tell FLUFFI about the system. To do so you have two options: either add it to ansible's [hosts](srv/fluffi/data/polenext/projects/1/hosts) file (persistent), or use the `Add System` button in FLUFFI's web GUI. When adding it, just use the system's host name without any domain suffix.
 
 ## 2) Preparing your target
 
