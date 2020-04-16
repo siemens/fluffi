@@ -578,7 +578,11 @@ void TestExecutorGDB::debuggerThreadMain(const std::string targetCMDline, std::s
 		gDBThreadCommunication->m_exOutput.m_debuggerThreadDone = true;
 		return;
 	}
-	*gDBThreadCommunication->m_ostreamToGdb << initCommandFile.rdbuf();
+	if (initCommandFile.rdbuf()->pubseekoff(0, std::ios_base::end) > 0) {
+		//Only pipe GDBInitfile if it has any content
+		initCommandFile.rdbuf()->pubseekpos(std::ios_base::beg);
+		*gDBThreadCommunication->m_ostreamToGdb << initCommandFile.rdbuf();
+	}
 	//*gDBThreadCommunication->m_ostreamToGdb << "set stop-on-solib-events 1" << std::endl; //stop on module load
 	*gDBThreadCommunication->m_ostreamToGdb << "set new-console on" << std::endl; //do not print the debugees output in our console
 	gDBThreadCommunication->m_ostreamToGdb->flush();
@@ -664,21 +668,22 @@ bool TestExecutorGDB::sendCommandToGDBAndWaitForResponse(const std::string comma
 			*response = "ERROR";
 			return false;
 		}
+
+		//Avoid race conditions (command processed before Ctrl+z is processed)
+		std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+		//Re-enable Ctrl-C handling or any subsequently started programs will inherit the disabled state.
+		SetConsoleCtrlHandler(NULL, false);
+
 #else
 		kill(gDBThreadCommunication->m_gdbPid, SIGINT);
 #endif
 	}
 
+	//Send the actual command
 	for (size_t i = 0; i < command.length(); i += 1000) {
 		//Handle gdbThreadShouldTerminate
 		if (gDBThreadCommunication->get_gdbThreadShouldTerminate()) {
-#if defined(_WIN32) || defined(_WIN64)
-			if (sendCtrlZ) {
-				//Re-enable Ctrl-C handling or any subsequently started
-				//programs will inherit the disabled state.
-				SetConsoleCtrlHandler(NULL, false);
-			}
-#endif
 			*response = "INTERRUPTED";
 			return false;
 		}
@@ -691,17 +696,11 @@ bool TestExecutorGDB::sendCommandToGDBAndWaitForResponse(const std::string comma
 	std::stringstream responseSS;
 	bool firstLine = true;
 	while (true) {
+		//Wait for response
 		gDBThreadCommunication->waitForTerminateMessageOrCovStateChange(nullptr, 0);
 
 		//Handle gdbThreadShouldTerminate
 		if (gDBThreadCommunication->get_gdbThreadShouldTerminate()) {
-#if defined(_WIN32) || defined(_WIN64)
-			if (sendCtrlZ) {
-				//Re-enable Ctrl-C handling or any subsequently started
-				//programs will inherit the disabled state.
-				SetConsoleCtrlHandler(NULL, false);
-			}
-#endif
 			*response = "INTERRUPTED";
 			return false;
 		}
@@ -710,13 +709,6 @@ bool TestExecutorGDB::sendCommandToGDBAndWaitForResponse(const std::string comma
 		while (gDBThreadCommunication->get_gdbOutputQueue_size() > 0) {
 			std::string line = gDBThreadCommunication->gdbOutputQueue_pop_front();
 			if (line.find("Undefined command") != std::string::npos) {
-#if defined(_WIN32) || defined(_WIN64)
-				if (sendCtrlZ) {
-					//Re-enable Ctrl-C handling or any subsequently started
-					//programs will inherit the disabled state.
-					SetConsoleCtrlHandler(NULL, false);
-				}
-#endif
 				*response = responseSS.str();
 				return true;
 			}
@@ -790,14 +782,14 @@ bool TestExecutorGDB::handleSignal(std::shared_ptr<GDBThreadCommunication> gDBTh
 
 	uint64_t signalAddress;
 	try {
-		signalAddress = std::stoll(addressLine.c_str(), 0, 0x10);
+		signalAddress = std::stoull(addressLine.c_str(), 0, 0x10);
 
 		if (signalAddress == 0) {
 			LOG(WARNING) << "handleSignal could not parse line " << addressLine << " as address";
 		}
 	}
 	catch (...) {
-		LOG(ERROR) << "handleSignal could not parse line " << addressLine << " as address: std::stoi/stoll failed";
+		LOG(ERROR) << "handleSignal could not parse line " << addressLine << " as address: std::stoi/stoull failed";
 		google::protobuf::ShutdownProtobufLibrary();
 		_exit(EXIT_FAILURE); //make compiler happy
 	}
@@ -810,6 +802,8 @@ bool TestExecutorGDB::handleSignal(std::shared_ptr<GDBThreadCommunication> gDBTh
 
 		if (breakPointKnown || breakPointKnownOffByOne) {
 			//Yep, this is one of our breakpoints
+			LOG(DEBUG) << "This is one of our breakpoints";
+
 			GDBBreakpoint gdbb = allBreakpoints->at(signalAddress - (breakPointKnown ? 0 : 1));
 			blocksCoveredSinceLastReset->insert(gdbb.m_fbb);
 
@@ -840,6 +834,8 @@ bool TestExecutorGDB::handleSignal(std::shared_ptr<GDBThreadCommunication> gDBTh
 			return true;
 		}
 	}
+	//This is not one of our breakpoints!
+	LOG(DEBUG) << "This is some strange bp";
 
 	std::vector<tModuleAddressesAndSizes> baseAddressesAndSizes;
 	std::string infoFilesResp;
@@ -1009,11 +1005,13 @@ void TestExecutorGDB::gdbDebug(std::shared_ptr<GDBThreadCommunication> gDBThread
 		switch (cstate) {
 		case GDBThreadCommunication::COVERAGE_STATE::SHOULD_RESET_HARD: //Reset coverage to NULL and enable all breakpoints
 		{
+			std::string enableAllCommand = generateEnableAllCommand(allBreakpoints, bpInstr, bpInstrBytes);
+
 			//As there might be leftover commands we might need to clean that first
 			std::string resp;
 			bool noProblem = false;
 			while (true) {
-				noProblem = sendCommandToGDBAndWaitForResponse(generateEnableAllCommand(allBreakpoints, bpInstr, bpInstrBytes), &resp, gDBThreadCommunication, true);
+				noProblem = sendCommandToGDBAndWaitForResponse(enableAllCommand, &resp, gDBThreadCommunication, true);
 				if (noProblem) {
 					break;
 				}
@@ -1105,7 +1103,7 @@ bool TestExecutorGDB::gdbPrepareForDebug(std::shared_ptr<GDBThreadCommunication>
 			numOfDummyBreakpoint = std::stoi(resp.c_str() + 11);
 		}
 		catch (...) {
-			LOG(ERROR) << "std::stoi failed";
+			LOG(ERROR) << "std::stoi of " << (resp.c_str() + 11) << " failed";
 			google::protobuf::ShutdownProtobufLibrary();
 			_exit(EXIT_FAILURE); //make compiler happy
 		}
@@ -1182,7 +1180,7 @@ bool TestExecutorGDB::gdbPrepareForDebug(std::shared_ptr<GDBThreadCommunication>
 				gDBThreadCommunication->m_exOutput.m_PID = std::stoi(resp.c_str() + isPos + 7);
 			}
 			catch (...) {
-				LOG(ERROR) << "std::stoi failed";
+				LOG(ERROR) << "std::stoi of " << (resp.c_str() + isPos + 7) << " failed";
 				google::protobuf::ShutdownProtobufLibrary();
 				_exit(EXIT_FAILURE); //make compiler happy
 			}
@@ -1247,7 +1245,7 @@ bool TestExecutorGDB::gdbPrepareForDebug(std::shared_ptr<GDBThreadCommunication>
 			}
 		}
 		catch (...) {
-			LOG(ERROR) << "std::stoi/stoll failed";
+			LOG(ERROR) << "std::stoi/stoull of " << linesIt << " failed";
 			google::protobuf::ShutdownProtobufLibrary();
 			_exit(EXIT_FAILURE); //make compiler happy
 		}
@@ -1370,11 +1368,11 @@ bool TestExecutorGDB::parseInfoFiles(std::vector<tModuleInformation>& loadedFile
 
 			uint64_t currentStartAddress, currentEndAddress;
 			try {
-				currentStartAddress = std::stoll(trimmedLine, NULL, 16);
-				currentEndAddress = std::stoll(trimmedLine.substr(trimmedLine.find("-") + 1), NULL, 16);
+				currentStartAddress = std::stoull(trimmedLine, NULL, 16);
+				currentEndAddress = std::stoull(trimmedLine.substr(trimmedLine.find("-") + 1), NULL, 16);
 			}
 			catch (...) {
-				LOG(ERROR) << "std::stoi/stoll failed";
+				LOG(ERROR) << "std::stoi/stoull of " << trimmedLine << ", or of " << trimmedLine.substr(trimmedLine.find("-") + 1) << " failed";
 				google::protobuf::ShutdownProtobufLibrary();
 				_exit(EXIT_FAILURE); //make compiler happy
 			}
@@ -1407,7 +1405,12 @@ void TestExecutorGDB::gdbLinereaderThread(std::shared_ptr<GDBThreadCommunication
 		if (totalBytesAvail != bytesRead) {
 #else
 	int nbytes = 0;
-	while (!gDBThreadCommunication->get_gdbThreadShouldTerminate() && 0 != ioctl(inputHandleFromGdb, FIONREAD, &nbytes)) {
+	while (!gDBThreadCommunication->get_gdbThreadShouldTerminate() && -1 != ioctl(inputHandleFromGdb, FIONREAD, &nbytes)) {
+		if (nbytes == 0) {
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			continue;
+		}
+
 		char* buff = new char[nbytes];
 		ssize_t bytesRead = read(inputHandleFromGdb, buff, nbytes);
 		if (bytesRead != nbytes) {

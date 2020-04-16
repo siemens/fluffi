@@ -111,7 +111,7 @@ int startvm(
 	std::this_thread::sleep_for(std::chrono::milliseconds(waittimeWinDbg));
 
 	//Start winDBG
-	execCommandAsync(windbg.generic_string() + " -k \"com:pipe,resets=0,reconnect,port=\\\\.\\pipe\\" + pipeName + "\" -c \".load " + kfuzzWindbg.string() + "\"");
+	execCommandAsync(windbg.generic_string() + " -d -k \"com:pipe,resets=0,reconnect,port=\\\\.\\pipe\\" + pipeName + "\" -c \".load " + kfuzzWindbg.string() + "\"");
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(sleepMS));
 

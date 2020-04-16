@@ -34,10 +34,11 @@ private:
 
 	SharedMemIPC m_requestIPC;
 	SharedMemIPC m_subscriberIPC;
-	std::mutex m_mutex_;
+	std::recursive_mutex m_mutex_; //Needs to be aquired for sharedmemipc with windbg. Will be locked while we are waiting for the target to entered a braked state
 	std::unique_ptr<std::thread> m_WinDbgMessageDispatcher;
 	bool m_stopRequested;
 	HANDLE m_SharedMemIPCInterruptEvent;
+	bool m_waitingForForcedBreak;
 
 	static std::shared_ptr<GDBEmulator> instance;
 };
