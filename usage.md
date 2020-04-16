@@ -37,6 +37,13 @@ To add new systems:
 * Tell FLUFFI about the system. To do so you have two options: either add it as a new windows/linux/odroid host to ansible's [hosts](srv/fluffi/data/polenext/projects/1/hosts) file (persistent), or use the `Add System` button in FLUFFI's web GUI. When adding it via the web GUI just use the system's host name without any domain suffix. When adding it via the hosts file, the line needs to look like this: `<hostname> ansible_ssh_host=<hostname>.fluffi`. Remember: When modifying the hosts file, you need to restart the polemarch and fluffi_web containers.
 + Assign a location to the system in the `Systems` tab. An explication of the location concept can be found [here](technical_details.md).
 
+## 1.1) Deploying FLUFFI
+Now that the new agent system is part of the FUN, the system needs to be configured for FLUFFI. Furthermore, the FLUFFI agent binaries need to be copied to the agent system.
+
+You can do this by navigating to the 'Systems' tab in FLUFFI's web GUI, and clicking on the system's name. Now you should click on 'Initial Setup' and let Pelemarch/Ansible configure the target system for FLUFFI.
+
+Once this is done, you should go to the 'Deploy FLUFFI' tab and deploy those FLUFFI binaries that correspond to the target's architecture. If your target is an X64 system, you might also want to copy the x86 binaries, to be able to fuzz both architectures on a single machine.
+
 ## 2) Preparing your target
 
 ### 2.1) Getting the input into your target
@@ -91,13 +98,6 @@ We recommend using it always!
 
 ## 3) Create a FLUFFI Fuzz Job
 
-All FuzzJobs are run on dedicated Runner systems in the FLUFFI Utility Network (FUN). Your test target, which should be prepared as a *package*, needs to be deployed to these Runner systems.
-
-A package is a zip file containing either an `install.bat`, an `install.ps1`, or an `install.sh` file as well as arbitrary data. When you deploy this package, it is copied to the FLUFFI runner systems, extracted (on Windows to  `C:\fluffi\SUT\<ZipFileName>\`, on Linux to `/home/<FluffiUser>/fluffi/persistent/SUT/<ZipfileName>\`), and the corresponding install script is executed. You should prepare the package so that it installs all the required dependencies for the target as well as the target itself. Once you have such a zip file, you should upload it to the FLUFFI FTP server at `ftp.fluffi` using anonymous login.
-
-If you create a Windows package, you should add page heap checks using gflags for the target binary. This allows FLUFFI to better detect access violations in the heap. As gflags is already installed on all our systems, you only need to add a line to your `install.ps1` or `install.bat` such as: `C:\utils\GFlags\x86\gflags.exe /p /enable TargetBinary.exe`
-
-Once the package is on the FTP server, you are ready to deploy it on the selected runner systems. You can do this in the `Systems` tab or while creating a fuzz job.
 
 If you want to create a FuzzJob go to the FLUFFI web page (currently reachable on `http://web.fluffi/`).
 
@@ -235,6 +235,9 @@ If there are several modules with the same name but different paths, you can spe
 
 **PLEASE NOTE**: If you are using a GDB runner, the module name is actually a segment name. An example therefore is `target.exe/.text` 
 
+**Target Upload**
+See section 4) below.
+
 **Population**
 
 Each evolutionary fuzzer needs a set of known-to-be-good input samples to start with. These need to be uploaded here. You can specify more than one at a time. Furthermore, you can always add more while the project is running.
@@ -250,7 +253,7 @@ target.exe/.text,0x2
 helper.dll/.text,0x100 
 ```
 
-If you want, you can alternatively insert the blocks in the database table `blocks_to_cover` yourself (e.g. by using an IDA python script).
+If you want, you can alternatively insert the blocks in the database table `blocks_to_cover` yourself (e.g. by using [this](ida_scripts/exportBBs.py) IDA python script).
 
 ### TestcaseGenerator
 
@@ -264,8 +267,22 @@ Which evaluator types should be used is set by the evaluatorTypes parameter. It 
 
 **PLEASE NOTE** that the LocalManagers will try to stick as close to your setting as possible. However, if that is not possible (for example, if only evaluators that have only type A implemented register), the ratio might not be as desired.
 
+## 4) Deploy the Fuzzjob on the target machines
 
-## 4) Start the FLUFFI Agents
+
+All FuzzJobs are run on dedicated Runner systems in the FLUFFI Utility Network (FUN). Your test target, which should be wrapped as a *package*, needs to be deployed to these Runner systems.
+
+A package is a zip file containing either an `install.bat`, an `install.ps1`, or an `install.sh` file as well as arbitrary data. When you deploy this package, it is copied to the FLUFFI runner systems, extracted (on Windows to  `C:\fluffi\SUT\<ZipFileName>\`, on Linux to `/home/<FluffiUser>/fluffi/persistent/SUT/<ZipfileName>\`), and the corresponding install script is executed. You should prepare the package so that it installs all the required dependencies for the target as well as the target itself.
+
+If you create a Windows package, you should add page heap checks using gflags for the target binary. This allows FLUFFI to better detect access violations in the heap. As gflags is by default copied to all agent systems, you only need to add a line to your `install.ps1` or `install.bat` such as: `C:\utils\GFlags\x86\gflags.exe /p /enable TargetBinary.exe`
+
+The package needs to be copied somehow to the FLUFFI ftp server (ftp.fluffi). You have two options to do so. Option one is you connect directly to the ftp server using anonymous login, and place the package in the SUT folder. Option two is, you upload the package while creating the fuzzjob. It will then be placed in that very folder. Additionally, it will be associated with the fuzzjob.
+
+
+Once the package is on the FTP server, you can deploy it to runner systems. You can do so in the `Systems` tab by selecting a system or group and chosing the 'Deploy SUT/Dependency' option (SUT stands for Software Under Test).
+
+
+## 5) Start the FLUFFI Agents
 You can control the number of running FLUFFI agents (LM, TR, TE, TG) via the web GUI.
 
 To do so, you can click on 
