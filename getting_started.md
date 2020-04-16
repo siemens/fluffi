@@ -77,10 +77,12 @@ For any other future compile run you can simply do:
 ```
 sudo ./buildAll.sh
 ```
-If you have already set up the [FUN](#setting-up-the-fun), you can directly upload your binaries by calling
+If you have already set up the [FUN](#setting-up-the-fun) AND your compile machine is part of the FUN, you can directly upload your binaries to the FLUFFI ftp server (ftp.fluffi) by calling
 ```
 sudo ./buildAll.sh DEPLOY_TO_FTP=TRUE
 ```
+
+Please note the FLUFFI binaries MUST have been uploaded to the ftp server at some time, in order for the deployment to work later.
 
 ### Windows
 These instructions assume you have a fresh and clean install of **Windows 10 64-bit**.
@@ -106,10 +108,12 @@ For all future compile runs you can use
 buildAll.bat
 ```
 
-If you have already set up the [FUN](#setting-up-the-fun), you can directly upload your binaries by calling
+If you have already set up the [FUN](#setting-up-the-fun) AND your compile machine is part of the FUN, you can directly upload your binaries to the FLUFFI ftp server (ftp.fluffi) by calling
 ```
 buildAll.bat -DEPLOY_TO_FTP TRUE
 ```
+
+Please note the FLUFFI binaries MUST have been uploaded to the ftp server at some time, in order for the deployment to work later.
 
 ## Setting up the FUN
 The FLUFFI Utility Network (FUN) contains all the infrastructure needed for fuzzing. 
