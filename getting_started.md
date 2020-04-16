@@ -148,6 +148,9 @@ sudo systemctl restart systemd-networkd
 
 ### FUN Services
 Next, create the live environment that serves all the core services:
+
+#### Preparing the master machine to run the FLUFFI docker containers
+
 ```
 sudo mkdir -p \
 	/srv/fluffi/data/ftp/files/{SUT,archive} \
@@ -212,6 +215,9 @@ sudo docker-compose -f /srv/fluffi/docker-compose.yaml up -d --force-recreate
 ```
 At this point you are ready to use FLUFFI, and can go to [the usage section](usage.md) for more information.
 You should be able to connect to the web interface at `web.fluffi:8880`.
+
+#### Reverse Proxy for comfortable service access
+
 We recommend to set up a reverse proxy for the different services, so you can obmit the port and use the network with DNS names only.
 An example configuration for a reverse proxy setup using `nginx` could look like this: 
 ```
@@ -247,6 +253,78 @@ server {
 }
 ```
 
+#### Package mirror
+
+
+When using Ubuntu or Odroid runner machines, the runner machines somehow need to be able to reach a packet mirror. If you use the [FLUFFI pxe images](agents/pxe_images), the mirror used will be apt.fluffi. We recommend setting up a local packet mirror by installing apt-mirror on your master machine with `apt-get install apt-mirror`.
+
+An example mirror.list you can use is
+```
+############# config ##################
+#
+set base_path    /srv/ftp/ubuntu-mirror
+#
+set mirror_path  $base_path/mirror
+set skel_path    $base_path/skel
+set var_path     $base_path/var
+set cleanscript $var_path/clean.sh
+# set defaultarch  <running host architecture>
+set postmirror_script $var_path/postmirror.sh
+# set run_postmirror 0
+set nthreads     20
+set _tilde 0
+#
+############# end config ##############
+
+### AMD64
+deb [arch=amd64] http://archive.ubuntu.com/ubuntu bionic main restricted universe multiverse
+deb [arch=amd64] http://archive.ubuntu.com/ubuntu bionic main/debian-installer restricted/debian-installer universe/debian-installer multiverse/debian-installer
+deb [arch=amd64] http://archive.ubuntu.com/ubuntu bionic-security main restricted universe multiverse
+deb [arch=amd64] http://archive.ubuntu.com/ubuntu bionic-updates main restricted universe multiverse
+deb [arch=amd64] http://archive.ubuntu.com/ubuntu bionic-backports main restricted universe multiverse
+
+### i386 - was necessary due to PXE installer requiring some i386 package
+deb [arch=i386] http://archive.ubuntu.com/ubuntu bionic main restricted universe multiverse
+deb [arch=i386] http://archive.ubuntu.com/ubuntu bionic main/debian-installer restricted/debian-installer universe/debian-installer multiverse/debian-installer
+deb [arch=i386] http://archive.ubuntu.com/ubuntu bionic-security main restricted universe multiverse
+deb [arch=i386] http://archive.ubuntu.com/ubuntu bionic-updates main restricted universe multiverse
+deb [arch=i386] http://archive.ubuntu.com/ubuntu bionic-backports main restricted universe multiverse
+
+### ARM64 - not absolutely necessary in current environment
+deb [arch=arm64] http://apt.armbian.com bionic main bionic-utils bionic-desktop
+deb [arch=arm64] http://ports.ubuntu.com bionic main restricted universe multiverse
+deb [arch=arm64] http://ports.ubuntu.com bionic-security main restricted universe multiverse
+deb [arch=arm64] http://ports.ubuntu.com bionic-updates main restricted universe multiverse
+deb [arch=arm64] http://ports.ubuntu.com bionic-backports main restricted universe multiverse
+deb [arch=arm64] http://ports.ubuntu.com bionic-backports main/debian-installer restricted/debian-installer universe/debian-installer multiverse/debian-installer
+
+### ARM-hf - Lemmings lair running on it
+deb [arch=armhf] http://apt.armbian.com bionic main bionic-utils bionic-desktop
+deb [arch=armhf] http://ports.ubuntu.com bionic main restricted universe multiverse
+deb [arch=armhf] http://ports.ubuntu.com bionic-security main restricted universe multiverse
+deb [arch=armhf] http://ports.ubuntu.com bionic-updates main restricted universe multiverse
+deb [arch=armhf] http://ports.ubuntu.com bionic-backports main restricted universe multiverse
+deb [arch=armhf] http://ports.ubuntu.com bionic-backports main/debian-installer restricted/debian-installer universe/debian-installer multiverse/debian-installer
+#deb http://archive.ubuntu.com/ubuntu bionic-proposed main restricted universe multiverse
+
+### Source because we can
+deb-src http://archive.ubuntu.com/ubuntu bionic main restricted universe multiverse
+deb-src http://archive.ubuntu.com/ubuntu bionic-security main restricted universe multiverse
+deb-src http://archive.ubuntu.com/ubuntu bionic-updates main restricted universe multiverse
+#deb-src http://archive.ubuntu.com/ubuntu bionic-proposed main restricted universe multiverse
+deb-src http://archive.ubuntu.com/ubuntu bionic-backports main restricted universe multiverse
+deb-src http://ports.ubuntu.com bionic main restricted universe multiverse
+deb-src http://ports.ubuntu.com bionic-security main restricted universe multiverse
+deb-src http://ports.ubuntu.com bionic-updates main restricted universe multiverse
+deb-src http://ports.ubuntu.com bionic-backports main restricted universe multiverse
+
+clean http://archive.ubuntu.com/ubuntu
+clean http://apt.armbian.com
+clean http://ports.ubuntu.com
+```
+
+#### Accessing the Internet from FUN
+
 To actually access the internet from the 10.66.0.0/23 subnet, you can set up routing on the master machine.
 Here, ens33 is the interet facing interface controlled by systemd, ens38 is connected to the FUN, controlled by dnsmasq:
 ```
@@ -256,6 +334,8 @@ sudo iptables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 sudo iptables -t nat -A POSTROUTING -o ens33 -j MASQUERADE
 ```
 Note that iptables rules do not typically survive a reboot of the machine and you have to either persist these, or run the above commands again after restarting your master.
+
+Please note: We strongly disencourage connecting FLUFFI to an untrusted network (see also the Operational Security section below)
 
 ## A Note On Operational Security
 
