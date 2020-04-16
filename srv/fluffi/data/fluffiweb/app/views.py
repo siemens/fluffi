@@ -1245,18 +1245,23 @@ def changeAgentStarterMode():
 
 @app.route("/systems/removeSystem/<string:hostName>", methods=["GET"])
 def removeSystemFromPolemarch(hostName):
-    removeResult = ANSIBLE_REST_CONNECTOR.removeSystem(hostName)
+    success = ANSIBLE_REST_CONNECTOR.removeSystem(hostName) 
 
-    if not removeResult:
-        flash("Error removing system!", "error")
+    if not success:
+        flash("Error removing system! Failed to connect to polemarch", "error")
         return redirect(url_for('systems'))
-    else:
+    
+    try:
         sys = models.Systems.query.filter_by(Name=hostName).first()
         sysloc = models.SystemsLocation.query.filter_by(System=sys.ID).first()
         db.session.delete(sysloc)
         db.session.delete(sys)
         db.session.commit()
         flash("Removed " + hostName + "!", "success")
+        return redirect(url_for('systems'))
+    except Exception as e:
+        print(e)
+        flash("Failed to remove " + hostName + " !", "error")
         return redirect(url_for('systems'))
 
 
