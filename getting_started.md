@@ -12,7 +12,7 @@ Author(s): Roman Bendt, Thomas Riedmaier, Pascal Eckmann, Junes Najah
 
 # Getting Started
 This section will guide you through the process of setting up your own FLUFFI installation.
-To make reproducing the FLUFFI environment as easy as possible, the following instructions are written to build a virtual FLUFFI network, but you can easily adapt them for actual hardware.
+To make reproducing the FLUFFI environment as easy as possible, the following instructions are written to build a virtual FLUFFI network. However, you can easily adapt them for actual hardware.
 
 - [Prerequisites](#prerequisites)
 - [Common Steps](#common-steps)
@@ -25,18 +25,18 @@ To make reproducing the FLUFFI environment as easy as possible, the following in
 - [A Note On Operational Security](#a-note-on-operational-security)
 
 ## Prerequisites
-You need to have at least two machines to run FLUFFI: A master machine that will host the infrastructure services and the controlling web interface, and another machine that runs the agents for actual fuzzing work.
-Furthermore, you need to create a subnet that is entirely under your control, no other DNS/DHCP server may interfere. 
+You need to have at least two machines to run FLUFFI: a master machine that will host the infrastructure services and the controlling web interface, and another machine that runs the agents for actual fuzzing work.
+Furthermore, you need to create a subnet that is entirely under your control, where no other DNS/DHCP server may interfere. 
 
-If you want to move to a production grade FLUFFI installation, it is recommended to distribute the master services to more than one server for performance reasons, at the very least you should consider a dedicated database server.
-Then you can further scale up your fuzzing capabilities by adding more and more agent machines.
+If you want to move to a production grade FLUFFI installation, it is recommended to distribute the master services to more than one server for performance reasons. At the very least, you should consider a dedicated database server.
+Then you can further scale your fuzzing capabilities by adding more and more agent machines.
 
 ## Common Steps
 These steps are needed to compile FLUFFI core, as well as to build the FLUFFI master for the FUN (FLUFFI utility network).
-Ensure you prepared both machines this way should you want to compile FLUFFI on another server than your master.
+Should you want to compile FLUFFI on a server other than your master, ensure that both machines are prepared this way.
 These instructions assume you have a fresh and clean install of **Ubuntu 18.04**.
 
-become root and setup the environment:
+Become root and setup the environment:
 ```bash
 sudo -s # to run these steps as root
 apt update
@@ -47,7 +47,7 @@ apt update
 apt install docker-ce docker-ce-cli containerd.io
 pip3 install --upgrade docker-compose
 ```
-drop root privileges now, so file permissions are correct afterwards. then we clone the repository:
+Drop root privileges now, so file permissions are correct afterwards. Then we clone the repository:
 ```bash
 exit # to get back to normal user
 git lfs install
@@ -58,11 +58,11 @@ git lfs pull
 
 ## Compiling FLUFFI core
 ### Linux
-Make sure you run the build on a machine/vm that has **at least 1.5 GB of memory for every core** installed, otherwise the system will not be able to build.
-So for a machine/vm with 4 cpu cores, please install/allocate at least 6 GB of RAM to it.
-Note, that the build is optimized to make heavy use of parallel processing, so the more cores the system has, the faster your build will be done.
+Make sure you run the build on a machine/VM that has **at least 1.5 GB of memory for every core** installed, otherwise the system will not be able to build.
+For example, a machine/VM with 4 cpu cores should have at least 6 GB of RAM allocated to it.
+Note that the build is optimized to make heavy use of parallel processing, so the more cores the system has, the faster your build will be done.
 
-Now use the [linux build file](build/ubuntu_based/buildAll.sh) to compile the core binaries. 
+Now use the [Linux build file](build/ubuntu_based/buildAll.sh) to compile the core binaries. 
 Please note that we rely on _sudo_ here to correctly set things like the effective `uid` and `gid`.
 If you directly run this as root (without sudo), you will get errors and the build will likely not work correctly.
 ```bash
@@ -71,7 +71,7 @@ sudo ./buildAll.sh PREPARE_ENV=TRUE WITH_DEPS=TRUE
 ```
 
 When you compile FLUFFI for the first time, use the parameters `PREPARE_ENV=TRUE` and `WITH_DEPS=TRUE`:
-- `PREPARE_ENV` will build the docker continers, this needs to be done only once.
+- `PREPARE_ENV` will build the docker containers. This needs to be done only once.
 - `WITH_DEPS` will build all of FLUFFI's dependencies from sources - please keep in mind that this will take a long time. This step needs to be repeated only if the dependencies change or get updated.
 For any other future compile run you can simply do:
 ```
@@ -94,7 +94,7 @@ The following tools are needed to build and deploy a FLUFFI installation:
 - 7zip
 - Winscp
 
-On Windows use [the windows build file](build/windows/buildAll.bat) to start the compilation of FLUFFI core. When you compile FLUFFI for the first time, call
+On Windows use [the Windows build file](build/windows/buildAll.bat) to start the compilation of FLUFFI core. When you compile FLUFFI for the first time, call
 ```
 cd build/windows
 buildAll.bat -WITH_DEPS TRUE
@@ -140,7 +140,7 @@ Domains=fluffi
 DNS=10.66.0.1
 EOF
 
-# this step is only be needed on ubuntu desktop installations, since
+# this step is only needed on ubuntu desktop installations, since
 # on headless installs systemd is already taking care of networking.
 sed -i 's/NetworkManager/networkd/' /etc/netplan/01-network-manager-all.yaml
 sudo systemctl restart systemd-networkd
@@ -171,13 +171,13 @@ sudo rsync -ai --delete --exclude={'data/ftp/files/archive','data/ftp/files/depl
 
 Now you need to apply your individual changes to the default configuration.
 We recommend you customize the following files:
-- `/srv/fluffi/data/dnsmasq/ethers` - assign MAC based host names
+- `/srv/fluffi/data/dnsmasq/ethers` - assign MAC based hostnames
 - `/srv/fluffi/data/dnsmasq/hosts` - assign static IP addresses or split the master services between different machines
 - `/srv/fluffi/data/polenext/projects/1/hosts` - amend the names and login credentials of your executor machines. Make sure that you are not using any underscores in your hostname, see [this upstream issue](https://github.com/ansible/ansible/issues/56930)
 - `/srv/fluffi/data/smb/files/initial/odroid_rootpasswd` - add root password for odroid executor machines if applicable
 - `/srv/fluffi/data/smb/files/initial/odroid_username` - add username for odroid executor machines if applicable
 - `/srv/fluffi/data/smb/files/initial/odroid_userpasswd` - add user password for your odroid executor machines applicable
-- `/srv/fluffi/data/smb/files/initial/MAC2Host.csv` - list MAC addresses and hostnames of your executor machines if you want to set host names during automatic deployment
+- `/srv/fluffi/data/smb/files/initial/MAC2Host.csv` - list MAC addresses and hostnames of your executor machines if you want to set hostnames during automatic deployment
 
 There are several necessary binary files we cannot provide in this repository.
 The following directories and their subdirectories contain a number of placeholder files that need to be replaced:
@@ -218,7 +218,7 @@ You should be able to connect to the web interface at `web.fluffi:8880`.
 
 #### Reverse Proxy for comfortable service access
 
-We recommend to set up a reverse proxy for the different services, so you can obmit the port and use the network with DNS names only.
+We recommend setting up a reverse proxy for the different services, so you can omit the port and use the network with DNS names only.
 An example configuration for a reverse proxy setup using `nginx` could look like this: 
 ```
 server {
@@ -326,7 +326,7 @@ clean http://ports.ubuntu.com
 #### Accessing the Internet from FUN
 
 To actually access the internet from the 10.66.0.0/23 subnet, you can set up routing on the master machine.
-Here, ens33 is the interet facing interface controlled by systemd, ens38 is connected to the FUN, controlled by dnsmasq:
+Here, ens33 is the internet facing interface controlled by systemd, and ens38 is connected to the FUN, controlled by dnsmasq:
 ```
 sudo sysctl -w net.ipv4.ip_forward=1
 sudo iptables -A FORWARD -o ens33 -i ens38 -s 10.66.0.0/23 ! -d 10.66.0.0/23 -m conntrack --ctstate NEW -j ACCEPT
@@ -335,9 +335,9 @@ sudo iptables -t nat -A POSTROUTING -o ens33 -j MASQUERADE
 ```
 Note that iptables rules do not typically survive a reboot of the machine and you have to either persist these, or run the above commands again after restarting your master.
 
-Please note: We strongly disencourage connecting FLUFFI to an untrusted network (see also the Operational Security section below)
+Please note: We strongly discourage connecting FLUFFI to an untrusted network (see also the Operational Security section below).
 
-## A Note On Operational Security
+## A Note on Operational Security
 
 FLUFFI was not meant to be used in hostile environments, which is why FLUFFI's internal protocol is not hardened against attacks. It is therefore recommended to operate FLUFFI in an isolated environment, to which you can restrict access, and only allow the master to be connected to the internet via NAT.
 Furthermore, it is strongly recommended to change the Polemarch user credentials, which are initially set to be `admin:admin`.
