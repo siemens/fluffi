@@ -92,9 +92,10 @@ class AnsibleRESTConnector:
                     jsonResult = json.loads(response.text)
                     for host in jsonResult['results']:
                         systems.append((host['name'], host['id']))
-            return systems
         except Exception as e:
-            return None
+            print(e)
+        finally:
+            return systems
 
     def getSystemsOfGroup(self, group):
         systems = []
@@ -152,17 +153,19 @@ class AnsibleRESTConnector:
     # calls Polemarch REST API to remove a system from fluffi network
     def removeSystem(self, hostName):
         systems = self.getSystems()
+            
         url = ""
         for system in systems:
             if system[0] == hostName:
                 url = self.ansibleURL + "host/" + str(system[1])
                 break
+            
         if url != "":
             try:
                 response = requests.delete(url, auth = self.auth)
                 return True
-
             except Exception as e:
+                print(e)
                 return False
         else:
             return False
