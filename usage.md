@@ -96,7 +96,7 @@ To help FLUFFI handle this we added the [fuzzcmp](core/helpers/fuzzcmp) helper. 
 We recommend using it always!
 
 
-## 3) Create a FLUFFI Fuzz Job
+## 3) Create a FLUFFI FuzzJob
 
 
 If you want to create a FuzzJob go to the FLUFFI web page (currently reachable on `http://web.fluffi/`).
@@ -140,13 +140,13 @@ FLUFFI supports various test case generators. You can use as many of them as you
 - [OedipusMutator](core/Oedipus)
 - `ExternalMutator` (Allows easy addition of custom mutators):
    in this case you need to specify an additional setting: `extGeneratorDirectory`
-   This setting points to a directory, where FLUFFI will insert a file called `fuzzjob.name` containing the name of the current FuzzJob.
+   This setting points to a directory, where FLUFFI will insert a file called `FuzzJob.name` containing the name of the current FuzzJob.
    It is the job of the external mutator to:
   1. Come up with a unique ID (UUID)
   2. Create a subdirectory in the `extGeneratorDirectory` named like that UUID
-  3. Connect to the GM database and extracts the connection parameters for the fuzzjob's database from the `fuzzjob` table
-  4. Connect to the fuzzjob's database and place a nice name in the fuzzjob's `nice_names_managed_instance` table for the chosen UUID
-  5. Place new mutations in the UUID subdirectory following this schema: `ParentGUID_ParentLocalID_GeneratorLocalID`. `GeneratorLocalID` needs to be a decimal number that is unique for the current mutator instance (i.e. you must ensure that the touple (`UUID`,`GeneratorLocalID`) is unique). If you want you can use any information from the fuzzjob's database to generate good testcases.
+  3. Connect to the GM database and extracts the connection parameters for the FuzzJob's database from the `fuzzjob` table
+  4. Connect to the FuzzJob's database and place a nice name in the FuzzJob's `nice_names_managed_instance` table for the chosen UUID
+  5. Place new mutations in the UUID subdirectory following this schema: `ParentGUID_ParentLocalID_GeneratorLocalID`. `GeneratorLocalID` needs to be a decimal number that is unique for the current mutator instance (i.e. you must ensure that the touple (`UUID`,`GeneratorLocalID`) is unique). If you want you can use any information from the FuzzJob's database to generate good testcases.
   6. Ensure that the hard drive does not fill up (e.g. by implementing a upper limit of files in the directory)
   7. Adapt ratings of Testcases that were used for mutations. Rule of thumb: each mutation that was done based on a parent should decrease the parent's rating by one.
 
@@ -267,7 +267,7 @@ Which evaluator types should be used is set by the evaluatorTypes parameter. It 
 
 **PLEASE NOTE** that the LocalManagers will try to stick as close to your setting as possible. However, if that is not possible (for example, if only evaluators that have only type A implemented register), the ratio might not be as desired.
 
-## 4) Deploy the Fuzzjob on the target machines
+## 4) Deploy the FuzzJob on the target machines
 
 
 All FuzzJobs are run on dedicated Runner systems in the FLUFFI Utility Network (FUN). Your test target, which should be wrapped as a *package*, needs to be deployed to these Runner systems.
@@ -276,28 +276,56 @@ A package is a zip file containing either an `install.bat`, an `install.ps1`, or
 
 If you create a Windows package, you should add page heap checks using gflags for the target binary. This allows FLUFFI to better detect access violations in the heap. As gflags is by default copied to all agent systems, you only need to add a line to your `install.ps1` or `install.bat` such as: `C:\utils\GFlags\x86\gflags.exe /p /enable TargetBinary.exe`
 
-The package needs to be copied somehow to the FLUFFI ftp server (ftp.fluffi). You have two options to do so. Option one is you connect directly to the ftp server using anonymous login, and place the package in the SUT folder. Option two is, you upload the package while creating the fuzzjob. It will then be placed in that very folder. Additionally, it will be associated with the fuzzjob.
+The package needs to be copied somehow to the FLUFFI ftp server (ftp.fluffi). You have two options to do so. Option one is you connect directly to the ftp server using anonymous login, and place the package in the SUT folder. Option two is, you upload the package while creating the FuzzJob. It will then be placed in that very folder. Additionally, it will be associated with the FuzzJob.
 
 
 Once the package is on the FTP server, you can deploy it to runner systems. You can do so in the `Systems` tab by selecting a system or group and chosing the 'Deploy SUT/Dependency' option (SUT stands for Software Under Test).
 
 
 ## 5) Start the FLUFFI Agents
-You can control the number of running FLUFFI agents (LM, TR, TE, TG) via the web GUI.
 
-To do so, you can click on 
-- the `Config System Instances` button on the FuzzJob overview page
-- a group name in the `Systems` tab
-- a system name in the `Systems` tab
+Currently there are two ways of how you can manage how many agents (LM, TR, TE, TG)  run on which system, and  work on which FuzzJob.
 
-Furthermore, you can stop running agents by clicking the `Managed Instances` button when viewing the FuzzJob overview page.
+### Manually
 
-Alternatively, you can connect to the system directly (SSH, RDP), and start the agents there.
+You can connect to the systems directly (SSH, RDP), and start the agents there.
 
 The credentials to do so can be looked up in polemarch's [hosts](srv/fluffi/data/polenext/projects/1/hosts) file.
 On Windows, start one LM (if there is not already one for your FuzzJob, such as on another machine in the same location) and as many TRs / TGs / TEs as you like, e.g. by clicking on the icons on the Desktop. On Linux, just start the appropriate agent binary from the command line, ensuring that you add the location name as the argument for the agent.
 
-You should always monitor your FuzzJob in the `Managed Instances` view in order to make sure that:
-1. The system is not overloaded (e.g. CPU>90%),
+After having been started, LMs register at the GlobalManager (GM) and keep asking for a yet unmanaged FuzzJob in their location. As soon as such a FuzzJob becomes available, the LM will start managing it.
+
+TRs / TGs / TEs will connect to the GM and wait until they are assigned a FuzzJob. This can be done in the Location page of the web application. Once a FuzzJob is assigned, they will connect to the LM in their location managing that FuzzJob.
+
+IMPORTANT: When managing agents manually, you need to disable the agent manager by setting it to `INACTIVE` in the `Options` dialog on the  `Systems` tab.
+
+### Automatically
+
+FLUFFI implements a so called agent manager. This manager checks how many agents should be run on which machine and will enforce that this is actually the case. It runs periodicly every few minutes (so you need a little patience after configuring new instances).
+
+
+You can control the number of running FLUFFI agents (LM, TR, TE, TG) via the web GUI.
+
+To do so you need go to one of the following locations: 
+- the `Config System Instances` section on the FuzzJob overview page
+- the properties of a group in the `Systems` tab (click on a group name)
+- the properties of a system in the `Systems` tab (click on a system name)
+
+IMPORTANT:  When managing agents with the agent manager, you need to enable the agent manager by setting it to `ACTIVE` in the `Options` dialog on the  `Systems` tab. Setting it to `KILL` will kill all currently running agents. As a result, you can easily replace FLUFFI or targets binaries.
+
+Note: The agent manager is implemented by two components: A periodic [polemarch task](srv/fluffi/data/polenext/manageAgents.py), and a [python REST server](srv/fluffi/data/ftp/files/restStarter) that is deployed to the runner machines and waits for commands to execute. The latter is one of the reasons why you should NEVER run FLUFFI in an untrusted environment.
+
+## 6) Monitoring FLUFFI Agents
+
+You should always monitor your FuzzJob.
+
+First of all, you should make sure that the number of executions and the number of covered blocks is rising. If one of them doesn't there is something wrong with your setup.
+
+Furthermore, in the `Managed Instances` view make sure that:
+1. The systems are not overloaded (e.g. CPU>90%),
 2. The TG queues are not close to 0, and
 3. The TE queues are not growing and growing.
+
+You can stop running agents by clicking the `Managed Instances` button when viewing the FuzzJob overview page.
+
+Finally, you should keep one eye on log messages. Currenlty, FLUFFI agents store all ERROR messages in the database. They can then be displayed in the web application (for agents in the `Managed Instances` view, for LMs there is a global tab).
