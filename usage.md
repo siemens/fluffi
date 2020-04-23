@@ -297,7 +297,7 @@ After having been started, LMs register at the GlobalManager (GM) and keep askin
 
 TRs / TGs / TEs will connect to the GM and wait until they are assigned a FuzzJob. This can be done in the Location page of the web application. Once a FuzzJob is assigned, they will connect to the LM in their location managing that FuzzJob.
 
-IMPORTANT: When managing agents manually, you need to disable the agent manager by setting it to `INACTIVE` in the `Options` dialog on the  `Systems` tab.
+IMPORTANT: When managing agents manually, you need to disable the agent manager by setting it to `INACTIVE` in the `Settings` button on the `Systems` tab.
 
 ### Automatically
 
@@ -311,7 +311,7 @@ To do so you need go to one of the following locations:
 - the properties of a group in the `Systems` tab (click on a group name)
 - the properties of a system in the `Systems` tab (click on a system name)
 
-IMPORTANT:  When managing agents with the agent manager, you need to enable the agent manager by setting it to `ACTIVE` in the `Options` dialog on the  `Systems` tab. Setting it to `KILL` will kill all currently running agents. As a result, you can easily replace FLUFFI or targets binaries.
+IMPORTANT:  When managing agents with the agent manager, you need to enable the agent manager by setting it to `ACTIVE` in the `Settings` button on the `Systems` tab. Setting it to `KILL` will kill all currently running agents. As a result, you can easily replace FLUFFI or targets binaries.
 
 Note: The agent manager is implemented by two components: A periodic [polemarch task](srv/fluffi/data/polenext/manageAgents.py), and a [python REST server](srv/fluffi/data/ftp/files/restStarter) that is deployed to the runner machines and waits for commands to execute. The latter is one of the reasons why you should NEVER run FLUFFI in an untrusted environment.
 
