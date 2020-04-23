@@ -22,7 +22,7 @@ Author(s): Abian Blome, Thomas Riedmaier
 #include <chrono>
 #include <thread>
 #include <fstream>
-#include <algorithm>
+#include <iterator>
 #include <experimental/filesystem>
 
 #if defined(_WIN64) || defined(_WIN32)
