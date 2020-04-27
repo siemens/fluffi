@@ -10,6 +10,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Author(s): Junes Najah, Thomas Riedmaier
 */
 
+var MON_BASE_URL = "http://mon.fluffi";
+var MON_PORT = ":8885";
+
 var clearId = 0;
 var rowCount = 0;
 var lastTimeout = 0;
@@ -33,12 +36,12 @@ function Swap(){
     if (row) {
         row.style.backgroundColor = "#BDBDBD";
         var projectID = row.cells[0].innerText;
-        var res = "http://mon.fluffi/dashboard/script/scripted.js?fuzzjobname=" + projectID + "&from=now-15m&to=now&orgId=1&kiosk";
+        var res = MON_BASE_URL + MON_PORT + "/dashboard/script/scripted.js?fuzzjobname=" + projectID + "&from=now-15m&to=now&orgId=1&kiosk";
         $("#icontainer").empty();
         $("#icontainer").append("<iframe width='100%' src='" + res + "' />");
     }
 }
- 
+
 function autoSwap() {
     Swap();
     clearId = setInterval(function(){
@@ -48,7 +51,7 @@ function autoSwap() {
 
 function showProjectGraph(projName) {
     clearInterval(clearId);
-    var Url = "http://mon.fluffi/dashboard/script/scripted.js?fuzzjobname=" + projName + "&from=now-15m&to=now&orgId=1&kiosk";
+    var Url = MON_BASE_URL + MON_PORT + "/dashboard/script/scripted.js?fuzzjobname=" + projName + "&from=now-15m&to=now&orgId=1&kiosk";
     var res = Url.replace(/'/g, "%27");
     $("#icontainer").empty();
     $("#icontainer").append("<iframe width='100%' src='" + res + "' />");

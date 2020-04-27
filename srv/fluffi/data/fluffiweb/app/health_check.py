@@ -20,7 +20,7 @@ import paho.mqtt.client as paho
 def healthCheck():
     try:
         client = paho.Client()
-        client.connect("mon.fluffi", 1883)
+        client.connect(config.MQTT_HOST, 1883)
         client.publish("FLUFFI/webui/db", payload = int(checkDbConnection()), qos = 2)
         client.publish("FLUFFI/webui/ftp", payload = int(checkFtpConnection()))
         client.publish("FLUFFI/webui/ansible", payload = int(checkAnsibleConnection()))
