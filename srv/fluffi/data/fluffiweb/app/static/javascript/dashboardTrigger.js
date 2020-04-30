@@ -1,16 +1,28 @@
-  //needs to be adjusted if columns are added or removed
-  var TIME_RANGE_CELL_INDEX = 6;
-  var states = ['now-15m', 'now-24h', 'now-7d'];
-  var timeRanges = {'now-15m': 'Last 15 min', 'now-24h': 'Last Day', 'now-7d': 'Last Week'};
-  var LOADING_TIME = 50000; 
-  var SHOW_TIME = 10000 + LOADING_TIME; 
-  var INTERVAL_TIME = SHOW_TIME * states.length;
-  var NOW = 'now'; 
-  
-  /*** global variables ***/
-  var reloadCounter = 1;
-  var rowIndex = 1;
-  var socket, table, tableSize, previousRow, row, projectName;
+/*
+Copyright 2017-2019 Siemens AG
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Author(s): Junes Najah, Thomas Riedmaier, Michael Kraus
+*/
+
+//needs to be adjusted if columns are added or removed
+var TIME_RANGE_CELL_INDEX = 6;
+var states = ['now-15m', 'now-24h', 'now-7d'];
+var timeRanges = {'now-15m': 'Last 15 min', 'now-24h': 'Last Day', 'now-7d': 'Last Week'};
+var LOADING_TIME = 50000; 
+var SHOW_TIME = 10000 + LOADING_TIME; 
+var INTERVAL_TIME = SHOW_TIME * states.length;
+var NOW = 'now'; 
+
+/*** global variables ***/
+var reloadCounter = 1;
+var rowIndex = 1;
+var socket, table, tableSize, previousRow, row, projectName;
 
   $(function () { 
     socket = io.connect('http://dashsync.fluffi:4000'  );
