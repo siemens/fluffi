@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2017-2019 Siemens AG
+# Copyright 2017-2020 Siemens AG
 # 
 # This source code is provided 'as-is', without any express or implied
 # warranty. In no event will the author be held liable for any damages
