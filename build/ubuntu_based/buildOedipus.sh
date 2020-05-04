@@ -19,7 +19,7 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 # 
-# Author(s): Thomas Riedmaier, Roman Bendt
+# Author(s): Roman Bendt, Thomas Riedmaier
 
 if ! [ -f /.dockerenv ]; then
     echo "This script is meant to be run in a docker container." 1>&2

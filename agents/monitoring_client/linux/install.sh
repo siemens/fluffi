@@ -19,7 +19,7 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 # 
-# Author(s): Thomas Riedmaier, Roman Bendt
+# Author(s): Roman Bendt, Thomas Riedmaier
 
 cp ./fm.sh /opt/fm.sh
 printf '%s\n' '#!/bin/bash' 'kill $(pgrep fm.sh) >/dev/null 2>&1' 'nohup /opt/fm.sh &' 'exit 0' > /etc/rc.local
