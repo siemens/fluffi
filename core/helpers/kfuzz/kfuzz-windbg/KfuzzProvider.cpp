@@ -342,6 +342,9 @@ namespace Debugger::DataModel::Libraries::Kfuzz
 					systemID = 0;
 				}
 			}
+			if (systemID > INT_MAX) {
+				systemID = 0;
+			}
 			responseSS << "* 1    process " << systemID << "     " << nameBuffer;
 			return;
 		}
