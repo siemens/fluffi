@@ -11,7 +11,7 @@
 from flask import flash, get_flashed_messages, redirect, url_for, request, send_file, Markup
 from werkzeug.exceptions import HTTPException
 from functools import wraps
-
+from sqlalchemy.exc import OperationalError
 
 from .controllers import *
 from .queries import *
@@ -35,17 +35,21 @@ def updateSystems():
 
 
 def checkSystemsLoaded(f):
-
     @wraps(f)
     def wrapper(*args, **kwargs):
-        if not app.SYSTEMS_LOADED and len(models.Locations.query.all()) is 0:
+        try:
+            locationsCount = len(models.Locations.query.all())
+        except OperationalError:
+            locationsCount = -1
+        
+        if not app.SYSTEMS_LOADED and locationsCount is 0:
             newFlash = 0
             for messages in get_flashed_messages(with_categories=True):
                 if "addLocation" == messages[0]:
                     newFlash += 1
             if newFlash < 2:
                 flash("To add systems to the database is a location necessary.", "addLocation")
-        elif not app.SYSTEMS_LOADED and len(models.Locations.query.all()) is not 0:
+        elif not app.SYSTEMS_LOADED and locationsCount is not 0:
             newFlash = 0
             for messages in get_flashed_messages(with_categories=True):
                 if "syncSystems" == messages[0]:
@@ -64,7 +68,7 @@ def syncSystems():
 
 @app.route("/")
 @app.route("/index")
-# @checkSystemsLoaded
+@checkSystemsLoaded
 def index():
     user = {"nickname": "amb"}
     inactivefuzzjobs = []
