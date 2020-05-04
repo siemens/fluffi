@@ -761,6 +761,7 @@ bool TestExecutorGDB::handleSignal(std::shared_ptr<GDBThreadCommunication> gDBTh
 
 			if (gDBThreadCommunication->get_gdbOutputQueue_size() == 0) {
 				//waiting failed: we should terminate
+				LOG(WARNING) << "Got Terminate message while waiting for signal details";
 				return false;
 			}
 		}
@@ -1177,10 +1178,10 @@ bool TestExecutorGDB::gdbPrepareForDebug(std::shared_ptr<GDBThreadCommunication>
 		size_t isPos = resp.find("process");
 		if (isPos != std::string::npos) {
 			try {
-				gDBThreadCommunication->m_exOutput.m_PID = std::stoi(resp.c_str() + isPos + 7);
+				gDBThreadCommunication->m_exOutput.m_PID = std::stoi(resp.c_str() + isPos + 7); //Fails if PID too big
 			}
 			catch (...) {
-				LOG(ERROR) << "std::stoi of " << (resp.c_str() + isPos + 7) << " failed";
+				LOG(ERROR) << "std::stoi of \"" << (resp.c_str() + isPos + 7) << "\" failed";
 				google::protobuf::ShutdownProtobufLibrary();
 				_exit(EXIT_FAILURE); //make compiler happy
 			}
