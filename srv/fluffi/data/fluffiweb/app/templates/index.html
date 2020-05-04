@@ -25,6 +25,11 @@ Author(s): Junes Najah, Thomas Riedmaier, Michael Kraus, Abian Blome, Pascal Eck
 </div>
 
 <main role="main">
+    {% if errorMessage|length > 0 %}
+        <div style="text-align: center;">
+            <div class="alert alert-danger" style="width: 80%; display: inline-block; text-align: left">Error: {{ errorMessage }}</div>
+        </div>
+    {% endif %}
     <!-- Main jumbotron for a primary marketing message or call to action -->
     <div class="jumbotron" style="opacity: 0.8">
         <div class="container">
@@ -38,7 +43,7 @@ Author(s): Junes Najah, Thomas Riedmaier, Michael Kraus, Abian Blome, Pascal Eck
         </div>
     </div>
 
-    <div class="container" style="width:100%">
+    <div class="container" style="width:100%">        
         <!-- Example row of columns -->
         <div class="row">
             <div class="col-md-4">

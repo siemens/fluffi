@@ -17,6 +17,7 @@ from os import system, unlink
 
 from flask import abort
 from sqlalchemy import *
+from sqlalchemy.exc import OperationalError
 
 from app import db, models
 from .constants import *
@@ -95,8 +96,15 @@ def createNewDatabase(name):
     return project
 
 
-def listFuzzJobs():
-    projects = models.Fuzzjob.query.all()
+def listFuzzJobs(): 
+    errorMsg = ""   
+    
+    try:
+        projects = models.Fuzzjob.query.all()
+    except OperationalError:
+        print("OperationalError! Please check your database connection and make sure the hostname db.fluffi is available with user fluffi_gm.")  
+        errorMsg = "Database connection failed! Make sure the hostname db.fluffi is available with user fluffi_gm."      
+        projects = []
 
     for project in projects:
         engine = create_engine(
@@ -146,6 +154,7 @@ def listFuzzJobs():
             project.numLM = int(models.Localmanagers.query.filter_by(Fuzzjob = project.ID).count())
         except Exception as e:
             print(e)
+            errorMsg += " Failed to create engine with sqlalchemy."
             project.status = "Unreachable"
             project.testcases = "-"
             project.numPopulation = "-"
@@ -159,13 +168,20 @@ def listFuzzJobs():
             connection.close()
             engine.dispose()
 
-    return projects
+    return projects, errorMsg
 
 
 def getLocations():
-    locations = db.session.query(models.Locations)
+    errorMsg = ""
+    
+    try:
+        locations = db.session.query(models.Locations)
+    except OperationalError:
+        print("OperationalError! Please check your database connection and make sure the hostname db.fluffi is available with user fluffi_gm.")
+        errorMsg = "Database connection failed! Make sure the hostname db.fluffi is available with user fluffi_gm."      
+        locations = []
 
-    return locations
+    return locations, errorMsg
 
 
 def getDownloadPath():

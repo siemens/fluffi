@@ -64,11 +64,23 @@ def syncSystems():
 
 @app.route("/")
 @app.route("/index")
-@checkSystemsLoaded
+# @checkSystemsLoaded
 def index():
-    fuzzjobs = listFuzzJobs()
+    user = {"nickname": "amb"}
     inactivefuzzjobs = []
     activefuzzjobs = []
+
+    fuzzjobs, errorMessage = listFuzzJobs() 
+    
+    if errorMessage:
+        return renderTemplate("index.html",
+                          title="Home",
+                          user=user,
+                          fuzzjobs=activefuzzjobs,
+                          locations=[],
+                          inactivefuzzjobs=inactivefuzzjobs,
+                          errorMessage=errorMessage,
+                          footer=FOOTER_SIEMENS)    
 
     for project in fuzzjobs:
         if ((int(project.numLM) > 0) and
@@ -79,8 +91,7 @@ def index():
         else:
             inactivefuzzjobs.append(project)
 
-    locations = getLocations()
-    user = {"nickname": "amb"}
+    locations, errorMessage = getLocations()
 
     return renderTemplate("index.html",
                           title="Home",
@@ -88,6 +99,7 @@ def index():
                           fuzzjobs=activefuzzjobs,
                           locations=locations,
                           inactivefuzzjobs=inactivefuzzjobs,
+                          errorMessage=errorMessage,
                           footer=FOOTER_SIEMENS)
 
 
@@ -1337,7 +1349,7 @@ def viewSystem(hostname, group):
         if instancetype[0] == 2:
             managed['evaluators'] = instancetype[2]
 
-    configFuzzjobs = listFuzzJobs()
+    configFuzzjobs, errorMessage = listFuzzJobs()
     fuzzjobList = []
     dbconfiguredFuzzjobInstances = db.session.query(models.SystemFuzzjobInstances.System,
                                                     models.SystemFuzzjobInstances.Fuzzjob,
@@ -1625,9 +1637,10 @@ def startFluffi(hostname, groupName):
 
 @app.route("/dashboardtrigger")
 def dashboardTrigger():
-    fuzzjobs = listFuzzJobs()
+    fuzzjobs, errorMessage = listFuzzJobs()
     inactivefuzzjobs = []
     activefuzzjobs = []
+    
     for project in fuzzjobs:
         if (int(project.numLM) > 0) and (int(project.numTE) > 0) and (int(project.numTR) > 0) and (
                 int(project.numTG) > 0):
@@ -1635,7 +1648,8 @@ def dashboardTrigger():
             activefuzzjobs.append(project)
         else:
             inactivefuzzjobs.append(project)
-    fuzzjobLocations = getLocations()
+       
+    fuzzjobLocations, errorMessage = getLocations()
     user = {"nickname": "amb"}
     return renderTemplate("dashboardTrigger.html",
                           title="Home",
@@ -1643,6 +1657,7 @@ def dashboardTrigger():
                           fuzzjobs=activefuzzjobs,
                           locations=fuzzjobLocations,
                           inactivefuzzjobs=inactivefuzzjobs,
+                          errorMessage=errorMessage,
                           footer=FOOTER_SIEMENS)
 
 
