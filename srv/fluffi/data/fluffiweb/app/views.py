@@ -42,20 +42,21 @@ def checkSystemsLoaded(f):
         except OperationalError:
             locationsCount = -1
         
-        if not app.SYSTEMS_LOADED and locationsCount is 0:
+        if not app.SYSTEMS_LOADED and locationsCount == 0:
             newFlash = 0
             for messages in get_flashed_messages(with_categories=True):
                 if "addLocation" == messages[0]:
                     newFlash += 1
             if newFlash < 2:
-                flash("To add systems to the database is a location necessary.", "addLocation")
-        elif not app.SYSTEMS_LOADED and locationsCount is not 0:
+                flash("A location is necessary to add systems to the database.", "addLocation")
+        elif not app.SYSTEMS_LOADED and locationsCount > 0:
             newFlash = 0
             for messages in get_flashed_messages(with_categories=True):
                 if "syncSystems" == messages[0]:
                     newFlash += 1
             if newFlash < 2:
-                flash("Something went wrong at the inital synchronization between PoleMarch and the database. Pleasy retry!", "syncSystems")
+                flash("Something went wrong at the inital synchronization between PoleMarch and the database. Pleasy retry!", "syncSystems")        
+            
         return f(*args, **kwargs)
     return wrapper
 
