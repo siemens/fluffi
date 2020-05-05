@@ -39,6 +39,7 @@ private:
 	bool m_stopRequested;
 	HANDLE m_SharedMemIPCInterruptEvent;
 	bool m_waitingForForcedBreak;
+	std::string m_fatalSystemErrorMessage;
 
 	static std::shared_ptr<GDBEmulator> instance;
 };

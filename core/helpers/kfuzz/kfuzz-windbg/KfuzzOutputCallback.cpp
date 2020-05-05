@@ -92,7 +92,7 @@ namespace Debugger::DataModel::Libraries::Kfuzz
 				if (secondComma != std::string::npos) {
 					try {
 						unsigned long long crashaddress = std::stoull(wstrText.substr(secondComma + 1), 0, 16);
-						whatHappened << "0x" << std::hex << std::setw(16) << std::setfill('0') << crashaddress << " in ?? ()";
+						whatHappened << "0x" << std::hex << std::setw(16) << std::setfill('0') << crashaddress << " in FATAL_SYSTEM_ERROR ()";
 					}
 					catch (...) {
 						std::wstring ws = wstrText.substr(secondComma + 1);

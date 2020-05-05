@@ -22,7 +22,8 @@ GDBEmulator::GDBEmulator() :
 	m_WinDbgMessageDispatcher(nullptr),
 	m_stopRequested(false),
 	m_SharedMemIPCInterruptEvent(NULL),
-	m_waitingForForcedBreak(false)
+	m_waitingForForcedBreak(false),
+	m_fatalSystemErrorMessage()
 {
 }
 
@@ -125,6 +126,12 @@ int GDBEmulator::handleConsoleCommands() {
 			std::cout << "  x/1xb" << std::endl;
 			std::cout << "  x/1xh" << std::endl;
 			std::cout << "  x/1xw" << std::endl;
+			continue;
+		}
+		else if (!m_fatalSystemErrorMessage.empty() && command == "c") {
+			//A fatal system error occured do not forward the continue request. Instead, replay the fatal error message
+			std::cout << m_fatalSystemErrorMessage << std::endl;
+			continue;
 		}
 		else {
 			//Forward command to WinDbg
@@ -167,6 +174,11 @@ void GDBEmulator::winDbgMessageDispatcher() {
 			continue;
 		}
 		std::string newMsg = messageToString(message);
+
+		if (newMsg.find("FATAL_SYSTEM_ERROR") != std::string::npos) {
+			//Store fatal system error message, so it can be replayed later
+			m_fatalSystemErrorMessage = newMsg;
+		}
 
 		if (newMsg.find("Program received signal SIGTRAP") != std::string::npos) {
 			//Check if we hit a ctrl+c induced breakpoint while not waiting for a forced break (happens if we request a break with ctrl+c but then hit another breakpoint)

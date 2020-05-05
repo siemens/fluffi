@@ -836,7 +836,7 @@ bool TestExecutorGDB::handleSignal(std::shared_ptr<GDBThreadCommunication> gDBTh
 		}
 	}
 	//This is not one of our breakpoints!
-	LOG(DEBUG) << "This is some strange bp";
+	LOG(DEBUG) << "This is an unexpected bp - most likely a crash!";
 
 	std::vector<tModuleAddressesAndSizes> baseAddressesAndSizes;
 	std::string infoFilesResp;
@@ -854,6 +854,8 @@ bool TestExecutorGDB::handleSignal(std::shared_ptr<GDBThreadCommunication> gDBTh
 	}
 
 	std::string crashRVA = getCrashRVA(baseAddressesAndSizes, signalAddress);
+
+	LOG(DEBUG) << "Crash RVA: " << crashRVA;
 
 	if (gDBThreadCommunication->m_exOutput.m_firstCrash == "") {
 		//first crash
