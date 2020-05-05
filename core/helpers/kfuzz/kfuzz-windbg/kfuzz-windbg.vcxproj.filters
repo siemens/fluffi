@@ -49,6 +49,9 @@ Author(s): Thomas Riedmaier
     <ClCompile Include="KfuzzEventCallback.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="KfuzzPublisher.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="kfuzz-windbg.h">
@@ -67,6 +70,9 @@ Author(s): Thomas Riedmaier
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="KfuzzEventCallback.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="KfuzzPublisher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

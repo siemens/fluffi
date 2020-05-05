@@ -27,7 +27,8 @@ namespace Debugger::DataModel::Libraries::Kfuzz
 		m_numOfProcessedCommands(-1),
 		m_responseIPC("kfuzz_windbg_request_response", 1 * 1024 * 1024),
 		m_SharedMemIPCInterruptEvent(NULL),
-		m_eventCallback()
+		m_publisher(),
+		m_eventCallback(&m_publisher),
 	{
 		m_spKfuzzExtension = std::make_unique<KfuzzExtension>();
 

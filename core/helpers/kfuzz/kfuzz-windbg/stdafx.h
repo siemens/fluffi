@@ -18,6 +18,7 @@ Author(s): Thomas Riedmaier
 #include <sstream>
 #include <iomanip>
 #include <algorithm>
+#include <mutex>
 
 using namespace Microsoft::WRL;
 #include <dbgmodel.h>

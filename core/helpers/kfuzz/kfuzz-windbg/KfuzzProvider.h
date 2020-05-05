@@ -12,6 +12,7 @@ Author(s): Thomas Riedmaier
 
 #pragma once
 #include "KfuzzExtension.h"
+#include "KfuzzPublisher.h"
 #include "KfuzzEventCallback.h"
 
 namespace Debugger::DataModel::Libraries::Kfuzz
@@ -42,6 +43,7 @@ namespace Debugger::DataModel::Libraries::Kfuzz
 		int m_numOfProcessedCommands;
 		SharedMemIPC m_responseIPC;
 		HANDLE m_SharedMemIPCInterruptEvent;
+		KfuzzPublisher m_publisher;
 		KfuzzEventCallback m_eventCallback;
 
 		static SharedMemMessage processMessage(ComPtr<IDebugControl> dbgControl, ComPtr<IDebugRegisters> dbgRegisters, ComPtr<IDebugDataSpaces3> dbgData, ComPtr<IDebugSymbols> dbgSymbols, ComPtr<IDebugSystemObjects> dbgSystemObj, const SharedMemMessage& message);

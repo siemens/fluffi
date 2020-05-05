@@ -12,16 +12,15 @@ Author(s): Thomas Riedmaier
 
 #include "stdafx.h"
 #include "KfuzzEventCallback.h"
+#include "KfuzzPublisher.h"
 
 namespace Debugger::DataModel::Libraries::Kfuzz
 {
-	KfuzzEventCallback::KfuzzEventCallback() :
+	KfuzzEventCallback::KfuzzEventCallback(KfuzzPublisher * publisher) :
 		m_cRef(0),
-		m_publisherIPC("kfuzz_windbg_publish_subscribe"),
-		m_breakpointfunctions()
+		m_breakpointfunctions(),
+		m_publisher(publisher)
 	{
-		m_publisherIPC.initializeAsServer();
-
 		//Try to identify those breakpoints that are triggered by breaking into
 		//Get a pointer to the symbols interface
 		IDebugHost * dbgHost = Debugger::DataModel::ClientEx::GetHost();
@@ -69,11 +68,8 @@ namespace Debugger::DataModel::Libraries::Kfuzz
 		else {
 			whatHappened << "program exited with code " << ExitCode << ".";
 		}
-		int timeoutMilliseconds = 1000;
-		SharedMemMessage response;
-		SharedMemMessage request = stringToMessage(whatHappened.str());
-		m_publisherIPC.sendMessageToClient(&request);
-		m_publisherIPC.waitForNewMessageToServer(&response, timeoutMilliseconds);
+
+		m_publisher->publish(whatHappened.str());
 
 		return DEBUG_STATUS_NO_CHANGE;
 	}
@@ -101,17 +97,9 @@ namespace Debugger::DataModel::Libraries::Kfuzz
 			}
 		}
 		whatHappened << "0x" << std::hex << std::setw(16) << std::setfill('0') << Exception->ExceptionAddress << " in ?? ()";
-		int timeoutMilliseconds = 1000;
-		SharedMemMessage response;
-		SharedMemMessage request = stringToMessage(whatHappened.str());
-		m_publisherIPC.sendMessageToClient(&request);
-		m_publisherIPC.waitForNewMessageToServer(&response, timeoutMilliseconds);
+
+		m_publisher->publish(whatHappened.str());
 
 		return DEBUG_STATUS_NO_CHANGE;
-	}
-
-	SharedMemMessage KfuzzEventCallback::stringToMessage(std::string command) {
-		SharedMemMessage request{ SHARED_MEM_MESSAGE_KFUZZ_REQUEST, command.c_str(),static_cast<int>(command.length()) };
-		return request;
 	}
 }
