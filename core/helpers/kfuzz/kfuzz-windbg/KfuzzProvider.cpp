@@ -29,6 +29,7 @@ namespace Debugger::DataModel::Libraries::Kfuzz
 		m_SharedMemIPCInterruptEvent(NULL),
 		m_publisher(),
 		m_eventCallback(&m_publisher),
+		m_outputCallback(&m_publisher)
 	{
 		m_spKfuzzExtension = std::make_unique<KfuzzExtension>();
 
@@ -39,7 +40,9 @@ namespace Debugger::DataModel::Libraries::Kfuzz
 			ComPtr<IDebugClient> dbgClient;
 			if (SUCCEEDED(spPrivate.As(&dbgClient)))
 			{
+				PDEBUG_OUTPUT_CALLBACKS pOutputCallback = reinterpret_cast<PDEBUG_OUTPUT_CALLBACKS>(&m_outputCallback);
 				dbgClient->SetEventCallbacks(&m_eventCallback);
+				dbgClient->SetOutputCallbacks(pOutputCallback);
 			}
 		}
 

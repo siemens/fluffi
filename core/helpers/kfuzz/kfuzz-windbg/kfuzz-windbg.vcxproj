@@ -210,6 +210,7 @@ exit 0</Command>
     <ClCompile Include="kfuzz-windbg.cpp" />
     <ClCompile Include="KfuzzEventCallback.cpp" />
     <ClCompile Include="KfuzzExtension.cpp" />
+    <ClCompile Include="KfuzzOutputCallback.cpp" />
     <ClCompile Include="KfuzzProvider.cpp" />
     <ClCompile Include="KfuzzPublisher.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -222,6 +223,7 @@ exit 0</Command>
     <ClInclude Include="kfuzz-windbg.h" />
     <ClInclude Include="KfuzzEventCallback.h" />
     <ClInclude Include="KfuzzExtension.h" />
+    <ClInclude Include="KfuzzOutputCallback.h" />
     <ClInclude Include="KfuzzProvider.h" />
     <ClInclude Include="KfuzzPublisher.h" />
     <ClInclude Include="stdafx.h" />

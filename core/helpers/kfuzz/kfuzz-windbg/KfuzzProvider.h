@@ -14,6 +14,7 @@ Author(s): Thomas Riedmaier
 #include "KfuzzExtension.h"
 #include "KfuzzPublisher.h"
 #include "KfuzzEventCallback.h"
+#include "KfuzzOutputCallback.h"
 
 namespace Debugger::DataModel::Libraries::Kfuzz
 {
@@ -45,6 +46,7 @@ namespace Debugger::DataModel::Libraries::Kfuzz
 		HANDLE m_SharedMemIPCInterruptEvent;
 		KfuzzPublisher m_publisher;
 		KfuzzEventCallback m_eventCallback;
+		KfuzzOutputCallback m_outputCallback;
 
 		static SharedMemMessage processMessage(ComPtr<IDebugControl> dbgControl, ComPtr<IDebugRegisters> dbgRegisters, ComPtr<IDebugDataSpaces3> dbgData, ComPtr<IDebugSymbols> dbgSymbols, ComPtr<IDebugSystemObjects> dbgSystemObj, const SharedMemMessage& message);
 		static bool ends_with(std::string const & value, std::string const & ending);
