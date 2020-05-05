@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2017-2019 Siemens AG. All Rights Reserved.
+# Copyright 2017-2020 Siemens AG. All Rights Reserved.
 #
 # Licensed under the Apache License 2.0 (the "License").  You may not use
 # this file except in compliance with the License.  You can obtain a copy
