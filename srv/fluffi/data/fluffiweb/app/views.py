@@ -41,8 +41,7 @@ def checkDbConnection(f):
         except Exception as e:
             print(e)
             return renderTemplate("index.html",
-                          title="Db Error",
-                          user={"nickname": "amb"},
+                          title="DB Error",
                           fuzzjobs=[],
                           locations=[],
                           inactivefuzzjobs=[],
@@ -71,7 +70,7 @@ def checkSystemsLoaded(f):
                 if "syncSystems" == messages[0]:
                     newFlash += 1
             if newFlash < 2:
-                flash("Something went wrong at the inital synchronization between PoleMarch and the database. Pleasy retry!", "syncSystems")        
+                flash("Something went wrong at the inital synchronization between PoleMarch and the database. Please retry!", "syncSystems")        
             
         return f(*args, **kwargs)
     return wrapper
@@ -88,7 +87,6 @@ def syncSystems():
 @checkDbConnection
 @checkSystemsLoaded
 def index():
-    user = {"nickname": "amb"}
     inactivefuzzjobs = []
     activefuzzjobs = []
 
@@ -107,7 +105,6 @@ def index():
 
     return renderTemplate("index.html",
                           title="Home",
-                          user=user,
                           fuzzjobs=activefuzzjobs,
                           locations=locations,
                           inactivefuzzjobs=inactivefuzzjobs,
@@ -1688,10 +1685,9 @@ def dashboardTrigger():
             inactivefuzzjobs.append(project)
        
     fuzzjobLocations = getLocations()
-    user = {"nickname": "amb"}
+    
     return renderTemplate("dashboardTrigger.html",
                           title="Home",
-                          user=user,
                           fuzzjobs=activefuzzjobs,
                           locations=fuzzjobLocations,
                           inactivefuzzjobs=inactivefuzzjobs,
@@ -1700,8 +1696,6 @@ def dashboardTrigger():
 
 @app.route("/dashboard")
 def dashboard():
-    user = {"nickname": "amb"}
     return renderTemplate("dashboard.html",
-                          title="Home",
-                          user=user)
+                          title="Home")
 
