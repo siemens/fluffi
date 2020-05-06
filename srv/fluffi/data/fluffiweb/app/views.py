@@ -11,7 +11,6 @@
 from flask import flash, get_flashed_messages, redirect, url_for, request, send_file, Markup
 from werkzeug.exceptions import HTTPException
 from functools import wraps
-from sqlalchemy.exc import OperationalError
 
 from .controllers import *
 from .queries import *
@@ -34,13 +33,30 @@ def updateSystems():
         print("Polemarch ist Mist")
 
 
-def checkSystemsLoaded(f):
+def checkDbConnection(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
         try:
-            locationsCount = len(models.Locations.query.all())
-        except OperationalError:
-            locationsCount = -1
+            _ = models.Locations.query.all()
+        except Exception as e:
+            print(e)
+            return renderTemplate("index.html",
+                          title="Db Error",
+                          user={"nickname": "amb"},
+                          fuzzjobs=[],
+                          locations=[],
+                          inactivefuzzjobs=[],
+                          errorMessage="Database connection failed! " + str(e),
+                          footer=FOOTER_SIEMENS)        
+            
+        return f(*args, **kwargs)
+    return wrapper
+
+
+def checkSystemsLoaded(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        locationsCount = len(models.Locations.query.all())
         
         if not app.SYSTEMS_LOADED and locationsCount == 0:
             newFlash = 0
@@ -69,23 +85,14 @@ def syncSystems():
 
 @app.route("/")
 @app.route("/index")
+@checkDbConnection
 @checkSystemsLoaded
 def index():
     user = {"nickname": "amb"}
     inactivefuzzjobs = []
     activefuzzjobs = []
 
-    fuzzjobs, errorMessage = listFuzzJobs() 
-    
-    if errorMessage:
-        return renderTemplate("index.html",
-                          title="Home",
-                          user=user,
-                          fuzzjobs=activefuzzjobs,
-                          locations=[],
-                          inactivefuzzjobs=inactivefuzzjobs,
-                          errorMessage=errorMessage,
-                          footer=FOOTER_SIEMENS)    
+    fuzzjobs = listFuzzJobs()  
 
     for project in fuzzjobs:
         if ((int(project.numLM) > 0) and
@@ -96,7 +103,7 @@ def index():
         else:
             inactivefuzzjobs.append(project)
 
-    locations, errorMessage = getLocations()
+    locations = getLocations()
 
     return renderTemplate("index.html",
                           title="Home",
@@ -104,11 +111,12 @@ def index():
                           fuzzjobs=activefuzzjobs,
                           locations=locations,
                           inactivefuzzjobs=inactivefuzzjobs,
-                          errorMessage=errorMessage,
+                          errorMessage="",
                           footer=FOOTER_SIEMENS)
 
 
 @app.route("/projects")
+@checkDbConnection
 @checkSystemsLoaded
 def projects():
     projects = getProjects()
@@ -175,6 +183,7 @@ def locationRemoveProject(locId, projId):
 
 
 @app.route("/projects/<int:projId>/setModuleBinaryAndPath/<int:moduleId>", methods=["GET", "POST"])
+@checkDbConnection
 @checkSystemsLoaded
 def setModuleBinaryAndPath(projId, moduleId):       
     if request.method == 'POST' and "moduleBinaryFile" in request.files:         
@@ -203,6 +212,7 @@ def setModuleBinaryAndPath(projId, moduleId):
 
 
 @app.route("/projects/<int:projId>/addSetting", methods=["GET", "POST"])
+@checkDbConnection
 @checkSystemsLoaded
 def createSetting(projId):
     settingForm = CreateProjectSettingForm()
@@ -271,6 +281,7 @@ def resetFuzzjob(projId):
 
 
 @app.route("/projects/<int:projId>/addModule", methods=["GET", "POST"])
+@checkDbConnection
 @checkSystemsLoaded
 def createProjectModule(projId):
     moduleForm = CreateProjectModuleForm()
@@ -293,6 +304,7 @@ def createProjectModule(projId):
 
 
 @app.route("/locations/<int:locId>/addProject", methods=["GET", "POST"])
+@checkDbConnection
 @checkSystemsLoaded
 def addLocationProject(locId):
     projects = []
@@ -318,6 +330,7 @@ def addLocationProject(locId):
 
 
 @app.route("/locations/createLocation", methods=["GET", "POST"])
+@checkDbConnection
 @checkSystemsLoaded
 def createLocation():
     form = CreateLocationForm()
@@ -457,6 +470,7 @@ def downloadArchive(archive):
 
 
 @app.route("/projects/<int:projId>/population/<int:page>")
+@checkDbConnection
 @checkSystemsLoaded
 def viewPopulation(projId, page):
     count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["population"]))
@@ -491,6 +505,7 @@ def downloadPopulation(projId):
 
 
 @app.route("/projects/<int:projId>/accessVioTotal/<int:page>")
+@checkDbConnection
 @checkSystemsLoaded
 def viewAccessVioTotal(projId, page):
     count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["accessViolations"]))
@@ -524,6 +539,7 @@ def downloadAccessVioTotal(projId):
 
 
 @app.route("/projects/<int:projId>/accessVioUnique")
+@checkDbConnection
 @checkSystemsLoaded
 def viewAccessVioUnique(projId):
     data = getGeneralInformationData(projId, UNIQUE_ACCESS_VIOLATION_NO_RAW)
@@ -549,6 +565,7 @@ def downloadAccessVioUnique(projId):
 
 
 @app.route("/projects/<int:projId>/totalCrashes/<int:page>")
+@checkDbConnection
 @checkSystemsLoaded
 def viewTotalCrashes(projId, page):
     count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["crashes"]))
@@ -582,6 +599,7 @@ def downloadTotalCrashes(projId):
 
 
 @app.route("/projects/<int:projId>/uniqueCrashes")
+@checkDbConnection
 @checkSystemsLoaded
 def viewUniqueCrashes(projId):
     data = getGeneralInformationData(projId, UNIQUE_CRASHES_NO_RAW)
@@ -607,6 +625,7 @@ def downloadUniqueCrashes(projId):
 
 
 @app.route("/projects/<int:projId>/hangs/<int:page>")
+@checkDbConnection
 @checkSystemsLoaded
 def viewHangs(projId, page):
     count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["hangs"]))
@@ -640,6 +659,7 @@ def downloadHangs(projId):
 
 
 @app.route("/projects/<int:projId>/noResponse/<int:page>")
+@checkDbConnection
 @checkSystemsLoaded
 def viewNoResponses(projId, page):
     count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["noResponses"]))
@@ -674,6 +694,7 @@ def downloadNoResponses(projId):
 
 
 @app.route("/projects/<int:projId>/violations")
+@checkDbConnection
 @checkSystemsLoaded
 def viewViolations(projId):
     violationsAndCrashes = getViolationsAndCrashes(projId)
@@ -720,6 +741,7 @@ def getSmallestVioOrCrashTestcase(projId, footprint):
 
 
 @app.route("/projects/<int:projId>/managedInstances")
+@checkDbConnection
 @checkSystemsLoaded
 def viewManagedInstances(projId):
     managedInstances, summarySection, localManagers = getManagedInstancesAndSummary(projId)
@@ -759,6 +781,7 @@ def getLogsOfManagedInstance(projId):
 
 
 @app.route("/projects/<int:projId>/configSystemInstances")
+@checkDbConnection
 @checkSystemsLoaded
 def viewConfigSystemInstances(projId):
     # initialize forms
@@ -834,6 +857,7 @@ def killInstanceType(projId, myType):
 
 
 @app.route("/projects/<int:projId>/addLocation", methods=["GET", "POST"])
+@checkDbConnection
 @checkSystemsLoaded
 def addProjectLocation(projId):
     locationForm = getLocationFormWithChoices(projId, AddProjectLocationForm())
@@ -945,6 +969,7 @@ def removeProjectSetting(projId, settingId):
 
 
 @app.route("/projects/createProject", methods=["GET", "POST"])
+@checkDbConnection
 @checkSystemsLoaded
 def createProject():
     form = CreateProjectForm()
@@ -976,6 +1001,7 @@ def createProject():
 
 
 @app.route("/projects/createCustomProject", methods=["GET", "POST"])
+@checkDbConnection
 @checkSystemsLoaded
 def createCustomProject():
     form = CreateCustomProjectForm()
@@ -1011,6 +1037,7 @@ def viewTestcaseGraph(projId):
 
 
 @app.route("/locations/view/<int:locId>")
+@checkDbConnection
 @checkSystemsLoaded
 def viewLocation(locId):
     location = getLocation(locId)
@@ -1021,6 +1048,7 @@ def viewLocation(locId):
 
 
 @app.route("/projects/view/<int:projId>")
+@checkDbConnection
 @checkSystemsLoaded
 def viewProject(projId):
     project = getProject(projId)
@@ -1038,6 +1066,7 @@ def viewProject(projId):
 
 
 @app.route("/locations")
+@checkDbConnection
 @checkSystemsLoaded
 def locations():
     locations = models.Locations.query.all()
@@ -1048,6 +1077,7 @@ def locations():
 
 
 @app.route("/commands")
+@checkDbConnection
 @checkSystemsLoaded
 def commands():
     commands = models.CommandQueue.query.all()
@@ -1058,6 +1088,7 @@ def commands():
 
 
 @app.route("/logs")
+@checkDbConnection
 @checkSystemsLoaded
 def logs():
     result = getResultOfStatementForGlobalManager(GET_LOCALMANAGER_LOGS)
@@ -1068,6 +1099,7 @@ def logs():
 
 
 @app.route("/systems")
+@checkDbConnection
 @checkSystemsLoaded
 def systems():
     ansibleConnectionWorks = True
@@ -1305,6 +1337,7 @@ def updateSystemLocation(hostName, locationId):
 
 
 @app.route("/systems/view/<string:hostname>/<string:group>", methods=["GET"])
+@checkDbConnection
 @checkSystemsLoaded
 def viewSystem(hostname, group):
     if group == "odroids":
@@ -1354,7 +1387,7 @@ def viewSystem(hostname, group):
         if instancetype[0] == 2:
             managed['evaluators'] = instancetype[2]
 
-    configFuzzjobs, errorMessage = listFuzzJobs()
+    configFuzzjobs = listFuzzJobs()
     fuzzjobList = []
     dbconfiguredFuzzjobInstances = db.session.query(models.SystemFuzzjobInstances.System,
                                                     models.SystemFuzzjobInstances.Fuzzjob,
@@ -1642,7 +1675,7 @@ def startFluffi(hostname, groupName):
 
 @app.route("/dashboardtrigger")
 def dashboardTrigger():
-    fuzzjobs, errorMessage = listFuzzJobs()
+    fuzzjobs = listFuzzJobs()
     inactivefuzzjobs = []
     activefuzzjobs = []
     
@@ -1654,7 +1687,7 @@ def dashboardTrigger():
         else:
             inactivefuzzjobs.append(project)
        
-    fuzzjobLocations, errorMessage = getLocations()
+    fuzzjobLocations = getLocations()
     user = {"nickname": "amb"}
     return renderTemplate("dashboardTrigger.html",
                           title="Home",
@@ -1662,7 +1695,6 @@ def dashboardTrigger():
                           fuzzjobs=activefuzzjobs,
                           locations=fuzzjobLocations,
                           inactivefuzzjobs=inactivefuzzjobs,
-                          errorMessage=errorMessage,
                           footer=FOOTER_SIEMENS)
 
 

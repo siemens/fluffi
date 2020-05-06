@@ -8,7 +8,6 @@
 # 
 # Author(s): Junes Najah, Thomas Riedmaier, Abian Blome, Pascal Eckmann, Michael Kraus
 
-from sqlalchemy.exc import OperationalError
 from flask_nav import Nav
 from flask_nav.elements import Link, Navbar, Separator, Subgroup, View
 
@@ -26,8 +25,8 @@ def createLocationsNav(listLinks):
         for location in locations:
             listLinks.append(Link(location.Name, '/locations/view/' + str(location.ID)))
              
-    except OperationalError:
-        print("OperationalError! Please check your database connection and make sure the hostname db.fluffi is available with user fluffi_gm.")    
+    except Exception as e:
+        print("Please check your database connection and make sure the hostname db.fluffi is available with user fluffi_gm. " + str(e))    
 
     return listLinks
 
@@ -41,8 +40,8 @@ def createFuzzjobsNav(listLinks):
         for project in projects:
             listLinks.append(Link(project.name[:15], '/projects/view/%d' % project.ID))
         
-    except OperationalError:
-        print("OperationalError! Please check your database connection and make sure the hostname db.fluffi is available with user fluffi_gm.")    
+    except Exception as e:
+        print("Please check your database connection and make sure the hostname db.fluffi is available with user fluffi_gm. " + str(e))    
 
     return listLinks
 

@@ -17,7 +17,6 @@ from os import system, unlink
 
 from flask import abort
 from sqlalchemy import *
-from sqlalchemy.exc import OperationalError
 
 from app import db, models
 from .constants import *
@@ -96,14 +95,11 @@ def createNewDatabase(name):
     return project
 
 
-def listFuzzJobs(): 
-    errorMsg = ""   
-    
+def listFuzzJobs():     
     try:
         projects = models.Fuzzjob.query.all()
-    except OperationalError:
-        print("OperationalError! Please check your database connection and make sure the hostname db.fluffi is available with user fluffi_gm.")  
-        errorMsg = "Database connection failed! Make sure the hostname db.fluffi is available with user fluffi_gm."      
+    except Exception as e:
+        print("Database connection failed! Make sure the hostname db.fluffi is available with user fluffi_gm. " + str(e))   
         projects = []
 
     for project in projects:
@@ -154,7 +150,6 @@ def listFuzzJobs():
             project.numLM = int(models.Localmanagers.query.filter_by(Fuzzjob = project.ID).count())
         except Exception as e:
             print(e)
-            errorMsg += " Failed to create engine with sqlalchemy."
             project.status = "Unreachable"
             project.testcases = "-"
             project.numPopulation = "-"
@@ -168,20 +163,17 @@ def listFuzzJobs():
             connection.close()
             engine.dispose()
 
-    return projects, errorMsg
+    return projects
 
 
-def getLocations():
-    errorMsg = ""
-    
+def getLocations():    
     try:
         locations = db.session.query(models.Locations)
-    except OperationalError:
-        print("OperationalError! Please check your database connection and make sure the hostname db.fluffi is available with user fluffi_gm.")
-        errorMsg = "Database connection failed! Make sure the hostname db.fluffi is available with user fluffi_gm."      
+    except:
+        print("Please check your database connection and make sure the hostname db.fluffi is available with user fluffi_gm.")
         locations = []
 
-    return locations, errorMsg
+    return locations
 
 
 def getDownloadPath():
