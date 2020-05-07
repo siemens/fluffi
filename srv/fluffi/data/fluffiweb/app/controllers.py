@@ -107,8 +107,12 @@ def createNewDatabase(name):
     return project
 
 
-def listFuzzJobs():
-    projects = models.Fuzzjob.query.all()
+def listFuzzJobs():     
+    try:
+        projects = models.Fuzzjob.query.all()
+    except Exception as e:
+        print("Database connection failed! Make sure the hostname db.fluffi is available with user fluffi_gm. " + str(e))   
+        projects = []
 
     for project in projects:
         engine = create_engine(
@@ -174,8 +178,12 @@ def listFuzzJobs():
     return projects
 
 
-def getLocations():
-    locations = db.session.query(models.Locations)
+def getLocations():    
+    try:
+        locations = db.session.query(models.Locations)
+    except:
+        print("Please check your database connection and make sure the hostname db.fluffi is available with user fluffi_gm.")
+        locations = []
 
     return locations
 

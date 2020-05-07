@@ -31,13 +31,13 @@ class AddLocationProjectForm(FlaskForm):
 
 
 class TargetForm(FlaskForm):
-    # this forms is never exposed so we can user the non CSRF version
+    # this forms is never exposed so we can use the non CSRF version
     target_moduleC = StringField('Target Module', validators = [DataRequired()])
     target_module_pathC = StringField('Module Path')
 
 
 class OptionForm(FlaskForm):
-    # this forms is never exposed so we can user the non CSRF version
+    # this forms is never exposed so we can use the non CSRF version
     option_moduleC = StringField('Option Module', validators = [DataRequired()])
     option_module_pathC = StringField('Module Value')
 
