@@ -28,11 +28,12 @@ Please note, that you need to adjust the values (especially innodb_buffer_pool_s
 
 Then create users and database with
 
+```
 CREATE USER 'fluffi_gm'@'%' IDENTIFIED BY 'fluffi_gm';
 GRANT ALL ON *.* TO 'fluffi_gm'@'%';
 FLUSH PRIVILEGES;
 mysql -u root < createGMDB.sql
-
+```
 
 Perfmon could be done e.g. with http://pmmdemo.percona.com/
 
