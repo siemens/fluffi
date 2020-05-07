@@ -37,4 +37,5 @@ void NotImplementedHandler::handleFLUFFIMessage(WorkerThreadState* workerThreadS
 	(void)(workerThreadState); //avoid unused parameter warning
 	(void)(req); //avoid unused parameter warning
 	resp->set_allocated_requesttypenotimplementedresponse(new RequestTypeNotImplementedResponse());
+	LOG(ERROR) << "Received a not implemented request message";
 }

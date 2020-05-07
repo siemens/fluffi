@@ -47,7 +47,8 @@ void ReportNewMutationsRequestHandler::handleFLUFFIMessage(WorkerThreadState* wo
 	const ReportNewMutationsRequest* reportNewMutationsRequest = &req->reportnewmutationsrequest();
 
 	FluffiTestcaseID tcID = FluffiTestcaseID(reportNewMutationsRequest->id());
-	bool success = lmWorkerThreadState->dbManager->addDeltaToTestcaseRating(tcID, -1 * reportNewMutationsRequest->numofnewmutationsinqueue());
+	LOG(DEBUG) << "Decreasing rating of " << tcID << " by " << reportNewMutationsRequest->numofnewmutationsinqueue();
+	bool success = lmWorkerThreadState->dbManager->addDeltaToTestcaseRating(tcID, 0 - reportNewMutationsRequest->numofnewmutationsinqueue());
 
 	ReportNewMutationsResponse *  reportNewMutationsResponse = new ReportNewMutationsResponse();
 	reportNewMutationsResponse->set_success(success);

@@ -440,7 +440,8 @@ namespace LMDatabaseManagerTester
 			Assert::IsTrue(dbman->addDeltaToTestcaseRating(ftid1, 10));
 			Assert::IsTrue(stoi(dbman->EXECUTE_TEST_STATEMENT("SELECT Rating from interesting_testcases WHERE CreatorLocalID = " + std::to_string(localid1) + " AND CreatorServiceDescriptorGUID = '" + guid1 + "'")) == 10, L"Testcase rating could not be increased");
 
-			Assert::IsTrue(dbman->addDeltaToTestcaseRating(ftid1, -20));
+			__int32 decrease = 20;
+			Assert::IsTrue(dbman->addDeltaToTestcaseRating(ftid1, 0 - decrease));
 			Assert::IsTrue(stoi(dbman->EXECUTE_TEST_STATEMENT("SELECT Rating from interesting_testcases WHERE CreatorLocalID = " + std::to_string(localid1) + " AND CreatorServiceDescriptorGUID = '" + guid1 + "'")) == -10, L"Testcase rating could not be decreased");
 
 			Assert::IsTrue(stoi(dbman->EXECUTE_TEST_STATEMENT("SELECT Rating from interesting_testcases WHERE CreatorLocalID = " + std::to_string(localid2) + " AND CreatorServiceDescriptorGUID = '" + guid2 + "'")) == 0, L"Wrong testcase was updated");

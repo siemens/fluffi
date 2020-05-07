@@ -291,6 +291,7 @@ bool QueueFillerWorker::tryGetConfigFromLM() {
 void QueueFillerWorker::reportNewMutations(FluffiTestcaseID id, int numOfNewMutations) {
 	FLUFFIMessage req;
 	ReportNewMutationsRequest* reportNewMutationsRequest = new ReportNewMutationsRequest();
+	LOG(DEBUG) << "Reporting " << numOfNewMutations << " new mutations on " << id;
 
 	TestcaseID* mutableTestcaseId = new TestcaseID();
 	mutableTestcaseId->CopyFrom(id.getProtobuf());
