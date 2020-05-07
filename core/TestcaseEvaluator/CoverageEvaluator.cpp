@@ -71,7 +71,7 @@ void CoverageEvaluator::processTestOutcomeDescriptor(TestOutcomeDescriptor* tod)
 		bool thisOneIsNew = !m_localBlockCoverageCache->isBlockInCacheAndAddItIfNot(fbb);
 		hasNewBlocks |= thisOneIsNew;
 		if (thisOneIsNew) {
-			LOG(INFO) << "Testcase " << FluffiTestcaseID(*mutableParentTestcaseId) << " got us new coverage: " << fbb;
+			LOG(INFO) << "Parent " << FluffiTestcaseID(*mutableParentTestcaseId) << " got us new coverage: " << fbb;
 		}
 	}
 
