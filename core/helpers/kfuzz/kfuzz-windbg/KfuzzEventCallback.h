@@ -28,10 +28,11 @@ namespace Debugger::DataModel::Libraries::Kfuzz
 	// KfuzzEventCallback:
 	//
 	// A class to handle Events sent by the debugging engine
+	class KfuzzPublisher;
 	class KfuzzEventCallback : public  DebugBaseEventCallbacks
 	{
 	public:
-		KfuzzEventCallback();
+		KfuzzEventCallback(KfuzzPublisher * publisher);
 		virtual ~KfuzzEventCallback();
 
 		ULONG STDMETHODCALLTYPE AddRef(void);
@@ -43,9 +44,8 @@ namespace Debugger::DataModel::Libraries::Kfuzz
 
 	private:
 		volatile ULONG m_cRef;
-		SharedMemIPC m_publisherIPC;
-		std::vector<uint64_t> m_breakpointfunctions;
 
-		SharedMemMessage stringToMessage(std::string command);
+		std::vector<uint64_t> m_breakpointfunctions;
+		KfuzzPublisher * m_publisher;
 	};
 }

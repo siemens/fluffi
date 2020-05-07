@@ -70,29 +70,75 @@ void GDBThreadCommunication::set_coverageState(GDBThreadCommunication::COVERAGE_
 	m_gdb_mutex_cv.notify_all();
 }
 
-void GDBThreadCommunication::waitForTerminateMessageOrCovStateChange(GDBThreadCommunication::COVERAGE_STATE statesToWaitFor[], int numOfStatesToWaitFor) {
+void GDBThreadCommunication::waitForTerminateOrNewMessageOrCovStateChange(GDBThreadCommunication::COVERAGE_STATE statesToWaitFor[], int numOfStatesToWaitFor) {
 	std::unique_lock<std::mutex> lk(m_gdb_mutex);
-	//Dont wait, if the state we want to wait for is already reached
-	if (m_gdbThreadShouldTerminate || m_gdbOutputQueue.size() > 0) {
-		return;
-	}
-	for (int i = 0; i < numOfStatesToWaitFor; i++) {
-		if (statesToWaitFor[i] == m_coverageState) {
+	while (true) {
+		//Dont wait, if the state we want to wait for is already reached
+		if (m_gdbThreadShouldTerminate || m_gdbOutputQueue.size() > 0) {
 			return;
 		}
-	}
+		for (int i = 0; i < numOfStatesToWaitFor; i++) {
+			if (statesToWaitFor[i] == m_coverageState) {
+				return;
+			}
+		}
 
-	m_gdb_mutex_cv.wait(lk);
+		m_gdb_mutex_cv.wait(lk);
+	}
+}
+
+std::cv_status GDBThreadCommunication::waitForTerminateOrNewMessageOrCovStateChangeWithTimeout(int timeoutMS, GDBThreadCommunication::COVERAGE_STATE statesToWaitFor[], int numOfStatesToWaitFor) {
+	std::unique_lock<std::mutex> lk(m_gdb_mutex);
+	std::chrono::time_point<std::chrono::steady_clock> routineEntryTimeStamp = std::chrono::steady_clock::now();
+	std::chrono::time_point<std::chrono::steady_clock> latestRoutineExitTimeStamp = routineEntryTimeStamp + std::chrono::milliseconds(timeoutMS);
+
+	while (true) {
+		//Dont wait, if the state we want to wait for is already reached
+		if (m_gdbThreadShouldTerminate || m_gdbOutputQueue.size() > 0) {
+			return std::cv_status::no_timeout;
+		}
+		for (int i = 0; i < numOfStatesToWaitFor; i++) {
+			if (statesToWaitFor[i] == m_coverageState) {
+				return std::cv_status::no_timeout;
+			}
+		}
+
+		std::cv_status waitResult = m_gdb_mutex_cv.wait_for(lk, latestRoutineExitTimeStamp - std::chrono::steady_clock::now());
+		if (waitResult == std::cv_status::timeout) {
+			return std::cv_status::timeout;
+		}
+	}
 }
 
 void GDBThreadCommunication::waitForDebuggingReady() {
 	std::unique_lock<std::mutex> lk(m_readyDebug_mutex);
-	//Dont wait, if the state we want to wait for is already reached
-	if (m_debuggingReady) {
-		return;
-	}
 
-	m_readyDebug_cv.wait(lk);
+	while (true) {
+		//Dont wait, if the state we want to wait for is already reached
+		if (m_debuggingReady) {
+			return;
+		}
+
+		m_readyDebug_cv.wait(lk);
+	}
+}
+
+std::cv_status GDBThreadCommunication::waitForDebuggingReadyWithTimeout(int timeoutMS) {
+	std::unique_lock<std::mutex> lk(m_readyDebug_mutex);
+	std::chrono::time_point<std::chrono::steady_clock> routineEntryTimeStamp = std::chrono::steady_clock::now();
+	std::chrono::time_point<std::chrono::steady_clock> latestRoutineExitTimeStamp = routineEntryTimeStamp + std::chrono::milliseconds(timeoutMS);
+
+	while (true) {
+		//Dont wait, if the state we want to wait for is already reached
+		if (m_debuggingReady) {
+			return std::cv_status::no_timeout;
+		}
+
+		std::cv_status waitResult = m_readyDebug_cv.wait_for(lk, latestRoutineExitTimeStamp - std::chrono::steady_clock::now());
+		if (waitResult == std::cv_status::timeout) {
+			return std::cv_status::timeout;
+		}
+	}
 }
 
 size_t GDBThreadCommunication::get_gdbOutputQueue_size() {

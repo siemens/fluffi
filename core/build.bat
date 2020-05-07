@@ -48,6 +48,10 @@ if errorlevel 1 goto errorDone
 MSBuild.exe helpers\fuzzcmp\fuzzcmp.sln /m  /t:Build /p:Configuration=Release /p:Platform=x64
 if errorlevel 1 goto errorDone
 
+:: kfuzz x64
+MSBuild.exe helpers\kfuzz\kfuzz.sln /m  /t:Build /p:Configuration=Release /p:Platform=x64
+if errorlevel 1 goto errorDone
+
 ENDLOCAL
 
 SETLOCAL
@@ -67,6 +71,10 @@ if errorlevel 1 goto errorDone
 
 :: Fuzzcmp x86
 MSBuild.exe helpers\fuzzcmp\fuzzcmp.sln /m  /t:Build /p:Configuration=Release /p:Platform=x86
+if errorlevel 1 goto errorDone
+
+:: kfuzz x86
+MSBuild.exe helpers\kfuzz\kfuzz.sln /m  /t:Build /p:Configuration=Release /p:Platform=x86
 if errorlevel 1 goto errorDone
 
 ENDLOCAL

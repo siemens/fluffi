@@ -45,6 +45,7 @@ Author(s): Thomas Riedmaier, Abian Blome, Fabian Russwurm, Roman Bendt, Pascal E
 #include "Util.h"
 #include "GarbageCollectorWorker.h"
 #include "GetLMConfigurationRequestHandler.h"
+#include "ReportNewMutationsRequestHandler.h"
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -137,6 +138,9 @@ int main(int argc, char* argv[])
 
 	GetLMConfigurationRequestHandler* m_getLMConfigurationRequestHandler = new GetLMConfigurationRequestHandler();
 	comm->registerFLUFFIMessageHandler(m_getLMConfigurationRequestHandler, FLUFFIMessage::FluffCase::kGetLMConfigurationRequest);
+
+	ReportNewMutationsRequestHandler* m_reportNewMutationsRequestHandler = new ReportNewMutationsRequestHandler();
+	comm->registerFLUFFIMessageHandler(m_reportNewMutationsRequestHandler, FLUFFIMessage::FluffCase::kReportNewMutationsRequest);
 	// ################## End of Registering Message Handler  ##################
 
 	// ################## Main Logic  ##################
@@ -291,6 +295,8 @@ int main(int argc, char* argv[])
 	m_isAgentWelcomedRequestHandler = nullptr;
 	delete m_getLMConfigurationRequestHandler;
 	m_getLMConfigurationRequestHandler = nullptr;
+	delete m_reportNewMutationsRequestHandler;
+	m_reportNewMutationsRequestHandler = nullptr;
 
 	delete workerStateBuilder;
 	workerStateBuilder = nullptr;

@@ -262,6 +262,11 @@ bool ExternalProcess::attachToProcess() {
 	//Opening target Process
 	m_pi = { 0 };
 	m_pi.dwProcessId = getPIDForProcessName(m_commandline);
+	if (m_pi.dwProcessId == 0) {
+		LOG(ERROR) << "Could not get PID for Process " << m_commandline;
+		return false;
+	}
+
 	m_pi.hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, m_pi.dwProcessId);
 	if (m_pi.hProcess == NULL) {
 		LOG(ERROR) << "Could not Open Process  " << m_pi.dwProcessId << " (Error " << GetLastError() << ")";

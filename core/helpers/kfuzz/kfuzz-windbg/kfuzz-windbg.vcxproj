@@ -222,7 +222,9 @@ exit 0</Command>
     <ClCompile Include="kfuzz-windbg.cpp" />
     <ClCompile Include="KfuzzEventCallback.cpp" />
     <ClCompile Include="KfuzzExtension.cpp" />
+    <ClCompile Include="KfuzzOutputCallback.cpp" />
     <ClCompile Include="KfuzzProvider.cpp" />
+    <ClCompile Include="KfuzzPublisher.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -233,7 +235,9 @@ exit 0</Command>
     <ClInclude Include="kfuzz-windbg.h" />
     <ClInclude Include="KfuzzEventCallback.h" />
     <ClInclude Include="KfuzzExtension.h" />
+    <ClInclude Include="KfuzzOutputCallback.h" />
     <ClInclude Include="KfuzzProvider.h" />
+    <ClInclude Include="KfuzzPublisher.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

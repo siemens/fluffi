@@ -39,7 +39,9 @@ namespace Debugger::DataModel::Libraries::Kfuzz
 		m_numOfProcessedCommands(-1),
 		m_responseIPC("kfuzz_windbg_request_response", 1 * 1024 * 1024),
 		m_SharedMemIPCInterruptEvent(NULL),
-		m_eventCallback()
+		m_publisher(),
+		m_eventCallback(&m_publisher),
+		m_outputCallback(&m_publisher)
 	{
 		m_spKfuzzExtension = std::make_unique<KfuzzExtension>();
 
@@ -50,7 +52,9 @@ namespace Debugger::DataModel::Libraries::Kfuzz
 			ComPtr<IDebugClient> dbgClient;
 			if (SUCCEEDED(spPrivate.As(&dbgClient)))
 			{
+				PDEBUG_OUTPUT_CALLBACKS pOutputCallback = reinterpret_cast<PDEBUG_OUTPUT_CALLBACKS>(&m_outputCallback);
 				dbgClient->SetEventCallbacks(&m_eventCallback);
+				dbgClient->SetOutputCallbacks(pOutputCallback);
 			}
 		}
 
@@ -353,6 +357,9 @@ namespace Debugger::DataModel::Libraries::Kfuzz
 				if (S_OK != dbgSystemObj->GetProcessIdsByIndex(0, 1, NULL, &systemID)) {
 					systemID = 0;
 				}
+			}
+			if (systemID > INT_MAX) {
+				systemID = 0;
 			}
 			responseSS << "* 1    process " << systemID << "     " << nameBuffer;
 			return;

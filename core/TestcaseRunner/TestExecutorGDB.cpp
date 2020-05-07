@@ -406,10 +406,7 @@ bool TestExecutorGDB::isSetupFunctionable() {
 }
 
 bool TestExecutorGDB::waitUntilTargetIsBeingDebugged(std::shared_ptr<GDBThreadCommunication> gDBThreadCommunication, int timeoutMS) {
-	std::chrono::time_point<std::chrono::steady_clock> routineEntryTimeStamp = std::chrono::steady_clock::now();
-	std::chrono::time_point<std::chrono::steady_clock> latestRoutineExitTimeStamp = routineEntryTimeStamp + std::chrono::milliseconds(timeoutMS);
-
-	gDBThreadCommunication->waitForDebuggingReadyTimeout(latestRoutineExitTimeStamp - std::chrono::steady_clock::now());
+	gDBThreadCommunication->waitForDebuggingReadyWithTimeout(timeoutMS);
 
 	return gDBThreadCommunication->get_debuggingReady();
 }
@@ -418,11 +415,19 @@ bool TestExecutorGDB::waitUntilCoverageState(std::shared_ptr<GDBThreadCommunicat
 	std::chrono::time_point<std::chrono::steady_clock> routineEntryTimeStamp = std::chrono::steady_clock::now();
 	std::chrono::time_point<std::chrono::steady_clock> latestRoutineExitTimeStamp = routineEntryTimeStamp + std::chrono::milliseconds(timeoutMS);
 
-	while (!gDBThreadCommunication->get_gdbThreadShouldTerminate() && gDBThreadCommunication->get_coverageState() != desiredState && std::chrono::steady_clock::now() < latestRoutineExitTimeStamp) {
-		gDBThreadCommunication->waitForTerminateMessageOrCovStateChangeTimeout(latestRoutineExitTimeStamp - std::chrono::steady_clock::now(), &desiredState, 1);
+	while (std::chrono::steady_clock::now() < latestRoutineExitTimeStamp) {
+		gDBThreadCommunication->waitForTerminateOrNewMessageOrCovStateChangeWithTimeout(static_cast<int>(std::chrono::duration_cast<std::chrono::milliseconds>(latestRoutineExitTimeStamp - std::chrono::steady_clock::now()).count()), &desiredState, 1);
+
+		if (gDBThreadCommunication->get_gdbThreadShouldTerminate()) {
+			return false;
+		}
+
+		if (gDBThreadCommunication->get_coverageState() == desiredState) {
+			return true;
+		}
 	}
 
-	return gDBThreadCommunication->get_coverageState() == desiredState;
+	return false;
 }
 
 bool TestExecutorGDB::attemptStartTargetAndFeeder() {
@@ -651,7 +656,7 @@ void TestExecutorGDB::debuggerThreadMain(const std::string targetCMDline, std::s
 	gDBThreadCommunication->set_gdbThreadShouldTerminate();
 	gDBThreadCommunication->m_exOutput.m_debuggerThreadDone = true;
 	return;
-}
+	}
 
 bool TestExecutorGDB::sendCommandToGDBAndWaitForResponse(const std::string command, std::string* response, std::shared_ptr<GDBThreadCommunication> gDBThreadCommunication, bool sendCtrlZ) {
 	//LOG(DEBUG) << "sendCommandToGDBAndWaitForResponse:\"" << command << "\"";
@@ -709,7 +714,7 @@ bool TestExecutorGDB::sendCommandToGDBAndWaitForResponse(const std::string comma
 	bool firstLine = true;
 	while (true) {
 		//Wait for response
-		gDBThreadCommunication->waitForTerminateMessageOrCovStateChange(nullptr, 0);
+		gDBThreadCommunication->waitForTerminateOrNewMessageOrCovStateChange(nullptr, 0);
 
 		//Handle gdbThreadShouldTerminate
 		if (gDBThreadCommunication->get_gdbThreadShouldTerminate()) {
@@ -769,10 +774,11 @@ bool TestExecutorGDB::handleSignal(std::shared_ptr<GDBThreadCommunication> gDBTh
 	while (!gotAddressLine) {
 		if (gDBThreadCommunication->get_gdbOutputQueue_size() == 0) {
 			//Try to wait for the message that contains the current ip
-			gDBThreadCommunication->waitForTerminateMessageOrCovStateChange(nullptr, 0);
+			gDBThreadCommunication->waitForTerminateOrNewMessageOrCovStateChange(nullptr, 0);
 
 			if (gDBThreadCommunication->get_gdbOutputQueue_size() == 0) {
 				//waiting failed: we should terminate
+				LOG(WARNING) << "Got Terminate message while waiting for signal details";
 				return false;
 			}
 		}
@@ -847,7 +853,7 @@ bool TestExecutorGDB::handleSignal(std::shared_ptr<GDBThreadCommunication> gDBTh
 		}
 	}
 	//This is not one of our breakpoints!
-	LOG(DEBUG) << "This is some strange bp";
+	LOG(DEBUG) << "This is an unexpected bp - most likely a crash!";
 
 	std::vector<tModuleAddressesAndSizes> baseAddressesAndSizes;
 	std::string infoFilesResp;
@@ -865,6 +871,8 @@ bool TestExecutorGDB::handleSignal(std::shared_ptr<GDBThreadCommunication> gDBTh
 	}
 
 	std::string crashRVA = getCrashRVA(baseAddressesAndSizes, signalAddress);
+
+	LOG(DEBUG) << "Crash RVA: " << crashRVA;
 
 	if (gDBThreadCommunication->m_exOutput.m_firstCrash == "") {
 		//first crash
@@ -1000,7 +1008,7 @@ void TestExecutorGDB::gdbDebug(std::shared_ptr<GDBThreadCommunication> gDBThread
 	std::set<FluffiBasicBlock> blocksCoveredSinceLastReset;
 	GDBThreadCommunication::COVERAGE_STATE statesToWaitFor[] = { GDBThreadCommunication::COVERAGE_STATE::SHOULD_DUMP, GDBThreadCommunication::COVERAGE_STATE::SHOULD_RESET_HARD, GDBThreadCommunication::COVERAGE_STATE::SHOULD_RESET_SOFT };
 	while (true) {
-		gDBThreadCommunication->waitForTerminateMessageOrCovStateChange(statesToWaitFor, 2);
+		gDBThreadCommunication->waitForTerminateOrNewMessageOrCovStateChange(statesToWaitFor, 3);
 
 		//Handle gdbThreadShouldTerminate
 		if (gDBThreadCommunication->get_gdbThreadShouldTerminate()) {
@@ -1189,10 +1197,10 @@ bool TestExecutorGDB::gdbPrepareForDebug(std::shared_ptr<GDBThreadCommunication>
 		size_t isPos = resp.find("process");
 		if (isPos != std::string::npos) {
 			try {
-				gDBThreadCommunication->m_exOutput.m_PID = std::stoi(resp.c_str() + isPos + 7);
+				gDBThreadCommunication->m_exOutput.m_PID = std::stoi(resp.c_str() + isPos + 7); //Fails if PID too big
 			}
 			catch (...) {
-				LOG(ERROR) << "std::stoi of " << (resp.c_str() + isPos + 7) << " failed";
+				LOG(ERROR) << "std::stoi of \"" << (resp.c_str() + isPos + 7) << "\" failed";
 				google::protobuf::ShutdownProtobufLibrary();
 				_exit(EXIT_FAILURE); //make compiler happy
 			}

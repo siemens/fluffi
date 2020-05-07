@@ -23,35 +23,19 @@ Author(s): Thomas Riedmaier
 */
 
 #pragma once
-
-class GDBEmulator
+namespace Debugger::DataModel::Libraries::Kfuzz
 {
-public:
-	GDBEmulator();
-	virtual ~GDBEmulator();
+	class KfuzzPublisher
+	{
+	public:
+		KfuzzPublisher();
+		virtual ~KfuzzPublisher();
 
-	bool init();
-	int handleConsoleCommands();
+		bool publish(std::string command);
+	private:
+		std::mutex m_mutex_;
+		SharedMemIPC m_publisherIPC;
 
-	static std::shared_ptr<GDBEmulator>  getInstance();
-
-private:
-
-	SharedMemMessage stringToMessage(std::string command);
-	std::string  messageToString(const SharedMemMessage& message);
-	std::string sendCommandToWinDbgAndGetResponse(std::string command);
-	void winDbgMessageDispatcher();
-
-	static BOOL WINAPI consoleHandler(DWORD dwCtrlType);
-
-	SharedMemIPC m_requestIPC;
-	SharedMemIPC m_subscriberIPC;
-	std::recursive_mutex m_mutex_; //Needs to be aquired for sharedmemipc with windbg. Will be locked while we are waiting for the target to entered a braked state
-	std::unique_ptr<std::thread> m_WinDbgMessageDispatcher;
-	bool m_stopRequested;
-	HANDLE m_SharedMemIPCInterruptEvent;
-	bool m_waitingForForcedBreak;
-	std::string m_fatalSystemErrorMessage;
-
-	static std::shared_ptr<GDBEmulator> instance;
-};
+		SharedMemMessage stringToMessage(std::string command);
+	};
+}

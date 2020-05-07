@@ -22,36 +22,38 @@ DEALINGS IN THE SOFTWARE.
 Author(s): Thomas Riedmaier
 */
 
-#pragma once
+#include "stdafx.h"
+#include "KfuzzPublisher.h"
 
-class GDBEmulator
+namespace Debugger::DataModel::Libraries::Kfuzz
 {
-public:
-	GDBEmulator();
-	virtual ~GDBEmulator();
+	KfuzzPublisher::KfuzzPublisher() :
+		m_mutex_(),
+		m_publisherIPC("kfuzz_windbg_publish_subscribe")
+	{
+		m_publisherIPC.initializeAsServer();
+	}
 
-	bool init();
-	int handleConsoleCommands();
+	KfuzzPublisher::~KfuzzPublisher() {
+	}
 
-	static std::shared_ptr<GDBEmulator>  getInstance();
+	SharedMemMessage KfuzzPublisher::stringToMessage(std::string command) {
+		SharedMemMessage request{ SHARED_MEM_MESSAGE_KFUZZ_REQUEST, command.c_str(),static_cast<int>(command.length()) };
+		return request;
+	}
 
-private:
+	bool KfuzzPublisher::publish(std::string command) {
+		//Make sure only one thread at a time uses the shared memory IPC
+		std::unique_lock<std::mutex> mlock(m_mutex_);
 
-	SharedMemMessage stringToMessage(std::string command);
-	std::string  messageToString(const SharedMemMessage& message);
-	std::string sendCommandToWinDbgAndGetResponse(std::string command);
-	void winDbgMessageDispatcher();
+		int timeoutMilliseconds = 1000;
+		SharedMemMessage response;
+		SharedMemMessage request = stringToMessage(command);
+		bool success = m_publisherIPC.sendMessageToClient(&request);
 
-	static BOOL WINAPI consoleHandler(DWORD dwCtrlType);
-
-	SharedMemIPC m_requestIPC;
-	SharedMemIPC m_subscriberIPC;
-	std::recursive_mutex m_mutex_; //Needs to be aquired for sharedmemipc with windbg. Will be locked while we are waiting for the target to entered a braked state
-	std::unique_ptr<std::thread> m_WinDbgMessageDispatcher;
-	bool m_stopRequested;
-	HANDLE m_SharedMemIPCInterruptEvent;
-	bool m_waitingForForcedBreak;
-	std::string m_fatalSystemErrorMessage;
-
-	static std::shared_ptr<GDBEmulator> instance;
-};
+		if (success) {
+			success = m_publisherIPC.waitForNewMessageToServer(&response, timeoutMilliseconds);
+		}
+		return success;
+	}
+}
