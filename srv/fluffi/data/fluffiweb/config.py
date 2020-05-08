@@ -23,24 +23,42 @@
 import os
 import socket
 
+
+def getHostByNameHandler(name):        
+    try:
+        host = socket.gethostbyname(name)        
+    except:
+        host = name
+        
+    return host 
+
+
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
+
 LOCAL_DEV = False
-SQLALCHEMY_DATABASE_URI = "mysql://root:toor@localhost/fluffi_gm" if LOCAL_DEV else "mysql://fluffi_gm:fluffi_gm@" \
-                                                                                    + socket.gethostbyname('db.fluffi')\
-                                                                                    + "/fluffi_gm"
+
+if LOCAL_DEV:
+    DBUSER = "root"
+    DBPASS = "toor"
+    DBHOST = "localhost"
+    SQLALCHEMY_DATABASE_URI = "mysql://{}:{}@{}/fluffi_gm".format(DBUSER, DBPASS, DBHOST)
+
+else:
+    DBUSER = "fluffi_gm"
+    DBPASS = "fluffi_gm"
+    DBHOST = getHostByNameHandler('db.fluffi')    
+    SQLALCHEMY_DATABASE_URI = "mysql://{}:{}@{}/fluffi_gm".format(DBUSER, DBPASS, DBHOST)
+                                                                                                                                                                  
+
+DBFILE = "sql_files/createLMDB.sql"
+DBPREFIX = "fluffi_"
+DEFAULT_DBNAME = "information_schema"
+FTP_URL = getHostByNameHandler('ftp.fluffi')
+MQTT_HOST = getHostByNameHandler('mon.fluffi')
+MQTT_PORT = 1883
+
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 WTF_CSRF_ENABLED = True
 SECRET_KEY = "asdf"
 BOOTSTRAP_SERVE_LOCAL = True
 SEND_FILE_MAX_AGE_DEFAULT = 0
-
-
-DBHOST = "localhost" if LOCAL_DEV else socket.gethostbyname('db.fluffi')
-DBUSER = "root" if LOCAL_DEV else "fluffi_gm"
-DBPASS = "toor" if LOCAL_DEV else "fluffi_gm"
-DBFILE = "sql_files/createLMDB.sql"
-DBPREFIX = "fluffi_"
-DEFAULT_DBNAME = "information_schema"
-FTP_URL = socket.gethostbyname('ftp.fluffi') if not LOCAL_DEV else 'ftp.fluffi'
-MQTT_HOST = socket.gethostbyname('mon.fluffi') if not LOCAL_DEV else 'mon.fluffi'
-MQTT_PORT = 1883
