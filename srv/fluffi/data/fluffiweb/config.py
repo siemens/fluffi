@@ -42,7 +42,6 @@ if LOCAL_DEV:
     DBPASS = "toor"
     DBHOST = "localhost"
     SQLALCHEMY_DATABASE_URI = "mysql://{}:{}@{}/fluffi_gm".format(DBUSER, DBPASS, DBHOST)
-
 else:
     DBUSER = "fluffi_gm"
     DBPASS = "fluffi_gm"
