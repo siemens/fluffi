@@ -41,14 +41,13 @@ if LOCAL_DEV:
     DBUSER = "root"
     DBPASS = "toor"
     DBHOST = "localhost"
-    SQLALCHEMY_DATABASE_URI = "mysql://{}:{}@{}/fluffi_gm".format(DBUSER, DBPASS, DBHOST)
 else:
     DBUSER = "fluffi_gm"
     DBPASS = "fluffi_gm"
-    DBHOST = getHostByNameHandler('db.fluffi')    
-    SQLALCHEMY_DATABASE_URI = "mysql://{}:{}@{}/fluffi_gm".format(DBUSER, DBPASS, DBHOST)
+    DBHOST = getHostByNameHandler('db.fluffi') 
+    
+SQLALCHEMY_DATABASE_URI = "mysql://{}:{}@{}/fluffi_gm".format(DBUSER, DBPASS, DBHOST)
                                                                                                                                                                   
-
 DBFILE = "sql_files/createLMDB.sql"
 DBPREFIX = "fluffi_"
 DEFAULT_DBNAME = "information_schema"
