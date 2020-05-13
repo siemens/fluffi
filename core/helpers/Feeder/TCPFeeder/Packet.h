@@ -23,15 +23,18 @@ Author(s): Thomas Riedmaier
 */
 
 #pragma once
-typedef enum { CONTINUE, WAIT_FOR_RESPONSE, WAIT_N_MILLISECONDS } WHAT_TODO_AFTER_SEND;
+typedef enum { CONTINUE, WAIT_FOR_ANY_RESPONSE, WAIT_FOR_BYTE_SEQUENCE, WAIT_N_MILLISECONDS } WHAT_TODO_AFTER_SEND;
 
 class Packet
 {
 public:
-	Packet(const std::vector<char> & packetBytes, WHAT_TODO_AFTER_SEND whatTodo, int waitMS = 0);
+	Packet(const std::vector<char> & packetBytes, WHAT_TODO_AFTER_SEND whatTodo); //CONTINUE, WAIT_FOR_ANY_RESPONSE
+	Packet(const std::vector<char> & packetBytes, WHAT_TODO_AFTER_SEND whatTodo, int waitMS); //WAIT_N_MILLISECONDS
+	Packet(const std::vector<char> & packetBytes, WHAT_TODO_AFTER_SEND whatTodo, std::vector<char> waitForBytes); //WAIT_FOR_BYTE_SEQUENCE
 	virtual ~Packet();
 
 	std::vector<char> m_packetBytes;
+	std::vector<char> m_waitForBytes;
 	WHAT_TODO_AFTER_SEND m_whatTodo;
 	int m_waitMS;
 };
