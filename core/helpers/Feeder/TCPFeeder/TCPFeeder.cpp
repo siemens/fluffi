@@ -93,7 +93,7 @@ bool sendPacketSequenceToHostAndPort(std::vector<Packet> packetSequence, std::st
 		return false;
 	}
 
-	for (int pi = 0; pi < packetSequence.size(); pi++) {
+	for (size_t pi = 0; pi < packetSequence.size(); pi++) {
 		//Send packet
 		if (packetSequence[pi].m_packetBytes.size() > 0) {
 			iResult = static_cast<int>(send(connectSocket, &(packetSequence[pi].m_packetBytes)[0], static_cast<int>(packetSequence[pi].m_packetBytes.size()), 0));
@@ -137,6 +137,7 @@ bool sendPacketSequenceToHostAndPort(std::vector<Packet> packetSequence, std::st
 						else {
 							//as we have not yet seen the desired response: Wait
 							std::this_thread::sleep_for(std::chrono::milliseconds(10));
+							continue;
 						}
 					}
 #if defined(_WIN32) || defined(_WIN64)
