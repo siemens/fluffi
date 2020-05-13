@@ -32,6 +32,7 @@ Author(s): Thomas Riedmaier, Abian Blome
 #include <chrono>
 #include <iterator>
 #include <thread>
+#include <algorithm>
 
 #include "SharedMemIPC.h"
 

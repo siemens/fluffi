@@ -109,12 +109,12 @@ bool sendPacketSequenceToHostAndPort(std::vector<Packet> packetSequence, std::st
 		switch (packetSequence[pi].m_whatTodo) {
 		case CONTINUE:
 			break;
-		case WAIT_FOR_RESPONSE:
+		case WAIT_FOR_ANY_RESPONSE:
+		case WAIT_FOR_BYTE_SEQUENCE:
 		{
 			//recv response (at least one byte is required)
-
+			std::vector<char>fullresponse;
 			char outbuf[0x2000];
-			bool responseReceived = false;
 			while (true) {
 				iResult = static_cast<int>(recv(connectSocket, outbuf, sizeof(outbuf), 0));
 				if (iResult == SOCKET_ERROR || iResult == 0) {
@@ -126,12 +126,16 @@ bool sendPacketSequenceToHostAndPort(std::vector<Packet> packetSequence, std::st
 					if (lasterr == EAGAIN || lasterr == EWOULDBLOCK) {
 #endif
 						//No new bytes
-						if (responseReceived) {
+						if (packetSequence[pi].m_whatTodo == WAIT_FOR_ANY_RESPONSE && fullresponse.size() > 0) {
 							//as we already have seen some response: we are done
 							break;
 						}
+						else if (packetSequence[pi].m_whatTodo == WAIT_FOR_BYTE_SEQUENCE && (std::search(fullresponse.begin(), fullresponse.end(), packetSequence[pi].m_waitForBytes.begin(), packetSequence[pi].m_waitForBytes.end()) != fullresponse.end())) {
+							//we have seen the desired response: we are dode
+							break;
+						}
 						else {
-							//as we have not yet seen some response: Wait
+							//as we have not yet seen the desired response: Wait
 							std::this_thread::sleep_for(std::chrono::milliseconds(10));
 						}
 					}
@@ -160,7 +164,7 @@ bool sendPacketSequenceToHostAndPort(std::vector<Packet> packetSequence, std::st
 					connectSocket = INVALID_SOCKET;
 					return false;
 				}
-				responseReceived = true;
+				fullresponse.insert(fullresponse.end(), outbuf, outbuf + iResult);
 			}
 
 			break;
@@ -190,7 +194,7 @@ bool sendBytesToHostAndPort(std::vector<char> fuzzBytes, std::string targethost,
 		return true;
 	}
 
-	Packet p(fuzzBytes, WAIT_FOR_RESPONSE);
+	Packet p(fuzzBytes, WHAT_TODO_AFTER_SEND::WAIT_FOR_ANY_RESPONSE);
 	std::vector<Packet> pvec{ p };
 	return sendPacketSequenceToHostAndPort(pvec, targethost, serverport);
 }

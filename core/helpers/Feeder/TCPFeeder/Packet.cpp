@@ -25,10 +25,27 @@ Author(s): Thomas Riedmaier
 #include "stdafx.h"
 #include "Packet.h"
 
+Packet::Packet(const std::vector<char> & packetBytes, WHAT_TODO_AFTER_SEND whatTodo) :
+	m_packetBytes(packetBytes),
+	m_waitForBytes(),
+	m_whatTodo(whatTodo),
+	m_waitMS(-1)
+{
+}
+
 Packet::Packet(const std::vector<char> & packetBytes, WHAT_TODO_AFTER_SEND whatTodo, int waitMS) :
 	m_packetBytes(packetBytes),
+	m_waitForBytes(),
 	m_whatTodo(whatTodo),
 	m_waitMS(waitMS)
+{
+}
+
+Packet::Packet(const std::vector<char> & packetBytes, WHAT_TODO_AFTER_SEND whatTodo, std::vector<char> waitForBytes) :
+	m_packetBytes(packetBytes),
+	m_waitForBytes(waitForBytes),
+	m_whatTodo(whatTodo),
+	m_waitMS(-1)
 {
 }
 
