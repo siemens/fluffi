@@ -19,32 +19,19 @@ OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 
-Author(s): Thomas Riedmaier, Abian Blome
+Author(s): Thomas Riedmaier
 */
 
 #pragma once
+typedef enum { CONTINUE, WAIT_FOR_RESPONSE, WAIT_N_MILLISECONDS } WHAT_TODO_AFTER_SEND;
 
-#include "targetver.h"
+class Packet
+{
+public:
+	Packet(const std::vector<char> & packetBytes, WHAT_TODO_AFTER_SEND whatTodo, int waitMS = 0);
+	virtual ~Packet();
 
-#include <string>
-#include <vector>
-#include <iostream>
-#include <chrono>
-#include <iterator>
-#include <thread>
-
-#include "SharedMemIPC.h"
-
-//#define USE_SSL
-#ifdef USE_SSL
-#if defined(_WIN32) || defined(_WIN64)
-#include <applink.c>
-#pragma comment(lib, "sslwrap.lib")
-#else
-#define __cdecl __attribute__((__cdecl__))
-#endif
-
-int __cdecl sendByteBufOnce(char* dstIP, int port, char* msg, int msgSize, int clientCertSize, const unsigned char * clientCert, int clientPrivateKeySize, const unsigned char * clientPrivateKey);
-int __cdecl sendByteBufWithResponse(char* dstIP, int port, char* msg, int msgSize, char* response, int responseSize, int clientCertSize, const unsigned char * clientCert, int clientPrivateKeySize, const unsigned char * clientPrivateKey);
-
-#endif
+	std::vector<char> m_packetBytes;
+	WHAT_TODO_AFTER_SEND m_whatTodo;
+	int m_waitMS;
+};

@@ -186,12 +186,14 @@ Author(s): Thomas Riedmaier, Abian Blome, Fabian Russwurm
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="http.h" />
+    <ClInclude Include="Packet.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="http.cpp" />
+    <ClCompile Include="Packet.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
