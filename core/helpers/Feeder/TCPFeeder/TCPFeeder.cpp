@@ -195,18 +195,18 @@ bool sendBytesToHostAndPort(std::vector<char> fuzzBytes, std::string targethost,
 	return sendPacketSequenceToHostAndPort(pvec, targethost, serverport);
 }
 
+bool firstByteMarksTestcaseType = false;
 bool sendTestcaseToHostAndPort(std::vector<char> fuzzBytes, std::string targethost, int serverport) {
-	bool firstByteMarksTestcaseType = false;
 	if (firstByteMarksTestcaseType) {
 		//The first byte tells us what to do.
 		//This allows us combining multiple testcases into a single feeder, that can even be adjusted over time :)
 		char firstbyte = fuzzBytes[0];
 		fuzzBytes.erase(fuzzBytes.begin());
+
 		switch (firstbyte) { //range -127 ... 128
 		case 0:
-			sendBytesToHostAndPort(fuzzBytes, targethost, serverport);
-			break;
-			//other cases ...
+			return sendBytesToHostAndPort(fuzzBytes, targethost, serverport);
+
 		default:
 			//Not implemented
 			return true;
@@ -214,15 +214,20 @@ bool sendTestcaseToHostAndPort(std::vector<char> fuzzBytes, std::string targetho
 	}
 	else {
 		//Just send whatever came in to the server
-		sendBytesToHostAndPort(fuzzBytes, targethost, serverport);
+		return sendBytesToHostAndPort(fuzzBytes, targethost, serverport);
 	}
 }
 
 void preprocess(std::vector<char>* bytes) {
-	// Add preprocession steps here as needed, e.g. for HTTP:
-	// dropNoDoubleLinebreak(&bytes);
-	// fixHTTPContentLength(&bytes);
-	// performHTTPAuthAndManageSession();
+	// Add preprocession steps here as needed
+	if (firstByteMarksTestcaseType) {
+	}
+	else {
+		// Sample preprocessing for HTTP:
+		// dropNoDoubleLinebreak(&bytes);
+		// fixHTTPContentLength(&bytes);
+		// performHTTPAuthAndManageSession();
+	}
 	return;
 }
 
