@@ -785,10 +785,10 @@ void ExternalProcess::debug(unsigned long timeoutMilliseconds, std::shared_ptr<D
 			case OUTPUT_DEBUG_STRING_EVENT:
 				if (!doPostMortemAnalysis) {
 					//https://github.com/DynamoRIO/dynamorio/wiki/Debugging
-					LOG(WARNING) << "The application uses OutputDebugString - Dynamo Rio cannot handle this! Please patch the target application if you get the message that drcovOutput is of length 0 (if not - you are fine - this is a known wtf)!";
+					LOG(ERROR) << "The application uses OutputDebugString - Dynamo Rio cannot handle this! Please patch the target application if you get the message that drcovOutput is of length 0 (if not - you are fine - this is a known wtf)!";
 				}
 				else {
-					LOG(INFO) << "The application uses OutputDebugString - No problem as long as Dynamo Rio is not used.";
+					LOG(INFO) << "The application uses OutputDebugString - As the current execution runs without dynamorio, this is not a problem.";
 				}
 				break;
 			case LOAD_DLL_DEBUG_EVENT:
