@@ -131,7 +131,7 @@ bool sendPacketSequenceToHostAndPort(std::vector<Packet> packetSequence, std::st
 							break;
 						}
 						else if (packetSequence[pi].m_whatTodo == WAIT_FOR_BYTE_SEQUENCE && (std::search(fullresponse.begin(), fullresponse.end(), packetSequence[pi].m_waitForBytes.begin(), packetSequence[pi].m_waitForBytes.end()) != fullresponse.end())) {
-							//we have seen the desired response: we are dode
+							//we have seen the desired response: we are done
 							break;
 						}
 						else {
@@ -204,6 +204,12 @@ bool sendTestcaseToHostAndPort(std::vector<char> fuzzBytes, std::string targetho
 	if (firstByteMarksTestcaseType) {
 		//The first byte tells us what to do.
 		//This allows us combining multiple testcases into a single feeder, that can even be adjusted over time :)
+
+		if (fuzzBytes.size() < 1) {
+			//Invalid mutation
+			return true;
+		}
+
 		char firstbyte = fuzzBytes[0];
 		fuzzBytes.erase(fuzzBytes.begin());
 
