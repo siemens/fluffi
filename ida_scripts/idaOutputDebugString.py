@@ -25,7 +25,7 @@ import ida_nalt
 import idc
 
 def patchFile(ea, offset):
-    filename = GetInputFilePath()
+    filename = ida_nalt.get_input_file_path()
     print "Patching file %s" % filename
     with open(filename, "r+b") as f:
         f.seek(offset)
@@ -58,4 +58,3 @@ for frm, to in xrefs:
     except:
         pass
 
-idc.Exit(0)
