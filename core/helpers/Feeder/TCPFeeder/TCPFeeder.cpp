@@ -141,7 +141,7 @@ bool sendPacketSequenceToHostAndPort(std::vector<Packet> packetSequence, std::st
 						}
 					}
 #if defined(_WIN32) || defined(_WIN64)
-					else if (lasterr == WSAECONNRESET) {
+					else if (lasterr == WSAECONNRESET || iResult == 0) {
 #else
 					else if (iResult == 0) {
 #endif
@@ -160,7 +160,7 @@ bool sendPacketSequenceToHostAndPort(std::vector<Packet> packetSequence, std::st
 					}
 
 					//Something went wrong!
-					std::cout << "TCPFeeder: Failed to receive a response for packet " << pi << std::endl;
+					std::cout << "TCPFeeder: Failed to receive a response for packet " << pi << " due to error " << lasterr << std::endl;
 					closesocket(connectSocket);
 					connectSocket = INVALID_SOCKET;
 					return false;
