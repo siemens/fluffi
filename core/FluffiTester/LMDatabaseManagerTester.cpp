@@ -576,7 +576,7 @@ namespace LMDatabaseManagerTester
 			std::ifstream f(testfile);
 			Assert::IsFalse(f.good());
 
-			//duplicate insert should result in an update and delete dependants such as worst case scenarios and coverage
+			//duplicate insert should result in an update and delete dependants such as crash descriptors and coverage. Nice names, however should remain
 			Assert::IsTrue(dbman->addEntryToCrashDescriptionsTable(ftid2, "here a crash fp"));
 			Assert::IsTrue(stoi(dbman->EXECUTE_TEST_STATEMENT("SELECT Count(*) from crash_descriptions")) == 1);
 			std::set<FluffiBasicBlock> blocks;
