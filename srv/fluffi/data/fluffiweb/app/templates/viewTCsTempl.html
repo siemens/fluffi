@@ -152,14 +152,14 @@ function addPages(actualPage, pageCount){
                 {% else %}
                     {% if testcase.niceName %}
                     <button id="tcBtn{{loop.index}}"
-                            onclick="addOrRenameNiceName({{ loop.index }}, {{ data.project.ID }}, 'update', '{{ testcase.testcaseID }}', '')"
+                            onclick="addOrRenameNiceName({{ loop.index }}, {{ data.project.ID }}, 'update', '{{ testcase.ID.split(':')[0] }}', '{{ testcase.ID.split(':')[1] }}', '')"
                             class="btn-desgin">
                         {{ testcase.niceName }}
                     </button>
                     <input class="form-control" id="tcInput{{loop.index}}" style="display: none;" type="text">
                     {% else %}
                     <button id="tcBtnNew{{loop.index}}"
-                            onclick="addOrRenameNiceName({{ loop.index }}, {{ data.project.ID }}, 'insert', '{{ testcase.testcaseID }}', '')"
+                            onclick="addOrRenameNiceName({{ loop.index }}, {{ data.project.ID }}, 'insert', '{{  testcase.ID.split(':')[0] }}', '{{ testcase.ID.split(':')[1] }}', '')"
                             class="btn-desgin">
                         {{ testcase.ID }}
                     </button>
