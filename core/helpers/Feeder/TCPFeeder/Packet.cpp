@@ -19,33 +19,35 @@ OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 
-Author(s): Thomas Riedmaier, Abian Blome
+Author(s): Thomas Riedmaier
 */
 
-#pragma once
+#include "stdafx.h"
+#include "Packet.h"
 
-#include "targetver.h"
+Packet::Packet(const std::vector<char> & packetBytes, WHAT_TODO_AFTER_SEND whatTodo) :
+	m_packetBytes(packetBytes),
+	m_waitForBytes(),
+	m_whatTodo(whatTodo),
+	m_waitMS(-1)
+{
+}
 
-#include <string>
-#include <vector>
-#include <iostream>
-#include <chrono>
-#include <iterator>
-#include <thread>
-#include <algorithm>
+Packet::Packet(const std::vector<char> & packetBytes, WHAT_TODO_AFTER_SEND whatTodo, int waitMS) :
+	m_packetBytes(packetBytes),
+	m_waitForBytes(),
+	m_whatTodo(whatTodo),
+	m_waitMS(waitMS)
+{
+}
 
-#include "SharedMemIPC.h"
+Packet::Packet(const std::vector<char> & packetBytes, WHAT_TODO_AFTER_SEND whatTodo, std::vector<char> waitForBytes) :
+	m_packetBytes(packetBytes),
+	m_waitForBytes(waitForBytes),
+	m_whatTodo(whatTodo),
+	m_waitMS(-1)
+{
+}
 
-//#define USE_SSL
-#ifdef USE_SSL
-#if defined(_WIN32) || defined(_WIN64)
-#include <applink.c>
-#pragma comment(lib, "sslwrap.lib")
-#else
-#define __cdecl __attribute__((__cdecl__))
-#endif
-
-int __cdecl sendByteBufOnce(char* dstIP, int port, char* msg, int msgSize, int clientCertSize, const unsigned char * clientCert, int clientPrivateKeySize, const unsigned char * clientPrivateKey);
-int __cdecl sendByteBufWithResponse(char* dstIP, int port, char* msg, int msgSize, char* response, int responseSize, int clientCertSize, const unsigned char * clientCert, int clientPrivateKeySize, const unsigned char * clientPrivateKey);
-
-#endif
+Packet::~Packet() {
+}

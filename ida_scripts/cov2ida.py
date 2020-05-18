@@ -80,14 +80,14 @@ database_string = "mysql+pymysql://%s:%s@%s/%s" % (username, password, hostname,
 
 engine = create_engine(database_string)
 with engine.connect() as con:
-    modulesDB = con.execute('SELECT * FROM target_modules')
+    modulesDB = con.execute('SELECT ID, ModuleName, ModulePath FROM target_modules')
     settingsDB = con.execute('SELECT * FROM settings')
 
 #print "Modules:"
-modules = {}
+modules = []
 for row in modulesDB:
     #print " %s" % row
-    modules[row[0]] = row
+    modules.append(row)
 
 #print "Settings:"
 #for row in settingsDB:
@@ -95,15 +95,15 @@ for row in modulesDB:
 
 # Step Nr. 4: Let user select module
 moduleList = []
-for module in modules.values():
+for module in modules:
     moduleList.append( (str(module[0]), module[1]) )
 
 a = SelectBox("Select a module", moduleList)
-selected_module = a.Show(True) + 1
-print "Selected module: %d" % selected_module
+selected_module = modules[a.Show(True)]
+print "Selected module: %d" % selected_module[0]
 
 rawModule = False
-if moduleList[selected_module-1][1] == 'NULL':
+if selected_module[1] == 'NULL':
     rawModule = True
 
 # Step Nr. 5: Let user change offset (optional)
@@ -113,7 +113,7 @@ offset = ida_kernwin.ask_long(0, "Add offset (if it's hex prepend a 0x)")
 engine = create_engine(database_string)
 with engine.connect() as con:
     #blocksDB = con.execute('SELECT Offset FROM covered_blocks WHERE ModuleID = %d' % selected_module)
-    blocksDistinctDB = con.execute('SELECT DISTINCT Offset FROM covered_blocks WHERE ModuleID = %d ORDER BY Offset ASC' % selected_module)
+    blocksDistinctDB = con.execute('SELECT DISTINCT Offset FROM covered_blocks WHERE ModuleID = %d ORDER BY Offset ASC' % selected_module[0])
 print "Found ? block(s) (%d distinct)" % (blocksDistinctDB.rowcount)
 
 # Step Nr. 7: Color the currently loaded binary

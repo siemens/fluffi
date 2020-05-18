@@ -23,10 +23,10 @@ Author(s): Thomas Riedmaier, Abian Blome
 */
 
 #include "stdafx.h"
-#include "SharedMemIPC.h"
 
 #include "http.h"
 #include "utils.h"
+#include "Packet.h"
 
 #if defined(_WIN32) || defined(_WIN64)
 #define SOCKETTYPE SOCKET
@@ -37,12 +37,155 @@ Author(s): Thomas Riedmaier, Abian Blome
 #define SOCKET_ERROR -1
 #endif
 
-void preprocess(std::vector<char>* bytes) {
-	// Add preprocession steps here as needed, e.g. for HTTP:
-	// dropNoDoubleLinebreak(&bytes);
-	// fixHTTPContentLength(&bytes);
-	// performHTTPAuthAndManageSession();
-	return;
+bool sendPacketSequenceToHostAndPort(std::vector<Packet> packetSequence, std::string targethost, int serverport) {
+	// Create a SOCKET for connecting to server
+	SOCKETTYPE connectSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	if (connectSocket == INVALID_SOCKET) {
+		std::cout << "TCPFeeder: socket failed!" << std::endl;
+		return false;
+	}
+
+	struct sockaddr_in saServer;
+	memset(&saServer, 0, sizeof(saServer));
+	saServer.sin_family = AF_INET;
+	saServer.sin_port = htons(serverport);
+#if defined(_WIN32) || defined(_WIN64)
+	if (inet_pton(AF_INET, targethost.c_str(), &saServer.sin_addr) == 0) {
+#else
+	if (inet_aton(targethost.c_str(), &saServer.sin_addr) == 0) {
+#endif
+		std::cout << "TCPFeeder: Error using inet_aton" << std::endl;
+		closesocket(connectSocket);
+		connectSocket = INVALID_SOCKET;
+		return false;
+	}
+
+	// Connect to server.
+	volatile int iResult = connect(connectSocket, reinterpret_cast<struct sockaddr*>(&saServer), sizeof(saServer));
+	if (iResult == SOCKET_ERROR) {
+		std::cout << "TCPFeeder: Failed to connect to the server" << std::endl;
+		closesocket(connectSocket);
+		connectSocket = INVALID_SOCKET;
+		return false;
+	}
+
+	// Mark socket as non-blocking
+#if defined(_WIN32) || defined(_WIN64)
+	u_long mode = 1;  // 1 to enable non-blocking socket
+	iResult = ioctlsocket(connectSocket, FIONBIO, &mode);
+#else
+
+	int flags = fcntl(fd, F_GETFL, 0);
+	if (flags == SOCKET_ERROR)
+	{
+		std::cout << "TCPFeeder: fcntl failed" << std::endl;
+		closesocket(connectSocket);
+		connectSocket = INVALID_SOCKET;
+		return false;
+	}
+	flags = (flags | O_NONBLOCK);
+	iResult = fcntl(fd, F_SETFL, flags);
+#endif
+	if (iResult == SOCKET_ERROR) {
+		std::cout << "TCPFeeder: Failed to make the socket non-blocking" << std::endl;
+		closesocket(connectSocket);
+		connectSocket = INVALID_SOCKET;
+		return false;
+	}
+
+	for (size_t pi = 0; pi < packetSequence.size(); pi++) {
+		//Send packet
+		if (packetSequence[pi].m_packetBytes.size() > 0) {
+			iResult = static_cast<int>(send(connectSocket, &(packetSequence[pi].m_packetBytes)[0], static_cast<int>(packetSequence[pi].m_packetBytes.size()), 0));
+			if (iResult == SOCKET_ERROR) {
+				std::cout << "TCPFeeder: Failed to send packet " << pi << " to the server" << std::endl;
+				closesocket(connectSocket);
+				connectSocket = INVALID_SOCKET;
+				return false;
+			}
+		}
+
+		//Do what there should be done (wait, receive answer, ...)
+		switch (packetSequence[pi].m_whatTodo) {
+		case CONTINUE:
+			break;
+		case WAIT_FOR_ANY_RESPONSE:
+		case WAIT_FOR_BYTE_SEQUENCE:
+		{
+			//recv response (at least one byte is required)
+			std::vector<char>fullresponse;
+			char outbuf[0x2000];
+			while (true) {
+				iResult = static_cast<int>(recv(connectSocket, outbuf, sizeof(outbuf), 0));
+				if (iResult == SOCKET_ERROR || iResult == 0) {
+#if defined(_WIN32) || defined(_WIN64)
+					int lasterr = WSAGetLastError();
+					if (lasterr == WSAEWOULDBLOCK) {
+#else
+					int lasterr = errno;
+					if (lasterr == EAGAIN || lasterr == EWOULDBLOCK) {
+#endif
+						//No new bytes
+						if (packetSequence[pi].m_whatTodo == WAIT_FOR_ANY_RESPONSE && fullresponse.size() > 0) {
+							//as we already have seen some response: we are done
+							break;
+						}
+						else if (packetSequence[pi].m_whatTodo == WAIT_FOR_BYTE_SEQUENCE && (std::search(fullresponse.begin(), fullresponse.end(), packetSequence[pi].m_waitForBytes.begin(), packetSequence[pi].m_waitForBytes.end()) != fullresponse.end())) {
+							//we have seen the desired response: we are done
+							break;
+						}
+						else {
+							//as we have not yet seen the desired response: Wait
+							std::this_thread::sleep_for(std::chrono::milliseconds(10));
+							continue;
+						}
+					}
+#if defined(_WIN32) || defined(_WIN64)
+					else if (lasterr == WSAECONNRESET || iResult == 0) {
+#else
+					else if (iResult == 0) {
+#endif
+						//server shut down the connection.
+						//Did we already send the last package?
+						if (pi == packetSequence.size() - 1) {
+							//Fair enough
+							break;
+						}
+						else {
+							std::cout << "TCPFeeder: Failed to receive a response for packet " << pi << " as the server prematurely closed the connection" << std::endl;
+							closesocket(connectSocket);
+							connectSocket = INVALID_SOCKET;
+							return false;
+						}
+					}
+
+					//Something went wrong!
+					std::cout << "TCPFeeder: Failed to receive a response for packet " << pi << " due to error " << lasterr << std::endl;
+					closesocket(connectSocket);
+					connectSocket = INVALID_SOCKET;
+					return false;
+				}
+				fullresponse.insert(fullresponse.end(), outbuf, outbuf + iResult);
+			}
+
+			break;
+		}
+
+		case WAIT_N_MILLISECONDS:
+			std::this_thread::sleep_for(std::chrono::milliseconds(packetSequence[pi].m_waitMS));
+			break;
+		default:
+			std::cout << "TCPFeeder: Invalid whatTodo for packet " << pi << std::endl;
+			closesocket(connectSocket);
+			connectSocket = INVALID_SOCKET;
+			return false;
+		}
+	}
+
+	//successfully sent all packages
+	closesocket(connectSocket);
+	connectSocket = INVALID_SOCKET;
+	return true;
 }
 
 bool sendBytesToHostAndPort(std::vector<char> fuzzBytes, std::string targethost, int serverport) {
@@ -51,71 +194,52 @@ bool sendBytesToHostAndPort(std::vector<char> fuzzBytes, std::string targethost,
 		//std::cout << "TCPFeeder: sending SHARED_MEM_MESSAGE_FUZZ_DONE to the runner as empty payloads are not forwarded" << std::endl;
 		return true;
 	}
-	//try until the runner kills us
-	while (true) {
-		// Create a SOCKET for connecting to server
-		SOCKETTYPE connectSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-		if (connectSocket == INVALID_SOCKET) {
-			std::cout << "TCPFeeder: socket failed!" << std::endl;
-			return false;
+
+	Packet p(fuzzBytes, WHAT_TODO_AFTER_SEND::WAIT_FOR_ANY_RESPONSE);
+	std::vector<Packet> pvec{ p };
+	return sendPacketSequenceToHostAndPort(pvec, targethost, serverport);
+}
+
+bool firstByteMarksTestcaseType = false;
+bool sendTestcaseToHostAndPort(std::vector<char> fuzzBytes, std::string targethost, int serverport) {
+	if (firstByteMarksTestcaseType) {
+		//The first byte tells us what to do.
+		//This allows us combining multiple testcases into a single feeder, that can even be adjusted over time :)
+
+		if (fuzzBytes.size() < 1) {
+			//Invalid mutation
+			return true;
 		}
 
-		struct sockaddr_in saServer;
-		memset(&saServer, 0, sizeof(saServer));
-		saServer.sin_family = AF_INET;
-		saServer.sin_port = htons(serverport);
-#if defined(_WIN32) || defined(_WIN64)
-		if (inet_pton(AF_INET, targethost.c_str(), &saServer.sin_addr) == 0) {
-#else
-		if (inet_aton(targethost.c_str(), &saServer.sin_addr) == 0) {
-#endif
-			std::cout << "TCPFeeder: Error using inet_aton" << std::endl;
-			closesocket(connectSocket);
-			return false;
+		char firstbyte = fuzzBytes[0];
+		fuzzBytes.erase(fuzzBytes.begin());
+
+		switch (firstbyte) { //range -127 ... 128
+		case 0:
+			return sendBytesToHostAndPort(fuzzBytes, targethost, serverport);
+
+		default:
+			//Not implemented
+			return true;
 		}
-
-		// Connect to server.
-		volatile int iResult = connect(connectSocket, reinterpret_cast<struct sockaddr*>(&saServer), sizeof(saServer));
-		if (iResult == SOCKET_ERROR) {
-			closesocket(connectSocket);
-			connectSocket = INVALID_SOCKET;
-			continue;
-		}
-
-		iResult = static_cast<int>(send(connectSocket, &(fuzzBytes)[0], static_cast<int>(fuzzBytes.size()), 0));
-		if (iResult == SOCKET_ERROR) {
-			closesocket(connectSocket);
-			connectSocket = INVALID_SOCKET;
-			continue;
-		}
-		char outbuf[1];
-		iResult = static_cast<int>(recv(connectSocket, outbuf, sizeof(outbuf), 0)); //recv  one byte (if possible)
-		if (iResult == SOCKET_ERROR) {
-#if defined(_WIN32) || defined(_WIN64)
-			int lasterr = WSAGetLastError();
-#else
-			//int lasterr = errno;
-#endif
-			closesocket(connectSocket);
-			connectSocket = INVALID_SOCKET;
-
-#if defined(_WIN32) || defined(_WIN64)
-			if (lasterr == WSAECONNRESET) {
-				//server shut down the connection. Fair enough
-				break;
-			}
-#endif
-
-			continue;
-		}
-
-		//success
-		closesocket(connectSocket);
-		connectSocket = INVALID_SOCKET;
-		break;
 	}
+	else {
+		//Just send whatever came in to the server
+		return sendBytesToHostAndPort(fuzzBytes, targethost, serverport);
+	}
+}
 
-	return true;
+void preprocess(std::vector<char>* bytes) {
+	// Add preprocession steps here as needed
+	if (firstByteMarksTestcaseType) {
+	}
+	else {
+		// Sample preprocessing for HTTP:
+		// dropNoDoubleLinebreak(&bytes);
+		// fixHTTPContentLength(&bytes);
+		// performHTTPAuthAndManageSession();
+	}
+	return;
 }
 
 int main(int argc, char* argv[])
@@ -147,7 +271,7 @@ int main(int argc, char* argv[])
 		std::vector<char> fuzzBytes = readAllBytesFromFile(fuzzFileName);
 
 		preprocess(&fuzzBytes);
-		if (sendBytesToHostAndPort(fuzzBytes, targethost, targetport)) {
+		if (sendTestcaseToHostAndPort(fuzzBytes, targethost, targetport)) {
 			SharedMemMessage fuzzDoneMessage(SHARED_MEM_MESSAGE_FUZZ_DONE, nullptr, 0);
 			sharedMemIPC_ToRunner.sendMessageToServer(&fuzzDoneMessage);
 		}
