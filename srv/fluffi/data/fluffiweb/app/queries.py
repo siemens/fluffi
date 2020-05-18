@@ -49,7 +49,7 @@ GET_MAX_LOCALID = (
 UPDATE_SETTINGS = (
     "UPDATE settings SET SettingValue=:SettingValue WHERE ID=:ID")
 UPDATE_NICE_NAME_TESTCASE = (
-    "UPDATE nice_names_testcase SET NiceName=:newName WHERE TestcaseID=:testcaseID")
+    "UPDATE nice_names_testcase SET NiceName=:newName WHERE CreatorServiceDescriptorGUID=:guid AND CreatorLocalID=:localId")
 UPDATE_NICE_NAME_MANAGED_INSTANACE = (
     "UPDATE nice_names_managed_instance SET NiceName=:newName WHERE ServiceDescriptorGUID=:sdguid")
 DELETE_TC_WTIH_LOCALID = (
@@ -125,7 +125,7 @@ UNIQUE_ACCESS_VIOLATION = (
     " FROM interesting_testcases AS it"
     " JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
     " WHERE it.TestCaseType=2 Group by cd.CrashFootprint) av "     
-    "LEFT JOIN nice_names_testcase AS nn ON av.ID = nn.TestcaseID;")
+    "LEFT JOIN nice_names_testcase AS nn ON av.CreatorServiceDescriptorGUID = nn.CreatorServiceDescriptorGUID AND  av.CreatorLocalID = nn.CreatorLocalID;")
 
 UNIQUE_ACCESS_VIOLATION_NO_RAW = (
     "SELECT av.ID, av.CrashFootprint, av.TestCaseType, av.CreatorServiceDescriptorGUID, av.CreatorLocalID, av.Rating, "
@@ -137,7 +137,7 @@ UNIQUE_ACCESS_VIOLATION_NO_RAW = (
 	"WHERE it.TestCaseType=2 "
 	"Group by cd.CrashFootprint) as av "
     "LEFT JOIN nice_names_managed_instance as nnmi on av.CreatorServiceDescriptorGUID = nnmi.ServiceDescriptorGUID "
-    "LEFT JOIN nice_names_testcase AS nn ON av.ID = nn.TestcaseID "
+    "LEFT JOIN nice_names_testcase AS nn ON av.CreatorServiceDescriptorGUID = nn.CreatorServiceDescriptorGUID AND  av.CreatorLocalID = nn.CreatorLocalID "
     "ORDER BY av.TimeOfInsertion asc;")
 
 NUM_UNIQUE_CRASH = (
@@ -157,7 +157,7 @@ UNIQUE_CRASHES = (
     " JOIN crash_descriptions AS cd"
     " ON it.ID = cd.CreatorTestcaseID "
     " GROUP BY cd.CrashFootprint) oc " 
-    "LEFT JOIN nice_names_testcase AS nn ON oc.ID = nn.TestcaseID "
+    "LEFT JOIN nice_names_testcase AS nn ON oc.CreatorServiceDescriptorGUID = nn.CreatorServiceDescriptorGUID AND oc.CreatorLocalID = nn.CreatorLocalID"
     "WHERE TestCaseType=3;")
 
 UNIQUE_CRASHES_NO_RAW = (
@@ -171,7 +171,7 @@ UNIQUE_CRASHES_NO_RAW = (
     "WHERE TestCaseType=3 "
     "GROUP BY cd.CrashFootprint) as oc "
     "LEFT JOIN nice_names_managed_instance as nnmi on oc.CreatorServiceDescriptorGUID = nnmi.ServiceDescriptorGUID "
-    "LEFT JOIN nice_names_testcase AS nn ON oc.ID = nn.TestcaseID "
+    "LEFT JOIN nice_names_testcase AS nn ON oc.CreatorServiceDescriptorGUID = nn.CreatorServiceDescriptorGUID AND oc.CreatorLocalID = nn.CreatorLocalID "
     "ORDER BY oc.TimeOfInsertion asc;")
 
 MANAGED_INSTANCES_HOST_AND_PORT_AGENT_TYPE = (
@@ -190,8 +190,8 @@ INSERT_TESTCASE_POPULATION = (
     "VALUES('initial', :localId, 'initial', :localId, :rawData, 10000, 0)")
 
 INSERT_NICE_NAME_TESTCASE = (
-    "INSERT INTO nice_names_testcase(NiceName, TestcaseID) "
-    "VALUES(:newName, :testcaseID)")
+    "INSERT INTO nice_names_testcase(NiceName, CreatorServiceDescriptorGUID, CreatorLocalID) "
+    "VALUES(:newName, :guid, :localId)")
 
 INSERT_NICE_NAME_MANAGED_INSTANACE = (
     "INSERT INTO nice_names_managed_instance(NiceName, ServiceDescriptorGUID) "
@@ -201,7 +201,7 @@ GET_POPULATION_DETAILS = (
     "SELECT DISTINCT it.CreatorServiceDescriptorGUID, it.CreatorLocalID, it.ParentServiceDescriptorGUID, "
     "it.ParentLocalID, nnt.NiceName as NiceNameTC, nnmi.NiceName as NiceNameMI, it.TestCaseType "
     "FROM interesting_testcases as it "
-    "LEFT JOIN nice_names_testcase as nnt on it.ID = nnt.TestcaseID "
+    "LEFT JOIN nice_names_testcase as nnt on it.CreatorServiceDescriptorGUID = nnt.CreatorServiceDescriptorGUID AND it.CreatorLocalID = nnt.CreatorLocalID "
     "LEFT JOIN nice_names_managed_instance as nnmi on it.CreatorServiceDescriptorGUID = nnmi.ServiceDescriptorGUID "
     "WHERE (it.TestCaseType=0 OR it.TestCaseType=5);")
 
@@ -222,8 +222,8 @@ GET_CRASH_PARENTS = (
 
 GET_NN_TESTCASE_RAWBYTES = (
     "SELECT it.RawBytes, nnt.NiceName FROM interesting_testcases as it LEFT JOIN nice_names_testcase as nnt "
-    "ON it.ID = nnt.TestcaseID "
-    "WHERE CreatorServiceDescriptorGUID=:guid AND CreatorLocalID=:localId;")
+    "ON it.CreatorServiceDescriptorGUID = nnt.CreatorServiceDescriptorGUID AND it.CreatorLocalID = nnt.CreatorLocalID "
+    "WHERE it.CreatorServiceDescriptorGUID=:guid AND it.CreatorLocalID=:localId;")
 	
 GET_PROJECTS = (
     "SELECT"
@@ -254,7 +254,7 @@ def getCrashesOrViosOfFootprint(footprint):
         "SELECT it.CreatorServiceDescriptorGUID, it.RawBytes, it.ID, nn.NiceName "
         "FROM interesting_testcases AS it "
         "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
-        "LEFT JOIN nice_names_testcase AS nn ON it.ID = nn.TestcaseID "
+        "LEFT JOIN nice_names_testcase AS nn ON it.CreatorServiceDescriptorGUID = nn.CreatorServiceDescriptorGUID AND  it.CreatorLocalID = nn.CreatorLocalID"
         "WHERE cd.CrashFootprint='{}' AND (it.TestCaseType=2 OR it.TestCaseType=3);".format(footprint)
     )
 
@@ -263,7 +263,7 @@ def getCrashesOrViosOfFootprintCount(footprint):
         "SELECT count(*) "
         "FROM interesting_testcases AS it "
         "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
-        "LEFT JOIN nice_names_testcase AS nn ON it.ID = nn.TestcaseID "
+        "LEFT JOIN nice_names_testcase AS nn ON it.CreatorServiceDescriptorGUID = nn.CreatorServiceDescriptorGUID AND  it.CreatorLocalID = nn.CreatorLocalID "
         "WHERE cd.CrashFootprint='{}' AND (it.TestCaseType=2 OR it.TestCaseType=3);".format(footprint)
     )
 
@@ -273,7 +273,7 @@ def getCrashesQuery(footprint, testCaseType):
         "SELECT it.CreatorServiceDescriptorGUID, it.RawBytes, it.ID, nn.NiceName "
         "FROM interesting_testcases AS it "
         "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
-        "LEFT JOIN nice_names_testcase AS nn ON it.ID = nn.TestcaseID "
+        "LEFT JOIN nice_names_testcase AS nn ON it.CreatorServiceDescriptorGUID = nn.CreatorServiceDescriptorGUID AND  it.CreatorLocalID = nn.CreatorLocalID "
         "WHERE cd.CrashFootprint='{}' AND it.TestCaseType={};".format(footprint, testCaseType)
     )
 
@@ -283,7 +283,7 @@ def getCrashesQueryCount(footprint, testCaseType):
         "SELECT COUNT(*)"
         "FROM interesting_testcases AS it "
         "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
-        "LEFT JOIN nice_names_testcase AS nn ON it.ID = nn.TestcaseID "
+        "LEFT JOIN nice_names_testcase AS nn ON it.CreatorServiceDescriptorGUID = nn.CreatorServiceDescriptorGUID AND  it.CreatorLocalID = nn.CreatorLocalID "
         "WHERE cd.CrashFootprint='{}' AND it.TestCaseType={};".format(footprint, testCaseType)
     )
 
@@ -297,7 +297,7 @@ def getITQueryOfType(n):
         "SELECT it.ID, it.RawBytes, it.CreatorServiceDescriptorGUID, it.CreatorLocalID, it.Rating, it.TimeOfInsertion, "
         "nn.NiceName, nnmi.NiceName as NiceNameMI "
         "FROM interesting_testcases AS it "
-        "LEFT JOIN nice_names_testcase AS nn ON it.ID = nn.TestcaseID "
+        "LEFT JOIN nice_names_testcase AS nn ON it.CreatorServiceDescriptorGUID = nn.CreatorServiceDescriptorGUID AND  it.CreatorLocalID = nn.CreatorLocalID "
         "LEFT JOIN nice_names_managed_instance as nnmi on it.CreatorServiceDescriptorGUID = nnmi.ServiceDescriptorGUID "
         "WHERE TestCaseType={};".format(n)
     )
@@ -308,7 +308,7 @@ def getITQueryOfTypeNoRaw(n):
         "SELECT it.ID, it.CreatorServiceDescriptorGUID, it.CreatorLocalID, it.Rating, it.TimeOfInsertion, "
         "nn.NiceName, nnmi.NiceName as NiceNameMI "
         "FROM interesting_testcases AS it "
-        "LEFT JOIN nice_names_testcase AS nn ON it.ID = nn.TestcaseID "
+        "LEFT JOIN nice_names_testcase AS nn ON it.CreatorServiceDescriptorGUID = nn.CreatorServiceDescriptorGUID AND  it.CreatorLocalID = nn.CreatorLocalID "
         "LEFT JOIN nice_names_managed_instance as nnmi on it.CreatorServiceDescriptorGUID = nnmi.ServiceDescriptorGUID "
         "WHERE TestCaseType={};".format(n)
     )
