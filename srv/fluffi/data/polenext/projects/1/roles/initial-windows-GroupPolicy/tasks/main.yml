@@ -29,16 +29,23 @@
 #  win_copy:
 #    src: "{{LGPOExecutableFileName}}"
 #    dest: "{{remoteUtilitiesFilePath}}"
+
+- name: Check file size
+  win_stat:
+    path: "{{remoteUtilitiesFilePath}}{{LGPOExecutableFileName}}"
+  register: file_size
     
 - name: Copy {{groupPolicyFileNameTxt}} to remote machine via template
   win_template:
     src: "{{groupPolicyFileNameTxt}}"
     dest: "{{remoteUtilitiesFilePath}}\\{{groupPolicyFileNameTxt}}"
+  when: file_size.stat.size > 200
 
 - name: Execute {{LGPOExecutableFileName}} to generate group policy {{groupPolicyFileNamePol}}
   win_command: "{{LGPOExecutableFileName}} /r {{groupPolicyFileNameTxt}} /w {{groupPolicyFileNamePol}}"
   args:
-    chdir: "{{remoteUtilitiesFilePath}}"    
+    chdir: "{{remoteUtilitiesFilePath}}"
+  when: file_size.stat.size > 200
 
 - name: Execute {{LGPOExecutableFileName}} to apply group policy {{groupPolicyFileNamePol}}
   win_command: "{{LGPOExecutableFileName}} /m .\\{{groupPolicyFileNamePol}}"
@@ -47,3 +54,9 @@
   notify:
     - Ensure Windows NTP service is running
     - Force Windows NTP time sync
+  when: file_size.stat.size > 200
+
+- fail:
+    msg: LGPO file is smaller than 200 Bytes
+  when: file_size.stat.size <= 200
+

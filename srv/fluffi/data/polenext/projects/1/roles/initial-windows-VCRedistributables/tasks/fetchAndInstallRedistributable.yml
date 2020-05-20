@@ -25,14 +25,25 @@
     url: "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{FTPRedistributableDirname}}/{{pkgName}}/{{installerFilename}}"
     dest: "{{remoteUtilitiesFilePath}}{{installerFilename}}"
 
+- name: Check file size
+  win_stat:
+    path: "{{remoteUtilitiesFilePath}}{{installerFilename}}"
+  register: file_size
+
 - name: Install redistributable "{{remoteUtilitiesFilePath}}{{installerFilename}}"
   win_package:
     path: "{{remoteUtilitiesFilePath}}{{installerFilename}}"
     product_id: Microsoft Windows
     arguments: "{{ installerFlags }}"
   ignore_errors: True
+  when: file_size.stat.size > 200
 
 - name: Delete "{{remoteUtilitiesFilePath}}{{installerFilename}}"
   win_file:
     path: "{{remoteUtilitiesFilePath}}{{installerFilename}}"
     state: absent
+  when: file_size.stat.size > 200
+
+- fail:
+    msg: redistributable installer is smaller than 200 Bytes
+  when: file_size.stat.size <= 200

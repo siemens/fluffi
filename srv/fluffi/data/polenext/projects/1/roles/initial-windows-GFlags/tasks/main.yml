@@ -35,11 +35,21 @@
     url: "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{GFlagsDirname}}/{{GFlagsZipFilename}}"
     dest: "{{remoteUtilitiesFilePath}}{{GFlagsDirname}}\\{{GFlagsZipFilename}}"
 
+- name: Check file size
+  win_stat:
+    path: "{{remoteUtilitiesFilePath}}{{GFlagsDirname}}\\{{GFlagsZipFilename}}"
+  register: file_size
+
 - name: Unzip GFlags
   win_unzip:
     src: "{{remoteUtilitiesFilePath}}\\{{GFlagsDirname}}\\{{GFlagsZipFilename}}"
     dest: "{{remoteUtilitiesFilePath}}{{GFlagsDirname}}"
     delete_archive: yes
+  when: file_size.stat.size > 200
+
+- fail:
+    msg: GFlags archive is smaller than 200 Bytes
+  when: file_size.stat.size <= 200
 
 #- name: Globally enable Page Heap
 #  win_command: gflags.exe -r +hpa

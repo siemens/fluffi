@@ -200,7 +200,7 @@ The following directories and their subdirectories contain a number of placehold
 - `/srv/fluffi/data/smb/files/initial/updatesWS2008`
 - `/srv/fluffi/data/ftp/files/initial/windows/ansible`
 
-All the files in there are dummy files named like the real files that have to go in there, but they are actually just textfiles that contain a download link.
+Most of the files in there are dummy files named like the real files that have to go in there, but they are actually just textfiles that contain a download link.
 Download the binaries from these links and replace the placeholder textfiles with their respective binaries.
 
 Get the GlobalManager components from where you [compiled FLUFFI core](#compiling-fluffi-core) - specifically, you need to copy

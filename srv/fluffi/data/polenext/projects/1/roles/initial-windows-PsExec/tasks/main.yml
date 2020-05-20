@@ -18,23 +18,34 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 # 
-# Author(s): Pascal Eckmann, Junes Najah, Thomas Riedmaier
- 
-- name: Fetch autologon from "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{autologonFolderName}}/{{autologonFile}}"
+# Author(s): Pascal Eckmann
+
+- name: Ensure source directory exists
+  win_file:
+    path: "{{remoteUtilitiesFilePath}}{{PsExecDirname}}"
+    state: directory
+
+- name: Fetch PsExec file "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{PsExecDirname}}/{{PsExecX86Filename}}"
   win_get_url: 
-    url: "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{autologonFolderName}}/{{autologonFile}}"
-    dest: "{{remoteUtilitiesFilePath}}{{autologonFile}}"
+    url: "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{PsExecDirname}}/{{PsExecX86Filename}}"
+    dest: "{{remoteUtilitiesFilePath}}{{PsExecDirname}}\\{{PsExecX86Filename}}"
+
+- name: Check file size 
+  win_stat:
+    path: "{{remoteUtilitiesFilePath}}{{PsExecDirname}}\\{{PsExecX86Filename}}"
+  register: file_size_1
+
+- name: Fetch PsExec file "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{PsExecDirname}}/{{PsExecX64Filename}}"
+  win_get_url: 
+    url: "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{PsExecDirname}}/{{PsExecX64Filename}}"
+    dest: "{{remoteUtilitiesFilePath}}{{PsExecDirname}}\\{{PsExecX64Filename}}"
 
 - name: Check file size
   win_stat:
-    path: "{{remoteUtilitiesFilePath}}{{autologonFile}}"
-  register: file_size
-
-- name: Run autologon
-  win_command: "{{remoteUtilitiesFilePath}}{{autologonFile}} -accepteula {{ ansible_user }} {{ inventory_hostname }} {{ ansible_password }}"
-  when: file_size.stat.size > 200
+    path: "{{remoteUtilitiesFilePath}}{{PsExecDirname}}\\{{PsExecX64Filename}}"
+  register: file_size_2
 
 - fail:
-    msg: autologon file is smaller than 200 Bytes
-  when: file_size.stat.size <= 200
-  
+    msg: PsExec is smaller than 200 Bytes
+  when: file_size_1.stat.size <= 200 or file_size_2.stat.size <= 200
+

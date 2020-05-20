@@ -40,7 +40,10 @@
 - hosts: windows
   roles:
     - initial-windows-Timezone
+    - initial-windows-PrivateNetwork
     - initial-windows-GFlags
+    - initial-windows-Python
+    - initial-windows-PsExec
     - initial-windows-PrepareEnvironment
     - initial-windows-GroupPolicy
     - initial-windows-pagefile

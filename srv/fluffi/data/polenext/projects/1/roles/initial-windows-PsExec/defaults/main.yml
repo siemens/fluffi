@@ -18,23 +18,8 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 # 
-# Author(s): Pascal Eckmann, Junes Najah, Thomas Riedmaier
- 
-- name: Fetch autologon from "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{autologonFolderName}}/{{autologonFile}}"
-  win_get_url: 
-    url: "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{autologonFolderName}}/{{autologonFile}}"
-    dest: "{{remoteUtilitiesFilePath}}{{autologonFile}}"
+# Author(s): Pascal Eckmann
 
-- name: Check file size
-  win_stat:
-    path: "{{remoteUtilitiesFilePath}}{{autologonFile}}"
-  register: file_size
-
-- name: Run autologon
-  win_command: "{{remoteUtilitiesFilePath}}{{autologonFile}} -accepteula {{ ansible_user }} {{ inventory_hostname }} {{ ansible_password }}"
-  when: file_size.stat.size > 200
-
-- fail:
-    msg: autologon file is smaller than 200 Bytes
-  when: file_size.stat.size <= 200
-  
+PsExecDirname : "PsExec"
+PsExecX86Filename: "PsExecx86.exe"
+PsExecX64Filename: "PsExecx64.exe"
