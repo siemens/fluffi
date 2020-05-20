@@ -18,32 +18,34 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 # 
-# Author(s): Fabian Russwurm, Thomas Riedmaier
+# Author(s): Pascal Eckmann
 
-- name: Fetch redistributable from "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{FTPRedistributableDirname}}"
+- name: Ensure source directory exists
+  win_file:
+    path: "{{remoteUtilitiesFilePath}}{{PsExecDirname}}"
+    state: directory
+
+- name: Fetch PsExec file "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{PsExecDirname}}/{{PsExecX86Filename}}"
   win_get_url: 
-    url: "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{FTPRedistributableDirname}}/{{pkgName}}/{{installerFilename}}"
-    dest: "{{remoteUtilitiesFilePath}}{{installerFilename}}"
+    url: "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{PsExecDirname}}/{{PsExecX86Filename}}"
+    dest: "{{remoteUtilitiesFilePath}}{{PsExecDirname}}\\{{PsExecX86Filename}}"
+
+- name: Check file size 
+  win_stat:
+    path: "{{remoteUtilitiesFilePath}}{{PsExecDirname}}\\{{PsExecX86Filename}}"
+  register: file_size_1
+
+- name: Fetch PsExec file "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{PsExecDirname}}/{{PsExecX64Filename}}"
+  win_get_url: 
+    url: "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{PsExecDirname}}/{{PsExecX64Filename}}"
+    dest: "{{remoteUtilitiesFilePath}}{{PsExecDirname}}\\{{PsExecX64Filename}}"
 
 - name: Check file size
   win_stat:
-    path: "{{remoteUtilitiesFilePath}}{{installerFilename}}"
-  register: file_size
-
-- name: Install redistributable "{{remoteUtilitiesFilePath}}{{installerFilename}}"
-  win_package:
-    path: "{{remoteUtilitiesFilePath}}{{installerFilename}}"
-    product_id: Microsoft Windows
-    arguments: "{{ installerFlags }}"
-  ignore_errors: True
-  when: file_size.stat.size > 200
-
-- name: Delete "{{remoteUtilitiesFilePath}}{{installerFilename}}"
-  win_file:
-    path: "{{remoteUtilitiesFilePath}}{{installerFilename}}"
-    state: absent
-  when: file_size.stat.size > 200
+    path: "{{remoteUtilitiesFilePath}}{{PsExecDirname}}\\{{PsExecX64Filename}}"
+  register: file_size_2
 
 - fail:
     msg: "File too small. Did you replace the stub files with the actual files?" 
-  when: file_size.stat.size <= 200
+  when: file_size_1.stat.size <= 200 or file_size_2.stat.size <= 200
+

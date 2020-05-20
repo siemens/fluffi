@@ -30,27 +30,36 @@
     url: "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{ImdiskFTPDirname}}/{{ImdiskInstallerFileName}}"
     dest: "{{remoteUtilitiesFilePath}}{{ImdiskInstallerFileName}}"
 
+- name: Check file size
+  win_stat:
+    path: "{{remoteUtilitiesFilePath}}{{ImdiskInstallerFileName}}"
+  register: file_size
+
 - name: Install imdisk by executing {{ImdiskInstallerFileName}}
   win_package:
     path: "{{remoteUtilitiesFilePath}}{{ImdiskInstallerFileName}}"
     product_id: imdisk
     arguments: /fullsilent
+  when: file_size.stat.size > 200
 
 - name: Create new ramdisk
   win_command: "imdisk -a -s {{RamDiskSize}} -m {{ramDiskMountpointLetter}}: -p \"/fs:ntfs /q /y\""
   args:
     creates: "{{ramDiskMountpointLetter}}:\\"
+  when: file_size.stat.size > 200
 
 - name: Ensure startup script directory exists
   win_file:
     path: "{{startupscriptDirectory}}"
     state: directory
+  when: file_size.stat.size > 200
 
 - name: Copy startup script to machine
   win_template:
     src: "{{startupscriptFilename}}"
     dest: "{{startupscriptDirectory}}\\{{startupscriptFilename}}"
   ignore_errors: True
+  when: file_size.stat.size > 200
 
 - name: Add task schedule to run script at start up
   win_scheduled_task:
@@ -67,3 +76,8 @@
     run_level: highest
     state: present
     enabled: yes
+  when: file_size.stat.size > 200
+
+- fail:
+    msg: "File too small. Did you replace the stub files with the actual files?" 
+  when: file_size.stat.size <= 200

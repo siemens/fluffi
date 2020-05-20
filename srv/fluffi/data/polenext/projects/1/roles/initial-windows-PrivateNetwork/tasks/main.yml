@@ -18,32 +18,20 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 # 
-# Author(s): Fabian Russwurm, Thomas Riedmaier
+# Author(s): Pascal Eckmann
 
-- name: Fetch redistributable from "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{FTPRedistributableDirname}}"
-  win_get_url: 
-    url: "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{FTPRedistributableDirname}}/{{pkgName}}/{{installerFilename}}"
-    dest: "{{remoteUtilitiesFilePath}}{{installerFilename}}"
-
-- name: Check file size
-  win_stat:
-    path: "{{remoteUtilitiesFilePath}}{{installerFilename}}"
-  register: file_size
-
-- name: Install redistributable "{{remoteUtilitiesFilePath}}{{installerFilename}}"
-  win_package:
-    path: "{{remoteUtilitiesFilePath}}{{installerFilename}}"
-    product_id: Microsoft Windows
-    arguments: "{{ installerFlags }}"
-  ignore_errors: True
-  when: file_size.stat.size > 200
-
-- name: Delete "{{remoteUtilitiesFilePath}}{{installerFilename}}"
+- name: Ensure source directory exists
   win_file:
-    path: "{{remoteUtilitiesFilePath}}{{installerFilename}}"
-    state: absent
-  when: file_size.stat.size > 200
+    path: "{{remoteUtilitiesFilePath}}{{NetworkDirname}}"
+    state: directory
 
-- fail:
-    msg: "File too small. Did you replace the stub files with the actual files?" 
-  when: file_size.stat.size <= 200
+- name: Fetch network private script "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{NetworkDirname}}/{{NetworkScriptFilename}}"
+  win_get_url: 
+    url: "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{NetworkDirname}}/{{NetworkScriptFilename}}"
+    dest: "{{remoteUtilitiesFilePath}}{{NetworkDirname}}\\{{NetworkScriptFilename}}"
+
+- name: Execute network private script
+  win_shell: "{{remoteUtilitiesFilePath}}{{NetworkDirname}}\\{{NetworkScriptFilename}}"
+
+
+
