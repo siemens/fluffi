@@ -39,6 +39,8 @@ move ..\..\core\Oedipus\Oedipus-amd64.exe ..\..\core\Oedipus\Oedipus.exe
 del ..\..\core\Oedipus\Oedipus.exe
 
 "C:\Program Files\7-Zip\7z.exe" a ..\..\core\x64\Release\x64.zip ..\..\core\helpers\Feeder\x64\Release\Tester.exe
+"C:\Program Files\7-Zip\7z.exe" a ..\..\core\x64\Release\x64.zip ..\..\core\helpers\kfuzz\x64\Release\GDBEmulator.exe
+"C:\Program Files\7-Zip\7z.exe" a ..\..\core\x64\Release\x64.zip ..\..\core\helpers\kfuzz\x64\Release\kfuzz-windbg.dll
 "C:\Program Files\7-Zip\7z.exe" a -r ..\..\core\x64\Release\x64.zip  ..\..\core\x64\Release\dyndist64
 
 :: Creating x86 zip
@@ -55,6 +57,8 @@ move ..\..\core\Oedipus\Oedipus-386.exe ..\..\core\Oedipus\Oedipus.exe
 del ..\..\core\Oedipus\Oedipus.exe
 
 "C:\Program Files\7-Zip\7z.exe" a ..\..\core\Win32\Release\x86.zip ..\..\core\helpers\Feeder\Win32\Release\Tester.exe
+"C:\Program Files\7-Zip\7z.exe" a ..\..\core\Win32\Release\x86.zip ..\..\core\helpers\kfuzz\Win32\Release\GDBEmulator.exe
+"C:\Program Files\7-Zip\7z.exe" a ..\..\core\Win32\Release\x86.zip ..\..\core\helpers\kfuzz\Win32\Release\kfuzz-windbg.dll
 "C:\Program Files\7-Zip\7z.exe" a -r ..\..\core\Win32\Release\x86.zip  ..\..\core\Win32\Release\dyndist32
 
 :: Pushing zips to ftp server
