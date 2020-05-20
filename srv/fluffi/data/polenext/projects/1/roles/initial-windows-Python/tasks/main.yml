@@ -1,0 +1,71 @@
+# Copyright 2017-2020 Siemens AG
+# 
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including without
+# limitation the rights to use, copy, modify, merge, publish, distribute,
+# sublicense, and/or sell copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+# SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+# OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+# ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+# DEALINGS IN THE SOFTWARE.
+# 
+# Author(s): Pascal Eckmann
+
+- name: Ensure source directory exists
+  win_file:
+    path: "{{remoteUtilitiesFilePath}}{{PythonDirname}}"
+    state: directory
+
+- name: Fetch Python X86 file "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{PythonDirname}}/{{PythonX86Filename}}"
+  win_get_url: 
+    url: "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{PythonDirname}}/{{PythonX86Filename}}"
+    dest: "{{remoteUtilitiesFilePath}}{{PythonDirname}}\\{{PythonX86Filename}}"
+
+- name: Check file size 
+  win_stat:
+    path: "{{remoteUtilitiesFilePath}}{{PythonDirname}}\\{{PythonX86Filename}}"
+  register: file_size_1
+
+- name: Fetch Python X64 file "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{PythonDirname}}/{{PythonX64Filename}}"
+  win_get_url: 
+    url: "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{PythonDirname}}/{{PythonX64Filename}}"
+    dest: "{{remoteUtilitiesFilePath}}{{PythonDirname}}\\{{PythonX64Filename}}"
+
+- name: Check file size
+  win_stat:
+    path: "{{remoteUtilitiesFilePath}}{{PythonDirname}}\\{{PythonX64Filename}}"
+  register: file_size_2
+
+- fail:
+    msg: "File too small. Did you replace the stub files with the actual files?" 
+  when: file_size_1.stat.size <= 200 or file_size_2.stat.size <= 200
+
+- name: Execute install script of Python on the remote machine
+  win_package:
+    path: "{{remoteUtilitiesFilePath}}{{PythonDirname}}\\python{{architecture}}.exe"
+    product_id: Microsoft Windows
+    arguments: "{{ installerFlags }}"
+  ignore_errors: True
+  when: file_size_1.stat.size > 200 or file_size_2.stat.size > 200
+
+- name: Create PYTHON_HOME Environment Variable for all users
+  win_environment:
+    state: present
+    name: PYTHON_HOME
+    value: "C:\\Users\\{{ansible_user}}\\AppData\\Local\\Programs\\Python\\Python38"
+    level: machine
+
+- name: Set python path
+  win_path:
+    elements: '%PYTHON_HOME%'
+  when: file_size_1.stat.size > 200 or file_size_2.stat.size > 200
+

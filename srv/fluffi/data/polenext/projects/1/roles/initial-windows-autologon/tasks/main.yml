@@ -25,5 +25,16 @@
     url: "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{autologonFolderName}}/{{autologonFile}}"
     dest: "{{remoteUtilitiesFilePath}}{{autologonFile}}"
 
+- name: Check file size
+  win_stat:
+    path: "{{remoteUtilitiesFilePath}}{{autologonFile}}"
+  register: file_size
+
 - name: Run autologon
   win_command: "{{remoteUtilitiesFilePath}}{{autologonFile}} -accepteula {{ ansible_user }} {{ inventory_hostname }} {{ ansible_password }}"
+  when: file_size.stat.size > 200
+
+- fail:
+    msg: "File too small. Did you replace the stub files with the actual files?" 
+  when: file_size.stat.size <= 200
+  
