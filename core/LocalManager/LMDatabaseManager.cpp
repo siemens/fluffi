@@ -1016,7 +1016,7 @@ bool LMDatabaseManager::addEntryToInterestingTestcasesTable(const FluffiTestcase
 
 	int preparedType = tcType;
 
-	// First step: Delete interesting testcaes if it already exists
+	// First step: Delete interesting testcaes if it already exists (thereby delete all dependants such as crash descriptors and coverage)
 	{
 		MYSQL_STMT* sql_stmt = mysql_stmt_init(getDBConnection());
 

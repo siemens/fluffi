@@ -379,7 +379,7 @@ def renameElement(projId):
     if not request.json:
         abort(400)
 
-    message, status = insertOrUpdateNiceName(projId, request.json["myId"], request.json["newName"],
+    message, status = insertOrUpdateNiceName(projId, request.json["myGUID"], request.json["myLocalID"], request.json["newName"],
                                              request.json["command"], request.json["elemType"])
 
     return json.dumps({"message": message, "status": status, "command": request.json["command"]})
