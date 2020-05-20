@@ -28,12 +28,12 @@ function addOrRenameNiceName(index, projectId, command, tcGUID, tcLocID, miGUID)
     var url = "/projects/" + projectId + "/renameElement";
     myCommand = command;
 
-    if(tcId){
+    if(tcGUID){
         myGUID = tcGUID;
         myLocalID = tcLocID;
         elemType = "testcase";
     }        
-    else if(miId){
+    else if(miGUID){
         myGUID = miGUID;
         elemType = "managedInstance";
     } else{
