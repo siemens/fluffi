@@ -57,6 +57,6 @@
   when: file_size.stat.size > 200
 
 - fail:
-    msg: LGPO file is smaller than 200 Bytes
+    msg: "File too small. Did you replace the stub files with the actual files?" 
   when: file_size.stat.size <= 200
 

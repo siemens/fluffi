@@ -46,6 +46,6 @@
   register: file_size_2
 
 - fail:
-    msg: PsExec is smaller than 200 Bytes
+    msg: "File too small. Did you replace the stub files with the actual files?" 
   when: file_size_1.stat.size <= 200 or file_size_2.stat.size <= 200
 
