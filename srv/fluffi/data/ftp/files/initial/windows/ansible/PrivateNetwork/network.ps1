@@ -1,4 +1,4 @@
-/*
+<#
 Copyright 2017-2020 Siemens AG
 
 Permission is hereby granted, free of charge, to any person obtaining a
@@ -19,33 +19,11 @@ OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 
-Author(s): Thomas Riedmaier, Abian Blome
-*/
+Author(s): Pascal Eckmann
+#>
 
-#pragma once
+$networkListManager = [Activator]::CreateInstance([Type]::GetTypeFromCLSID([Guid]"{DCB00C01-570F-4A9B-8D69-199FDBA5723B}")) 
+$connections = $networkListManager.GetNetworkConnections() 
 
-#include "targetver.h"
-
-#include <string>
-#include <vector>
-#include <iostream>
-#include <chrono>
-#include <iterator>
-#include <thread>
-#include <algorithm>
-
-#include "SharedMemIPC.h"
-
-//#define USE_SSL
-#ifdef USE_SSL
-#if defined(_WIN32) || defined(_WIN64)
-#include <applink.c>
-#pragma comment(lib, "sslwrap.lib")
-#else
-#define __cdecl __attribute__((__cdecl__))
-#endif
-
-int __cdecl sendByteBufOnce(char* dstIP, int port, char* msg, int msgSize, int clientCertSize, const unsigned char * clientCert, int clientPrivateKeySize, const unsigned char * clientPrivateKey);
-int __cdecl sendByteBufWithResponse(char* dstIP, int port, char* msg, int msgSize, char* response, int responseSize, int clientCertSize, const unsigned char * clientCert, int clientPrivateKeySize, const unsigned char * clientPrivateKey);
-
-#endif
+# Set network location to Private for all networks 
+$connections | % {$_.GetNetwork().SetCategory(1)}

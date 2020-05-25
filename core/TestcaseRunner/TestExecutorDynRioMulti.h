@@ -126,14 +126,14 @@ public:
 	HANDLE m_pipe_to_dynrio;
 	HANDLE m_SharedMemIPCInterruptEvent;
 
-	static void debuggerThreadMain(std::shared_ptr<DebugExecutionOutput> exOutput_FROM_TARGET_DEBUGGING, std::shared_ptr<ExternalProcess> debuggeeProcess, HANDLE sharedMemIPCInterruptEvent, bool attachInsteadOfStart, bool treatAnyAccessViolationAsFatal);
+	static void debuggerThreadMain(std::shared_ptr<DebugExecutionOutput> exOutput_FROM_TARGET_DEBUGGING, std::shared_ptr<ExternalProcess> debuggeeProcess, HANDLE sharedMemIPCInterruptEvent, bool attachInsteadOfStart, bool doPostMortemAnalysis, bool treatAnyAccessViolationAsFatal);
 
 #else
 	int m_pipe_to_dynrio;
 	int m_SharedMemIPCInterruptFD[2];
 	bool m_target_forks;
 
-	static void debuggerThreadMain(std::shared_ptr<DebugExecutionOutput> exOutput_FROM_TARGET_DEBUGGING, std::shared_ptr<ExternalProcess> debuggeeProcess, int sharedMemIPCInterruptWriteFD, bool attachInsteadOfStart, bool treatAnyAccessViolationAsFatal);
+	static void debuggerThreadMain(std::shared_ptr<DebugExecutionOutput> exOutput_FROM_TARGET_DEBUGGING, std::shared_ptr<ExternalProcess> debuggeeProcess, int sharedMemIPCInterruptWriteFD, bool attachInsteadOfStart, bool doPostMortemAnalysis, bool treatAnyAccessViolationAsFatal);
 	dr_config_status_t m_dr_nudge_pid(process_id_t process_id, client_id_t client_id, uint64_t arg, uint timeout_ms);
 #endif
 

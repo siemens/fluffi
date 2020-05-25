@@ -458,7 +458,7 @@ def getResultOfStatementForGlobalManager(stmt, params=None):
     return result
 
 
-def insertOrUpdateNiceName(projId, myId, newName, command, elemType):
+def insertOrUpdateNiceName(projId, myGUID, myLocalID, newName, command, elemType):
     project = models.Fuzzjob.query.filter_by(ID = projId).first()
 
     engine = create_engine(
@@ -466,11 +466,11 @@ def insertOrUpdateNiceName(projId, myId, newName, command, elemType):
     connection = engine.connect()
     try:
         if elemType == "testcase":
-            data = {"testcaseID": myId, "newName": newName}
+            data = {"guid": myGUID, "localId": myLocalID, "newName": newName}
             statement = text(INSERT_NICE_NAME_TESTCASE) if command == "insert" else text(UPDATE_NICE_NAME_TESTCASE)
             connection.execute(statement, data)
         elif elemType == "managedInstance":
-            data = {"sdguid": myId, "newName": newName}
+            data = {"sdguid": myGUID, "newName": newName}
             statement = text(INSERT_NICE_NAME_MANAGED_INSTANACE) if command == "insert" else text(
                 UPDATE_NICE_NAME_MANAGED_INSTANACE)
             connection.execute(statement, data)
@@ -929,8 +929,7 @@ def insertTestcases(projId, files):
         # insert testcases and add filenames as nice names
         for f in files:
             connection.execute(text(INSERT_TESTCASE_POPULATION), {"rawData": f.read(), "localId": localId})
-            testcaseID = connection.execute(text(GET_TESTCASE_ID), {"creatorlocalID": localId}).fetchone()[0]
-            connection.execute(text(INSERT_NICE_NAME_TESTCASE), {"testcaseID": testcaseID, "newName": f.filename})
+            connection.execute(text(INSERT_NICE_NAME_TESTCASE), {"localId": localId, "guid":"initial", "newName": f.filename})
             localId += 1
 
         return "Added Testcase(s)", "success"
@@ -1175,8 +1174,7 @@ def insertFormInputForProject(form, request):
             # insert testcases and add filenames as nice names
             for f in request.files.getlist('filename'):
                 connection.execute(text(INSERT_TESTCASE_POPULATION), {"rawData": f.read(), "localId": localId})
-                testcaseID = connection.execute(text(GET_TESTCASE_ID), {"creatorlocalID": localId}).fetchone()[0]
-                connection.execute(text(INSERT_NICE_NAME_TESTCASE), {"testcaseID": testcaseID, "newName": f.filename})
+                connection.execute(text(INSERT_NICE_NAME_TESTCASE), {"localId": localId,"guid": "initial", "newName": f.filename})
                 localId += 1
         else:
             return ["Error: No files were found!", "error"]

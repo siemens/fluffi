@@ -366,7 +366,7 @@ def assign_agents_to_fuzzjobs(database):
                         agent_type_w = agent["agentType"]
 
                         if ((fuzzjob_w is "None") and
-                                (system == system_w) and
+                                (system.lower() == system_w.lower()) and
                                 (agent_info["agentType"] == agent_type_w) and
                                 (agent_info["location"] == location_w)):
                             workers_dic[sd_guid]["fuzzjob"] = fuzzjob

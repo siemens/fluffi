@@ -399,10 +399,10 @@ bool TestExecutorDynRioMulti::attemptStartTargetAndFeeder(bool use_dyn_rio) {
 #if defined(_WIN32) || defined(_WIN64)
 	//Appending a parameter to the Environment is currently not implemented in Windows, so additionalEnvParam is ignored
 	m_debuggeeProcess = std::make_shared<ExternalProcess>(cmdlineWithReplacements, m_child_output_mode);
-	std::thread debuggerThread(&TestExecutorDynRioMulti::debuggerThreadMain, m_exOutput_FROM_TARGET_DEBUGGING, m_debuggeeProcess, m_SharedMemIPCInterruptEvent, m_attachInsteadOfStart, m_treatAnyAccessViolationAsFatal);
+	std::thread debuggerThread(&TestExecutorDynRioMulti::debuggerThreadMain, m_exOutput_FROM_TARGET_DEBUGGING, m_debuggeeProcess, m_SharedMemIPCInterruptEvent, m_attachInsteadOfStart, !use_dyn_rio, m_treatAnyAccessViolationAsFatal);
 #else
 	m_debuggeeProcess = std::make_shared<ExternalProcess>(cmdlineWithReplacements, m_child_output_mode, m_additionalEnvParam, use_dyn_rio);
-	std::thread debuggerThread(&TestExecutorDynRioMulti::debuggerThreadMain, m_exOutput_FROM_TARGET_DEBUGGING, m_debuggeeProcess, m_SharedMemIPCInterruptFD[1], m_attachInsteadOfStart, m_treatAnyAccessViolationAsFatal);
+	std::thread debuggerThread(&TestExecutorDynRioMulti::debuggerThreadMain, m_exOutput_FROM_TARGET_DEBUGGING, m_debuggeeProcess, m_SharedMemIPCInterruptFD[1], m_attachInsteadOfStart, !use_dyn_rio, m_treatAnyAccessViolationAsFatal);
 #endif
 	debuggerThread.detach(); //we do not want to join this. It will terminate as soon as the debugee terminates
 	LOG(DEBUG) << "started debugger thread";
@@ -1029,10 +1029,10 @@ void TestExecutorDynRioMulti::waitForDebuggerToTerminate() {
 }
 
 #if defined(_WIN32) || defined(_WIN64)
-void TestExecutorDynRioMulti::debuggerThreadMain(std::shared_ptr<DebugExecutionOutput> exOutput_FROM_TARGET_DEBUGGING, std::shared_ptr<ExternalProcess> debuggeeProcess, HANDLE sharedMemIPCInterruptEvent, bool attachInsteadOfStart, bool treatAnyAccessViolationAsFatal) {
+void TestExecutorDynRioMulti::debuggerThreadMain(std::shared_ptr<DebugExecutionOutput> exOutput_FROM_TARGET_DEBUGGING, std::shared_ptr<ExternalProcess> debuggeeProcess, HANDLE sharedMemIPCInterruptEvent, bool attachInsteadOfStart, bool doPostMortemAnalysis, bool treatAnyAccessViolationAsFatal) {
 #else
 #define INFINITE            0xFFFFFFFF  // Infinite timeout
-void TestExecutorDynRioMulti::debuggerThreadMain(std::shared_ptr<DebugExecutionOutput> exOutput_FROM_TARGET_DEBUGGING, std::shared_ptr<ExternalProcess> debuggeeProcess, int sharedMemIPCInterruptWriteFD, bool attachInsteadOfStart, bool treatAnyAccessViolationAsFatal) {
+void TestExecutorDynRioMulti::debuggerThreadMain(std::shared_ptr<DebugExecutionOutput> exOutput_FROM_TARGET_DEBUGGING, std::shared_ptr<ExternalProcess> debuggeeProcess, int sharedMemIPCInterruptWriteFD, bool attachInsteadOfStart, bool doPostMortemAnalysis, bool treatAnyAccessViolationAsFatal) {
 #endif
 	exOutput_FROM_TARGET_DEBUGGING->m_terminationType = DebugExecutionOutput::PROCESS_TERMINATION_TYPE::ERR;
 	exOutput_FROM_TARGET_DEBUGGING->m_terminationDescription = "The target did not run!";
@@ -1059,7 +1059,7 @@ void TestExecutorDynRioMulti::debuggerThreadMain(std::shared_ptr<DebugExecutionO
 
 	LOG(DEBUG) << "Current target process ID " << debuggeeProcess->getProcessID();
 
-	debuggeeProcess->debug(INFINITE, exOutput_FROM_TARGET_DEBUGGING, true, treatAnyAccessViolationAsFatal);
+	debuggeeProcess->debug(INFINITE, exOutput_FROM_TARGET_DEBUGGING, doPostMortemAnalysis, treatAnyAccessViolationAsFatal);
 
 	if (exOutput_FROM_TARGET_DEBUGGING->m_terminationType == DebugExecutionOutput::PROCESS_TERMINATION_TYPE::EXCEPTION_ACCESSVIOLATION || exOutput_FROM_TARGET_DEBUGGING->m_terminationType == DebugExecutionOutput::PROCESS_TERMINATION_TYPE::EXCEPTION_OTHER) {
 		//In case an exception occured, set sharedMemIPCInterruptEvent / write to the sharedMemIPCInterruptWriteFD, so the shared mem communication does not need to wait for an timeout but terminates early

@@ -140,11 +140,9 @@ CREATE TABLE IF NOT EXISTS fluffi.billing (
 CREATE TABLE IF NOT EXISTS fluffi.nice_names_testcase (
 	`ID` BIGINT NOT NULL AUTO_INCREMENT,
 	`NiceName` VARCHAR(100) NOT NULL,
-	`TestcaseID` BIGINT NOT NULL,
-	FOREIGN KEY (`TestcaseID`)
-		REFERENCES fluffi.interesting_testcases(`ID`)
-		ON UPDATE RESTRICT ON DELETE CASCADE,
-	UNIQUE (`TestcaseID`),
+	`CreatorServiceDescriptorGUID` VARCHAR(50) NOT NULL,
+	`CreatorLocalID` BIGINT NOT NULL,
+	UNIQUE (`CreatorServiceDescriptorGUID`, `CreatorLocalID`),
 	UNIQUE (`NiceName`),
 	PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

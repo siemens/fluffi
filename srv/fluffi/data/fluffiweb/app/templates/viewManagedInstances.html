@@ -147,14 +147,14 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
         <td style="text-align: center;">
             {% if instance["NiceName"] %}
             <button id="tcBtn{{loop.index}}"
-                    onclick="addOrRenameNiceName({{ loop.index }}, {{ managedInstances['project'].ID }}, 'update', '', '{{ instance['ServiceDescriptorGUID'] }}')"
+                    onclick="addOrRenameNiceName({{ loop.index }}, {{ managedInstances['project'].ID }}, 'update', '', '', '{{ instance['ServiceDescriptorGUID'] }}')"
                     class="add-or-rename-btn">
                 {{ instance['NiceName'] }}
             </button>
             <input class="form-control" id="tcInput{{loop.index}}" style="display: none;" type="text">
             {% else %}
             <button id="tcBtnNew{{loop.index}}"
-                    onclick="addOrRenameNiceName({{ loop.index }}, {{ managedInstances['project'].ID }}, 'insert', '', '{{ instance['ServiceDescriptorGUID'] }}')"
+                    onclick="addOrRenameNiceName({{ loop.index }}, {{ managedInstances['project'].ID }}, 'insert', '', '', '{{ instance['ServiceDescriptorGUID'] }}')"
                     class="add-or-rename-btn">
                 {{ instance['ServiceDescriptorGUID'] }}
             </button>
