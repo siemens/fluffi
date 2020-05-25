@@ -24,6 +24,7 @@ import io
 import csv
 import subprocess
 import time
+import re
 from base64 import b64encode
 from os import system, unlink
 
@@ -1080,10 +1081,12 @@ def insertFormInputForConfiguredFuzzjobInstances(request, fuzzjob):
 
 
 def insertFormInputForProject(form, request):
-    myProjName = form.name.data.replace(" ", "_")
+    myFuzzjobName = form.name.data.strip()
+    validFuzzjobName = bool(re.match("^[A-Za-z0-9]*$", myFuzzjobName))
+    
     targetFileName = ""
 
-    if not myProjName or not form.targetCMDLine.data or form.option_module.data is None or not form.option_module_value.data:
+    if not validFuzzjobName or not form.targetCMDLine.data or form.option_module.data is None or not form.option_module_value.data:
         return ["Error: Could not create project! Check input data!", "error"]
 
     targetFileUpload = False
@@ -1096,7 +1099,7 @@ def insertFormInputForProject(form, request):
             FTP_CONNECTOR.saveTargetFileOnFTPServer(targetFileData, targetFileName)
             targetFileUpload = True
 
-    project = createNewDatabase(name=myProjName)
+    project = createNewDatabase(name=myFuzzjobName)
     db.session.add(project)
     db.session.commit()
     locations = request.form.getlist('location')
