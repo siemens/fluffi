@@ -28,7 +28,7 @@
 # 
 # Author(s): Thomas Riedmaier, Pascal Eckmann, Roman Bendt
 
-THREADS=$(cat /proc/cpuinfo | grep processor | wc -l)
+THREADS=$(nproc)
 ARCH=$(file /bin/bash | awk -F',' '{print $2}' | tr -d ' ')
 
 # delete old build results (but do not throw away include/build$ARCH of other architectures)
