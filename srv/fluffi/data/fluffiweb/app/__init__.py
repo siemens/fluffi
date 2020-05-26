@@ -50,5 +50,3 @@ if not LOCAL_DEV:
     scheduler.add_job(healthCheck, 'interval', minutes = 0.5)
 
 scheduler.start()
-
-app.SYSTEMS_LOADED = False

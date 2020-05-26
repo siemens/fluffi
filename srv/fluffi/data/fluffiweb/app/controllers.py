@@ -37,42 +37,7 @@ from .helpers import *
 from .queries import *
 
 
-@app.before_first_request
-def loadSystems():
-    if not app.SYSTEMS_LOADED:
-        try:
-            systemsDB = [s for s, in models.Systems.query.with_entities(models.Systems.Name).all()]
-            if ANSIBLE_REST_CONNECTOR.checkFluffiInventory():
-                systemsPM = [system[0] for system in ANSIBLE_REST_CONNECTOR.getSystems()]
 
-                for persSystem in systemsPM:
-                    if persSystem not in systemsDB:
-                        sys = models.Systems(Name=persSystem)
-                        loc = models.Locations.query.first()
-                        if sys is not None and loc is not None:
-                            try:
-                                db.session.add(sys)
-                                db.session.commit()
-                                sysloc = models.SystemsLocation(System=sys.ID, Location=loc.ID)
-                                db.session.add(sysloc)
-                                db.session.commit()
-                            except AttributeError as e:
-                                print("Error adding new system: ", e)
-                for system in systemsDB:
-                    if system not in systemsPM:
-                        try:
-                            sys = models.Systems.query.filter_by(Name=system).first()
-                            sysloc = models.SystemsLocation.query.filter_by(System=sys.ID).first()
-                            db.session.delete(sysloc)
-                            db.session.delete(sys)
-                            db.session.commit()
-                        except AttributeError as e:
-                            print("Error removing system: ", e)
-                if set([s for s, in models.Systems.query.with_entities(models.Systems.Name).all()]) == set(
-                        [system[0] for system in ANSIBLE_REST_CONNECTOR.getSystems()]):
-                    app.SYSTEMS_LOADED = True
-        except Exception as e:
-            print("Cannot get systems from database or PoleMarch.", e)
 
 
 def createNewDatabase(name):
@@ -1280,7 +1245,7 @@ def getGraphData(projId):
     return graphdata
 
 
-class LockFile:
+class DownloadArchiveLockFile:
     file_path = os.getcwd() + "/download.lock"
     tmp_path = os.getcwd() + "/temp"
 
