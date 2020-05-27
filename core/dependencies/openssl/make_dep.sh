@@ -8,7 +8,7 @@
 #
 # Author(s): Thomas Riedmaier
 
-THREADS=$(cat /proc/cpuinfo | grep processor | wc -l)
+HREADS=$(nproc)
 ARCH=$(file /bin/bash | awk -F',' '{print $2}' | tr -d ' ')
 
 rm -rf include
