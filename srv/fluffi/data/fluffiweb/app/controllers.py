@@ -381,23 +381,20 @@ def getGeneralInformationData(projId, stmt):
         for row in result:
             testcase = type('', (), {})()
             testcase.testcaseID = row["ID"]
-            
             if "CrashFootprint" in row and row["CrashFootprint"] is not None:
                     testcase.footprint = row["CrashFootprint"]
-                    
             testcase.ID = "{}:{}".format(row["CreatorServiceDescriptorGUID"], row["CreatorLocalID"])
             testcase.rating = row["Rating"]
             
-            if row["CreatorServiceDescriptorGUID"] is not None:
-                testcase.niceName = "{}:{}".format(row["CreatorServiceDescriptorGUID"], row["CreatorLocalID"])
-                
-            if row["NiceNameMI"] is not None:
-                testcase.niceName = "{}:{}".format(row["NiceNameMI"], row["CreatorLocalID"])
-                
-            if row["NiceName"] is not None:
-                testcase.niceName = row["NiceName"]
+            if row["NiceName"] is None:
+                testcase.triggerInsert = True
+                if row["NiceNameMI"] is None:
+                    testcase.niceName = "{}:{}".format(row["CreatorServiceDescriptorGUID"], row["CreatorLocalID"])                
+                else:
+                    testcase.niceName = "{}:{}".format(row["NiceNameMI"], row["CreatorLocalID"])                    
             else:
-                testcase.niceName = ""
+                testcase.triggerInsert = False
+                testcase.niceName = row["NiceName"]
                 
             testcase.timeOfInsertion = row["TimeOfInsertion"]
             data.testcases.append(testcase)

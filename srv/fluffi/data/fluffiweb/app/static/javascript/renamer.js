@@ -35,6 +35,7 @@ function addOrRenameNiceName(index, projectId, command, tcGUID, tcLocID, miGUID)
     }        
     else if(miGUID){
         myGUID = miGUID;
+        myLocalID = -1;
         elemType = "managedInstance";
     } else{
         console.log("Error: Invalid Id argument in addOrRenameNiceName(...)!");
@@ -72,7 +73,7 @@ function addOrRenameNiceName(index, projectId, command, tcGUID, tcLocID, miGUID)
 
 function validateAndSave(e, i, url, btnId, inputId) {
     var input = e.target.value;
-    var data = { "newName": input, "elemType": elemType, "myGUID": myGUID, "myLocalID": myLocalID, "command": myCommand};  
+    var data = { "newName": input, "elemType": elemType, "myGUID": myGUID, "myLocalID": myLocalID, "command": myCommand};
 
     if(input.length != 0){
         $(inputId+i).css("display", "none");
