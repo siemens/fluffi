@@ -385,12 +385,17 @@ def getGeneralInformationData(projId, stmt):
                     testcase.footprint = row["CrashFootprint"]
             testcase.ID = "{}:{}".format(row["CreatorServiceDescriptorGUID"], row["CreatorLocalID"])
             testcase.rating = row["Rating"]
-            if row["CreatorServiceDescriptorGUID"] is not None:
-                testcase.niceName = "{}:{}".format(row["CreatorServiceDescriptorGUID"], row["CreatorLocalID"])
-            if row["NiceNameMI"] is not None:
-                testcase.niceName = "{}:{}".format(row["NiceNameMI"], row["CreatorLocalID"])
-            if row["NiceName"] is not None:
+            
+            if row["NiceName"] is None:
+                testcase.triggerInsert = True
+                if row["NiceNameMI"] is None:
+                    testcase.niceName = "{}:{}".format(row["CreatorServiceDescriptorGUID"], row["CreatorLocalID"])                
+                else:
+                    testcase.niceName = "{}:{}".format(row["NiceNameMI"], row["CreatorLocalID"])                    
+            else:
+                testcase.triggerInsert = False
                 testcase.niceName = row["NiceName"]
+                
             testcase.timeOfInsertion = row["TimeOfInsertion"]
             data.testcases.append(testcase)
     except Exception as e:
@@ -461,7 +466,7 @@ def getResultOfStatementForGlobalManager(stmt, params=None):
 
 def insertOrUpdateNiceName(projId, myGUID, myLocalID, newName, command, elemType):
     project = models.Fuzzjob.query.filter_by(ID = projId).first()
-
+    
     engine = create_engine(
         'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
     connection = engine.connect()
