@@ -44,10 +44,12 @@ function assignWorker(guid) {
         data: JSON.stringify(data),
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
-        async: false,
-        success: function(msg) {}
+        success: function(msg) {
+            // TODO display box with msg
+            console.log("msg: ", msg);
+        }
     });
-    location.reload();
+    //location.reload();
 }
 </script>
 
@@ -76,7 +78,7 @@ function assignWorker(guid) {
         <tr>
             <td><a href="/projects/view/{{project.ID}}">{{ project.name }}</a></td>
             <td>
-                <input onclick="deleteProject({{ project.ID }}, '{{ location.ID }}')" type="button" value="Delete"/>
+                <input class="btn btn-default" onclick="deleteProject({{ project.ID }}, '{{ location.ID }}')" type="button" value="Delete"/>
             </td>
         </tr>
         {% endfor %}
@@ -108,13 +110,13 @@ function assignWorker(guid) {
             <td>{{ worker.Agentsubtypes }}</td>
             <td>{{ worker.Timeoflastrequest}}</td>
             <td>
-                <select id="worker-{{ worker.Servicedescriptorguid }}">
+                <select class="form-control" style="width: 60%; display: inline" id="worker-{{ worker.Servicedescriptorguid }}">
                     <option>Unassigned</option>
                     {% for project in location.projects %}
                     <option value="{{ project.ID }}">{{ project.name }}</option>
                     {% endfor %}
                 </select>
-                <input onclick="assignWorker('{{ worker.Servicedescriptorguid }}')" type="button" value="Assign"/>
+                <input onclick="assignWorker('{{ worker.Servicedescriptorguid }}')" type="button" class="btn btn-default" value="Assign" style="display: inline;"/>
             </td>
         </tr>
         {% endfor %}

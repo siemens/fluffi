@@ -910,20 +910,41 @@ def addTestcase(projId):
         return redirect("/projects/{}/population/1".format(projId))
 
 
+# (pymysql.err.InternalError) (1366, "Incorrect integer value: 'Unassigned' for column `fluffi_gm`.`workers`.`FuzzJob` at row 1")
+# [SQL: UPDATE workers SET `Fuzzjob`=%(Fuzzjob)s WHERE workers.`Servicedescriptorguid` = %(workers_Servicedescriptorguid)s]
+# [parameters: {'Fuzzjob': 'Unassigned', 'workers_Servicedescriptorguid': '4e304987-8dd0-4f6b-a4fa-24324aa2732a'}]
+# (Background on this error at: http://sqlalche.me/e/2j85)
+# [pid: 21|app: 0|req: 23/45] 172.18.0.1 () {50 vars in 1025 bytes} 
 @app.route("/locations/assignWorker/<string:workerID>", methods=["POST"])
 def assignWorker(workerID):
     message = ""
+    fuzzjobId = None
 
     if not request.json:
         abort(400)
-
+        
+    if request.json["ProjectID"] == "Unassigned":
+        return json.dumps({"message": "Cannot assign to 'Unassigned'"})
+        
     try:
-        worker = models.Workers.query.filter_by(Servicedescriptorguid=workerID).first()
-        worker.Fuzzjob = request.json["ProjectID"]
-        db.session.commit()
+        fuzzjobId = int(request.json["ProjectID"])
+    except ValueError:
+        return json.dumps({"message": "FuzzjobId is not valid"})
+
+    try:        
+        if fuzzjobId is not None:
+            worker = models.Workers.query.filter_by(Servicedescriptorguid=workerID).first()
+            if worker:
+                worker.Fuzzjob = fuzzjobId
+                db.session.commit()
+                message = "Successfully assigned worker"
+            else:
+                message = "Worker with Servicedescriptorguid {} does not exist".format(workerID)
+        else:
+            message = "FuzzjobId is not valid"
     except Exception as e:
         print(e)
-        message = "Could not assign worker"
+        message = "Failed to assign worker! " + str(e)
 
     return json.dumps({"message": message})
 
