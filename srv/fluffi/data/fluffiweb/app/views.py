@@ -910,43 +910,26 @@ def addTestcase(projId):
         return redirect("/projects/{}/population/1".format(projId))
 
 
-# (pymysql.err.InternalError) (1366, "Incorrect integer value: 'Unassigned' for column `fluffi_gm`.`workers`.`FuzzJob` at row 1")
-# [SQL: UPDATE workers SET `Fuzzjob`=%(Fuzzjob)s WHERE workers.`Servicedescriptorguid` = %(workers_Servicedescriptorguid)s]
-# [parameters: {'Fuzzjob': 'Unassigned', 'workers_Servicedescriptorguid': '4e304987-8dd0-4f6b-a4fa-24324aa2732a'}]
-# (Background on this error at: http://sqlalche.me/e/2j85)
-# [pid: 21|app: 0|req: 23/45] 172.18.0.1 () {50 vars in 1025 bytes} 
-@app.route("/locations/assignWorker/<string:workerID>", methods=["POST"])
-def assignWorker(workerID):
-    message = ""
-    fuzzjobId = None
-
-    if not request.json:
-        abort(400)
+@app.route("/locations/assignWorker/<string:workerSdGUID>/<int:fuzzjobId>/<int:locationId>", methods=["GET", "POST"])
+def assignWorker(workerSdGUID, fuzzjobId, locationId):             
+    if fuzzjobId == 0:
+        flash("Cannot assign to 'Unassigned'", "error")
+        return redirect(url_for('viewLocation', locId=locationId))
         
-    if request.json["ProjectID"] == "Unassigned":
-        return json.dumps({"message": "Cannot assign to 'Unassigned'"})
-        
-    try:
-        fuzzjobId = int(request.json["ProjectID"])
-    except ValueError:
-        return json.dumps({"message": "FuzzjobId is not valid"})
-
     try:        
-        if fuzzjobId is not None:
-            worker = models.Workers.query.filter_by(Servicedescriptorguid=workerID).first()
-            if worker:
-                worker.Fuzzjob = fuzzjobId
-                db.session.commit()
-                message = "Successfully assigned worker"
-            else:
-                message = "Worker with Servicedescriptorguid {} does not exist".format(workerID)
+        worker = models.Workers.query.filter_by(Servicedescriptorguid=workerSdGUID).first()
+        if worker:
+            worker.Fuzzjob = fuzzjobId
+            db.session.commit()
+            message, category = "Successfully assigned worker", "success"
         else:
-            message = "FuzzjobId is not valid"
+            message, category = "Worker with Servicedescriptorguid {} does not exist".format(workerSdGUID), "error"
     except Exception as e:
         print(e)
-        message = "Failed to assign worker! " + str(e)
+        message, category = "Failed to assign worker! " + str(e), "error"
 
-    return json.dumps({"message": message})
+    flash(message, category)
+    return redirect(url_for('viewLocation', locId=locationId))
 
 
 @app.route("/projects/<int:projId>/changeSetting/<int:settingId>", methods=["POST"])
@@ -1074,6 +1057,7 @@ def viewLocation(locId):
 
     return renderTemplate("viewLocation.html",
                           title="Location details",
+                          locationId=locId,
                           location=location)
 
 

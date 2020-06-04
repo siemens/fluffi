@@ -34,22 +34,21 @@ function deleteProject(projId, locId) {
     window.location.replace(delUrl);
 }
 
-function assignWorker(guid) {
-    var assignUrl = "/locations/assignWorker/" + guid;
-    var data = { "ProjectID": document.getElementById("worker-" + guid).value };
+function assignWorker(loopIndex, workerSdGUID, locationId) {
+    var fuzzjobId = $("#selector" + loopIndex).val();
+    var assignUrl = "/locations/assignWorker/" + workerSdGUID + "/" + fuzzjobId + "/" + locationId;
+    
+    window.location.replace(assignUrl);
+}
 
-    $.ajax({
-        url: assignUrl,
-        type: 'POST',
-        data: JSON.stringify(data),
-        contentType: 'application/json; charset=utf-8',
-        dataType: 'json',
-        success: function(msg) {
-            // TODO display box with msg
-            console.log("msg: ", msg);
-        }
-    });
-    //location.reload();
+function validateSelectedAssign(loopIndex){
+    var fuzzjobId = $("#selector" + loopIndex).val();
+
+    if (fuzzjobId == 0){        
+        $("#assignBtn" + loopIndex).attr("disabled", true);
+    } else {        
+        $("#assignBtn" + loopIndex).attr("disabled", false);
+    }    
 }
 </script>
 
@@ -110,13 +109,13 @@ function assignWorker(guid) {
             <td>{{ worker.Agentsubtypes }}</td>
             <td>{{ worker.Timeoflastrequest}}</td>
             <td>
-                <select class="form-control" style="width: 60%; display: inline" id="worker-{{ worker.Servicedescriptorguid }}">
-                    <option>Unassigned</option>
+                <select id="selector{{ loop.index }}" onchange="validateSelectedAssign('{{ loop.index }}')" class="form-control" style="width: 60%; display: inline">
+                    <option value="0">Unassigned</option>
                     {% for project in location.projects %}
                     <option value="{{ project.ID }}">{{ project.name }}</option>
                     {% endfor %}
                 </select>
-                <input onclick="assignWorker('{{ worker.Servicedescriptorguid }}')" type="button" class="btn btn-default" value="Assign" style="display: inline;"/>
+                <input id="assignBtn{{ loop.index }}" onclick="assignWorker({{ loop.index }}, '{{ worker.Servicedescriptorguid }}', {{ locationId }})" type="button" class="btn btn-default" value="Assign" style="display: inline;" disabled/>
             </td>
         </tr>
         {% endfor %}
