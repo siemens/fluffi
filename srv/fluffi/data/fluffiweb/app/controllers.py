@@ -1252,8 +1252,8 @@ def getGraphData(projId):
 
 
 class DownloadArchiveLockFile:
-    file_path = os.getcwd() + "/download.lock"
-    tmp_path = os.getcwd() + "/temp"
+    file_path = "/download.lock"
+    tmp_path = "/downloadTemp"
 
     # if lock file in dir: return False
     def check_file(self):
