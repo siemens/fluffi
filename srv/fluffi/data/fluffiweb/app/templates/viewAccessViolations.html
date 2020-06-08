@@ -25,6 +25,17 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
 {% extends "base.html" %}
 {% block title %}FLUFFI - Fuzzjobs - {{ violationsAndCrashes.project.name[:30] }} - Access Violations and Crashes{% endblock %}
 
+{% block scripts  %}
+<script src="{{ url_for('static', filename = 'javascript/tooltip.js') }}" type="text/javascript"></script>
+<script>
+    function download(){
+        form = $('#downloadSmallestVioOrCrash');
+        form.submit();
+    }
+</script>
+{{super()}}
+{% endblock %}
+
 {% block content %}
 
 <div class="container">
@@ -62,13 +73,22 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
             <td style="text-align: center;">Other</td>
             {% endif %}
             <td style="text-align: center;">
-                <a class="btn btn-secondary"
-                   href="/projects/{{ violationsAndCrashes.project.ID }}/getSmallestVioOrCrashTestcase/{{ testcase.footprint }}"
+                <!-- <a class="btn btn-secondary"
+                   onclick="getSmallestVioOrCrashTestcase({{ violationsAndCrashes.project.ID }}, '{{ testcase.footprint }}')"
+                   data-toggle="tooltip" 
+                   title="Explain this getSmallestVioOrCrashTestcase"
                    role="button">
                     <span class="glyphicon glyphicon-floppy-save"></span>
-                </a>
+                </a> -->
+                <form id="downloadSmallestVioOrCrash" action="/projects/{{ violationsAndCrashes.project.ID }}/getSmallestVioOrCrashTestcase" method="POST">
+                    <a href="#">
+                        <input type="hidden" name="footprint" value="{{ testcase.footprint }}"><span onclick="download()" class="glyphicon glyphicon-floppy-save"></span>
+                    </a>
+                </form>
                 <a class="btn btn-secondary"
                    href="/projects/{{ violationsAndCrashes.project.ID }}/crashes/download/{{ testcase.footprint }}/{{ testcase.type }}"
+                   data-toggle="tooltip" 
+                   title="Download crashes"
                    role="button">
                     <span class="glyphicon glyphicon-save"></span>
                 </a>

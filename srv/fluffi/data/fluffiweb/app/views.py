@@ -701,7 +701,6 @@ def downloadNoResponses(projId):
     return createZipArchive(projId, nice_name, type)
 
 
-
 @app.route("/projects/<int:projId>/violations")
 @checkDbConnection
 @checkSystemsLoaded
@@ -740,13 +739,20 @@ def getTestcase(projId, testcaseId):
                      as_attachment=True)
 
 
-@app.route("/projects/<int:projId>/getSmallestVioOrCrashTestcase/<string:footprint>")
-def getSmallestVioOrCrashTestcase(projId, footprint):
+@app.route("/projects/<int:projId>/getSmallestVioOrCrashTestcase", methods=["GET", "POST"])
+def getSmallestVioOrCrashTestcase(projId):
+    
+    footprint = request.form.get("footprint", None)
+    
+    if footprint is None:
+        flash("Footprint does not exist!", "error")
+        return redirect(url_for('viewViolations', projId=projId))
+    
     byteIO = createByteIOForSmallestVioOrCrash(projId, footprint)
-
+    
     return send_file(byteIO,
-                     attachment_filename=footprint.replace(":", "_"),
-                     as_attachment=True)
+                    attachment_filename=footprint.replace(":", "_"),
+                    as_attachment=True)        
 
 
 @app.route("/projects/<int:projId>/managedInstances")
