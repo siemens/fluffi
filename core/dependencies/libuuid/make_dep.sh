@@ -13,7 +13,7 @@
 # 
 # Author(s): Thomas Riedmaier, Pascal Eckmann
 
-THREADS=$(cat /proc/cpuinfo | grep processor | wc -l)
+THREADS=$(nproc)
 ARCH=$(file /bin/bash | awk -F',' '{print $2}' | tr -d ' ')
 
 rm -rf lib/$ARCH

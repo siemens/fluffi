@@ -26,7 +26,7 @@ if ! [ -f /.dockerenv ]; then
     exit 1
 fi
 
-MAKE_THREADS=-j$(cat /proc/cpuinfo | awk '/^processor/{print $3}' | wc -l) 
+MAKE_THREADS=-j$(nproc) 
 
 if [ "$FLUFFI_DEPS" = TRUE ] ; then
 	cd /fluffi/dependencies

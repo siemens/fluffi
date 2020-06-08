@@ -29,6 +29,6 @@ RUN apt-get update -y
 RUN apt-get upgrade -y
 RUN apt-get dist-upgrade -y
 
-RUN apt-get install -yq build-essential git cmake python pkg-config libglib2.0-dev rsync libbsd-dev
+RUN apt-get install -yq build-essential git cmake python pkg-config libglib2.0-dev rsync libbsd-dev flex bison
 
 CMD ["/bin/bash"]
