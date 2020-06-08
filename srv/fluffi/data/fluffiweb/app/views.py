@@ -910,22 +910,26 @@ def addTestcase(projId):
         return redirect("/projects/{}/population/1".format(projId))
 
 
-@app.route("/locations/assignWorker/<string:workerID>", methods=["POST"])
-def assignWorker(workerID):
-    message = ""
-
-    if not request.json:
-        abort(400)
-
-    try:
-        worker = models.Workers.query.filter_by(Servicedescriptorguid=workerID).first()
-        worker.Fuzzjob = request.json["ProjectID"]
-        db.session.commit()
+@app.route("/locations/assignWorker/<string:workerSdGUID>/<int:fuzzjobId>/<int:locationId>", methods=["GET", "POST"])
+def assignWorker(workerSdGUID, fuzzjobId, locationId):             
+    if fuzzjobId == 0:
+        flash("Cannot assign to 'Unassigned'", "error")
+        return redirect(url_for('viewLocation', locId=locationId))
+        
+    try:        
+        worker = models.Workers.query.filter_by(Servicedescriptorguid=workerSdGUID).first()
+        if worker:
+            worker.Fuzzjob = fuzzjobId
+            db.session.commit()
+            message, category = "Successfully assigned worker", "success"
+        else:
+            message, category = "Worker with Servicedescriptorguid {} does not exist".format(workerSdGUID), "error"
     except Exception as e:
         print(e)
-        message = "Could not assign worker"
+        message, category = "Failed to assign worker! " + str(e), "error"
 
-    return json.dumps({"message": message})
+    flash(message, category)
+    return redirect(url_for('viewLocation', locId=locationId))
 
 
 @app.route("/projects/<int:projId>/changeSetting/<int:settingId>", methods=["POST"])
@@ -1053,6 +1057,7 @@ def viewLocation(locId):
 
     return renderTemplate("viewLocation.html",
                           title="Location details",
+                          locationId=locId,
                           location=location)
 
 

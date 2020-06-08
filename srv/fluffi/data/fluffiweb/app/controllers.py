@@ -504,6 +504,7 @@ def getLocation(locId):
     for l in models.LocationFuzzjobs.query.filter_by(Location = locId).all():
         currentFuzzjob = models.Fuzzjob.query.filter_by(ID = l.Fuzzjob).first()
         location.projects.append(currentFuzzjob)
+    
     location.workers = models.Workers.query.filter(models.Workers.Location == locId, models.Workers.Fuzzjob == None, models.Workers.Agenttype != 4).all()
     return location
 
