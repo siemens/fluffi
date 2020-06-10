@@ -28,12 +28,12 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
 {% block scripts  %}
 <script>
     function downloadSmallestVioOrCrash(loopIndex){
-        form = $("#downloadSmallestVioOrCrash" + loopIndex);
+        var form = $("#downloadSmallestVioOrCrash" + loopIndex);
         form.submit();
     }
 
     function downloadCrashes(loopIndex){
-        form = $("#downloadCrashes" + loopIndex);
+        var form = $("#downloadCrashes" + loopIndex);
         form.submit();
     }
 </script>
