@@ -26,7 +26,6 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
 {% block title %}FLUFFI - Fuzzjobs - {{ violationsAndCrashes.project.name[:30] }} - Access Violations and Crashes{% endblock %}
 
 {% block scripts  %}
-<script src="{{ url_for('static', filename = 'javascript/tooltip.js') }}" type="text/javascript"></script>
 <script>
     function downloadSmallestVioOrCrash(loopIndex){
         form = $("#downloadSmallestVioOrCrash" + loopIndex);
