@@ -712,13 +712,24 @@ def viewViolations(projId):
                           violationsAndCrashes=violationsAndCrashes)
 
 
-@app.route("/projects/<int:projId>/crashes/download/<string:footprint>/<int:testCaseType>")
-def downloadCrashes(projId, footprint, testCaseType):
-    project = models.Fuzzjob.query.filter_by(ID=projId).first()
-    type = "crashesFootprintTestcase " + str(footprint) + " " + str(testCaseType)
-    nice_name = project.name + ": Crashes (Footprint)"
-
-    return createZipArchive(projId, nice_name, type)
+@app.route("/projects/<int:projId>/crashes/download", methods=["GET", "POST"])
+def downloadCrashes(projId):
+    footprint = request.form.get("footprint", None)
+    testcaseType = request.form.get("testcaseType", None)
+    
+    if footprint is not None and testcaseType is not None:        
+        project = models.Fuzzjob.query.filter_by(ID=projId).first()
+        
+        if project:            
+            type = "crashesFootprintTestcase " + str(footprint) + " " + str(testcaseType)
+            nice_name = project.name + ": Crashes (Footprint)"
+            return createZipArchive(projId, nice_name, type)
+         
+        flash("Project does not exist!", "error")
+        return redirect(url_for('viewViolations', projId=projId))
+    
+    flash("Footprint or testcaseType does not exist!", "error")
+    return redirect(url_for('viewViolations', projId=projId))
 
 
 @app.route("/projects/<int:projId>/crashesorvio/download/<string:footprint>")
