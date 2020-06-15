@@ -48,6 +48,6 @@ TESTCASE_TYPES = {
 }
 
 FTP_CONNECTOR = FTPConnector(config.FTP_URL)
-ANSIBLE_REST_CONNECTOR = AnsibleRESTConnector("http://pole.fluffi:8888/api/v2/", "admin", "admin")
+ANSIBLE_REST_CONNECTOR = AnsibleRESTConnector(config.POLE_URL, "admin", "admin")
 
 
