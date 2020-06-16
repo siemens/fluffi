@@ -25,6 +25,21 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
 {% extends "base.html" %}
 {% block title %}FLUFFI - Fuzzjobs - {{ violationsAndCrashes.project.name[:30] }} - Access Violations and Crashes{% endblock %}
 
+{% block scripts  %}
+<script>
+    function downloadSmallestVioOrCrash(loopIndex){
+        var form = $("#downloadSmallestVioOrCrash" + loopIndex);
+        form.submit();
+    }
+
+    function downloadCrashes(loopIndex){
+        var form = $("#downloadCrashes" + loopIndex);
+        form.submit();
+    }
+</script>
+{{super()}}
+{% endblock %}
+
 {% block content %}
 
 <div class="container">
@@ -61,17 +76,22 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
             {% else %}
             <td style="text-align: center;">Other</td>
             {% endif %}
-            <td style="text-align: center;">
-                <a class="btn btn-secondary"
-                   href="/projects/{{ violationsAndCrashes.project.ID }}/getSmallestVioOrCrashTestcase/{{ testcase.footprint }}"
-                   role="button">
-                    <span class="glyphicon glyphicon-floppy-save"></span>
-                </a>
-                <a class="btn btn-secondary"
-                   href="/projects/{{ violationsAndCrashes.project.ID }}/crashes/download/{{ testcase.footprint }}/{{ testcase.type }}"
-                   role="button">
-                    <span class="glyphicon glyphicon-save"></span>
-                </a>
+            <td>                
+                <div style="text-align: center;">
+                    <form id="downloadSmallestVioOrCrash{{loop.index}}" style="display: inline-block; margin-right: 6px;" action="/projects/{{ violationsAndCrashes.project.ID }}/getSmallestVioOrCrashTestcase" method="POST">
+                        <a href="#">
+                            <input type="hidden" name="footprint" value="{{ testcase.footprint }}">
+                            <span onclick="downloadSmallestVioOrCrash({{loop.index}})" class="glyphicon glyphicon-floppy-save"></span>
+                        </a>
+                    </form>
+                    <form id="downloadCrashes{{loop.index}}" style="display: inline-block;" action="/projects/{{ violationsAndCrashes.project.ID }}/crashes/download" method="POST">
+                        <a href="#">
+                            <input type="hidden" name="footprint" value="{{ testcase.footprint }}">
+                            <input type="hidden" name="testcaseType" value="{{ testcase.type }}">
+                            <span onclick="downloadCrashes({{loop.index}})" class="glyphicon glyphicon-save"></span>
+                        </a>
+                    </form>
+                </div>                
             </td>
         </tr>
         {% endfor %}

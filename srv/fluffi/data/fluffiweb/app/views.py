@@ -701,7 +701,6 @@ def downloadNoResponses(projId):
     return createZipArchive(projId, nice_name, type)
 
 
-
 @app.route("/projects/<int:projId>/violations")
 @checkDbConnection
 @checkSystemsLoaded
@@ -713,13 +712,24 @@ def viewViolations(projId):
                           violationsAndCrashes=violationsAndCrashes)
 
 
-@app.route("/projects/<int:projId>/crashes/download/<string:footprint>/<int:testCaseType>")
-def downloadCrashes(projId, footprint, testCaseType):
-    project = models.Fuzzjob.query.filter_by(ID=projId).first()
-    type = "crashesFootprintTestcase " + str(footprint) + " " + str(testCaseType)
-    nice_name = project.name + ": Crashes (Footprint)"
-
-    return createZipArchive(projId, nice_name, type)
+@app.route("/projects/<int:projId>/crashes/download", methods=["GET", "POST"])
+def downloadCrashes(projId):
+    footprint = request.form.get("footprint", None)
+    testcaseType = request.form.get("testcaseType", None)
+    
+    if footprint is not None and testcaseType is not None:        
+        project = models.Fuzzjob.query.filter_by(ID=projId).first()
+        
+        if project:            
+            type = "crashesFootprintTestcase " + str(footprint) + " " + str(testcaseType)
+            nice_name = project.name + ": Crashes (Footprint)"
+            return createZipArchive(projId, nice_name, type)
+         
+        flash("Project does not exist!", "error")
+        return redirect(url_for('viewViolations', projId=projId))
+    
+    flash("Footprint or testcaseType does not exist!", "error")
+    return redirect(url_for('viewViolations', projId=projId))
 
 
 @app.route("/projects/<int:projId>/crashesorvio/download/<string:footprint>")
@@ -740,13 +750,20 @@ def getTestcase(projId, testcaseId):
                      as_attachment=True)
 
 
-@app.route("/projects/<int:projId>/getSmallestVioOrCrashTestcase/<string:footprint>")
-def getSmallestVioOrCrashTestcase(projId, footprint):
+@app.route("/projects/<int:projId>/getSmallestVioOrCrashTestcase", methods=["GET", "POST"])
+def getSmallestVioOrCrashTestcase(projId):
+    
+    footprint = request.form.get("footprint", None)
+    
+    if footprint is None:
+        flash("Footprint does not exist!", "error")
+        return redirect(url_for('viewViolations', projId=projId))
+    
     byteIO = createByteIOForSmallestVioOrCrash(projId, footprint)
-
+    
     return send_file(byteIO,
-                     attachment_filename=footprint.replace(":", "_"),
-                     as_attachment=True)
+                    attachment_filename=footprint.replace(":", "_"),
+                    as_attachment=True)        
 
 
 @app.route("/projects/<int:projId>/managedInstances")
