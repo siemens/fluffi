@@ -116,7 +116,7 @@ If you want to create a FuzzJob go to the FLUFFI web page (currently reachable o
 
 Having done so, you need to create a FuzzJob via `FuzzJobs->Create FuzzJob`.
 
-![alt text](CreateNewProject.png "The dialog to create a new FuzzJob")
+![The dialog to create a new FuzzJob](CreateNewProject.png)
 
 **Name**
 

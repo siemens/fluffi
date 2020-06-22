@@ -24,7 +24,7 @@ Author(s): Thomas Riedmaier, Roman Bendt
 
 # FLUFFI
 
-![alt text](srv/fluffi/data/fluffiweb/app/static/images/friendly_fluffi_md.jpg "FLUFFI greets you")
+![FLUFFI greets you](srv/fluffi/data/fluffiweb/app/static/images/friendly_fluffi_md.jpg)
 
 FLUFFI - A distributed evolutionary binary fuzzer for pentesters.
 

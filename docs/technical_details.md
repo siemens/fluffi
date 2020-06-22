@@ -100,7 +100,7 @@ In order to get the system up and running, there is a `LocalManager` (aka LM) th
 - Coordinates the other components, and
 - Stores state (such as crashes and block coverage).
 
-![alt text](FLUFFILocalArchitecture.png "FLUFFI's local architecture")
+![FLUFFI's local architecture](FLUFFILocalArchitecture.png)
 
 ### 3.2) The overall architecture
 Here an overview of the FLUFFI system:
@@ -112,13 +112,13 @@ Here an overview of the FLUFFI system:
 - Jobs can be created and managed at the `GlobalManager` Controlling UI (a web page, currently listening on [http://web.fluffi/](http://web.fluffi/))
 - Statistics are shown in the Graph UI (embedded in the web UI and hosted on [http://mon.fluffi/](http://mon.fluffi/))
 
-![alt text](FLUFFIGlobalArchitecture.png "FLUFFI's global architecture")
+![FLUFFI's global architecture](FLUFFIGlobalArchitecture.png)
 
 ### 3.3) Messages
 The FLUFFI systems communicate by passing message. The messages are defined in the [FLUFFI.proto](core/dependencies/libprotoc/FLUFFI.proto)
 
 Here a visualization of all messages passed between Local Manager (LM), Testcase Generator (TG), Testcase Runner (TR), and Testcase Evaluator (TE):
-![alt text](FLUFFILocalMessages.png "FLUFFI's local messages")
+![FLUFFI's local messages](FLUFFILocalMessages.png)
 
 Please note that this graphic does not contain the messages that involve the Global Manager (GM):
 - GetStatus (implemented by LM)

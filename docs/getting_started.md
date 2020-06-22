@@ -136,7 +136,7 @@ Before continuing, make sure you have run the necessary steps listed under [Comm
 Set up your master machine with two network interfaces, one as your method of internet access and one to connect to the separate FLUFFI network.
 In these exemplary instructions we use `ens33` for internet access and `ens38` for the FUN.
 
-![alt text](virtualfluffi.png "virtual FLUFFI utility network")
+![virtual FLUFFI utility network](virtualfluffi.png)
 
 Then configure the interfaces on the master:
 ```bash

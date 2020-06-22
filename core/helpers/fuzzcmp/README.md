@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
 
 We fuzzed the program with FLUFFI without using fuzzcmp. The result thereof is shown here:
 
-![alt text](without_fuzzcmp.png "Population and coverage when running the testcase program without fuzzcmp")
+![Population and coverage when running the testcase program without fuzzcmp](without_fuzzcmp.png)
 
 As you can see, the coverage increased at the beginning up to about 500 blocks and then didn't change anymore for almost two weeks. Furhtermore, you can see, that the crash, i.e. the magic string, was never discovered.
  
@@ -69,7 +69,7 @@ As you can see, the coverage increased at the beginning up to about 500 blocks a
 
 Then we fuzzed the same program while using fuzzcmp.The result thereof is shown here:
 
-![alt text](with_fuzzcmp.png "Population and coverage when running the testcase program with fuzzcmp")
+![Population and coverage when running the testcase program with fuzzcmp](with_fuzzcmp.png)
 
 As you can see, there was a constant increase of blocks and FLUFFI step-by-step figured out the magic string. Within 12 hours, the first crashes appeared (meaning, the magic string was discovered).
 
