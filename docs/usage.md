@@ -32,14 +32,14 @@ To add new systems:
 * Physically plug your system into FUN
 * Check connectivity to `gm.fluffi`. For problems: check the firewall
 * Decide on the host name for that system, and put it in the [MAC2Host.csv](srv/fluffi/data/smb/files/initial/MAC2Host.csv).  Other systems within FUN must be able to reach your system with that hostname.
-* Create a user for ansible. To do so you need to create a user that matches whatever username and password you specified in ansible's [hosts](srv/fluffi/data/polenext/projects/1/hosts) file (see [the getting started section](getting_started.md)). On Linux, this user needs to be a sudoer. On Windows, this user needs to be local administrator.
+* Create a user for ansible. To do so you need to create a user that matches whatever username and password you specified in ansible's [hosts](srv/fluffi/data/polenext/projects/1/hosts) file (see [the getting started section](./getting_started.md)). On Linux, this user needs to be a sudoer. On Windows, this user needs to be local administrator.
 * Prepare the system for ansible. To do so run the following commands on the new agent system:
   * Windows:
     * `net use y: \\smb.fluffi\install\initial /user:nobody pass`
     * `y:\initialConfiguration.bat`
     * `net use y: /Delete /yes`
   * Linux:
-    * Make sure, your system is able to reach a packet mirror from within FUN (see also [the package mirror section in the getting_started.md](getting_started.md)).
+    * Make sure, your system is able to reach a packet mirror from within FUN (see also [the package mirror section in the getting_started.md](./getting_started.md)).
     * `apt-get install openssh-server smbclient net-tools`
     * `smbclient '//smb.fluffi/install' -c 'cd initial; get MAC2Host.csv; get initialConfiguration.sh' -U anonymous%pass;`
     * `chmod 777 initialConfiguration.sh`
@@ -47,7 +47,7 @@ To add new systems:
     * `rm MAC2Host.csv`
     * `rm initialConfiguration.sh`
 * Tell FLUFFI about the system. To do so you have two options: either add it as a new windows/linux/odroid host to ansible's [hosts](srv/fluffi/data/polenext/projects/1/hosts) file (persistent), or use the `Add System` button in FLUFFI's web GUI. When adding it via the web GUI just use the system's host name without any domain suffix. When adding it via the hosts file, the line needs to look like this: `<hostname> ansible_ssh_host=<hostname>.fluffi`. Remember: When modifying the hosts file, you need to restart the polemarch and fluffi_web containers.
-+ Assign a location to the system in the `Systems` tab. An explication of the location concept can be found [here](technical_details.md).
++ Assign a location to the system in the `Systems` tab. An explication of the location concept can be found [here](./technical_details.md).
 
 ## 1.1) Deploying FLUFFI
 Now that the new agent system is part of the FUN, the system needs to be configured for FLUFFI. Furthermore, the FLUFFI agent binaries need to be copied to the agent system.

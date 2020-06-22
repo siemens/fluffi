@@ -81,7 +81,7 @@ GDB test cases will not succeed on Windows 10 if CFG is active for gdb. Disable 
 
 
 ## 3) Architecture
-In contrast to other fuzzers, FLUFFI is not a single stand-alone executable, but a distributed system of agents. The reasons for this are discussed in the [about section](about.md).
+In contrast to other fuzzers, FLUFFI is not a single stand-alone executable, but a distributed system of agents. The reasons for this are discussed in the [about section](./about.md).
 Furthermore, FLUFFI is designed with a high degree of modularity that allows us to replace and upgrade components (e.g., the generation of test cases).
 
 ### 3.1) The fuzzing loop
