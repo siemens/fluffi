@@ -34,7 +34,7 @@ Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Thomas Riedmaier
 {% block content %}
 
 <div class="container">
-    <h1>Systems in FluffiNET</h1>
+    <h1>Systems in the FUN</h1>
 </div>
 <div class="container">
     {{ flashMessages() }}
@@ -65,7 +65,7 @@ Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Thomas Riedmaier
             <div class="modal-content">
                 <div class="modal-header">
                     <button class="close" data-dismiss="modal" type="button">&times;</button>
-                    <h4 class="modal-title">Add new system to FluffiNET</h4>
+                    <h4 class="modal-title">Add new system to the FUN</h4>
                 </div>
                 <div class="modal-body">
                     <form action="{{ url_for('addNewSystemToPolemarch') }}" method="post">
@@ -106,7 +106,7 @@ Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Thomas Riedmaier
                     <p>
                     <h3>HowTo:</h3>
                     <ul>
-                        <li>Assure that the Odroid systems are connected to the FluffiNet</li>
+                        <li>Assure that the Odroid systems are connected to the FUN</li>
                         <li>Follow the link (LEMMINGS LAIR) to power on and manage the boards</li>
                         <li>Check connections, hostname & dns (ping by hostname e.g. "ping lemming01.fluffi")</li>
                         <li>On the Odroids an operating system has to be rolled out (Usually Linux). Automation is still

@@ -32,7 +32,7 @@ It also sketches the typical integration process of patches.
 - use git to manage your changes [*recommended*]
 
 - add the required copyright header to each new file introduced, see
-  [licensing information](LICENSING.md) [**required**]
+  [licensing information](./LICENSE.md) [**required**]
 
 - structure patches logically, in small steps [**required**]
     - one separable functionality/fix/refactoring = one patch

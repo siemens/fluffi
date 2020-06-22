@@ -41,16 +41,16 @@ __On _web.fluffi_ you can select the OS, which should be loaded over PXE.__
 - ##### SMB
     - `smb.fluffi/install/...`
         - `smb.fluffi/install/initial/` -> configuration of hostname, etc., for freshly deployed systems
-        - e.g. `smb.fluffi/install/server2016/` -> Windows image; detailed steps are in the instructions for [Windows](windows.md)
+        - e.g. `smb.fluffi/install/server2016/` -> Windows image; detailed steps are in the instructions for [Windows](./windows.md)
 
 ## Agent systems OS
 - ##### Windows
-    - [Create and configure Windows image for PXE](windows.md)
+    - [Create and configure Windows image for PXE](./windows.md)
 - ##### Ubuntu
-    - [Create and configure Ubuntu image for PXE](ubuntu.md)
+    - [Create and configure Ubuntu image for PXE](./ubuntu.md)
 - ##### Armbian/Odroid-XU4
-    - [Install and configure Odroid-XU4 for PXE](odroid.md)
-    - [Create and configure Armbian image for PXE](armbian.md)
+    - [Install and configure Odroid-XU4 for PXE](./odroid.md)
+    - [Create and configure Armbian image for PXE](./armbian.md)
     
 ## Add MAC address and hostname for automatic configuration
 - Add the MAC address with the associated hostname to the [MAC2Host.csv](../../srv/fluffi/data/smb/files/initial/MAC2Host.csv) file on the SMB share
@@ -62,4 +62,4 @@ __On _web.fluffi_ you can select the OS, which should be loaded over PXE.__
     - Use BIOS instead of UEFI
     - Bridge your network device to the VM to use PXE properly
     - Select OS in _webgui_ and boot your empty VM (it should now load the OS over PXE)
-- Now you can integrate the system in Fluffi according to [usage.md](../../usage.md)
+- Now you can integrate the system in Fluffi according to [usage.md](../../docs/usage.md)
