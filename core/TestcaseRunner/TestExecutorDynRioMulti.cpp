@@ -951,8 +951,8 @@ std::shared_ptr<DebugExecutionOutput> TestExecutorDynRioMulti::execute(const Flu
 			_exit(EXIT_FAILURE); //make compiler happy;
 		}
 		//Case "Target terminated without an Exception" - treat this like an Exception
-		/* fall through */
 		LOG(DEBUG) << "Target terminated \"cleanly\" although it should not have";
+		/* fall through */
 	case DebugExecutionOutput::EXCEPTION_OTHER:
 	case DebugExecutionOutput::EXCEPTION_ACCESSVIOLATION:
 		LOG(DEBUG) << "Testcase execution yielded an exception - or the target terminated \"cleanly\" by itself. Let's try to reproduce this without dynamorio";

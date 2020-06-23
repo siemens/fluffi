@@ -31,6 +31,7 @@ Author(s): Thomas Riedmaier, Abian Blome
 #if defined(_WIN32) || defined(_WIN64)
 #define SOCKETTYPE SOCKET
 #else
+#include <fcntl.h>
 #define SOCKETTYPE int
 #define closesocket close
 #define INVALID_SOCKET -1
@@ -75,7 +76,7 @@ bool sendPacketSequenceToHostAndPort(std::vector<Packet> packetSequence, std::st
 	iResult = ioctlsocket(connectSocket, FIONBIO, &mode);
 #else
 
-	int flags = fcntl(fd, F_GETFL, 0);
+	int flags = fcntl(connectSocket, F_GETFL, 0);
 	if (flags == SOCKET_ERROR)
 	{
 		std::cout << "TCPFeeder: fcntl failed" << std::endl;
@@ -84,7 +85,7 @@ bool sendPacketSequenceToHostAndPort(std::vector<Packet> packetSequence, std::st
 		return false;
 	}
 	flags = (flags | O_NONBLOCK);
-	iResult = fcntl(fd, F_SETFL, flags);
+	iResult = fcntl(connectSocket, F_SETFL, flags);
 #endif
 	if (iResult == SOCKET_ERROR) {
 		std::cout << "TCPFeeder: Failed to make the socket non-blocking" << std::endl;
