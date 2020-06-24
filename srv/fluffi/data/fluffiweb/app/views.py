@@ -826,11 +826,11 @@ def viewConfigSystemInstances(projId):
                                                     models.SystemFuzzjobInstances.Fuzzjob,
                                                     models.SystemFuzzjobInstances.AgentType,
                                                     models.SystemFuzzjobInstances.InstanceCount,
-                                                    models.SystemFuzzjobInstances.Architecture).filter_by(
-        Fuzzjob=projId).all()
+                                                    models.SystemFuzzjobInstances.Architecture).filter_by(Fuzzjob=projId).all()
     
     for system in sysList:
-        s = {'name': system.Name, 'tg': 0, 'tr': 0, 'te': 0, 'tgarch': "", 'trarch': "", 'tearch': ""}
+        # TODO second fallback with settings - add settings
+        s = {'name': system.Name, 'tg': 0, 'tr': 0, 'te': 0, 'tgarch': "", 'trarch': "", 'tearch': "", 'settingArch': ""}
         if 'lemming' not in system.Name:
             sysInstanceList.append(s)
         else:
@@ -839,18 +839,18 @@ def viewConfigSystemInstances(projId):
             if system.ID == conf.System:
                 if conf.AgentType == 0:
                     s['tg'] = conf.InstanceCount
-                    s['tgarch'] = "(" + conf.Architecture + ")"
+                    s['tgarch'] = conf.Architecture
                 if conf.AgentType == 1:
                     s['tr'] = conf.InstanceCount
-                    s['trarch'] = "(" + conf.Architecture + ")"
+                    s['trarch'] = conf.Architecture
                 if conf.AgentType == 2:
                     s['te'] = conf.InstanceCount
-                    s['tearch'] = "(" + conf.Architecture + ")"
+                    s['tearch'] = conf.Architecture
     
     for conf in dbconfiguredFuzzjobInstances:
         if conf.AgentType == 4:
             lmCount = lmCount + conf.InstanceCount
-
+    
     return renderTemplate("viewConfigSystemInstances.html",
                           title="View Instance Configuration",
                           systemInstanceConfigForm=systemInstanceConfigForm,

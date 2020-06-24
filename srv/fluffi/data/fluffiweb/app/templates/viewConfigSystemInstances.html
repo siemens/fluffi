@@ -72,37 +72,96 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
                             <tbody>
                             <tr>
                                 <th scope="row">TestcaseGenerator</th>
-                                <td><p id="{{system.name}}_tg_count">{{system.tg}}<font
-                                        size="1">&ensp;{{system.tgarch}}</font></p></td>
+                                <td><p id="{{system.name}}_tg_count">
+                                        {{system.tg}}
+                                    </p>
+                                </td>
                                 <td><input class="form-control" id="{{system.name}}_tg" name="{{system.name}}_tg"
                                            placeholder="0" type="text"></td>
                                 <td>
                                     <select class="form-control" id="{{system.name}}_tg_arch"
                                             name="{{system.name}}_tg_arch" style="width: 90px">
-                                        <option name="choice1" value="x64">x64</option>
-                                        <option name="choice2" value="x86">x86</option>
-                                        <option name="choice2" value="arm32">arm32</option>
-                                        <option name="choice2" value="arm64">arm64</option>
+                                        {% if system.tgarch == "x64" %}
+                                            <option value="x64" selected="selected">x64</option>
+                                        {% elif system.settingArch == "x64" %}
+                                            <option value="x64" selected="selected"></option>
+                                        {% else %}
+                                            <option value="x64">x64</option>
+                                        {% endif %}
+
+                                        {% if system.tgarch == "x86" %}
+                                            <option value="x86" selected="selected">x86</option>
+                                        {% elif system.settingArch == "x86" %}
+                                            <option value="x86" selected="selected"></option>
+                                        {% else %}
+                                            <option value="x86">x86</option>
+                                        {% endif %}
+
+                                        {% if system.tgarch == "arm32" %}
+                                            <option value="arm32" selected="selected">arm32</option>
+                                        {% elif system.settingArch == "arm32" %}
+                                            <option value="arm32" selected="selected"></option>
+                                        {% else %}
+                                            <option value="arm32">arm32</option>
+                                        {% endif %}
+
+                                        {% if system.tgarch == "arm64" %}
+                                            <option value="arm64" selected="selected">arm64</option>
+                                        {% elif system.settingArch == "arm64" %}
+                                            <option value="arm64" selected="selected"></option>
+                                        {% else %}
+                                            <option value="arm64">arm64</option>
+                                        {% endif %}
                                     </select>
                                 </td>
                                 <td class="remove"><a class="btn btn-secondary"
-                                                                             onclick="removeInstances('/systems/removeConfiguredInstances/{{ system.name }}/{{ fuzzjob.name }}/tg', '{{system.name}}_tg_count');"
-                                                                             role="button"><span
-                                        class="glyphicon glyphicon-remove"></span></a></td>
+                                                        onclick="removeInstances('/systems/removeConfiguredInstances/{{ system.name }}/{{ fuzzjob.name }}/tg', '{{system.name}}_tg_count');"
+                                                        role="button">
+                                                        <span class="glyphicon glyphicon-remove"></span>
+                                                    </a>
+                                </td>
                             </tr>
                             <tr>
                                 <th scope="row">TestcaseRunner</th>
-                                <td><p id="{{system.name}}_tr_count">{{system.tr}}<font
-                                        size="1">&ensp;{{system.trarch}}</font></p></td>
+                                <td>
+                                    <p id="{{system.name}}_tr_count">{{system.tr}}</p>
+                                </td>
                                 <td><input class="form-control" id="{{system.name}}_tr" name="{{system.name}}_tr"
                                            placeholder="0" type="text"></td>
                                 <td>
                                     <select class="form-control" id="{{system.name}}_tr_arch"
                                             name="{{system.name}}_tr_arch" style="width: 90px">
-                                        <option name="choice1" value="x64">x64</option>
-                                        <option name="choice2" value="x86">x86</option>
-                                        <option name="choice2" value="arm32">arm32</option>
-                                        <option name="choice2" value="arm64">arm64</option>
+                                        {% if system.trarch == "x64" %}
+                                            <option value="x64" selected="selected">x64</option>
+                                        {% elif system.settingArch == "x64" %}
+                                            <option value="x64" selected="selected"></option>
+                                        {% else %}
+                                            <option value="x64">x64</option>
+                                        {% endif %}
+
+                                        {% if system.trarch == "x86" %}
+                                            <option value="x86" selected="selected">x86</option>
+                                        {% elif system.settingArch == "x86" %}
+                                            <option value="x86" selected="selected"></option>
+                                        {% else %}
+                                            <option value="x86">x86</option>
+                                        {% endif %}
+
+                                        {% if system.trarch == "arm32" %}
+                                            <option value="arm32" selected="selected">arm32</option>
+                                        {% elif system.settingArch == "arm32" %}
+                                            <option value="arm32" selected="selected"></option>
+                                        {% else %}
+                                            <option value="arm32">arm32</option>
+                                        {% endif %}
+
+                                        {% if system.trarch == "arm64" %}
+                                            <option value="arm64" selected="selected">arm64</option>
+                                        {% elif system.settingArch == "arm64" %}
+                                            <option value="arm64" selected="selected"></option>
+                                        {% else %}
+                                            <option value="arm64">arm64</option>
+                                        {% endif %}
                                     </select>
                                 </td>
                                 <td class="remove"><a class="btn btn-secondary"
@@ -112,17 +171,43 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
                             </tr>
                             <tr>
                                 <th scope="row">TestcaseEvaluator</th>
-                                <td><p id="{{system.name}}_te_count">{{system.te}}<font
-                                        size="1">&ensp;{{system.tearch}}</font></p></td>
+                                <td><p id="{{system.name}}_te_count">{{system.te}}</p></td>
                                 <td><input class="form-control" id="{{system.name}}_te" name="{{system.name}}_te"
                                            placeholder="0" type="text"></td>
                                 <td>
                                     <select class="form-control" id="{{system.name}}_te_arch"
                                             name="{{system.name}}_te_arch" style="width: 90px">
-                                        <option name="choice1" value="x64">x64</option>
-                                        <option name="choice2" value="x86">x86</option>
-                                        <option name="choice2" value="arm32">arm32</option>
-                                        <option name="choice2" value="arm64">arm64</option>
+                                        {% if system.tearch == "x64" %}
+                                            <option value="x64" selected="selected">x64</option>
+                                        {% elif system.settingArch == "x64" %}
+                                            <option value="x64" selected="selected"></option>
+                                        {% else %}
+                                            <option value="x64">x64</option>
+                                        {% endif %}
+
+                                        {% if system.tearch == "x86" %}
+                                            <option value="x86" selected="selected">x86</option>
+                                        {% elif system.settingArch == "x86" %}
+                                            <option value="x86" selected="selected"></option>
+                                        {% else %}
+                                            <option value="x86">x86</option>
+                                        {% endif %}
+
+                                        {% if system.tearch == "arm32" %}
+                                            <option value="arm32" selected="selected">arm32</option>
+                                        {% elif system.settingArch == "arm32" %}
+                                            <option value="arm32" selected="selected"></option>
+                                        {% else %}
+                                            <option value="arm32">arm32</option>
+                                        {% endif %}
+
+                                        {% if system.tearch == "arm64" %}
+                                            <option value="arm64" selected="selected">arm64</option>
+                                        {% elif system.settingArch == "arm64" %}
+                                            <option value="arm64" selected="selected"></option>
+                                        {% else %}
+                                            <option value="arm64">arm64</option>
+                                        {% endif %}
                                     </select>
                                 </td>
                                 <td class="remove"><a class="btn btn-secondary"
@@ -153,17 +238,43 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
                             <tbody>
                             <tr>
                                 <th scope="row">TestcaseGenerator</th>
-                                <td><p id="{{system.name}}_tg_count">{{system.tg}}<font
-                                        size="1">&ensp;{{system.tgarch}}</font></p></td>
+                                <td><p id="{{system.name}}_tg_count">{{system.tg}}</p></td>
                                 <td><input class="form-control" id="{{system.name}}_tg" name="{{system.name}}_tg"
                                            placeholder="0" type="text"></td>
                                 <td>
                                     <select class="form-control" id="{{system.name}}_tg_arch"
                                             name="{{system.name}}_tg_arch" style="width: 90px">
-                                        <option name="choice1" value="x64">x64</option>
-                                        <option name="choice2" value="x86">x86</option>
-                                        <option name="choice2" value="arm32">arm32</option>
-                                        <option name="choice2" value="arm64">arm64</option>
+                                        {% if system.tgarch == "x64" %}
+                                            <option value="x64" selected="selected">x64</option>
+                                        {% elif system.settingArch == "x64" %}
+                                            <option value="x64" selected="selected"></option>
+                                        {% else %}
+                                            <option value="x64">x64</option>
+                                        {% endif %}
+
+                                        {% if system.tgarch == "x86" %}
+                                            <option value="x86" selected="selected">x86</option>
+                                        {% elif system.settingArch == "x86" %}
+                                            <option value="x86" selected="selected"></option>
+                                        {% else %}
+                                            <option value="x86">x86</option>
+                                        {% endif %}
+
+                                        {% if system.tgarch == "arm32" %}
+                                            <option value="arm32" selected="selected">arm32</option>
+                                        {% elif system.settingArch == "arm32" %}
+                                            <option value="arm32" selected="selected"></option>
+                                        {% else %}
+                                            <option value="arm32">arm32</option>
+                                        {% endif %}
+
+                                        {% if system.tgarch == "arm64" %}
+                                            <option value="arm64" selected="selected">arm64</option>
+                                        {% elif system.settingArch == "arm64" %}
+                                            <option value="arm64" selected="selected"></option>
+                                        {% else %}
+                                            <option value="arm64">arm64</option>
+                                        {% endif %}
                                     </select>
                                 </td>
                                 <td class="remove"><a class="btn btn-secondary"
@@ -173,17 +284,43 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
                             </tr>
                             <tr>
                                 <th scope="row">TestcaseRunner</th>
-                                <td><p id="{{system.name}}_tr_count">{{system.tr}}<font
-                                        size="1">&ensp;{{system.trarch}}</font></p></td>
+                                <td><p id="{{system.name}}_tr_count">{{system.tr}}</p></td>
                                 <td><input class="form-control" id="{{system.name}}_tr" name="{{system.name}}_tr"
                                            placeholder="0" type="text"></td>
                                 <td>
                                     <select class="form-control" id="{{system.name}}_tr_arch"
                                             name="{{system.name}}_tr_arch" style="width: 90px">
-                                        <option name="choice1" value="x64">x64</option>
-                                        <option name="choice2" value="x86">x86</option>
-                                        <option name="choice2" value="arm32">arm32</option>
-                                        <option name="choice2" value="arm64">arm64</option>
+                                        {% if system.trarch == "x64" %}
+                                            <option value="x64" selected="selected">x64</option>
+                                        {% elif system.settingArch == "x64" %}
+                                            <option value="x64" selected="selected"></option>
+                                        {% else %}
+                                            <option value="x64">x64</option>
+                                        {% endif %}
+
+                                        {% if system.trarch == "x86" %}
+                                            <option value="x86" selected="selected">x86</option>
+                                        {% elif system.settingArch == "x86" %}
+                                            <option value="x86" selected="selected"></option>
+                                        {% else %}
+                                            <option value="x86">x86</option>
+                                        {% endif %}
+
+                                        {% if system.trarch == "arm32" %}
+                                            <option value="arm32" selected="selected">arm32</option>
+                                        {% elif system.settingArch == "arm32" %}
+                                            <option value="arm32" selected="selected"></option>
+                                        {% else %}
+                                            <option value="arm32">arm32</option>
+                                        {% endif %}
+
+                                        {% if system.trarch == "arm64" %}
+                                            <option value="arm64" selected="selected">arm64</option>
+                                        {% elif system.settingArch == "arm64" %}
+                                            <option value="arm64" selected="selected"></option>
+                                        {% else %}
+                                            <option value="arm64">arm64</option>
+                                        {% endif %}
                                     </select>
                                 </td>
                                 <td class="remove"><a class="btn btn-secondary"
@@ -193,17 +330,43 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
                             </tr>
                             <tr>
                                 <th scope="row">TestcaseEvaluator</th>
-                                <td><p id="{{system.name}}_te_count">{{system.te}}<font
-                                        size="1">&ensp;{{system.tearch}}</font></p></td>
+                                <td><p id="{{system.name}}_te_count">{{system.te}}</p></td>
                                 <td><input class="form-control" id="{{system.name}}_te" name="{{system.name}}_te"
                                            placeholder="0" type="text"></td>
                                 <td>
                                     <select class="form-control" id="{{system.name}}_te_arch"
                                             name="{{system.name}}_te_arch" style="width: 90px">
-                                        <option name="choice1" value="x64">x64</option>
-                                        <option name="choice2" value="x86">x86</option>
-                                        <option name="choice2" value="arm32">arm32</option>
-                                        <option name="choice2" value="arm64">arm64</option>
+                                        {% if system.tearch == "x64" %}
+                                            <option value="x64" selected="selected">x64</option>
+                                        {% elif system.settingArch == "x64" %}
+                                            <option value="x64" selected="selected"></option>
+                                        {% else %}
+                                            <option value="x64">x64</option>
+                                        {% endif %}
+
+                                        {% if system.tearch == "x86" %}
+                                            <option value="x86" selected="selected">x86</option>
+                                        {% elif system.settingArch == "x86" %}
+                                            <option value="x86" selected="selected"></option>
+                                        {% else %}
+                                            <option value="x86">x86</option>
+                                        {% endif %}
+
+                                        {% if system.tearch == "arm32" %}
+                                            <option value="arm32" selected="selected">arm32</option>
+                                        {% elif system.settingArch == "arm32" %}
+                                            <option value="arm32" selected="selected"></option>
+                                        {% else %}
+                                            <option value="arm32">arm32</option>
+                                        {% endif %}
+
+                                        {% if system.tearch == "arm64" %}
+                                            <option value="arm64" selected="selected">arm64</option>
+                                        {% elif system.settingArch == "arm64" %}
+                                            <option value="arm64" selected="selected"></option>
+                                        {% else %}
+                                            <option value="arm64">arm64</option>
+                                        {% endif %}
                                     </select>
                                 </td>
                                 <td class="remove"><a class="btn btn-secondary"
