@@ -29,12 +29,13 @@ from .queries import *
 from .helpers import *
 from .forms import *
 from .constants import *
+from .utils.sync import *
 
 import json
 import os
 import requests
 
-lock = LockFile()
+lock = DownloadArchiveLockFile()
 
 
 @app.before_first_request
@@ -42,10 +43,17 @@ def updateSystems():
     try:
         ANSIBLE_REST_CONNECTOR.execHostAlive()
     except Exception as e:
-        print("Polemarch ist Mist")
+        print(e)
 
 
-def checkDbConnection(f):
+@app.before_first_request
+@app.route("/syncSystems")
+def syncSystems():
+    loadSystems()
+    return redirect("/")
+
+
+def checkDBConnection(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
         try:
@@ -68,35 +76,31 @@ def checkSystemsLoaded(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
         locationsCount = len(models.Locations.query.all())
-        
-        if not app.SYSTEMS_LOADED and locationsCount == 0:
+
+        if getSyncStatus() and locationsCount == 0:
             newFlash = 0
             for messages in get_flashed_messages(with_categories=True):
                 if "addLocation" == messages[0]:
                     newFlash += 1
             if newFlash < 2:
                 flash("A location is necessary to add systems to the database.", "addLocation")
-        elif not app.SYSTEMS_LOADED and locationsCount > 0:
-            newFlash = 0
-            for messages in get_flashed_messages(with_categories=True):
-                if "syncSystems" == messages[0]:
-                    newFlash += 1
-            if newFlash < 2:
-                flash("Something went wrong at the inital synchronization between PoleMarch and the database. Please retry!", "syncSystems")        
+        elif getSyncStatus() and locationsCount > 0:
+            loadSystems()
+            if not checkSyncedFile():
+                newFlash = 0
+                for messages in get_flashed_messages(with_categories=True):
+                    if "syncSystems" == messages[0]:
+                        newFlash += 1
+                if newFlash < 2:
+                    flash("Something went wrong at the inital synchronization between PoleMarch and the database. Please retry!", "syncSystems")
             
         return f(*args, **kwargs)
     return wrapper
 
 
-@app.route("/syncSystems")
-def syncSystems():
-    loadSystems()
-    return redirect("/")
-
-
 @app.route("/")
 @app.route("/index")
-@checkDbConnection
+@checkDBConnection
 @checkSystemsLoaded
 def index():
     inactivefuzzjobs = []
@@ -125,7 +129,7 @@ def index():
 
 
 @app.route("/projects")
-@checkDbConnection
+@checkDBConnection
 @checkSystemsLoaded
 def projects():
     projects = getProjects()
@@ -192,7 +196,7 @@ def locationRemoveProject(locId, projId):
 
 
 @app.route("/projects/<int:projId>/setModuleBinaryAndPath/<int:moduleId>", methods=["GET", "POST"])
-@checkDbConnection
+@checkDBConnection
 @checkSystemsLoaded
 def setModuleBinaryAndPath(projId, moduleId):       
     if request.method == 'POST' and "moduleBinaryFile" in request.files:         
@@ -221,7 +225,7 @@ def setModuleBinaryAndPath(projId, moduleId):
 
 
 @app.route("/projects/<int:projId>/addSetting", methods=["GET", "POST"])
-@checkDbConnection
+@checkDBConnection
 @checkSystemsLoaded
 def createSetting(projId):
     settingForm = CreateProjectSettingForm()
@@ -290,7 +294,7 @@ def resetFuzzjob(projId):
 
 
 @app.route("/projects/<int:projId>/addModule", methods=["GET", "POST"])
-@checkDbConnection
+@checkDBConnection
 @checkSystemsLoaded
 def createProjectModule(projId):
     moduleForm = CreateProjectModuleForm()
@@ -313,7 +317,7 @@ def createProjectModule(projId):
 
 
 @app.route("/locations/<int:locId>/addProject", methods=["GET", "POST"])
-@checkDbConnection
+@checkDBConnection
 @checkSystemsLoaded
 def addLocationProject(locId):
     projects = []
@@ -339,7 +343,7 @@ def addLocationProject(locId):
 
 
 @app.route("/locations/createLocation", methods=["GET", "POST"])
-@checkDbConnection
+@checkDBConnection
 @checkSystemsLoaded
 def createLocation():
     form = CreateLocationForm()
@@ -479,7 +483,7 @@ def downloadArchive(archive):
 
 
 @app.route("/projects/<int:projId>/population/<int:page>")
-@checkDbConnection
+@checkDBConnection
 @checkSystemsLoaded
 def viewPopulation(projId, page):
     count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["population"]))
@@ -514,7 +518,7 @@ def downloadPopulation(projId):
 
 
 @app.route("/projects/<int:projId>/accessVioTotal/<int:page>")
-@checkDbConnection
+@checkDBConnection
 @checkSystemsLoaded
 def viewAccessVioTotal(projId, page):
     count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["accessViolations"]))
@@ -548,7 +552,7 @@ def downloadAccessVioTotal(projId):
 
 
 @app.route("/projects/<int:projId>/accessVioUnique")
-@checkDbConnection
+@checkDBConnection
 @checkSystemsLoaded
 def viewAccessVioUnique(projId):
     data = getGeneralInformationData(projId, UNIQUE_ACCESS_VIOLATION_NO_RAW)
@@ -574,7 +578,7 @@ def downloadAccessVioUnique(projId):
 
 
 @app.route("/projects/<int:projId>/totalCrashes/<int:page>")
-@checkDbConnection
+@checkDBConnection
 @checkSystemsLoaded
 def viewTotalCrashes(projId, page):
     count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["crashes"]))
@@ -608,7 +612,7 @@ def downloadTotalCrashes(projId):
 
 
 @app.route("/projects/<int:projId>/uniqueCrashes")
-@checkDbConnection
+@checkDBConnection
 @checkSystemsLoaded
 def viewUniqueCrashes(projId):
     data = getGeneralInformationData(projId, UNIQUE_CRASHES_NO_RAW)
@@ -634,7 +638,7 @@ def downloadUniqueCrashes(projId):
 
 
 @app.route("/projects/<int:projId>/hangs/<int:page>")
-@checkDbConnection
+@checkDBConnection
 @checkSystemsLoaded
 def viewHangs(projId, page):
     count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["hangs"]))
@@ -668,7 +672,7 @@ def downloadHangs(projId):
 
 
 @app.route("/projects/<int:projId>/noResponse/<int:page>")
-@checkDbConnection
+@checkDBConnection
 @checkSystemsLoaded
 def viewNoResponses(projId, page):
     count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["noResponses"]))
@@ -702,7 +706,7 @@ def downloadNoResponses(projId):
 
 
 @app.route("/projects/<int:projId>/violations")
-@checkDbConnection
+@checkDBConnection
 @checkSystemsLoaded
 def viewViolations(projId):
     violationsAndCrashes = getViolationsAndCrashes(projId)
@@ -767,7 +771,7 @@ def getSmallestVioOrCrashTestcase(projId):
 
 
 @app.route("/projects/<int:projId>/managedInstances")
-@checkDbConnection
+@checkDBConnection
 @checkSystemsLoaded
 def viewManagedInstances(projId):
     managedInstances, summarySection, localManagers = getManagedInstancesAndSummary(projId)
@@ -807,7 +811,7 @@ def getLogsOfManagedInstance(projId):
 
 
 @app.route("/projects/<int:projId>/configSystemInstances")
-@checkDbConnection
+@checkDBConnection
 @checkSystemsLoaded
 def viewConfigSystemInstances(projId):
     # initialize forms
@@ -883,7 +887,7 @@ def killInstanceType(projId, myType):
 
 
 @app.route("/projects/<int:projId>/addLocation", methods=["GET", "POST"])
-@checkDbConnection
+@checkDBConnection
 @checkSystemsLoaded
 def addProjectLocation(projId):
     locationForm = getLocationFormWithChoices(projId, AddProjectLocationForm())
@@ -999,7 +1003,7 @@ def removeProjectSetting(projId, settingId):
 
 
 @app.route("/projects/createProject", methods=["GET", "POST"])
-@checkDbConnection
+@checkDBConnection
 @checkSystemsLoaded
 def createProject():
     form = CreateProjectForm()
@@ -1031,7 +1035,7 @@ def createProject():
 
 
 @app.route("/projects/createCustomProject", methods=["GET", "POST"])
-@checkDbConnection
+@checkDBConnection
 @checkSystemsLoaded
 def createCustomProject():
     form = CreateCustomProjectForm()
@@ -1067,7 +1071,7 @@ def viewTestcaseGraph(projId):
 
 
 @app.route("/locations/view/<int:locId>")
-@checkDbConnection
+@checkDBConnection
 @checkSystemsLoaded
 def viewLocation(locId):
     location = getLocation(locId)
@@ -1079,7 +1083,7 @@ def viewLocation(locId):
 
 
 @app.route("/projects/view/<int:projId>")
-@checkDbConnection
+@checkDBConnection
 @checkSystemsLoaded
 def viewProject(projId):
     project = getProject(projId)
@@ -1097,7 +1101,7 @@ def viewProject(projId):
 
 
 @app.route("/locations")
-@checkDbConnection
+@checkDBConnection
 @checkSystemsLoaded
 def locations():
     locations = models.Locations.query.all()
@@ -1108,7 +1112,7 @@ def locations():
 
 
 @app.route("/commands")
-@checkDbConnection
+@checkDBConnection
 @checkSystemsLoaded
 def commands():
     commands = models.CommandQueue.query.all()
@@ -1119,7 +1123,7 @@ def commands():
 
 
 @app.route("/logs")
-@checkDbConnection
+@checkDBConnection
 @checkSystemsLoaded
 def logs():
     result = getResultOfStatementForGlobalManager(GET_LOCALMANAGER_LOGS)
@@ -1130,7 +1134,7 @@ def logs():
 
 
 @app.route("/systems")
-@checkDbConnection
+@checkDBConnection
 @checkSystemsLoaded
 def systems():
     ansibleConnectionWorks = True
@@ -1368,7 +1372,7 @@ def updateSystemLocation(hostName, locationId):
 
 
 @app.route("/systems/view/<string:hostname>/<string:group>", methods=["GET"])
-@checkDbConnection
+@checkDBConnection
 @checkSystemsLoaded
 def viewSystem(hostname, group):
     if group == "odroids":

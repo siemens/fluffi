@@ -23,6 +23,7 @@
 import datetime
 import json
 import config
+import os
 from app import app
 
 from app.utils.ansible import AnsibleRESTConnector
@@ -49,5 +50,9 @@ TESTCASE_TYPES = {
 
 FTP_CONNECTOR = FTPConnector(config.FTP_URL)
 ANSIBLE_REST_CONNECTOR = AnsibleRESTConnector(config.POLE_URL, "admin", "admin")
+
+SYNC = True
+SYNCING_FILEPATH = "/syncing.lock"
+SYNCED_FILEPATH = "/synced.lock"
 
 
