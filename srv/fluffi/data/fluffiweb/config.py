@@ -35,16 +35,20 @@ def getHostByNameHandler(name):
 
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
 
-LOCAL_DEV = False
-
+LOCAL_DEV = False                                                                                                                                                                      
+                                                                                    
 if LOCAL_DEV:
-    DBUSER = "root"
-    DBPASS = "toor"
+    # set to True if you want to run it on linux with database, ftp and polemarch container
+    WITH_CONTAINERS = False
+    DBUSER = "fluffi_gm" if WITH_CONTAINERS else "root"
+    DBPASS = "fluffi_gm" if WITH_CONTAINERS else "toor"
     DBHOST = "localhost"
+    POLE_URL = "http://localhost:8888/api/v2/"
 else:
     DBUSER = "fluffi_gm"
     DBPASS = "fluffi_gm"
-    DBHOST = getHostByNameHandler('db.fluffi') 
+    DBHOST = getHostByNameHandler('db.fluffi')
+    POLE_URL = "http://pole.fluffi:8888/api/v2/" 
     
 SQLALCHEMY_DATABASE_URI = "mysql://{}:{}@{}/fluffi_gm".format(DBUSER, DBPASS, DBHOST)
                                                                                                                                                                   

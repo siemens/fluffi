@@ -136,7 +136,7 @@ Before continuing, make sure you have run the necessary steps listed under [Comm
 Set up your master machine with two network interfaces, one as your method of internet access and one to connect to the separate FLUFFI network.
 In these exemplary instructions we use `ens33` for internet access and `ens38` for the FUN.
 
-![insert image here](virtualfluffi.png "virtual FLUFFI utility network")
+![virtual FLUFFI utility network](virtualfluffi.png)
 
 Then configure the interfaces on the master:
 ```bash
@@ -229,7 +229,7 @@ Now you can start the build of the containers and bring up the infrastructure se
 sudo docker-compose -f /srv/fluffi/docker-compose.yaml build --parallel --no-cache --pull
 sudo docker-compose -f /srv/fluffi/docker-compose.yaml up -d --force-recreate
 ```
-At this point you are ready to use FLUFFI, and can go to [the usage section](usage.md) for more information.
+At this point you are ready to use FLUFFI, and can go to [the usage section](./usage.md) for more information.
 You should be able to connect to the web interface at `web.fluffi:8880`.
 
 #### Reverse Proxy for comfortable service access

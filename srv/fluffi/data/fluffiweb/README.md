@@ -32,7 +32,7 @@ FLUFFI - A distributed evolutionary binary fuzzer for pentesters.
 
 - Install Python Version >= 3.5 
 
-If you also have a old python 2.7 version installed, use pip3 and python3 to start the app and on unix `sudo` before the pip command
+If you also have an old python 2 version installed, use pip3 and python3 to start the app and on unix `sudo` before the pip command.
 
 ```
 $ pip install -r requirements.txt
@@ -46,6 +46,8 @@ To run the app on localhost:5000:
 ```
 $ python main.py
 ```
+
+If you want to run the full environment in local development, set up the polemarch, ftp and database container and set the WITH_CONTAINERS flag to True in [config.py](config.py).
 
 ## Testing
 

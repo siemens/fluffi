@@ -24,17 +24,17 @@ Author(s): Thomas Riedmaier, Roman Bendt
 
 # FLUFFI
 
-![alt text](srv/fluffi/data/fluffiweb/app/static/images/friendly_fluffi_md.jpg "FLUFFI greets you")
+![FLUFFI greets you](srv/fluffi/data/fluffiweb/app/static/images/friendly_fluffi_md.jpg)
 
 FLUFFI - A distributed evolutionary binary fuzzer for pentesters.
 
-- [About the project](about.md)
-- [High level overview](overview.md)
-- [Getting started](getting_started.md)
-- [Usage](usage.md)
-- [Technical Details](technical_details.md)
-- [Contributing to FLUFFI](CONTRIBUTING.md)
-- [LICENSE](LICENSE.md)
+- [About the project](./docs/about.md)
+- [High level overview](./docs/overview.md)
+- [Getting started](./docs/getting_started.md)
+- [Usage](./docs/usage.md)
+- [Technical Details](./docs/technical_details.md)
+- [Contributing to FLUFFI](./CONTRIBUTING.md)
+- [LICENSE](./LICENSE.md)
 
 
 # Bugs found
