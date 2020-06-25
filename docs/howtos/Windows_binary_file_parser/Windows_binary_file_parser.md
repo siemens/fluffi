@@ -30,8 +30,8 @@ Prior to FLUFFI, there already were Windows binary fuzzers around, such as [WinA
 - Support for custom Feeders
 - Support for fuzzing of Windows services
 - Support for programs that don't have a `parse(input)` function (e.g. as the parse function itself calls `read` multiple times)
-- Scaling accross multiple machines
-- Blue-Screen data persistance
+- Scaling across multiple machines
+- Blue-Screen data persistence
 
 FLUFFI on the other hand is a mutational/evolutionary fuzzer, that was designed as some kind of swiss-army knife with respect to fuzz targets. With FLUFFI a tester can fuzz
 
@@ -86,7 +86,7 @@ Now let's walk through all the options:
     -   hangTimeout: 1000
     -   suppressChildOutput: true
     -   populationMinimization: true
--   Target Modules: We want to fuzz the  `dump-pe.exe`, and the `pe-parser-library.dll`. So select these file here.
+-   Target Modules: We want to fuzz the `dump-pe.exe`, and the `pe-parser-library.dll`. So select these file here.
 -   Target Upload: Select the `dump-pe.zip` you created earlier
 -   Population: Select a bunch of valid pe files. This will be the starting population that will be mutated until crashes are found
 
@@ -121,7 +121,7 @@ By clicking on `Population Graph`, you can see what the mutational / evolutionar
 ![The fuzzing process' population](PopulationGraph.png)
 
 
-If you are in the lucky position to have an IDA Pro license, you can even visualize which code blocks were already covered during your fuzzing run. To do so open a module for which coverage is being collected (e.g. the  `pe-parser-library.dll` in IDA Pro. Then go to `File` -> `Script File` and select the [cov2ida.py](../../../ida_scripts/cov2ida.py). Now you have to select the fuzz job you are working on and the correct module.
+If you are in the lucky position to have an IDA Pro license, you can even visualize which code blocks were already covered during your fuzzing run. To do so open a module for which coverage is being collected (e.g. the `pe-parser-library.dll` in IDA Pro. Then go to `File` -> `Script File` and select the [cov2ida.py](../../../ida_scripts/cov2ida.py). Now you have to select the fuzz job you are working on and the correct module.
 
 The result will look similar to this:
 
