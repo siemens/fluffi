@@ -32,6 +32,7 @@ FLUFFI - A distributed evolutionary binary fuzzer for pentesters.
 - [High level overview](./docs/overview.md)
 - [Getting started](./docs/getting_started.md)
 - [Usage](./docs/usage.md)
+- [HOWTOs](./docs/howtos/)
 - [Technical Details](./docs/technical_details.md)
 - [Contributing to FLUFFI](./CONTRIBUTING.md)
 - [LICENSE](./LICENSE.md)
