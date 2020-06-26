@@ -94,7 +94,7 @@ Now Press the green `FLUFFI FUZZ` button.
 
 FLUFFI will now create a fuzz job for you, and store all of the information you entered either in its database, or its ftp server (the deplyoment zip).
 
-### Starting the FLUFFI fuzz job
+### Deploying and starting the FLUFFI fuzz job
 Please keep in mind, that there is still no fuzzing going on, as FLUFFI does not know yet, on which runner machines you want to fuzz on. 
 
 Talking about runner machines: Your deployment package was not yet deployed to your runner machines. You should do this now by clicking on `Systems` in FLUFFI's web GUI, selecting your target machine (or its group), and then deploy your fuzz job's deployment package by selecting your fuzzjob in the `Deploy SUT/Dependency` tab.
