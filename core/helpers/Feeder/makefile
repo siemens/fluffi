@@ -50,7 +50,7 @@ sslwrap:
 
 tcpfeeder: sslwrap
 	@cp sslwrap/libsslwrap.so TCPFeeder
-	$(CC) $(AFLAGS) -o TCPFeeder/TCPFeeder -I ../../SharedMemIPC/  -DUSE_SSL TCPFeeder/stdafx.cpp TCPFeeder/http.cpp  TCPFeeder/TCPFeeder.cpp TCPFeeder/utils.cpp -L TCPFeeder -l:libsharedmemipc.so -l:libsslwrap.so -Wl,-rpath='$${ORIGIN}'
+	$(CC) $(AFLAGS) -o TCPFeeder/TCPFeeder -I ../../SharedMemIPC/  -DUSE_SSL TCPFeeder/stdafx.cpp TCPFeeder/http.cpp TCPFeeder/Packet.cpp TCPFeeder/TCPFeeder.cpp TCPFeeder/utils.cpp -L TCPFeeder -l:libsharedmemipc.so -l:libsslwrap.so -Wl,-rpath='$${ORIGIN}'
 
 tester:		
 	$(CC) $(AFLAGS) -o Tester/Tester  -I ../../SharedMemIPC -I ../../SharedCode -I ../../dependencies/libprotoc/include/siemens/cpp -I ../../dependencies/libprotoc/include   -I ../../dependencies/easylogging/include -I ../../dependencies/libuuid/include Tester/Tester.cpp ../../$(ARCH)/lib/sharedcode.a  ../../dependencies/libprotoc/lib/$(ARCH)/libprotobuf.a  ../../dependencies/easylogging/lib/x86-64/libeasyloggingpp.a -pthread -lstdc++fs -ldl -L Tester -l:libzmq.so.5 -lsharedmemipc  -Wl,-rpath='$${ORIGIN}'
