@@ -121,7 +121,7 @@ void TRMainWorker::workerMain() {
 		FLUFFIMessage respMessage;
 		bool success = getTestcaseFromGenerator(&respMessage, generatorHAP);
 		if (!success) {
-			LOG(ERROR) << "Receiving Testcase from " << generatorHAP << " failed!";
+			LOG(WARNING) << "Receiving Testcase from " << generatorHAP << " failed!";
 			continue;
 		}
 		const GetTestcaseResponse* receivedTestcase = &(respMessage.gettestcaseresponse());
@@ -196,7 +196,7 @@ bool TRMainWorker::getTestcaseFromGenerator(FLUFFIMessage* resp, std::string gen
 
 	const GetTestcaseResponse* receivedTestcase = &(resp->gettestcaseresponse());
 	if (!receivedTestcase->success()) {
-		LOG(ERROR) << "Testcase generator appears to be overloaded!";
+		LOG(WARNING) << "Testcase generator appears to be overloaded!";
 		return false;
 	}
 
