@@ -19,28 +19,15 @@ OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 
-Author(s): Thomas Riedmaier, Roman Bendt
+Author(s): Thomas Riedmaier
 -->
 
-# FLUFFI
+# HOWTOs
 
-![FLUFFI greets you](srv/fluffi/data/fluffiweb/app/static/images/friendly_fluffi_md.jpg)
+Currently, there are the following HOWTOs, that show how FLUFFI can be used:
 
-FLUFFI - A distributed evolutionary binary fuzzer for pentesters.
-
-- [About the project](./docs/about.md)
-- [High level overview](./docs/overview.md)
-- [Getting started](./docs/getting_started.md)
-- [Usage](./docs/usage.md)
-- [HOWTOs](./docs/howtos/)
-- [Technical Details](./docs/technical_details.md)
-- [Contributing to FLUFFI](./CONTRIBUTING.md)
-- [LICENSE](./LICENSE.md)
+-  [Windows binary file parser](./Windows_binary_file_parser/Windows_binary_file_parser.md)
+-  [Windows binary server](./Windows_binary_server/Windows_binary_server.md)
+-  [Windows binary driver](./Windows_binary_driver/Windows_binary_driver.md)
 
 
-# Bugs found
-
-So far, FLUFFI was almost exclusively used on SIEMENS products and solutions. Bugs found therein will not be published.
-
-However, FLUFFI found the following published bugs (please help us keep this list up to date):
-- [Buffer underflow in bc_shift_addsub](https://bugs.php.net/bug.php?id=78878)(CVE-2019-11046)
