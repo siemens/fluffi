@@ -28,6 +28,6 @@ Currently, there are the following HOWTOs, that show how FLUFFI can be used:
 
 -  [Windows binary file parser](./Windows_binary_file_parser/Windows_binary_file_parser.md)
 -  [Windows binary server](./Windows_binary_server/Windows_binary_server.md)
--  [Windows binary driver](./lancrypt_windows_driver/lancrypt_windows_driver.md)
+-  [Windows binary driver](./Windows_binary_driver/Windows_binary_driver.md)
 
 

@@ -54,13 +54,4 @@ FLUFFI comes with a set of mechanisms that allow automated setup of those runner
 
 
 
-# Fuzzing the LanCrypt Windows driver
-So, what's a good target to start fuzzing with? During my work as a professional penetration tester / red teamer, I quite frequently stumble upon machines running Sophos SafeGuard LANCrypt.
-
-LANCrypt is a piece of software that lets you encrypt files and folders in arbitrary locations, including network shares. As the encryption/decryption code is implemented as a Windows driver, LANCrypt is a prime target for red teamers: Assuming that a memory corruption vulnerability was found in the driver, attackers could get code execution with maximum privileges on any machine that accesses a compromised network share.
-
-So, let's start fuzzing it!
-
-
-
-# !!!!!!!!!!! The rest of this article waits for a GO from the LANCrypt dev team. It won't be published before !!!!!!!!!!!!!!!
+# !!!!!!!!!!! The rest of this article waits for a GO from the dev team of the driver we fuzzed. It won't be published before !!!!!!!!!!!!!!!
