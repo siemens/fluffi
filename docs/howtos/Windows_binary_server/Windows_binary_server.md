@@ -61,9 +61,9 @@ First, we need to tell FLUFFI how to hand testcases to the target. To hand testc
 
 Network protocols are usually a state machine: The initial state is reached after the connection is established. The next state might subsequently be reached after encryption is set up. A further step might then be reached after the client authenticated to the server. Each state accepts different input messages.
 
-In theory, one could now write a Feeder for each state and start seperate fuzz jobs, one for each state. This, however, would be rather inefficient. What we will do instead, is implementing the code to fuzz multiple states in a single Feeder.
+In theory, one could now write a Feeder for each state and start separate fuzz jobs, one for each state. This, however, would be rather inefficient. What we will do instead, is implementing the code to fuzz multiple states in a single Feeder.
 
-This can be done by prepending each testcase with one byte that is used as a testcase type identifier. The Feeder will strip this testcase type identifier from each input, connect to the target server, send all necessary messages to enter the state specified by the testcase type identifier, and finaly send the Feeder's input minus the testcase type identifier.
+This can be done by prepending each testcase with one byte that is used as a testcase type identifier. The Feeder will strip this testcase type identifier from each input, connect to the target server, send all necessary messages to enter the state specified by the testcase type identifier, and finally send the Feeder's input minus the testcase type identifier.
 
 The code for all of this is already implemented in the TCPFeeder. All that we need to do is define the testcase type identifier we want to use and implement the code to reach the states.
 
@@ -112,7 +112,7 @@ bool sendTestcaseToHostAndPort(std::vector<char> fuzzBytes, std::string targetho
 
 ```
 
-Now let's test our Feeder. Testing a FLUFFI feeder can be done best with the [Feeder Tester](../../../core/helpers/Feeder/Tester). It simulates the way FLUFFI calls a Feeder but is a light weight stand-alone console application.
+Now let's test our Feeder. Testing a FLUFFI feeder can be done best with the [Feeder Tester](../../../core/helpers/Feeder/Tester). It simulates the way FLUFFI calls a Feeder but is a lightweight stand-alone console application.
 
 To test if test case type `0` is working properly, we create the following initial population element:
 
@@ -148,7 +148,7 @@ As you can see, the intended packet is sent by the client, and the server proces
 
 
 ### Creating the fuzz setup deployment package
-Now that we have all puzzle pieces at hand, let's build the deployment package for our fuzzjob. To do so, we need to create a folder with the following content:
+Now that we have all puzzle pieces at hand, let's build the deployment package for our fuzz job. To do so, we need to create a folder with the following content:
 
 ![The file structure of our deployment package](deploymentPackage.png)
 
@@ -163,11 +163,11 @@ The `install.bat` should enable page heap on the target binary. To do so create 
 C:\utils\GFlags\x86\gflags.exe /p /enable ftpdmin.exe
 ```
 
-All that is left to do now is zip all files and folders (not the folder containing them) into a `ftpdmin.zip` 
+All that is left to do now is zip all files (not the folder containing them) into a `ftpdmin.zip` 
 
 
 ### Creating the FLUFFI fuzz job
-What is left to do now is creating the actual FLUFFI fuzzjob and starting it. The process of creating such a fuzz job is documented [here](../../../docs/usage.md). Let's just walk through this, shall we?
+What is left to do now is creating the actual FLUFFI fuzz job and starting it. The process of creating such a fuzz job is documented [here](../../../docs/usage.md). Let's just walk through this, shall we?
 
 Firstly, we point our browser to [web.fluffi](http://web.fluffi) and click on `Fuzzjobs` -> `Create Fuzzjob`:
 
@@ -185,11 +185,11 @@ Now let's walk through all the options:
     -   hangTimeout: 1000
     -   suppressChildOutput: true
     -   populationMinimization: true
-    -   feederCMDLine: The location of our feeder. Should be `C:\FLUFFI\SUT\ftpdmin\TCPFeeder.exe` (note: no port parameter required. The Feeder will determine the port automaticly.)
+    -   feederCMDLine: The location of our feeder. Should be `C:\FLUFFI\SUT\ftpdmin\TCPFeeder.exe` (note: no port parameter required. The Feeder will determine the port automatically.)
     -   initializationTimeout: 3000
 -   Target Modules: We want to fuzz the `ftpdmin.exe`. So select this file here.
 -   Target Upload: Select the `ftpdmin.zip` you created earlier
--   Population: Select the initial testcases we created above. This will be the starting population that will be mutated until crashes are found. The results will be even better if you give FLUFI more starting points to start mutating from (e.g. more testcases of type 1 with different FTP commands).
+-   Population: Select the initial testcases we created above. These will be the starting population that will be mutated until crashes are found. The results will be even better if you give FLUFI more starting points to start mutating from (e.g. more testcases of type `1` with different FTP commands).
 
 
 Now Press the green `FLUFFI FUZZ` button.
@@ -201,7 +201,7 @@ Please keep in mind that you can always update the deployment zip and redeploy i
 ### Deploying and starting the FLUFFI fuzz job
 Please keep in mind, that there is still no fuzzing going on, as FLUFFI does not know yet, on which runner machines you want to fuzz on. 
 
-Talking about runner machines: Your deployment package was not yet deployed to your runner machines. You should do this now by clicking on `Systems` in FLUFFI's web GUI, selecting your target machine (or its group), and then deploy your fuzz job's deployment package by selecting your fuzzjob in the `Deploy SUT/Dependency` tab.
+Talking about runner machines: Your deployment package was not yet deployed to your runner machines. You should do this now by clicking on `Systems` in FLUFFI's web GUI, selecting your target machine (or its group), and then deploy your fuzz job's deployment package by selecting your fuzz job in the `Deploy SUT/Dependency` tab.
 
 ![Deploying the deployment package from the web page](deployPackageToSystem.png)
 

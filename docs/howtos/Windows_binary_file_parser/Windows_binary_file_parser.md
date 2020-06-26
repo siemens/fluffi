@@ -57,7 +57,7 @@ So, what's a good binary file parser to start with? While searching for a good e
 I hear you crying: "But this is not a binary! You've got sources for that!". Yes, I know, I know. But for the sake of this tutorial let's assume we only got the compiled version of dump-pe: `dump-pe.exe`, and `pe-parser-library.dll`.
 
 ### Creating the fuzz setup deployment package
-Building the deployment package for our fuzzjob is quite simple. First you need to create a `install.bat` that enables page heap for `dump-pe.exe`. To do so create a new file, name it `install.bat`, and put the following line in it:
+Building the deployment package for our fuzz job is quite simple. First you need to create a `install.bat` that enables page heap for `dump-pe.exe`. To do so create a new file, name it `install.bat`, and put the following line in it:
 
 ```
 C:\utils\GFlags\x64\gflags.exe /p /enable dump-pe.exe
@@ -68,7 +68,7 @@ Now, just put the `install.bat`, the `dump-pe.exe`, and the `pe-parser-library.d
 ![The file structure of our deployment package](deployment-package.png )
 
 ### Creating the FLUFFI fuzz job
-What is left to do now is creating the actual FLUFFI fuzzjob and starting it. The process of creating such a fuzz job is documented [here](../../../docs/usage.md). Let's just walk through this, shall we?
+What is left to do now is creating the actual FLUFFI fuzz job and starting it. The process of creating such a fuzz job is documented [here](../../../docs/usage.md). Let's just walk through this, shall we?
 
 Firstly, we point our browser to [web.fluffi](http://web.fluffi) and click on `Fuzzjobs` -> `Create Fuzzjob`:
 
@@ -97,7 +97,7 @@ FLUFFI will now create a fuzz job for you, and store all of the information you 
 ### Deploying and starting the FLUFFI fuzz job
 Please keep in mind, that there is still no fuzzing going on, as FLUFFI does not know yet, on which runner machines you want to fuzz on. 
 
-Talking about runner machines: Your deployment package was not yet deployed to your runner machines. You should do this now by clicking on `Systems` in FLUFFI's web GUI, selecting your target machine (or its group), and then deploy your fuzz job's deployment package by selecting your fuzzjob in the `Deploy SUT/Dependency` tab.
+Talking about runner machines: Your deployment package was not yet deployed to your runner machines. You should do this now by clicking on `Systems` in FLUFFI's web GUI, selecting your target machine (or its group), and then deploy your fuzz job's deployment package by selecting your fuzz job in the `Deploy SUT/Dependency` tab.
 
 ![Deploying the deployment package from the web page](deployPackageToSystem.png)
 
