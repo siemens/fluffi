@@ -22,8 +22,14 @@
 
 .global mystrcmp
 .global mymemcmp
+.global my_stricmp
+.global mystrcmpi
+.global mystricmp
 .global memcmp
 .global strcmp
+.global _stricmp
+.global strcmpi
+.global stricmp
 
 .text
 
@@ -32,6 +38,15 @@ strcmp:
 
 memcmp:
 	jmp mymemcmp
+
+_stricmp:
+	jmp my_stricmp
+
+strcmpi:
+	jmp mystrcmpi
+
+stricmp:
+	jmp mystricmp
 
 .if ARCH == 64
 
@@ -57,6 +72,35 @@ mymemcmp:
 	leave # restore stack
 	ret
 
+my_stricmp:
+	push %rbp
+	mov %rsp,%rbp
+	mov %rsi, %rdx # parameter3 of my_stricmp_ 
+	mov %rdi, %rsi  # parameter2 of my_stricmp_
+	mov 8(%rbp), %rdi # parameter1 of my_stricmp_
+	call _Z9my_stricmp_mPKcS0_@plt 
+	leave # restore stack
+	ret
+
+mystrcmpi:
+	push %rbp
+	mov %rsp,%rbp
+	mov %rsi, %rdx # parameter3 of mystrcmpi_ 
+	mov %rdi, %rsi  # parameter2 of mystrcmpi_
+	mov 8(%rbp), %rdi # parameter1 of mystrcmpi_
+	call _Z9mystrcmpi_mPKcS0_@plt 
+	leave # restore stack
+	ret
+
+mystricmp:
+	push %rbp
+	mov %rsp,%rbp
+	mov %rsi, %rdx # parameter3 of mystricmp_ 
+	mov %rdi, %rsi  # parameter2 of mystricmp_
+	mov 8(%rbp), %rdi # parameter1 of mystricmp_
+	call _Z9mystricmp_mPKcS0_@plt 
+	leave # restore stack
+	ret
 
 
 .else
@@ -91,6 +135,47 @@ mymemcmp:
 	add $16, %esp
 	ret
 
+my_stricmp:
+	pop %eax # caller address
+	pop %edx # str1
+	pop %ecx # str2
+	push %ecx # restore stack 1/3
+	push %edx # restore stack 2/3
+	push %eax # restore stack 3/3
+	push %ecx # parameter3 of my_stricmp_ 
+	push %edx # parameter2 of my_stricmp_
+	push %eax # parameter1 of my_stricmp_
+	call _Z9my_stricmp_jPKcS0_@plt 
+	add $12, %esp 
+	ret
+
+mystrcmpi:
+	pop %eax # caller address
+	pop %edx # str1
+	pop %ecx # str2
+	push %ecx # restore stack 1/3
+	push %edx # restore stack 2/3
+	push %eax # restore stack 3/3
+	push %ecx # parameter3 of mystrcmpi_ 
+	push %edx # parameter2 of mystrcmpi_
+	push %eax # parameter1 of mystrcmpi_
+	call _Z9mystrcmpi_jPKcS0_@plt 
+	add $12, %esp 
+	ret
+
+mystricmp:
+	pop %eax # caller address
+	pop %edx # str1
+	pop %ecx # str2
+	push %ecx # restore stack 1/3
+	push %edx # restore stack 2/3
+	push %eax # restore stack 3/3
+	push %ecx # parameter3 of mystricmp_ 
+	push %edx # parameter2 of mystricmp_
+	push %eax # parameter1 of mystricmp_
+	call _Z9mystricmp_jPKcS0_@plt 
+	add $12, %esp 
+	ret
 
 .endif
 

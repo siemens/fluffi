@@ -151,3 +151,6 @@ core/helpers/kfuzz/x64/
 core/helpers/kfuzz/Win32/
 core/dependencies/WinDbgModel/include/
 core/dependencies/big-list-of-naughty-strings/lib/
+core/helpers/fuzzcmp/_stricmp.cpp
+core/helpers/fuzzcmp/strcmpi.cpp
+core/helpers/fuzzcmp/stricmp.cpp

@@ -44,9 +44,6 @@ Author(s): Thomas Riedmaier
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="strcmp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="fuzzcmp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -54,6 +51,18 @@ Author(s): Thomas Riedmaier
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="memcmp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="strcmp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="_stricmp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="strcmpi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stricmp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -67,10 +76,19 @@ Author(s): Thomas Riedmaier
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="memcmp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="strcmp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="memcmp.cpp">
+    <ClCompile Include="_stricmp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="strcmpi.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stricmp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

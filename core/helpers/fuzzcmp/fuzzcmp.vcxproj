@@ -124,7 +124,7 @@ Author(s): Thomas Riedmaier
       <ModuleDefinitionFile>fuzzcmp.def</ModuleDefinitionFile>
     </Link>
     <PreBuildEvent>
-      <Command>perl generate_memcmp.pl  &amp; perl generate_strcmp.pl</Command>
+      <Command>perl generate_memcmp.pl &amp; perl generate_strcmp.pl &amp; perl generate__stricmp.pl &amp; perl generate_strcmpi.pl &amp; generate_stricmp.pl</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -142,7 +142,7 @@ Author(s): Thomas Riedmaier
       <ModuleDefinitionFile>fuzzcmp.def</ModuleDefinitionFile>
     </Link>
     <PreBuildEvent>
-      <Command>perl generate_memcmp.pl  &amp; perl generate_strcmp.pl</Command>
+      <Command>perl generate_memcmp.pl &amp; perl generate_strcmp.pl &amp; perl generate__stricmp.pl &amp; perl generate_strcmpi.pl &amp; generate_stricmp.pl</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -166,7 +166,7 @@ Author(s): Thomas Riedmaier
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PreBuildEvent>
-      <Command>perl generate_memcmp.pl  &amp; perl generate_strcmp.pl</Command>
+      <Command>perl generate_memcmp.pl &amp; perl generate_strcmp.pl &amp; perl generate__stricmp.pl &amp; perl generate_strcmpi.pl &amp; generate_stricmp.pl</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -188,16 +188,19 @@ Author(s): Thomas Riedmaier
       <ModuleDefinitionFile>fuzzcmp.def</ModuleDefinitionFile>
     </Link>
     <PreBuildEvent>
-      <Command>perl generate_memcmp.pl  &amp; perl generate_strcmp.pl</Command>
+      <Command>perl generate_memcmp.pl &amp; perl generate_strcmp.pl &amp; perl generate__stricmp.pl &amp; perl generate_strcmpi.pl &amp; generate_stricmp.pl</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="fuzzcmp.h" />
-    <ClInclude Include="memcmp.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="strcmp.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="trampoline.h" />
+    <ClInclude Include="memcmp.h" />
+    <ClInclude Include="strcmp.h" />
+    <ClInclude Include="_stricmp.h" />
+    <ClInclude Include="strcmpi.h" />
+    <ClInclude Include="stricmp.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -215,14 +218,17 @@ Author(s): Thomas Riedmaier
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="fuzzcmp.cpp" />
-    <ClCompile Include="memcmp.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="memcmp.cpp" />
     <ClCompile Include="strcmp.cpp" />
+    <ClCompile Include="_stricmp.cpp" />
+    <ClCompile Include="strcmpi.cpp" />
+    <ClCompile Include="stricmp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="fuzzcmp.def" />

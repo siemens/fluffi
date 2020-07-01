@@ -25,6 +25,9 @@ IFDEF RAX
 
 ?mystrcmp_@@YAH_KPEBD1@Z PROTO C
 ?mymemcmp_@@YAH_KPEBX10@Z PROTO C
+?my_stricmp_@@YAH_KPEBD1@Z PROTO C
+?mystrcmpi_@@YAH_KPEBD1@Z PROTO C
+?mystricmp_@@YAH_KPEBD1@Z PROTO C
 
 .CODE
 
@@ -51,13 +54,48 @@ mymemcmp PROC
 	ret
 mymemcmp ENDP
 
+my_stricmp PROC
+	sub rsp, 32 ; create shadow space
+	mov r8, rdx ; parameter3 of my_stricmp_ 
+	mov rdx, rcx ; parameter2 of my_stricmp_
+	pop rcx ; parameter1 of my_stricmp_
+	push rcx ; restore stack
+	call ?my_stricmp_@@YAH_KPEBD1@Z
+	add rsp, 32; cleanup shadow space
+	ret
+my_stricmp ENDP
+
+mystrcmpi PROC
+	sub rsp, 32 ; create shadow space
+	mov r8, rdx ; parameter3 of mystrcmpi_ 
+	mov rdx, rcx ; parameter2 of mystrcmpi_
+	pop rcx ; parameter1 of mystrcmpi_
+	push rcx ; restore stack
+	call ?mystrcmpi_@@YAH_KPEBD1@Z
+	add rsp, 32; cleanup shadow space
+	ret
+mystrcmpi ENDP
+
+mystricmp PROC
+	sub rsp, 32 ; create shadow space
+	mov r8, rdx ; parameter3 of mystricmp_ 
+	mov rdx, rcx ; parameter2 of mystricmp_
+	pop rcx ; parameter1 of mystricmp_
+	push rcx ; restore stack
+	call ?mystricmp_@@YAH_KPEBD1@Z
+	add rsp, 32; cleanup shadow space
+	ret
+mystricmp ENDP
 
 ELSE
 
 .MODEL FLAT, C
 
- ?mystrcmp_@@YAHIPBD0@Z PROTO SYSCALL
- ?mymemcmp_@@YAHIPBX0I@Z PROTO SYSCALL
+?mystrcmp_@@YAHIPBD0@Z PROTO SYSCALL
+?mymemcmp_@@YAHIPBX0I@Z PROTO SYSCALL
+?my_stricmp_@@YAHIPBD0@Z PROTO SYSCALL
+?mystrcmpi_@@YAHIPBD0@Z PROTO SYSCALL
+?mystricmp_@@YAHIPBD0@Z PROTO SYSCALL
 
 .CODE
 
@@ -92,6 +130,50 @@ mymemcmp PROC
 	ret
 mymemcmp ENDP
 
+my_stricmp PROC
+	pop eax ; caller address
+	pop edx ; str1
+	pop ecx ; str2
+	push ecx ; restore stack 1/3
+	push edx ; restore stack 2/3
+	push eax ; restore stack 3/3
+	push ecx ; parameter3 of my_stricmp_ 
+	push edx ; parameter2 of my_stricmp_
+	push eax ; parameter1 of my_stricmp_
+	call ?my_stricmp_@@YAHIPBD0@Z
+	add esp, 12
+	ret
+my_stricmp ENDP
+
+mystrcmpi PROC
+	pop eax ; caller address
+	pop edx ; str1
+	pop ecx ; str2
+	push ecx ; restore stack 1/3
+	push edx ; restore stack 2/3
+	push eax ; restore stack 3/3
+	push ecx ; parameter3 of mystrcmpi_ 
+	push edx ; parameter2 of mystrcmpi_
+	push eax ; parameter1 of mystrcmpi_
+	call ?mystrcmpi_@@YAHIPBD0@Z
+	add esp, 12
+	ret
+mystrcmpi ENDP
+
+mystricmp PROC
+	pop eax ; caller address
+	pop edx ; str1
+	pop ecx ; str2
+	push ecx ; restore stack 1/3
+	push edx ; restore stack 2/3
+	push eax ; restore stack 3/3
+	push ecx ; parameter3 of mystricmp_ 
+	push edx ; parameter2 of mystricmp_
+	push eax ; parameter1 of mystricmp_
+	call ?mystricmp_@@YAHIPBD0@Z
+	add esp, 12
+	ret
+mystricmp ENDP
 
 ENDIF
 

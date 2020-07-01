@@ -22,8 +22,6 @@ DEALINGS IN THE SOFTWARE.
 Author(s): Thomas Riedmaier
 */
 
-//perl generate_memcmp.pl && perl generate_strcmp.pl
-//g++ --std=c++11 -fPIC -shared trampoline.s fuzzcmp.cpp strcmp.cpp memcmp.cpp -o libfuzzcmp.so -Wl,--version-script=libfuzzcmp.version -Wa,--defsym,ARCH=$(file /bin/bash | awk -F',' '{print $2}' | tr -d ' ' | grep 64 > /dev/null && echo 64 || echo 32) -Wl,-z,defs
 
 #include "stdafx.h"
 #include "fuzzcmp.h"
@@ -100,6 +98,9 @@ void installIATHooks() {
 	std::vector<std::tuple<std::string, size_t>> replacements;
 	replacements.push_back(std::make_tuple("strcmp", (size_t)&mystrcmp));
 	replacements.push_back(std::make_tuple("memcmp", (size_t)&mymemcmp));
+	replacements.push_back(std::make_tuple("_stricmp", (size_t)&my_stricmp));
+	replacements.push_back(std::make_tuple("strcmpi", (size_t)&mystrcmpi));
+	replacements.push_back(std::make_tuple("stricmp", (size_t)&mystricmp));
 	installIATHook(replacements);
 	printf("Done installing API Hooks\n");
 }

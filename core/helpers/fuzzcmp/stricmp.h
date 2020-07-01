@@ -21,7 +21,7 @@ DEALINGS IN THE SOFTWARE.
 
 Author(s): Thomas Riedmaier
 */
-GLIBC_2.2.5 {
-  global: mystrcmp; mymemcmp; my_stricmp; mystrcmpi; mystricmp; strcmp; memcmp; _stricmp; strcmpi; stricmp; _Z9mymemcmp_mPKvS0_m; _Z9my_stricmp_mPKcS0_; _Z9mystrcmpi_mPKcS0_; _Z9mystricmp_mPKcS0_; _Z9mystrcmp_mPKcS0_; _Z9mymemcmp_jPKvS0_j; _Z9mystrcmp_jPKcS0_; _Z9my_stricmp_jPKcS0_; _Z9mystrcmpi_jPKcS0_; _Z9mystricmp_jPKcS0_; # explicitly list symbols to be exported
-  local: *;         # hide everything else
-};
+
+#pragma once
+
+int __cdecl  mystricmp_(size_t caller, const char * str1, const char * str2);
