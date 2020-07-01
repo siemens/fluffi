@@ -28,3 +28,4 @@ EXPORTS
    my_stricmp @3
    mystrcmpi  @4
    mystricmp  @5
+   mystrncmp  @6

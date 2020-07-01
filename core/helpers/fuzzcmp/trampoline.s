@@ -25,11 +25,13 @@
 .global my_stricmp
 .global mystrcmpi
 .global mystricmp
+.global mystrncmp
 .global memcmp
 .global strcmp
 .global _stricmp
 .global strcmpi
 .global stricmp
+.global strncmp
 
 .text
 
@@ -47,6 +49,9 @@ strcmpi:
 
 stricmp:
 	jmp mystricmp
+
+strncmp:
+	jmp mystrncmp
 
 .if ARCH == 64
 
@@ -102,6 +107,16 @@ mystricmp:
 	leave # restore stack
 	ret
 
+mystrncmp:
+	push %rbp
+	mov %rsp,%rbp
+	mov %rdx, %rcx  # parameter4 of mystrncmp_ 
+	mov %rsi, %rdx  # parameter3 of mystrncmp_ 
+	mov %rdi, %rsi # parameter2 of mystrncmp_
+	mov 8(%rbp), %rdi # parameter1 of mystrncmp_
+	call _mystrncmp_mPKcS0_@plt 
+	leave # restore stack
+	ret
 
 .else
 
@@ -175,6 +190,20 @@ mystricmp:
 	push %eax # parameter1 of mystricmp_
 	call _Z9mystricmp_jPKcS0_@plt 
 	add $12, %esp 
+	ret
+
+mystrncmp:
+	sub $16, %esp 
+	mov 16(%esp), %eax
+	mov %eax, (%esp) # parameter1 of mystrncmp_
+	mov 20(%esp), %eax
+	mov %eax, 4(%esp) # parameter2 of mystrncmp_
+	mov 24(%esp), %eax 
+	mov %eax, 8(%esp) # parameter3 of mystrncmp_
+	mov 28(%esp), %eax
+	mov %eax, 12(%esp) # parameter4 of mystrncmp_
+	call _Z9mymemcmp_jPKvS0_j@plt 
+	add $16, %esp
 	ret
 
 .endif

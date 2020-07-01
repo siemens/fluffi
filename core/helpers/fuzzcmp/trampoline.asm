@@ -28,6 +28,7 @@ IFDEF RAX
 ?my_stricmp_@@YAH_KPEBD1@Z PROTO C
 ?mystrcmpi_@@YAH_KPEBD1@Z PROTO C
 ?mystricmp_@@YAH_KPEBD1@Z PROTO C
+?mystrncmp_@@YAH_KPEBD10@Z PROTO C
 
 .CODE
 
@@ -87,6 +88,18 @@ mystricmp PROC
 	ret
 mystricmp ENDP
 
+mystrncmp PROC
+	sub rsp, 32 ; create shadow space
+	mov r9, r8 ; parameter4 of mystrncmp_ 
+	mov r8, rdx ; parameter3 of mystrncmp_ 
+	mov rdx, rcx ; parameter2 of mystrncmp_
+	pop rcx ; parameter1 of mystrncmp_
+	push rcx ; restore stack
+	call ?mystrncmp_@@YAH_KPEBD10@Z
+	add rsp, 32; cleanup shadow space
+	ret
+mystrncmp ENDP
+
 ELSE
 
 .MODEL FLAT, C
@@ -96,6 +109,7 @@ ELSE
 ?my_stricmp_@@YAHIPBD0@Z PROTO SYSCALL
 ?mystrcmpi_@@YAHIPBD0@Z PROTO SYSCALL
 ?mystricmp_@@YAHIPBD0@Z PROTO SYSCALL
+?mystrncmp_@@YAHIPBD0I@Z PROTO SYSCALL
 
 .CODE
 
@@ -174,6 +188,21 @@ mystricmp PROC
 	add esp, 12
 	ret
 mystricmp ENDP
+
+mystrncmp PROC
+	sub esp, 16
+	mov eax, [esp+16]
+	mov [esp], eax ; parameter1 of mystrncmp_
+	mov eax, [esp+20]
+	mov [esp+4], eax ; parameter2 of mystrncmp_
+	mov eax, [esp+24]
+	mov [esp+8], eax ; parameter3 of mystrncmp_
+	mov eax, [esp+28]
+	mov [esp+12], eax ; parameter4 of mystrncmp_
+	call ?mystrncmp_@@YAHIPBD0I@Z
+	add esp, 16
+	ret
+mystrncmp ENDP
 
 ENDIF
 

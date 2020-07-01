@@ -37,7 +37,8 @@ all:
 	perl generate__stricmp.pl
 	perl generate_strcmpi.pl
 	perl generate_stricmp.pl
+	perl generate_strncmp.pl
 	$(CC) $(AFLAGS) -fPIC -shared trampoline.s *.cpp -o libfuzzcmp.so -Wl,--version-script=libfuzzcmp.version -Wa,--defsym,ARCH=$(ARCH) -Wl,-z,defs
 
 clean:
-	rm -f memcmp.cpp strcmp.cpp _stricmp.cpp strcmpi.cpp stricmp.cpp libfuzzcmp.so
+	rm -f memcmp.cpp strcmp.cpp _stricmp.cpp strcmpi.cpp stricmp.cpp strncmp.cpp libfuzzcmp.so

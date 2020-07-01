@@ -22,7 +22,6 @@ DEALINGS IN THE SOFTWARE.
 Author(s): Thomas Riedmaier
 */
 
-
 #include "stdafx.h"
 #include "fuzzcmp.h"
 #include "trampoline.h"
@@ -101,6 +100,7 @@ void installIATHooks() {
 	replacements.push_back(std::make_tuple("_stricmp", (size_t)&my_stricmp));
 	replacements.push_back(std::make_tuple("strcmpi", (size_t)&mystrcmpi));
 	replacements.push_back(std::make_tuple("stricmp", (size_t)&mystricmp));
+	replacements.push_back(std::make_tuple("strncmp", (size_t)&mystrncmp));
 	installIATHook(replacements);
 	printf("Done installing API Hooks\n");
 }

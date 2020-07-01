@@ -32,6 +32,7 @@ extern "C" {
 	int __cdecl my_stricmp(const char * str1, const char * str2);
 	int __cdecl mystrcmpi(const char * str1, const char * str2);
 	int __cdecl mystricmp(const char * str1, const char * str2);
+	int __cdecl mystrncmp(const char * str1, const char * str2, size_t n);
 
 #ifdef __cplusplus
 }

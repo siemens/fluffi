@@ -64,8 +64,10 @@ Author(s): Thomas Riedmaier
     </ClInclude>
     <ClInclude Include="stricmp.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
+      </ClInclude>
+    <ClInclude Include="strncmp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude></ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
@@ -89,6 +91,9 @@ Author(s): Thomas Riedmaier
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="stricmp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="strncmp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
