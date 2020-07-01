@@ -83,7 +83,7 @@ my_stricmp:
 	mov %rsi, %rdx # parameter3 of my_stricmp_ 
 	mov %rdi, %rsi  # parameter2 of my_stricmp_
 	mov 8(%rbp), %rdi # parameter1 of my_stricmp_
-	call _Z9my_stricmp_mPKcS0_@plt 
+	call _Z10mystrcmpi_mPKcS0_@plt 
 	leave # restore stack
 	ret
 
@@ -93,7 +93,7 @@ mystrcmpi:
 	mov %rsi, %rdx # parameter3 of mystrcmpi_ 
 	mov %rdi, %rsi  # parameter2 of mystrcmpi_
 	mov 8(%rbp), %rdi # parameter1 of mystrcmpi_
-	call _Z9mystrcmpi_mPKcS0_@plt 
+	call _Z10mystrcmpi_mPKcS0_@plt 
 	leave # restore stack
 	ret
 
@@ -103,7 +103,7 @@ mystricmp:
 	mov %rsi, %rdx # parameter3 of mystricmp_ 
 	mov %rdi, %rsi  # parameter2 of mystricmp_
 	mov 8(%rbp), %rdi # parameter1 of mystricmp_
-	call _Z9mystricmp_mPKcS0_@plt 
+	call _Z10mystricmp_mPKcS0_@plt 
 	leave # restore stack
 	ret
 
@@ -114,7 +114,7 @@ mystrncmp:
 	mov %rsi, %rdx  # parameter3 of mystrncmp_ 
 	mov %rdi, %rsi # parameter2 of mystrncmp_
 	mov 8(%rbp), %rdi # parameter1 of mystrncmp_
-	call _mystrncmp_mPKcS0_@plt 
+	call _Z10mystrncmp_mPKcS0_m@plt 
 	leave # restore stack
 	ret
 
@@ -160,7 +160,7 @@ my_stricmp:
 	push %ecx # parameter3 of my_stricmp_ 
 	push %edx # parameter2 of my_stricmp_
 	push %eax # parameter1 of my_stricmp_
-	call _Z9my_stricmp_jPKcS0_@plt 
+	call _Z11my_stricmp_jPKcS0_@plt 
 	add $12, %esp 
 	ret
 
@@ -174,7 +174,7 @@ mystrcmpi:
 	push %ecx # parameter3 of mystrcmpi_ 
 	push %edx # parameter2 of mystrcmpi_
 	push %eax # parameter1 of mystrcmpi_
-	call _Z9mystrcmpi_jPKcS0_@plt 
+	call _Z10mystrcmpi_jPKcS0_@plt 
 	add $12, %esp 
 	ret
 
@@ -188,7 +188,7 @@ mystricmp:
 	push %ecx # parameter3 of mystricmp_ 
 	push %edx # parameter2 of mystricmp_
 	push %eax # parameter1 of mystricmp_
-	call _Z9mystricmp_jPKcS0_@plt 
+	call _Z10mystricmp_jPKcS0_@plt 
 	add $12, %esp 
 	ret
 
@@ -202,7 +202,7 @@ mystrncmp:
 	mov %eax, 8(%esp) # parameter3 of mystrncmp_
 	mov 28(%esp), %eax
 	mov %eax, 12(%esp) # parameter4 of mystrncmp_
-	call _Z9mymemcmp_jPKvS0_j@plt 
+	call _Z10mystrncmp_jPKcS0_j@plt 
 	add $16, %esp
 	ret
 

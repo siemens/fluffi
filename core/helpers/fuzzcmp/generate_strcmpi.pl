@@ -43,8 +43,8 @@ for (my $k=0; $k < $mystrcmpiCopies; $k++){
 			if($j != 0){
 				print $file "char".$j.":\n";
 			}
-			print $file "   char str1".$j."low = tolower(str1[".$j."]);\n";
-			print $file "   char str2".$j."low = tolower(str2[".$j."]);\n";
+			print $file "   char str1".$j."low = static_cast<char>(tolower(str1[".$j."]));\n";
+			print $file "   char str2".$j."low = static_cast<char>(tolower(str2[".$j."]));\n";
 			print $file "	switch (str1".$j."low) {\n";
 			print $file "	case 0: {goto char".$j."StrNoMatch;}\n";
 			for ( my $i=-128;$i<128;$i++){ 
