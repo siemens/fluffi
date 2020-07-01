@@ -248,20 +248,14 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
                         </select>
                     </td>
                     <td>
-                        <div>
-                            <div style="float: left;">
-                                <input onclick="updateSetting({{ project.ID }}, {{ setting.ID }}, {{ loop.index }})"
-                                    type="button"
-                                    class="btn btn-default btn-sm"
-                                    value="Update"/>
-                            </div>
-                            <div style="float: right">
-                                <input id="deleteSetting{{ setting.name }}{{ project.ID }}"
-                                    onclick="deleteSetting({{ project.ID }}, {{ setting.ID }})" type="button"
-                                    class="btn btn-default btn-sm"
-                                    value="Delete"/>
-                            </div>                                                        
-                        </div>
+                        <input onclick="updateSetting({{ project.ID }}, {{ setting.ID }}, {{ loop.index }})"
+                            type="button"
+                            class="btn btn-default btn-sm"
+                            value="Update"/>
+                        <input id="deleteSetting{{ setting.name }}{{ project.ID }}"
+                            onclick="deleteSetting({{ project.ID }}, {{ setting.ID }})" type="button"
+                            class="btn btn-default btn-sm"
+                            value="Delete"/>
                     </td>
                     <td>
                         <span class="glyphicon glyphicon-ok" id="successIcon{{ loop.index }}"
@@ -275,17 +269,13 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
                         <div>{{ setting.value }}</div>
                     </td>
                     <td>
-                        <div style="float: left;">
-                            <input data-target="#updateGeneratorTypes" data-toggle="modal" type="button" 
-                                class="btn btn-default btn-sm"
-                                value="Update"/>
-                        </div>
-                        <div style="float: right;">
-                            <input id="deleteSetting{{ setting.name }}{{ project.ID }}"
-                               onclick="deleteSetting({{ project.ID }}, {{ setting.ID }})" type="button"
-                               class="btn btn-default btn-sm"
-                               value="Delete"/>
-                        </div>
+                        <input data-target="#updateGeneratorTypes" data-toggle="modal" type="button" 
+                            class="btn btn-default btn-sm"
+                            value="Update"/>
+                        <input id="deleteSetting{{ setting.name }}{{ project.ID }}"
+                            onclick="deleteSetting({{ project.ID }}, {{ setting.ID }})" type="button"
+                            class="btn btn-default btn-sm"
+                            value="Delete"/>
                     </td>
                     <td>
                         <span class="glyphicon glyphicon-ok" id="successIcon{{ loop.index }}"
@@ -386,21 +376,15 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
                             value="{{ setting.value }}"/>
                     </td>
                     <td>
-                        <div>
-                            <div style="float: left;">
-                                <input onclick="updateSetting({{ project.ID }}, {{ setting.ID }}, {{ loop.index }})"
-                                    type="button"
-                                    class="btn btn-default btn-sm"
-                                    value="Update"/>
-                            </div>
-                            <div style="float: right">
-                                <input id="deleteSetting{{ setting.name }}{{ project.ID }}"
-                                    onclick="deleteSetting({{ project.ID }}, {{ setting.ID }})" 
-                                    type="button"
-                                    class="btn btn-default btn-sm"
-                                    value="Delete"/>
-                            </div>                                                        
-                        </div>
+                        <input onclick="updateSetting({{ project.ID }}, {{ setting.ID }}, {{ loop.index }})"
+                            type="button"
+                            class="btn btn-default btn-sm"
+                            value="Update"/>
+                        <input id="deleteSetting{{ setting.name }}{{ project.ID }}"
+                            onclick="deleteSetting({{ project.ID }}, {{ setting.ID }})" 
+                            type="button"
+                            class="btn btn-default btn-sm"
+                            value="Delete"/>
                     </td>
                     <td>
                         <span class="glyphicon glyphicon-ok" id="successIcon{{ loop.index }}"
