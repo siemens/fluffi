@@ -83,7 +83,7 @@ my_stricmp:
 	mov %rsi, %rdx # parameter3 of my_stricmp_ 
 	mov %rdi, %rsi  # parameter2 of my_stricmp_
 	mov 8(%rbp), %rdi # parameter1 of my_stricmp_
-	call _Z10mystrcmpi_mPKcS0_@plt 
+	call _Z11my_stricmp_mPKcS0_@plt 
 	leave # restore stack
 	ret
 
