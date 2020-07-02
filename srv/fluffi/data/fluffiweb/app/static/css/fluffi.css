@@ -433,6 +433,40 @@ Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Thomas Riedmaier
     margin: 50px 0;
 }
 
+#hexTable {
+    font-family: monospace;
+    border-collapse: collapse;
+    width: 100%;
+    text-align: center;
+}
+
+#hexTable td, th {
+    border: 0px;
+}
+
+#hexTable tr:nth-child(even) {
+    background-color: #f1f1f1;
+}
+
+#hexTable .by {
+    background-color: #337ab7;
+    color: #fff;
+    border-bottom: solid 1px #777;
+}
+
+#hexTable .br {
+    border-right: solid 1px #777;
+}
+
+#hexTable .br {
+    border-right: solid 1px #777;
+}
+
+#hexTable .bp {
+    padding-left: 10px;
+    border-left: solid 1px #777;
+}
+
 /* Safari */
 @-webkit-keyframes spin {
 0% { -webkit-transform: rotate(0deg); }

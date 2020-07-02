@@ -34,6 +34,7 @@ from .utils.sync import *
 import json
 import os
 import requests
+import binascii
 
 lock = DownloadArchiveLockFile()
 
@@ -808,6 +809,44 @@ def getLogsOfManagedInstance(projId):
     miLogs = [ row["LogMessage"] for row in result ]  
 
     return json.dumps({"status": "OK", "pageCount": pageCount, "miLogs": miLogs})
+
+
+@app.route("/hexdump/<int:projId>/<int:testcaseId>/<int:offset>", methods=["GET"])
+def getTestcaseHexdump(projId, testcaseId, offset):
+    result = getResultOfStatement(projId, GET_TESTCASE_HEXDUMP, {"testcaseID": testcaseId, "offset": offset + 1})
+
+    textOutput = []
+    decodedData = []
+    pageCount = 0
+    rows = result.fetchall()
+    for row in rows:
+        for num, x in enumerate(row):
+            if num is 0:
+                textOutput = [x[i:i + 2] for i in range(0, len(x), 2)]
+            elif num is 1:
+                pageCount = int(x/320) + (x % 320 > 0)
+
+    targetLen = (int(len(textOutput)/16) + (len(textOutput) % 16 > 0)) * 16
+    for _ in range(len(textOutput), targetLen):
+        textOutput.append("00")
+
+    for b in textOutput:
+        if 0 <= int(b, 16) <= 31 or 127 <= int(b, 16) <= 159:
+            decodedText = "."
+        else:
+            decodedText = binascii.unhexlify(b).decode("latin-1", "ignore")
+        if not decodedText:
+            decodedData.append(".")
+        else:
+            decodedData.append(decodedText)
+
+    for _ in range(len(decodedData), targetLen):
+        decodedData.append(".")
+
+    textOutputF = [textOutput[x:x + 16] for x in range(0, len(textOutput), 16)]
+    decodedDataF = [decodedData[x:x + 16] for x in range(0, len(decodedData), 16)]
+
+    return json.dumps({"status": "OK", "pageCount": pageCount, "hex": textOutputF, "decoded": decodedDataF})
 
 
 @app.route("/projects/<int:projId>/configSystemInstances")
