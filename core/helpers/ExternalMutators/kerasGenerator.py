@@ -36,9 +36,8 @@ import sys, os, time, uuid, random, datetime
 # Simple generator that uses the information available in the database to generate samples
 # We currently don't have a good way of passing options, so we do it over the following set of variables
 
-fuzzjobName = "MyParser"
-extDir = "c:\\temp\\generators"
-database_string = 'mysql+pymysql://user:pass@dbserver:3306/fluffi_gm'
+extDir = "c:\\fluffi\\mut\\out"
+database_string = 'mysql+pymysql://fluffi_gm:fluffi_gm@db.fluffi:3306/fluffi_gm'
 limit = "ORDER BY RAND() LIMIT 2000"
 epochs = 20
 
@@ -46,9 +45,7 @@ epochs = 20
 guid = str(uuid.uuid4())
 localID = 0
 
-def registerInDB(con):
-    global guid
-    global extDir
+def registerInDB(con, guid):
     diffMutatorsResp = con.execute('SELECT * FROM nice_names_managed_instance WHERE NiceName LIKE "KerasGenerator %%"')
     if diffMutatorsResp.rowcount == 0:
         niceName = "KerasGenerator 1"
@@ -64,9 +61,8 @@ def registerInDB(con):
         'guid': guid,
         'nicename': niceName
     } )
-    os.mkdir(os.path.join(extDir, guid))
 
-def get_engine(database_string):
+def get_engine(database_string, fuzzjobName):
     engine = create_engine(database_string)
     with engine.connect() as con:
         fuzzjobsDB = con.execute('SELECT * FROM fuzzjob WHERE name="%s"' % fuzzjobName)
@@ -181,8 +177,18 @@ def getMaxSize(testcases):
             maxSize = len(testcase)
     return maxSize
 
-engine = get_engine(database_string)
-registerInDB(engine)
+def getFuzzjobName(extDir):
+    with open(os.path.join(extDir, 'FuzzJob.name'), 'r') as f:
+        fuzzjob = f.readline()
+    return fuzzjob.strip()
+
+fuzzjobName = getFuzzjobName(extDir)
+
+storDir = os.path.join(extDir, guid)
+os.mkdir(storDir)
+
+engine = get_engine(database_string, fuzzjobName)
+registerInDB(engine, guid)
 maxdate = get_maxdate(engine)
 testcases = get_testcases(engine, limit)
 sequences = getFeatures(testcases)
@@ -205,9 +211,10 @@ while True:
     if (datetime.datetime.now() - lastTrain).total_seconds() > 60*60*4:
         # For now we do it quick & ugly:
         maxdate = get_maxdate(engine)
-        testcases = get_testcases(engine)
+        testcases = get_testcases(engine, limit)
         sequences = getFeatures(testcases)
-        mapping = getMapping(testcases)
+        charset = getCharset(testcases)
+        mapping = getMapping(charset)
         sequences = encode_seq(mapping, sequences)
         maxSize = getMaxSize(testcases)
         model = getModel(len(mapping))
@@ -219,12 +226,12 @@ while True:
         model.fit(x_tr, y_tr, epochs=epochs, verbose=2, validation_data=(x_val, y_val))
         lastTrain = datetime.datetime.now()
 
-    numFiles = len([name for name in os.listdir(extDir)])
+    numFiles = len([name for name in os.listdir(storDir)])
     if numFiles >= 50:
         continue
     print("Generating new sequence")
     new_seq= generate_seq(model, mapping, 40, (random.choice(charset),), random.randint(0, maxSize)) 
-    filename = "%s_%d_%d" % ("sampleGenerator", 0, curIndex)
-    with open(os.path.join(extDir, filename), "wb") as f:
+    filename = "%s_%d_%d" % (guid, curIndex, curIndex)
+    with open(os.path.join(storDir, filename), "wb") as f:
         f.write(bytearray(new_seq))
     curIndex+=1
