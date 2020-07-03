@@ -42,7 +42,7 @@ def updateSystems():
     try:
         ANSIBLE_REST_CONNECTOR.execHostAlive()
     except Exception as e:
-        print("Polemarch ist Mist")
+        print("Ansible Connector failed! " + str(e))
 
 
 def checkDbConnection(f):
@@ -827,9 +827,11 @@ def viewConfigSystemInstances(projId):
                                                     models.SystemFuzzjobInstances.AgentType,
                                                     models.SystemFuzzjobInstances.InstanceCount,
                                                     models.SystemFuzzjobInstances.Architecture).filter_by(Fuzzjob=projId).all()
+        
+    settingArch = getSettingArchitecture(projId)
     
     for system in sysList:
-        # TODO second fallback with settings - add settings
+        # TODO second fallback with settings: settingArch
         s = {'name': system.Name, 'tg': 0, 'tr': 0, 'te': 0, 'tgarch': "", 'trarch': "", 'tearch': "", 'settingArch': ""}
         if 'lemming' not in system.Name:
             sysInstanceList.append(s)
@@ -846,11 +848,13 @@ def viewConfigSystemInstances(projId):
                 if conf.AgentType == 2:
                     s['te'] = conf.InstanceCount
                     s['tearch'] = conf.Architecture
-    
+                        
     for conf in dbconfiguredFuzzjobInstances:
         if conf.AgentType == 4:
             lmCount = lmCount + conf.InstanceCount
-    
+        
+    for sysinstance in sysInstanceList:
+        print("sysinstance", sysinstance)
     return renderTemplate("viewConfigSystemInstances.html",
                           title="View Instance Configuration",
                           systemInstanceConfigForm=systemInstanceConfigForm,
