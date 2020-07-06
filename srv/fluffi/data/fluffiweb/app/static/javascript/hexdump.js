@@ -42,70 +42,83 @@ function loadHexdump(projId, testcaseID, loopIndex, offset=0, currentPage=1, ini
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
         success: function(response) {
-            hexData = response["hex"];
-            decodedData = response["decoded"];
-            pageCount = response["pageCount"];
-            // build hex elements
-            $("#buildHexdump" + loopIndex).empty();
-            var hexTableHtml = $("<table id=\"hexTable\"><tr class=\"by\"><td class=\"br\">Offset(h)</td><td>00</td><td>01</td><td>02</td><td>03</td><td>04</td><td>05</td><td>06</td><td>07</td><td>08</td><td>09</td><td>0A</td><td>0B</td><td>0C</td><td>0D</td><td>0E</td><td>0F</td><td class=\"bp\" colspan=\"16\">Decoded text</td></tr></table>");
-            $("#buildHexdump" + loopIndex).append(hexTableHtml);
+            if(response["status"] == "OK"){
+                hexData = response["hex"];
+                decodedData = response["decoded"];
+                pageCount = response["pageCount"];
+                // build hex elements
+                $("#buildHexdump" + loopIndex).empty();
+                var hexTableHtml = $("<table id=\"hexTable\"><tr class=\"by\"><td class=\"br\">Offset(h)</td><td>00</td><td>01</td><td>02</td><td>03</td><td>04</td><td>05</td><td>06</td><td>07</td><td>08</td><td>09</td><td>0A</td><td>0B</td><td>0C</td><td>0D</td><td>0E</td><td>0F</td><td class=\"bp\" colspan=\"16\">Decoded text</td></tr></table>");
+                $("#buildHexdump" + loopIndex).append(hexTableHtml);
 
-            $.each(hexData, function(key, row){
-                var hexTableRow = $("<tr></tr>");
-                $(hexTableHtml).append(hexTableRow);
-                var offsetNum = ((key + (currentPage - 1) * 20) * 16).toString(16);
-                var offsetZeroLength = 8 - offsetNum.length;
-                for (var z = 0; z < offsetZeroLength; z++) {
-                    offsetNum = "0" + offsetNum;
-                };
-                $(hexTableRow).append("<td class=\"br\"> " + offsetNum + "</td>");
-                var hexTableData = "";
-                var hexTableText = "";
-                $.each(row, function(i, value){
-                    hexTableData = hexTableData.concat("<td>" + value + "</td>");
-                    if (i==0){
-                        hexTableText = hexTableText.concat("<td class=\"bp\">");
-                    }else{
-                        hexTableText = hexTableText.concat("<td>");
-                    }
-                    hexTableText = hexTableText.concat(decodedData[key][i] + "</td>");
+                $.each(hexData, function(key, row){
+                    var hexTableRow = $("<tr></tr>");
+                    $(hexTableHtml).append(hexTableRow);
+                    var offsetNum = ((key + (currentPage - 1) * 20) * 16).toString(16);
+                    var offsetZeroLength = 8 - offsetNum.length;
+                    for (var z = 0; z < offsetZeroLength; z++) {
+                        offsetNum = "0" + offsetNum;
+                    };
+                    $(hexTableRow).append("<td class=\"br\"> " + offsetNum + "</td>");
+                    var hexTableData = "";
+                    var hexTableText = "";
+                    $.each(row, function(i, value){
+                        hexTableData = hexTableData.concat("<td>" + value + "</td>");
+                        if (i==0){
+                            hexTableText = hexTableText.concat("<td class=\"bp\">");
+                        }else{
+                            hexTableText = hexTableText.concat("<td>");
+                        }
+                        hexTableText = hexTableText.concat(decodedData[key][i] + "</td>");
+                    });
+                    $(hexTableRow).append(hexTableData);
+                    $(hexTableRow).append(hexTableText);
                 });
-                $(hexTableRow).append(hexTableData);
-                $(hexTableRow).append(hexTableText);
-            });
 
-            if(init){
-                $("#buildLinks" + loopIndex).empty()
-                $("#buildLinks" + loopIndex).append("<li onclick='prevHex(" + loopIndex + ")' class='leftArrow'><a href='#' aria-label='Previous'><span aria-hidden='true'>&laquo;</span></a></li>");
-                for (var index = 1; index <= pageCount; index++) {
-                    navigateFuncStr = "navigateHex(" + projId + ", " + testcaseID + ", " + loopIndex + ", " + index + ")";
-                    var offsetNum = (((index - 1) * 20) * 16).toString(16);
-                    if (index == currentPage){
-                        linkElem = "<li id='" + loopIndex + "link" + index + "' class='active'><a href='#' onclick='" + navigateFuncStr + "'>" + offsetNum + "</a></li>";
-                    }            
-                    else {
-                        var style = index > 5 && index < pageCount ? "style='display:none'" : "";
-                        linkElem = "<li id='" + loopIndex + "link" + index + "' " + style + "><a href='#' onclick='" + navigateFuncStr + "'>" + offsetNum + "</a></li>";
-                    }   
+                if(init){
+                    $("#buildLinks" + loopIndex).empty()
+                    $("#buildLinks" + loopIndex).append("<li onclick='prevHex(" + loopIndex + ")' class='leftArrow'><a href='#' aria-label='Previous'><span aria-hidden='true'>&laquo;</span></a></li>");
+                    for (var index = 1; index <= pageCount; index++) {
+                        navigateFuncStr = "navigateHex(" + projId + ", " + testcaseID + ", " + loopIndex + ", " + index + ")";
+                        var offsetNum = (((index - 1) * 20) * 16).toString(16);
+                        if (index == currentPage){
+                            linkElem = "<li id='" + loopIndex + "link" + index + "' class='active'><a href='#' onclick='" + navigateFuncStr + "'>" + offsetNum + "</a></li>";
+                        }
+                        else {
+                            var style = index > 5 && index < pageCount ? "style='display:none'" : "";
+                            linkElem = "<li id='" + loopIndex + "link" + index + "' " + style + "><a href='#' onclick='" + navigateFuncStr + "'>" + offsetNum + "</a></li>";
+                        }
 
-                    $("#buildLinks" + loopIndex).append(linkElem); 
+                        $("#buildLinks" + loopIndex).append(linkElem);
 
-                    if(index == 1 && pageCount > (MARGIN + 1)) {                        
-                        $("#buildLinks" + loopIndex).append("<li class='startDots' style='display:none;'><a href='#'>...</a></li>"); 
-                    }                  
-                    if(index == (pageCount-1) && pageCount > (MARGIN + 1)){ 
-                        var liTagEndDots = pageCount <= MARGIN ? "<li class='endDots' style='display:none;'><a href='#'>...</a></li>" : "<li class='endDots'><a href='#'>...</a></li>";
-                        $("#buildLinks" + loopIndex).append(liTagEndDots);
-                    }         
-                }                
-                $("#buildLinks" + loopIndex).append("<li onclick='nextHex(" + loopIndex + ")' class='rightArrow'><a href='#' aria-label='Next'><span aria-hidden='true'>&raquo;</span></a></li>");
-            }
-            else if(pageCount > (MARGIN + 1)) {
-                updatePageLinksHex(loopIndex);
-            } 
+                        if(index == 1 && pageCount > (MARGIN + 1)) {
+                            $("#buildLinks" + loopIndex).append("<li class='startDots' style='display:none;'><a href='#'>...</a></li>");
+                        }
+                        if(index == (pageCount-1) && pageCount > (MARGIN + 1)){
+                            var liTagEndDots = pageCount <= MARGIN ? "<li class='endDots' style='display:none;'><a href='#'>...</a></li>" : "<li class='endDots'><a href='#'>...</a></li>";
+                            $("#buildLinks" + loopIndex).append(liTagEndDots);
+                        }
+                    }
+                    $("#buildLinks" + loopIndex).append("<li onclick='nextHex(" + loopIndex + ")' class='rightArrow'><a href='#' aria-label='Next'><span aria-hidden='true'>&raquo;</span></a></li>");
+                }
+                else if(pageCount > (MARGIN + 1)) {
+                    updatePageLinksHex(loopIndex);
+                }
+                $(".modal-loader").css("display", "none");
+                $("#buildHexdump" + loopIndex).css("visibility", "visible");
+            }else{
+                $(".modal-loader").css("display", "none");
+                $("#buildHexdump" + loopIndex).css("visibility", "visible");
+                $("#buildHexdump" + loopIndex).empty();
+                $("#buildHexdump" + loopIndex).append("Something went wrong!");
+            };
+        },
+        error: function(response) {
             $(".modal-loader").css("display", "none");
             $("#buildHexdump" + loopIndex).css("visibility", "visible");
-        }        
+            $("#buildHexdump" + loopIndex).empty();
+            $("#buildHexdump" + loopIndex).append("Something went wrong!");
+        }
     });    
 }
 
