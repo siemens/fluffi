@@ -224,7 +224,12 @@ GET_NN_TESTCASE_RAWBYTES = (
     "SELECT it.RawBytes, nnt.NiceName FROM interesting_testcases as it LEFT JOIN nice_names_testcase as nnt "
     "ON (it.CreatorServiceDescriptorGUID = nnt.CreatorServiceDescriptorGUID AND it.CreatorLocalID = nnt.CreatorLocalID) "
     "WHERE it.CreatorServiceDescriptorGUID=:guid AND it.CreatorLocalID=:localId;")
-	
+
+GET_TESTCASE_HEXDUMP = (
+    "SELECT HEX(SUBSTR(it.RawBytes, :offset, 320)), LENGTH(it.RawBytes) FROM interesting_testcases as it LEFT JOIN nice_names_testcase as nnt "
+    "ON (it.CreatorServiceDescriptorGUID = nnt.CreatorServiceDescriptorGUID AND it.CreatorLocalID = nnt.CreatorLocalID) "
+    "WHERE it.ID=:testcaseID ;")
+
 GET_PROJECTS = (
     "SELECT"
         "(SELECT COUNT(*) FROM completed_testcases), "
