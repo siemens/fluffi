@@ -831,7 +831,6 @@ def viewConfigSystemInstances(projId):
     settingArch = getSettingArchitecture(projId)
     
     for system in sysList:
-        # TODO second fallback with settings: settingArch
         s = {'name': system.Name, 'tg': 0, 'tr': 0, 'te': 0, 'tgarch': "", 'trarch': "", 'tearch': "", 'settingArch': settingArch}
         if 'lemming' not in system.Name:
             sysInstanceList.append(s)
@@ -1429,23 +1428,23 @@ def viewSystem(hostname, group):
                                                     models.SystemFuzzjobInstances.AgentType,
                                                     models.SystemFuzzjobInstances.InstanceCount,
                                                     models.SystemFuzzjobInstances.Architecture, models.Systems).join(
-        models.Systems).filter(models.SystemFuzzjobInstances.System == models.Systems.ID).filter_by(
-        Name=hostname).all()
+        models.Systems).filter(models.SystemFuzzjobInstances.System == models.Systems.ID).filter_by(Name=hostname).all()
 
     for fuzzjob in configFuzzjobs:
-        fj = {'name': fuzzjob.name, 'tg': 0, 'tr': 0, 'te': 0, 'tgarch': "", 'trarch': "", 'tearch': ""}
+        settingArch = getSettingArchitecture(fuzzjob.ID)
+        fj = {'name': fuzzjob.name, 'tg': 0, 'tr': 0, 'te': 0, 'tgarch': "", 'trarch': "", 'tearch': "", 'settingArch': settingArch}
         fuzzjobList.append(fj)
         for conf in dbconfiguredFuzzjobInstances:
             if fuzzjob.ID == conf.Fuzzjob:
                 if conf.AgentType == 0:
                     fj['tg'] = conf.InstanceCount
-                    fj['tgarch'] = "(" + conf.Architecture + ")"
+                    fj['tgarch'] = conf.Architecture
                 if conf.AgentType == 1:
                     fj['tr'] = conf.InstanceCount
-                    fj['trarch'] = "(" + conf.Architecture + ")"
+                    fj['trarch'] = conf.Architecture
                 if conf.AgentType == 2:
                     fj['te'] = conf.InstanceCount
-                    fj['tearch'] = "(" + conf.Architecture + ")"
+                    fj['tearch'] = conf.Architecture
 
     for conf in dbconfiguredFuzzjobInstances:
         if conf.AgentType == 4:
@@ -1474,8 +1473,8 @@ def configureSystemInstances(system):
 
     if request.method == 'POST' and form.is_submitted:
         msg, category = insertFormInputForConfiguredInstances(request, system)
+    
     flash(msg, category)
-
     return redirect(url_for("systems"))
 
 
@@ -1483,13 +1482,12 @@ def configureSystemInstances(system):
 def configureFuzzjobInstances(fuzzjob):
     form = SystemInstanceConfigForm()
     projId = db.session.query(models.Fuzzjob).filter_by(name=fuzzjob).first()
-    msg = ""
-    category = ""
+    msg, category = "", ""
 
     if request.method == 'POST' and form.is_submitted:
         msg, category = insertFormInputForConfiguredFuzzjobInstances(request, fuzzjob)
+    
     flash(msg, category)
-
     return redirect(url_for("viewConfigSystemInstances", projId=projId.ID))
 
 
@@ -1505,17 +1503,7 @@ def removeConfiguredInstances():
         print(e)
         return json.dumps({"status": "ERROR", "message": "System {} was not found".format(systemName)})
             
-    # TODO refactor this to dict
-    if typeFromReq == "tg":
-        agentType = 0
-    elif typeFromReq == "tr":
-        agentType = 1
-    elif typeFromReq == "te":
-        agentType = 2
-    elif typeFromReq == "lm":
-        agentType = 4
-    else:
-        agentType = None        
+    agentType = AGENT_TYPES.get(typeFromReq, None)           
     
     if agentType is not None and agentType != 4:
         try:

@@ -1020,75 +1020,22 @@ def deleteElement(projId, elementName, query, data):
 
     return msg, category
 
-# TODO
+
 def insertFormInputForConfiguredInstances(request, system):
-    f = request.form
-
-    try:
-        dic = {}
-        for key, value in f.items():
-            if 'arch' in key[-4:]:
-                dic[key] = value
-        for key, value in f.items():
-            if value is not "" and 'arch' not in key[-4:]:
-                agenttype = 0
-
-                if "tr" in key[-3:]:
-                    agenttype = 1
-                if "te" in key[-3:]:
-                    agenttype = 2
-                if "lm" in key[-3:]:
-                    agenttype = 4
-
-                sys = models.Systems.query.filter_by(Name = system).first()
-                fuzzjobId = None
-
-                if agenttype != 4:
-                    fj = models.Fuzzjob.query.filter_by(name = key[:-3]).first()
-                    fuzzjobId = fj.ID
-
-                arch = dic.get(key + '_arch')
-                instance = models.SystemFuzzjobInstances.query.filter_by(System = sys.ID, Fuzzjob = fuzzjobId,
-                                                                         AgentType = int(agenttype)).first()
-                if instance is not None:
-                    db.session.delete(instance)
-                    db.session.commit()
-
-                if value != 0:
-                    newinstances = models.SystemFuzzjobInstances(System = sys.ID, Fuzzjob = fuzzjobId,
-                                                                 AgentType = agenttype,
-                                                                 InstanceCount = value, Architecture = arch)
-                    db.session.add(newinstances)
-                    db.session.commit()
-
-        return "Success: Configured Instances!", "success"
-    except Exception as e:
-        print(e)
-        return "Error: Could not configure Instances!", "error"
-
-
-def insertFormInputForConfiguredFuzzjobInstances(request, fuzzjob):
     try:      
-        fj = models.Fuzzjob.query.filter_by(name = fuzzjob).first()         
-        if fj is None:
-            return "Error: Could not configure Instances. Fuzzjob does not exist!", "error"
+        sys = models.Systems.query.filter_by(Name=system).first()        
+        if sys is None:
+            return "Error: Could not configure Instances. System does not exist!", "error"
                                         
         for key, value in request.form.items(): 
-            agenttype = None 
-            if "tg" in key[-3:]:
-                agenttype = 0    
-            if "tr" in key[-3:]:
-                agenttype = 1
-            if "te" in key[-3:]:
-                agenttype = 2
-            if "lm" in key[-3:]:
-                agenttype = 4                                        
+            agentType = AGENT_TYPES.get(key[-2:], None)                                                  
             
-            if agenttype is not None and agenttype != 4:
-                sys = models.Systems.query.filter_by(Name = key[:-3]).first()            
-                if sys is not None:                                             
+            if agentType is not None and agentType != 4:
+                fuzzjobName = key[:-3]
+                fj = models.Fuzzjob.query.filter_by(name=fuzzjobName).first()           
+                if fj is not None:                                             
                     instance = models.SystemFuzzjobInstances.query.filter_by(System=sys.ID, Fuzzjob=fj.ID,
-                                                                            AgentType=agenttype).first()
+                                                                            AgentType=agentType).first()
                     
                     arch = request.form.get(key + '_arch', None) 
                     
@@ -1110,7 +1057,53 @@ def insertFormInputForConfiguredFuzzjobInstances(request, fuzzjob):
                     else:
                         if arch is not None and valueAsInt > 0:
                             newInstance = models.SystemFuzzjobInstances(System=sys.ID, Fuzzjob=fj.ID,
-                                                                        AgentType=agenttype,
+                                                                        AgentType=agentType,
+                                                                        InstanceCount=valueAsInt, Architecture=arch)
+                            db.session.add(newInstance)
+                    db.session.commit()                                                
+        return "Success: Configured Instances!", "success"            
+    except Exception as e:
+        print(e)
+        return "Error: Could not configure Instances!", "error"
+    
+    
+def insertFormInputForConfiguredFuzzjobInstances(request, fuzzjob):
+    try:      
+        fj = models.Fuzzjob.query.filter_by(name=fuzzjob).first()         
+        if fj is None:
+            return "Error: Could not configure Instances. Fuzzjob does not exist!", "error"
+                                        
+        for key, value in request.form.items(): 
+            agentType = AGENT_TYPES.get(key[-2:], None)                                                  
+            
+            if agentType is not None and agentType != 4:
+                systemName = key[:-3]
+                sys = models.Systems.query.filter_by(Name=systemName).first()            
+                if sys is not None:                                             
+                    instance = models.SystemFuzzjobInstances.query.filter_by(System=sys.ID, Fuzzjob=fj.ID,
+                                                                            AgentType=agentType).first()
+                    
+                    arch = request.form.get(key + '_arch', None) 
+                    
+                    try:
+                        valueAsInt = int(value)
+                    except ValueError:
+                        valueAsInt = -1 
+                        
+                    # update system fuzzjob instance
+                    if instance is not None:                                                   
+                        if valueAsInt > 0:                                
+                            instance.InstanceCount = valueAsInt
+                        elif valueAsInt == 0:
+                            db.session.delete(instance)                               
+                        if arch is not None:
+                            instance.Architecture = arch 
+                            
+                    # Add new system fuzzjob instance
+                    else:
+                        if arch is not None and valueAsInt > 0:
+                            newInstance = models.SystemFuzzjobInstances(System=sys.ID, Fuzzjob=fj.ID,
+                                                                        AgentType=agentType,
                                                                         InstanceCount=valueAsInt, Architecture=arch)
                             db.session.add(newInstance)
                     db.session.commit()                                                

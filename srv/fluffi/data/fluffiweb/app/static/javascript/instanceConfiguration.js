@@ -22,7 +22,7 @@ DEALINGS IN THE SOFTWARE.
 Author(s): Michael Kraus, Thomas Riedmaier
 */
 
-function removeInstances(systemName, fuzzjobName, type, counterId) {
+function removeInstances(systemName, fuzzjobName, type, counterId){
     var data = { systemName: systemName, fuzzjobName: fuzzjobName, type: type}
 
     $.ajax({
