@@ -79,12 +79,13 @@ function loadHexdump(projId, testcaseID, loopIndex, offset=0, currentPage=1, ini
                 $("#buildLinks" + loopIndex).append("<li onclick='prevHex(" + loopIndex + ")' class='leftArrow'><a href='#' aria-label='Previous'><span aria-hidden='true'>&laquo;</span></a></li>");
                 for (var index = 1; index <= pageCount; index++) {
                     navigateFuncStr = "navigateHex(" + projId + ", " + testcaseID + ", " + loopIndex + ", " + index + ")";
+                    var offsetNum = (((index - 1) * 20) * 16).toString(16);
                     if (index == currentPage){
-                        linkElem = "<li id='" + loopIndex + "link" + index + "' class='active'><a href='#' onclick='" + navigateFuncStr + "'>" + index + "</a></li>";                        
+                        linkElem = "<li id='" + loopIndex + "link" + index + "' class='active'><a href='#' onclick='" + navigateFuncStr + "'>" + offsetNum + "</a></li>";
                     }            
                     else {
                         var style = index > 5 && index < pageCount ? "style='display:none'" : "";
-                        linkElem = "<li id='" + loopIndex + "link" + index + "' " + style + "><a href='#' onclick='" + navigateFuncStr + "'>" + index + "</a></li>";
+                        linkElem = "<li id='" + loopIndex + "link" + index + "' " + style + "><a href='#' onclick='" + navigateFuncStr + "'>" + offsetNum + "</a></li>";
                     }   
 
                     $("#buildLinks" + loopIndex).append(linkElem); 
@@ -108,9 +109,15 @@ function loadHexdump(projId, testcaseID, loopIndex, offset=0, currentPage=1, ini
     });    
 }
 
+function jumpToOffset(projId, testcaseID, loopIndex, offsetNum){
+    if(event.key === 'Enter') {
+        var page = Math.floor(parseInt("0x" + offsetNum.value) / 320) + 1;
+        navigateHex(projId, testcaseID, loopIndex, page)
+    }
+}
+
 function navigateHex(projId, testcaseID, loopIndex, currentPage){
     var offset = (currentPage-1) * 320;
-    console.log("call", projId, testcaseID, loopIndex, currentPage)
 
     loadHexdump(projId, testcaseID, loopIndex, offset, currentPage, false);
     $("#buildLinks" + loopIndex).children().removeClass("active");
