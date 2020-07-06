@@ -832,7 +832,7 @@ def viewConfigSystemInstances(projId):
     
     for system in sysList:
         # TODO second fallback with settings: settingArch
-        s = {'name': system.Name, 'tg': 0, 'tr': 0, 'te': 0, 'tgarch': "", 'trarch': "", 'tearch': "", 'settingArch': ""}
+        s = {'name': system.Name, 'tg': 0, 'tr': 0, 'te': 0, 'tgarch': "", 'trarch': "", 'tearch': "", 'settingArch': settingArch}
         if 'lemming' not in system.Name:
             sysInstanceList.append(s)
         else:
@@ -1493,33 +1493,43 @@ def configureFuzzjobInstances(fuzzjob):
     return redirect(url_for("viewConfigSystemInstances", projId=projId.ID))
 
 
-@app.route("/systems/removeConfiguredInstances/<string:system>/<string:fuzzjob>/<string:type>", methods=["POST"])
-def removeConfiguredInstances(system, fuzzjob, type):
-    status = 'OK'
+@app.route("/systems/removeConfiguredInstances", methods=["POST"])
+def removeConfiguredInstances():    
+    systemName = request.json.get("systemName", "")
+    fuzzjobName = request.json.get("fuzzjobName", "")
+    typeFromReq = request.json.get("type", "")
+    
     try:
-        sys = models.Systems.query.filter_by(Name=system).first()
-        agenttype = 0
-        fuzzjobId = None
-        if "tr" in type:
-            agenttype = 1
-        if "te" in type:
-            agenttype = 2
-        if "lm" in type:
-            agenttype = 4
-        if agenttype != 4:
-            fj = models.Fuzzjob.query.filter_by(name=fuzzjob).first()
-            fuzzjobId = fj.ID
-
-        instance = models.SystemFuzzjobInstances.query.filter_by(System=sys.ID, Fuzzjob=fuzzjobId,
-                                                                 AgentType=int(agenttype)).first()
-        if instance is not None:
-            db.session.delete(instance)
-            db.session.commit()
+        system = models.Systems.query.filter_by(Name=systemName).first()
     except Exception as e:
-        status = 'error'
-
-    return json.dumps({"status": status})
-
+        print(e)
+        return json.dumps({"status": "ERROR", "message": "System {} was not found".format(systemName)})
+            
+    # TODO refactor this to dict
+    if typeFromReq == "tg":
+        agentType = 0
+    elif typeFromReq == "tr":
+        agentType = 1
+    elif typeFromReq == "te":
+        agentType = 2
+    elif typeFromReq == "lm":
+        agentType = 4
+    else:
+        agentType = None        
+    
+    if agentType is not None and agentType != 4:
+        try:
+            fuzzjob = models.Fuzzjob.query.filter_by(name=fuzzjobName).first()
+            instance = models.SystemFuzzjobInstances.query.filter_by(System=system.ID, Fuzzjob=fuzzjob.ID, AgentType=agentType).first()
+            db.session.delete(instance)
+            db.session.commit() 
+            return json.dumps({"status": "OK", "message": "Successfully removed configured instance!"})
+        except Exception as e:
+            print(e)
+            return json.dumps({"status": "ERROR", "message": "Failed to delete instance with fuzzjob name {} and agent type {} for system {}.".format(fuzzjobName, agentType, systemName)})
+    
+    return json.dumps({"status": "ERROR", "message": "Missing agent type"})        
+                
 
 @app.route("/systems/reboot/<string:hostname>", methods=["GET"])
 def rebootSystem(hostname):

@@ -458,9 +458,7 @@ def getSettingArchitecture(projId):
         except:
             runnerType = ""
             runnerTypeLowerCase = ""
-            
-        print("runnerType", runnerType)
-        
+                    
         if "x64" in runnerTypeLowerCase:
             settingArch = "x64"
         elif "x86" in runnerTypeLowerCase:
@@ -469,7 +467,7 @@ def getSettingArchitecture(projId):
             settingArch = "arm32"
         elif "arm64" in runnerTypeLowerCase:
             settingArch = "arm64"
-    print("settingArch", settingArch)    
+        
     return settingArch
     
 
@@ -1086,31 +1084,36 @@ def insertFormInputForConfiguredFuzzjobInstances(request, fuzzjob):
             if "lm" in key[-3:]:
                 agenttype = 4                                        
             
-            systemId = None
             if agenttype is not None and agenttype != 4:
-                sys = models.Systems.query.filter_by(Name = key[:-3]).first()
-                systemId = sys.ID                       
-            
-            if systemId is not None:                           
-                instance = models.SystemFuzzjobInstances.query.filter_by(System = systemId, Fuzzjob = fj.ID,
-                                                                         AgentType = int(agenttype)).first()
-                # update system fuzzjob instance
-                if instance is not None:   
-                    arch = request.form.get(key + '_arch', None)
-                    if arch is not None:
-                        instance.Architecture = arch 
-                    if value != "":
-                        instance.InstanceCount = int(value)
-                    db.session.commit()
-                # Add new system fuzzjob instance
-                elif value != "":
-                    arch = request.form.get(key + '_arch', None)
-                    if arch is not None:
-                        newInstance = models.SystemFuzzjobInstances(System = systemId, Fuzzjob = fj.ID,
-                                                                    AgentType = agenttype,
-                                                                    InstanceCount = value, Architecture = arch)
-                        db.session.add(newInstance)
-                        db.session.commit()                                                
+                sys = models.Systems.query.filter_by(Name = key[:-3]).first()            
+                if sys is not None:                                             
+                    instance = models.SystemFuzzjobInstances.query.filter_by(System=sys.ID, Fuzzjob=fj.ID,
+                                                                            AgentType=agenttype).first()
+                    
+                    arch = request.form.get(key + '_arch', None) 
+                    
+                    try:
+                        valueAsInt = int(value)
+                    except ValueError:
+                        valueAsInt = -1 
+                        
+                    # update system fuzzjob instance
+                    if instance is not None:                                                   
+                        if valueAsInt > 0:                                
+                            instance.InstanceCount = valueAsInt
+                        elif valueAsInt == 0:
+                            db.session.delete(instance)                               
+                        if arch is not None:
+                            instance.Architecture = arch 
+                            
+                    # Add new system fuzzjob instance
+                    else:
+                        if arch is not None and valueAsInt > 0:
+                            newInstance = models.SystemFuzzjobInstances(System=sys.ID, Fuzzjob=fj.ID,
+                                                                        AgentType=agenttype,
+                                                                        InstanceCount=valueAsInt, Architecture=arch)
+                            db.session.add(newInstance)
+                    db.session.commit()                                                
         return "Success: Configured Instances!", "success"            
     except Exception as e:
         print(e)
