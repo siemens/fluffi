@@ -18,27 +18,23 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 # 
-# Author(s): Junes Najah, Thomas Riedmaier
+# Author(s): Thomas Riedmaier
 
-ARCH := $(shell file /bin/bash | awk -F',' '{print $2}' | tr -d ' ' | grep 64 > /dev/null && echo 64 || echo 32)
+use strict;
+use warnings;
 
-WARNINGS = -Wno-psabi -Wall -Wextra -Wconversion -Wsign-compare -Wlogical-op -Wnull-dereference -Wold-style-cast
-DEBUG = $(WARNIGNS) -g3 -O0 -DDEBUG
-RELEASE = $(WARNINGS) -s -g0 -O2
+open(my $file, ">", "stricmp.cpp") or die "Could not open out file ";
 
-#By default compile as release (uncomment here for debug build)
-#AFLAGS = $(DEBUG)
-AFLAGS = $(RELEASE)
-CC = g++ -std=c++11
+print $file "#include \"stdafx.h\"\n";
+print $file "#include \"fuzzcmp.h\"\n";
+print $file "#include \"strcmpi.h\"\n";
+print $file "#include \"stricmp.h\"\n";
 
-all:
-	perl generate_memcmp.pl
-	perl generate_strcmp.pl
-	perl generate__stricmp.pl
-	perl generate_strcmpi.pl
-	perl generate_stricmp.pl
-	perl generate_strncmp.pl
-	$(CC) $(AFLAGS) -fPIC -shared trampoline.s *cmp*.cpp -o libfuzzcmp.so -Wl,--version-script=libfuzzcmp.version -Wa,--defsym,ARCH=$(ARCH) -Wl,-z,defs
 
-clean:
-	rm -f memcmp.cpp strcmp.cpp _stricmp.cpp strcmpi.cpp stricmp.cpp strncmp.cpp libfuzzcmp.so
+
+print $file "\nint __cdecl mystricmp_(size_t caller, const char * str1, const char * str2){\n";
+print $file "return mystrcmpi_(caller, str1, str2);\n";
+print $file "}\n";
+
+close $file
+
