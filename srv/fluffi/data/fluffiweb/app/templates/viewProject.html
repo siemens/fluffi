@@ -173,14 +173,17 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
         <tr>
             <td><a href="/locations/view/{{ location.ID }}">{{ location.Name }}</a></td>
             <td>
-                <input onclick="deleteLocation({{ project.ID }}, '{{ location.Name }}')" type="button" value="Delete"/>
+                <input onclick="deleteLocation({{ project.ID }}, '{{ location.Name }}')" type="button" 
+                        class="btn btn-default"
+                        value="Delete"/>
             </td>
         </tr>
         {% endfor %}
         </tbody>
     </table>
-    <button data-target="#addLocationModal" data-toggle="modal" type="button"><span
-            class="glyphicon glyphicon-plus"></span></button>
+    <button data-target="#addLocationModal" data-toggle="modal" type="button" class="btn btn-default">
+        <span class="glyphicon glyphicon-plus"></span>
+    </button>
     <!-- Modal -->
     <div class="modal fade" id="addLocationModal" role="dialog">
         <div class="modal-dialog">
@@ -240,17 +243,19 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
                                 name="SettingValue-{{ setting.ID }}">
                             <option selected="selected">{{ setting.value }}</option>
                             {% for option in setting.options %}
-                            <option value="{{ option }}">{{ option }}</option>
+                                <option value="{{ option }}">{{ option }}</option>
                             {% endfor %}
                         </select>
                     </td>
                     <td>
-                        <input  onclick="updateSetting({{ project.ID }}, {{ setting.ID }}, {{ loop.index }})"
-                               type="button"
-                               value="Update"/>
-                        <input  id="deleteSetting{{ setting.name }}{{ project.ID }}"
-                               onclick="deleteSetting({{ project.ID }}, {{ setting.ID }})" type="button"
-                               value="Delete"/>
+                        <input onclick="updateSetting({{ project.ID }}, {{ setting.ID }}, {{ loop.index }})"
+                            type="button"
+                            class="btn btn-default btn-sm"
+                            value="Update"/>
+                        <input id="deleteSetting{{ setting.name }}{{ project.ID }}"
+                            onclick="deleteSetting({{ project.ID }}, {{ setting.ID }})" type="button"
+                            class="btn btn-default btn-sm"
+                            value="Delete"/>
                     </td>
                     <td>
                         <span class="glyphicon glyphicon-ok" id="successIcon{{ loop.index }}"
@@ -264,10 +269,13 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
                         <div>{{ setting.value }}</div>
                     </td>
                     <td>
-                        <input  data-target="#updateGeneratorTypes" data-toggle="modal" type="button" value="Update"/>
-                        <input  id="deleteSetting{{ setting.name }}{{ project.ID }}"
-                               onclick="deleteSetting({{ project.ID }}, {{ setting.ID }})" type="button"
-                               value="Delete"/>
+                        <input data-target="#updateGeneratorTypes" data-toggle="modal" type="button" 
+                            class="btn btn-default btn-sm"
+                            value="Update"/>
+                        <input id="deleteSetting{{ setting.name }}{{ project.ID }}"
+                            onclick="deleteSetting({{ project.ID }}, {{ setting.ID }})" type="button"
+                            class="btn btn-default btn-sm"
+                            value="Delete"/>
                     </td>
                     <td>
                         <span class="glyphicon glyphicon-ok" id="successIcon{{ loop.index }}"
@@ -313,10 +321,13 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
                         <div>{{ setting.value }}</div>
                     </td>
                     <td>
-                        <input  data-target="#updateevaluatorTypes" data-toggle="modal" type="button" value="Update"/>
-                        <input  id="deleteSetting{{ setting.name }}{{ project.ID }}"
-                               onclick="deleteSetting({{ project.ID }}, {{ setting.ID }})" type="button"
-                               value="Delete"/>
+                        <input data-target="#updateevaluatorTypes" data-toggle="modal" type="button" 
+                            class="btn btn-default btn-sm"
+                            value="Update"/>
+                        <input id="deleteSetting{{ setting.name }}{{ project.ID }}"
+                            onclick="deleteSetting({{ project.ID }}, {{ setting.ID }})" type="button"
+                            class="btn btn-default btn-sm"
+                            value="Delete"/>
                     </td>
                     <td>
                         <span class="glyphicon glyphicon-ok" id="successIcon{{ loop.index }}"
@@ -358,15 +369,22 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
                     </div>
                     {% else %}
                     <td>{{ setting.name }}</td>
-                    <td><input id="SettingValue-{{ setting.ID }}" size="98" type="text" value="{{ setting.value }}"/>
+                    <td>
+                        <input id="SettingValue-{{ setting.ID }}" 
+                            class="form-control" 
+                            type="text" 
+                            value="{{ setting.value }}"/>
                     </td>
                     <td>
-                        <input  onclick="updateSetting({{ project.ID }}, {{ setting.ID }}, {{ loop.index }})"
-                               type="button"
-                               value="Update"/>
-                        <input  id="deleteSetting{{ setting.name }}{{ project.ID }}"
-                               onclick="deleteSetting({{ project.ID }}, {{ setting.ID }})" type="button"
-                               value="Delete"/>
+                        <input onclick="updateSetting({{ project.ID }}, {{ setting.ID }}, {{ loop.index }})"
+                            type="button"
+                            class="btn btn-default btn-sm"
+                            value="Update"/>
+                        <input id="deleteSetting{{ setting.name }}{{ project.ID }}"
+                            onclick="deleteSetting({{ project.ID }}, {{ setting.ID }})" 
+                            type="button"
+                            class="btn btn-default btn-sm"
+                            value="Delete"/>
                     </td>
                     <td>
                         <span class="glyphicon glyphicon-ok" id="successIcon{{ loop.index }}"
@@ -401,8 +419,8 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
                             class="glyphicon glyphicon-plus"></span></button>
                 </div>
                 <div class="col-md-4"></div>
-                <div class="col-md-2" style="text-align: center"><input class="btn btn-primary" id="addSettings"
-                                                                        type="submit" value="Add Settings"/>
+                <div class="col-md-2" style="text-align: center">
+                    <input class="btn btn-primary" id="addSettings" type="submit" value="Add Settings"/>
                 </div>
             </div>
         </form>
@@ -426,10 +444,10 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
                 <td>{{ module.name }}</td>
                 <td>{{ module.path }}</td>
                 <td>
-                    <input class="btn" id="deleteModule{{ module.name }}{{ project.ID }}"
+                    <input class="btn btn-default" id="deleteModule{{ module.name }}{{ project.ID }}"
                             onclick="deleteModule({{ project.ID }}, {{ module.ID }})" type="button"
                             value="Delete"/>
-                    <input class="btn" id="setModuleBinary{{ module.name }}{{ project.ID }}"
+                    <input class="btn btn-default" id="setModuleBinary{{ module.name }}{{ project.ID }}"
                             data-target="#setModuleBinary{{ module.ID }}" data-toggle="modal" type="button"
                             value="Edit Module"/>
                 </td>
