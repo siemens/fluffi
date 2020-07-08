@@ -851,9 +851,7 @@ def viewConfigSystemInstances(projId):
     for conf in dbconfiguredFuzzjobInstances:
         if conf.AgentType == 4:
             lmCount = lmCount + conf.InstanceCount
-        
-    for sysinstance in sysInstanceList:
-        print("sysinstance", sysinstance)
+            
     return renderTemplate("viewConfigSystemInstances.html",
                           title="View Instance Configuration",
                           systemInstanceConfigForm=systemInstanceConfigForm,
@@ -1384,11 +1382,29 @@ def viewSystem(hostname, group):
     deployFuzzjobPackageForm = ExecuteDeployFuzzjobInstallPackageForm()
     startFluffiComponentForm = StartFluffiComponentForm()
     systemInstanceConfigForm = SystemInstanceConfigForm()
-    availableInstallPackagesFromFTP = FTP_CONNECTOR.getListOfFilesOnFTPServer("SUT/")
+    
+    try:
+        availableInstallPackagesFromFTP = FTP_CONNECTOR.getListOfFilesOnFTPServer("SUT/")
+    except Exception as e:
+        print(e)
+        availableInstallPackagesFromFTP = []
+        
     deployPackageForm.installPackage.choices = availableInstallPackagesFromFTP
-    availableArchitecturesFromFTP = FTP_CONNECTOR.getListOfArchitecturesOnFTPServer("fluffi/" + group + "/", group)
+    
+    try:
+        availableArchitecturesFromFTP = FTP_CONNECTOR.getListOfArchitecturesOnFTPServer("fluffi/" + group + "/", group)
+    except Exception as e:
+        print(e)
+        availableArchitecturesFromFTP = []
+    
     fluffiDeployForm.architecture.choices = availableArchitecturesFromFTP
-    availableArchitecturesFromFTP = FTP_CONNECTOR.getListOfArchitecturesOnFTPServer("fluffi/" + group + "/", group)
+    
+    try:
+        availableArchitecturesFromFTP = FTP_CONNECTOR.getListOfArchitecturesOnFTPServer("fluffi/" + group + "/", group)
+    except Exception as e:
+        print(e)
+        availableArchitecturesFromFTP = []
+    
     startFluffiComponentForm.architecture.choices = availableArchitecturesFromFTP
     system = ANSIBLE_REST_CONNECTOR.getSystemObjectByName(hostname)
     jobList = []
@@ -1462,8 +1478,7 @@ def viewSystem(hostname, group):
                           managed=managed,
                           systemInstanceConfigForm=systemInstanceConfigForm,
                           configFuzzjobs=fuzzjobList,
-                          lmCount=lmCount
-                          )
+                          lmCount=lmCount)
 
 
 @app.route("/systems/configureSystemInstances/<string:system>", methods=["POST"])
@@ -1497,26 +1512,8 @@ def removeConfiguredInstances():
     fuzzjobName = request.json.get("fuzzjobName", "")
     typeFromReq = request.json.get("type", "")
     
-    try:
-        system = models.Systems.query.filter_by(Name=systemName).first()
-    except Exception as e:
-        print(e)
-        return json.dumps({"status": "ERROR", "message": "System {} was not found".format(systemName)})
-            
-    agentType = AGENT_TYPES.get(typeFromReq, None)           
-    
-    if agentType is not None and agentType != 4:
-        try:
-            fuzzjob = models.Fuzzjob.query.filter_by(name=fuzzjobName).first()
-            instance = models.SystemFuzzjobInstances.query.filter_by(System=system.ID, Fuzzjob=fuzzjob.ID, AgentType=agentType).first()
-            db.session.delete(instance)
-            db.session.commit() 
-            return json.dumps({"status": "OK", "message": "Successfully removed configured instance!"})
-        except Exception as e:
-            print(e)
-            return json.dumps({"status": "ERROR", "message": "Failed to delete instance with fuzzjob name {} and agent type {} for system {}.".format(fuzzjobName, agentType, systemName)})
-    
-    return json.dumps({"status": "ERROR", "message": "Missing agent type"})        
+    status, msg = deleteConfiguredInstance(systemName, fuzzjobName, typeFromReq)
+    return json.dumps({"status": status, "message": msg})        
                 
 
 @app.route("/systems/reboot/<string:hostname>", methods=["GET"])

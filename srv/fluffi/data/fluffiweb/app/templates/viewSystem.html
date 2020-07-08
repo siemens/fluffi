@@ -94,10 +94,10 @@ Author(s): Pascal Eckmann, Fabian Russwurm, Junes Najah, Michael Kraus, Thomas R
                 <table>
                     <tr>
                         <td>{{ deployFuzzjobPackageForm.fuzzingJob.label }}</td>
-                        <td>{{deployFuzzjobPackageForm.fuzzingJob}}</td>
+                        <td>{{ deployFuzzjobPackageForm.fuzzingJob }}</td>
                     </tr>
                     <tr>
-                        <td>{{deployFuzzjobPackageForm.execute_deploy_package}}</td>
+                        <td>{{ deployFuzzjobPackageForm.execute_deploy_package }}</td>
                     </tr>
                 </table>
             </form>
@@ -107,10 +107,10 @@ Author(s): Pascal Eckmann, Fabian Russwurm, Junes Najah, Michael Kraus, Thomas R
                 <table>
                     <tr>
                         <td>{{ deployPackageForm.installPackage.label }}</td>
-                        <td>{{deployPackageForm.installPackage}}</td>
+                        <td>{{ deployPackageForm.installPackage }}</td>
                     </tr>
                     <tr>
-                        <td>{{deployPackageForm.execute_deploy_package}}</td>
+                        <td>{{ deployPackageForm.execute_deploy_package }}</td>
                     </tr>
                 </table>
             </form>
@@ -134,7 +134,7 @@ Author(s): Pascal Eckmann, Fabian Russwurm, Junes Najah, Michael Kraus, Thomas R
                             <tbody>
                             <tr>
                                 <th scope="row">LocalManager</th>
-                                <td><p id="localManager_lm_count">{{lmCount}}</p></td>
+                                <td><p id="localManager_lm_count">{{ lmCount }}</p></td>
                                 <td><input class="form-control" id="localManager_lm" name="localManager_lm"
                                            placeholder="0" type="text"></td>
                                 <td>

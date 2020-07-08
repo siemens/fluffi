@@ -1021,6 +1021,36 @@ def deleteElement(projId, elementName, query, data):
     return msg, category
 
 
+def deleteConfiguredInstance(sysName, fjName, typeFromReq):        
+    try:
+        system = models.Systems.query.filter_by(Name=sysName).first()
+    except Exception as e:
+        print(e)
+        return "ERROR", "System {} was not found".format(sysName)
+            
+    fuzzjobId = None
+    agentType = AGENT_TYPES.get(typeFromReq, None)           
+    
+    if agentType is not None:
+        try:
+            if agentType != 4:
+                fuzzjob = models.Fuzzjob.query.filter_by(name=fjName).first()
+                fuzzjobId = fuzzjob.ID
+                
+            instance = models.SystemFuzzjobInstances.query.filter_by(System=system.ID, Fuzzjob=fuzzjobId, AgentType=agentType).first()
+            if instance is not None:
+                db.session.delete(instance)
+                db.session.commit() 
+                return "OK", "Successfully removed instance!"
+            
+            return "ERROR", "Failed! Cannot find instance."
+        except Exception as e:
+            print(e)
+            return "ERROR", "Failed to delete instance."
+    
+    return "ERROR", "Missing agent type"  
+
+
 def insertFormInputForConfiguredInstances(request, system):
     try:      
         sys = models.Systems.query.filter_by(Name=system).first()        
