@@ -18,35 +18,23 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 # 
-# Author(s): Junes Najah, Abian Blome, Thomas Riedmaier
+# Author(s): Thomas Riedmaier
 
-import pymysql
-from flask import Flask
-from flask_bootstrap import Bootstrap
-from flask_sqlalchemy import SQLAlchemy
-from pytz import utc
+use strict;
+use warnings;
 
-pymysql.install_as_MySQLdb()
+open(my $file, ">", "_stricmp.cpp") or die "Could not open out file ";
 
-app = Flask(__name__)
-Bootstrap(app)
-app.config.from_object("config")
-db = SQLAlchemy(app)
+print $file "#include \"stdafx.h\"\n";
+print $file "#include \"fuzzcmp.h\"\n";
+print $file "#include \"strcmpi.h\"\n";
+print $file "#include \"_stricmp.h\"\n";
 
-from .nav import nav
 
-nav.init_app(app)
 
-from app import views, models, controllers
+print $file "\nint __cdecl my_stricmp_(size_t caller, const char * str1, const char * str2){\n";
+print $file "return mystrcmpi_(caller, str1, str2);\n";
+print $file "}\n";
 
-from apscheduler.schedulers.background import BackgroundScheduler
-from .health_check import healthCheck
-from config import LOCAL_DEV
+close $file
 
-scheduler = BackgroundScheduler()
-scheduler.configure(timezone = utc)
-
-if not LOCAL_DEV:
-    scheduler.add_job(healthCheck, 'interval', minutes = 0.5)
-
-scheduler.start()

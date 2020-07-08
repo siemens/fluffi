@@ -25,3 +25,7 @@ LIBRARY
 EXPORTS
    mystrcmp   @1
    mymemcmp   @2
+   my_stricmp @3
+   mystrcmpi  @4
+   mystricmp  @5
+   mystrncmp  @6
