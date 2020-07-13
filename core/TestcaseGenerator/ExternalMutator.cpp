@@ -91,45 +91,53 @@ std::deque<TestcaseDescriptor> ExternalMutator::batchMutate(unsigned int numToGe
 
 	std::deque<TestcaseDescriptor> generatedMutations{};
 
-	for (auto& file : std::experimental::filesystem::recursive_directory_iterator(m_extTestcaseDir)) {
-		if (generatedMutations.size() == numToGenerate) {
-			return generatedMutations;
-		}
-		if (std::experimental::filesystem::is_regular_file(file.path()) && file.path().filename().generic_string() != "fuzzjob.name") {
-			std::string generatorGUID = file.path().parent_path().filename().generic_string();
-			auto parentGUIDAndLocalID = Util::splitString(file.path().filename().generic_string(), "_");
-			if (parentGUIDAndLocalID.size() != 3) {
-				LOG(ERROR) << "File not in expected format (parentGUID_parentLocalID_localID): " << file.path().filename().generic_string();
-				break;
-			}
-			std::string parentGUID = parentGUIDAndLocalID[0];
-			uint64_t parentLocalID, localID;
-			try {
-				parentLocalID = std::stoull(parentGUIDAndLocalID[1]);
-				localID = std::stoull(parentGUIDAndLocalID[2]);
-			}
-			catch (const std::exception& e) {
-				LOG(ERROR) << "Error extracting localIDs from file: " << e.what();
-				break;
-			}
+	if (numToGenerate == 0) {
+		return generatedMutations;
+	}
 
-			FluffiServiceDescriptor parentServiceDescriptor{ "", parentGUID };
-			FluffiTestcaseID parentTestcaseID{ parentServiceDescriptor, parentLocalID };
+	for (auto& fileOrFolderInExtTestcaseDir : std::experimental::filesystem::directory_iterator(m_extTestcaseDir)) {
+		if (std::experimental::filesystem::is_directory(fileOrFolderInExtTestcaseDir.path())) {
+			std::string generatorGUID = fileOrFolderInExtTestcaseDir.path().filename().generic_string();
 
-			FluffiServiceDescriptor extServiceDescriptor{ "", generatorGUID };
-			FluffiTestcaseID testcaseID{ extServiceDescriptor, localID };
+			for (auto& fileOrFolderInUUIDDir : std::experimental::filesystem::directory_iterator(fileOrFolderInExtTestcaseDir.path())) {
+				std::vector<std::string> parentGUIDparentLocalIDAndLocalID = Util::splitString(fileOrFolderInUUIDDir.path().filename().generic_string(), "_");
+				if (parentGUIDparentLocalIDAndLocalID.size() != 3) {
+					LOG(ERROR) << "File not in expected format (parentGUID_parentLocalID_localID): " << fileOrFolderInUUIDDir.path().filename().generic_string();
+					break;
+				}
+				std::string parentGUID = parentGUIDparentLocalIDAndLocalID[0];
+				uint64_t parentLocalID, localID;
+				try {
+					parentLocalID = std::stoull(parentGUIDparentLocalIDAndLocalID[1]);
+					localID = std::stoull(parentGUIDparentLocalIDAndLocalID[2]);
+				}
+				catch (const std::exception& e) {
+					LOG(ERROR) << "Error extracting localIDs from file: " << e.what();
+					break;
+				}
 
-			std::string pathAndFilename = Util::generateTestcasePathAndFilename(testcaseID, m_testcaseDir);
+				FluffiServiceDescriptor parentServiceDescriptor{ "", parentGUID };
+				FluffiTestcaseID parentTestcaseID{ parentServiceDescriptor, parentLocalID };
 
-			if (Util::attemptRenameFile(file.path().generic_string(), pathAndFilename))
-			{
-				TestcaseDescriptor childTestcaseDescriptor{ testcaseID, parentTestcaseID, pathAndFilename, false };
-				generatedMutations.push_back(childTestcaseDescriptor);
-			}
-			else
-			{
-				LOG(ERROR) << "Error renaming generated file: " << file.path().generic_string();
-				break;
+				FluffiServiceDescriptor extServiceDescriptor{ "", generatorGUID };
+				FluffiTestcaseID testcaseID{ extServiceDescriptor, localID };
+
+				std::string pathAndFilename = Util::generateTestcasePathAndFilename(testcaseID, m_testcaseDir);
+
+				if (Util::attemptRenameFile(fileOrFolderInUUIDDir.path().generic_string(), pathAndFilename))
+				{
+					TestcaseDescriptor childTestcaseDescriptor{ testcaseID, parentTestcaseID, pathAndFilename, false };
+					generatedMutations.push_back(childTestcaseDescriptor);
+
+					if (generatedMutations.size() >= numToGenerate) {
+						return generatedMutations;
+					}
+				}
+				else
+				{
+					LOG(ERROR) << "Error renaming generated file: " << fileOrFolderInUUIDDir.path().generic_string();
+					break;
+				}
 			}
 		}
 	}
