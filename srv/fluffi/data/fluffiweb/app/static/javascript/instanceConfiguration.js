@@ -22,19 +22,22 @@ DEALINGS IN THE SOFTWARE.
 Author(s): Michael Kraus, Thomas Riedmaier
 */
 
-function removeInstances(url, counterId) {
-    var changeUrl = url;
+function removeInstances(systemName, fuzzjobName, type, counterId){
+    var data = { systemName: systemName, fuzzjobName: fuzzjobName, type: type}
 
     $.ajax({
-        url: changeUrl,
+        url: "/systems/removeConfiguredInstances",
         type: 'POST',
-        data: JSON.stringify(''),
+        data: JSON.stringify(data),
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
-        async: false,
         success: function(response) {
-            if(response["status"] == "OK")
-                document.getElementById(counterId).innerHTML = "0";
+            if(response["status"] == "OK"){
+                console.log(response["message"]);
+                $("#" + counterId).text("0");
+            } else {
+                console.log(response["message"]);
+            }               
         }
     });
 }

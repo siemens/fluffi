@@ -44,7 +44,7 @@ def updateSystems():
     try:
         ANSIBLE_REST_CONNECTOR.execHostAlive()
     except Exception as e:
-        print(e)
+        print("Ansible Connector failed! " + str(e))
 
 
 @app.before_first_request
@@ -872,11 +872,12 @@ def viewConfigSystemInstances(projId):
                                                     models.SystemFuzzjobInstances.Fuzzjob,
                                                     models.SystemFuzzjobInstances.AgentType,
                                                     models.SystemFuzzjobInstances.InstanceCount,
-                                                    models.SystemFuzzjobInstances.Architecture).filter_by(
-        Fuzzjob=projId).all()
+                                                    models.SystemFuzzjobInstances.Architecture).filter_by(Fuzzjob=projId).all()
+        
+    settingArch = getSettingArchitecture(projId)
     
     for system in sysList:
-        s = {'name': system.Name, 'tg': 0, 'tr': 0, 'te': 0, 'tgarch': "", 'trarch': "", 'tearch': ""}
+        s = {'name': system.Name, 'tg': 0, 'tr': 0, 'te': 0, 'tgarch': "", 'trarch': "", 'tearch': "", 'settingArch': settingArch}
         if 'lemming' not in system.Name:
             sysInstanceList.append(s)
         else:
@@ -885,18 +886,18 @@ def viewConfigSystemInstances(projId):
             if system.ID == conf.System:
                 if conf.AgentType == 0:
                     s['tg'] = conf.InstanceCount
-                    s['tgarch'] = "(" + conf.Architecture + ")"
+                    s['tgarch'] = conf.Architecture
                 if conf.AgentType == 1:
                     s['tr'] = conf.InstanceCount
-                    s['trarch'] = "(" + conf.Architecture + ")"
+                    s['trarch'] = conf.Architecture
                 if conf.AgentType == 2:
                     s['te'] = conf.InstanceCount
-                    s['tearch'] = "(" + conf.Architecture + ")"
-    
+                    s['tearch'] = conf.Architecture
+                        
     for conf in dbconfiguredFuzzjobInstances:
         if conf.AgentType == 4:
             lmCount = lmCount + conf.InstanceCount
-
+            
     return renderTemplate("viewConfigSystemInstances.html",
                           title="View Instance Configuration",
                           systemInstanceConfigForm=systemInstanceConfigForm,
@@ -1427,11 +1428,29 @@ def viewSystem(hostname, group):
     deployFuzzjobPackageForm = ExecuteDeployFuzzjobInstallPackageForm()
     startFluffiComponentForm = StartFluffiComponentForm()
     systemInstanceConfigForm = SystemInstanceConfigForm()
-    availableInstallPackagesFromFTP = FTP_CONNECTOR.getListOfFilesOnFTPServer("SUT/")
+    
+    try:
+        availableInstallPackagesFromFTP = FTP_CONNECTOR.getListOfFilesOnFTPServer("SUT/")
+    except Exception as e:
+        print(e)
+        availableInstallPackagesFromFTP = []
+        
     deployPackageForm.installPackage.choices = availableInstallPackagesFromFTP
-    availableArchitecturesFromFTP = FTP_CONNECTOR.getListOfArchitecturesOnFTPServer("fluffi/" + group + "/", group)
+    
+    try:
+        availableArchitecturesFromFTP = FTP_CONNECTOR.getListOfArchitecturesOnFTPServer("fluffi/" + group + "/", group)
+    except Exception as e:
+        print(e)
+        availableArchitecturesFromFTP = []
+    
     fluffiDeployForm.architecture.choices = availableArchitecturesFromFTP
-    availableArchitecturesFromFTP = FTP_CONNECTOR.getListOfArchitecturesOnFTPServer("fluffi/" + group + "/", group)
+    
+    try:
+        availableArchitecturesFromFTP = FTP_CONNECTOR.getListOfArchitecturesOnFTPServer("fluffi/" + group + "/", group)
+    except Exception as e:
+        print(e)
+        availableArchitecturesFromFTP = []
+    
     startFluffiComponentForm.architecture.choices = availableArchitecturesFromFTP
     system = ANSIBLE_REST_CONNECTOR.getSystemObjectByName(hostname)
     jobList = []
@@ -1471,23 +1490,23 @@ def viewSystem(hostname, group):
                                                     models.SystemFuzzjobInstances.AgentType,
                                                     models.SystemFuzzjobInstances.InstanceCount,
                                                     models.SystemFuzzjobInstances.Architecture, models.Systems).join(
-        models.Systems).filter(models.SystemFuzzjobInstances.System == models.Systems.ID).filter_by(
-        Name=hostname).all()
+        models.Systems).filter(models.SystemFuzzjobInstances.System == models.Systems.ID).filter_by(Name=hostname).all()
 
     for fuzzjob in configFuzzjobs:
-        fj = {'name': fuzzjob.name, 'tg': 0, 'tr': 0, 'te': 0, 'tgarch': "", 'trarch': "", 'tearch': ""}
+        settingArch = getSettingArchitecture(fuzzjob.ID)
+        fj = {'name': fuzzjob.name, 'tg': 0, 'tr': 0, 'te': 0, 'tgarch': "", 'trarch': "", 'tearch': "", 'settingArch': settingArch}
         fuzzjobList.append(fj)
         for conf in dbconfiguredFuzzjobInstances:
             if fuzzjob.ID == conf.Fuzzjob:
                 if conf.AgentType == 0:
                     fj['tg'] = conf.InstanceCount
-                    fj['tgarch'] = "(" + conf.Architecture + ")"
+                    fj['tgarch'] = conf.Architecture
                 if conf.AgentType == 1:
                     fj['tr'] = conf.InstanceCount
-                    fj['trarch'] = "(" + conf.Architecture + ")"
+                    fj['trarch'] = conf.Architecture
                 if conf.AgentType == 2:
                     fj['te'] = conf.InstanceCount
-                    fj['tearch'] = "(" + conf.Architecture + ")"
+                    fj['tearch'] = conf.Architecture
 
     for conf in dbconfiguredFuzzjobInstances:
         if conf.AgentType == 4:
@@ -1505,8 +1524,7 @@ def viewSystem(hostname, group):
                           managed=managed,
                           systemInstanceConfigForm=systemInstanceConfigForm,
                           configFuzzjobs=fuzzjobList,
-                          lmCount=lmCount
-                          )
+                          lmCount=lmCount)
 
 
 @app.route("/systems/configureSystemInstances/<string:system>", methods=["POST"])
@@ -1516,8 +1534,8 @@ def configureSystemInstances(system):
 
     if request.method == 'POST' and form.is_submitted:
         msg, category = insertFormInputForConfiguredInstances(request, system)
+    
     flash(msg, category)
-
     return redirect(url_for("systems"))
 
 
@@ -1525,43 +1543,24 @@ def configureSystemInstances(system):
 def configureFuzzjobInstances(fuzzjob):
     form = SystemInstanceConfigForm()
     projId = db.session.query(models.Fuzzjob).filter_by(name=fuzzjob).first()
-    msg = ""
-    category = ""
+    msg, category = "", ""
 
     if request.method == 'POST' and form.is_submitted:
         msg, category = insertFormInputForConfiguredFuzzjobInstances(request, fuzzjob)
+    
     flash(msg, category)
-
     return redirect(url_for("viewConfigSystemInstances", projId=projId.ID))
 
 
-@app.route("/systems/removeConfiguredInstances/<string:system>/<string:fuzzjob>/<string:type>", methods=["POST"])
-def removeConfiguredInstances(system, fuzzjob, type):
-    status = 'OK'
-    try:
-        sys = models.Systems.query.filter_by(Name=system).first()
-        agenttype = 0
-        fuzzjobId = None
-        if "tr" in type:
-            agenttype = 1
-        if "te" in type:
-            agenttype = 2
-        if "lm" in type:
-            agenttype = 4
-        if agenttype != 4:
-            fj = models.Fuzzjob.query.filter_by(name=fuzzjob).first()
-            fuzzjobId = fj.ID
-
-        instance = models.SystemFuzzjobInstances.query.filter_by(System=sys.ID, Fuzzjob=fuzzjobId,
-                                                                 AgentType=int(agenttype)).first()
-        if instance is not None:
-            db.session.delete(instance)
-            db.session.commit()
-    except Exception as e:
-        status = 'error'
-
-    return json.dumps({"status": status})
-
+@app.route("/systems/removeConfiguredInstances", methods=["POST"])
+def removeConfiguredInstances():    
+    systemName = request.json.get("systemName", "")
+    fuzzjobName = request.json.get("fuzzjobName", "")
+    typeFromReq = request.json.get("type", "")
+    
+    status, msg = deleteConfiguredInstance(systemName, fuzzjobName, typeFromReq)
+    return json.dumps({"status": status, "message": msg})        
+                
 
 @app.route("/systems/reboot/<string:hostname>", methods=["GET"])
 def rebootSystem(hostname):

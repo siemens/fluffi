@@ -24,8 +24,8 @@ import datetime
 import json
 import config
 import os
-from app import app
 
+from app import app
 from app.utils.ansible import AnsibleRESTConnector
 from app.utils.ftp import FTPConnector
 
@@ -37,8 +37,11 @@ def getConfigJson():
 
 
 JSON_CONFIG = getConfigJson()
+
 FLUFFI_VERSION = "1.0"
+
 FOOTER_SIEMENS = "Siemens AG, Corporate Technology {} | FLUFFI {}".format(datetime.datetime.now().year, FLUFFI_VERSION)
+
 TESTCASE_TYPES = {
     "population": 0,
     "hangs": 1,
@@ -48,11 +51,16 @@ TESTCASE_TYPES = {
     "minimized": 5
 }
 
+AGENT_TYPES = {
+    "tg": 0,
+    "tr": 1,
+    "te": 2,
+    "lm": 4
+}
+                
 FTP_CONNECTOR = FTPConnector(config.FTP_URL)
 ANSIBLE_REST_CONNECTOR = AnsibleRESTConnector(config.POLE_URL, "admin", "admin")
 
 SYNC = True
 SYNCING_FILEPATH = "/syncing.lock"
 SYNCED_FILEPATH = "/synced.lock"
-
-

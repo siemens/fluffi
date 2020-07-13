@@ -44,18 +44,19 @@ if LOCAL_DEV:
     DBPASS = "fluffi_gm" if WITH_CONTAINERS else "toor"
     DBHOST = "localhost"
     POLE_URL = "http://localhost:8888/api/v2/"
+    FTP_URL = getHostByNameHandler('localhost')
 else:
     DBUSER = "fluffi_gm"
     DBPASS = "fluffi_gm"
     DBHOST = getHostByNameHandler('db.fluffi')
-    POLE_URL = "http://pole.fluffi:8888/api/v2/" 
+    POLE_URL = "http://pole.fluffi:8888/api/v2/"
+    FTP_URL = getHostByNameHandler('ftp.fluffi')
     
 SQLALCHEMY_DATABASE_URI = "mysql://{}:{}@{}/fluffi_gm".format(DBUSER, DBPASS, DBHOST)
                                                                                                                                                                   
 DBFILE = "sql_files/createLMDB.sql"
 DBPREFIX = "fluffi_"
 DEFAULT_DBNAME = "information_schema"
-FTP_URL = getHostByNameHandler('ftp.fluffi')
 MQTT_HOST = getHostByNameHandler('mon.fluffi')
 MQTT_PORT = 1883
 

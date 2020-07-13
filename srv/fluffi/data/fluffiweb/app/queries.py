@@ -34,6 +34,8 @@ NUM_BLOCKS = (
     "SELECT COUNT(DISTINCT ModuleID, Offset) FROM covered_blocks")
 GET_SETTINGS = (
     "SELECT ID, SettingName, SettingValue FROM settings")
+GET_RUNNERTYPE = (
+    "SELECT SettingValue FROM settings WHERE SettingName='runnerType'")
 GET_TARGET_MODULES = (
     "SELECT ID, ModuleName, ModulePath FROM target_modules")
 DELETE_TESTCASES = (
