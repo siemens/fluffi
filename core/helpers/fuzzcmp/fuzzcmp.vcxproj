@@ -124,7 +124,7 @@ Author(s): Thomas Riedmaier
       <ModuleDefinitionFile>fuzzcmp.def</ModuleDefinitionFile>
     </Link>
     <PreBuildEvent>
-      <Command>perl generate_memcmp.pl &amp; perl generate_strcmp.pl &amp; perl generate__stricmp.pl &amp; perl generate_strcmpi.pl &amp; generate_stricmp.pl &amp; generate_strncmp.pl</Command>
+      <Command>perl generate_memcmp.pl &amp; perl generate_strcmp.pl &amp; perl generate__stricmp.pl &amp; perl generate_strcmpi.pl &amp; perl generate_stricmp.pl &amp; perl generate_strncmp.pl</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -142,7 +142,7 @@ Author(s): Thomas Riedmaier
       <ModuleDefinitionFile>fuzzcmp.def</ModuleDefinitionFile>
     </Link>
     <PreBuildEvent>
-      <Command>perl generate_memcmp.pl &amp; perl generate_strcmp.pl &amp; perl generate__stricmp.pl &amp; perl generate_strcmpi.pl &amp; generate_stricmp.pl &amp; generate_strncmp.pl</Command>
+      <Command>perl generate_memcmp.pl &amp; perl generate_strcmp.pl &amp; perl generate__stricmp.pl &amp; perl generate_strcmpi.pl &amp; perl generate_stricmp.pl &amp; perl generate_strncmp.pl</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -166,7 +166,7 @@ Author(s): Thomas Riedmaier
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PreBuildEvent>
-      <Command>perl generate_memcmp.pl &amp; perl generate_strcmp.pl &amp; perl generate__stricmp.pl &amp; perl generate_strcmpi.pl &amp; generate_stricmp.pl &amp; generate_strncmp.pl</Command>
+      <Command>perl generate_memcmp.pl &amp; perl generate_strcmp.pl &amp; perl generate__stricmp.pl &amp; perl generate_strcmpi.pl &amp; perl generate_stricmp.pl &amp; perl generate_strncmp.pl</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -188,7 +188,7 @@ Author(s): Thomas Riedmaier
       <ModuleDefinitionFile>fuzzcmp.def</ModuleDefinitionFile>
     </Link>
     <PreBuildEvent>
-      <Command>perl generate_memcmp.pl &amp; perl generate_strcmp.pl &amp; perl generate__stricmp.pl &amp; perl generate_strcmpi.pl &amp; generate_stricmp.pl &amp; generate_strncmp.pl</Command>
+      <Command>perl generate_memcmp.pl &amp; perl generate_strcmp.pl &amp; perl generate__stricmp.pl &amp; perl generate_strcmpi.pl &amp; perl generate_stricmp.pl &amp; perl generate_strncmp.pl</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
