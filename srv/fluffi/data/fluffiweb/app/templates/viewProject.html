@@ -518,10 +518,7 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
                                             style="font-size: 20px" title="This will only save the new *.zip file!"></span>
             </h2>
             <form action="{{ url_for('uploadNewTargetZip', projId=project.ID) }}" method="POST" enctype=multipart/form-data>
-                <p>Upload new Target as *.zip file:</p>
-                <div class="checkbox">
-                    <label><input name="addTargetToFuzzjob" type="checkbox" value="addTarget">Add target files to Fuzzjob</label>
-                </div>
+                <p>Upload new Target as *.zip file:</p>                
                 <input name="uploadFile" type="file" required>
                 <input class="btn btn-primary" type="submit" value="Upload" style="margin-top:15px"/>
             </form>
