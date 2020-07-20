@@ -26,7 +26,7 @@ $(document).ready(function(){
     var data = { infoType: "timeOfLatestPopulation"} ;
 
     if (projId != undefined) {
-        setInterval(function() {            
+        setInterval(function() {     
             $.ajax({
                 url: "/projects/" + projId + "/updateInfo",
                 type: 'POST',
@@ -35,9 +35,7 @@ $(document).ready(function(){
                 dataType: 'json',
                 success: function(response) {
                     if(response["status"] == "OK"){
-                        $("#timeOfLatestPopulation").css("background-color", "#1abc9c");
                         $("#timeOfLatestPopulation").text(response["info"]);
-                        setTimeout(function(){ $("#timeOfLatestPopulation").css("background-color", "#FFFFFF"); }, 500);
                     } else {
                         console.log(response["message"]);
                     }               
