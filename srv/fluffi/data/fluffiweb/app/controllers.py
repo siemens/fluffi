@@ -391,6 +391,115 @@ def getRowCount(projId, stmt, params=None):
         engine.dispose()
 
     return data
+    
+    
+def writeHexDiffFile(hexOneFile, hexTwoFile, diffFile):
+    with open(hexOneFile, "rb") as f1, open(hexTwoFile, "rb") as f2:
+        matcher = difflib.SequenceMatcher(None, f1.read(), f2.read())
+        with open(diffFile, 'a') as csvfile:
+            w = csv.writer(csvfile, delimiter=' ')
+            for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+                w.writerow([tag, i1, i2, j1, j2])
+        return matcher.ratio()
+
+
+def getHexDiff(diffFile, offset):
+    offsetEnd = offset + 960
+    diff = []
+    file = open(diffFile, "rU")
+    reader = csv.reader(file, delimiter=' ')
+    for row in reader:
+        x = range(int(row[1]), int(row[2]))
+        y = range(int(row[3]), int(row[4]))
+        z = range(offset, offsetEnd)
+        if len(list(set(x) & set(z))) > 0 or len(list(set(y) & set(z))) > 0:
+            diff.append(row)
+
+    return diff
+
+
+def createHexDiff(projId, testcaseId, parentTestcaseId, diffResultFile):
+    # create testcaseHexFile
+    testcaseHexfilePath = "/testcaseHex" + str(projId) + "." + str(testcaseId)
+    parentTestcaseHexfilePath = "/parentTestcaseHex" + str(projId) + "." + str(parentTestcaseId)
+    offset = 1
+    hexLen = 0
+
+    with open(testcaseHexfilePath, 'wb') as testcaseHexfile:
+        while True:
+            resultTestcaseHex = getResultOfStatement(projId, GET_TESTCASE_DUMP,
+                                                     {"testcaseID": testcaseId, "offset": offset})
+            if resultTestcaseHex is not None:
+                rows = resultTestcaseHex.fetchall()
+                for row in rows:
+                    for num, x in enumerate(row):
+                        if num is 0:
+                            testcaseHexfile.write(x)
+                        elif num is 1:
+                            hexLen = x
+                            offset += 960
+            if offset > hexLen:
+                break
+
+    offset = 1
+    # create parentTestcaseHexFile
+    with open(parentTestcaseHexfilePath, 'wb') as parentTestcaseHexfile:
+        while True:
+            resultParentTestcaseHex = getResultOfStatement(projId, GET_TESTCASE_DUMP,
+                                                     {"testcaseID": parentTestcaseId, "offset": offset})
+            if resultParentTestcaseHex is not None:
+                rows = resultParentTestcaseHex.fetchall()
+                for row in rows:
+                    for num, x in enumerate(row):
+                        if num is 0:
+                            parentTestcaseHexfile.write(x)
+                        elif num is 1:
+                            hexLen = x
+                            offset += 960
+            if offset > hexLen:
+                break
+
+    # compare these files
+    writeHexDiffFile(parentTestcaseHexfilePath, testcaseHexfilePath, diffResultFile)
+
+    # delete files
+    os.remove(testcaseHexfilePath)
+    os.remove(parentTestcaseHexfilePath)
+
+
+def deleteOldDiffFiles(diffFileNameSub):
+    for element in os.listdir("/"):
+        if diffFileNameSub in element and element.count(".") is 2:
+            if (int(round(time.time())) - int(round(os.stat("/" + element).st_mtime))) / 60 > 30:
+                os.remove("/" + element)
+
+
+def getTextByHex(hexTable, split):
+    decodedData = []
+    targetLen = (int(len(hexTable) / split) + (len(hexTable) % split > 0)) * split
+    for _ in range(len(hexTable), targetLen):
+        hexTable.append("  ")
+
+    for b in hexTable:
+        if b == "  ":
+            decodedData.append(" ")
+        else:
+            if 0 <= int(b, 16) <= 31 or 127 <= int(b, 16) <= 159:
+                decodedText = "."
+            else:
+                decodedText = binascii.unhexlify(b).decode("latin-1", "ignore")
+            if not decodedText:
+                decodedData.append(".")
+            else:
+                decodedData.append(decodedText)
+
+    for _ in range(len(decodedData), targetLen):
+        decodedData.append(" ")
+
+    textOutputF = [hexTable[x:x + split] for x in range(0, len(hexTable), split)]
+    decodedDataF = [decodedData[x:x + split] for x in range(0, len(decodedData), split)]
+
+    return textOutputF, decodedDataF
 
 
 def getResultOfStatement(projId, stmt, params=None):
