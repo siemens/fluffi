@@ -25,6 +25,7 @@ import csv
 import subprocess
 import time
 import re
+import binascii
 from base64 import b64encode
 from os import system, unlink
 
@@ -35,9 +36,6 @@ from app import db, models
 from .constants import *
 from .helpers import *
 from .queries import *
-
-
-
 
 
 def createNewDatabase(name):
