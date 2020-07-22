@@ -390,6 +390,17 @@ def renameElement(projId):
     return json.dumps({"message": message, "status": status, "command": request.json["command"]})
 
 
+@app.route("/projects/<int:projId>/updateInfo", methods=["POST"])
+def updateInfo(projId):
+    if not request.json:
+        abort(400)
+
+    infoType = request.json.get("infoType")
+    msg, info, status = updateInfoHandler(projId, infoType)
+
+    return json.dumps({"message": msg, "status": status, "info": info})
+
+
 @app.route("/projects/<int:projId>/download")
 def downloadTestcaseSet(projId):
     project = models.Fuzzjob.query.filter_by(ID=projId).first()
@@ -1139,8 +1150,7 @@ def viewProject(projId):
                           project=project,
                           locationForm=locationForm,
                           settingForm=settingForm,
-                          moduleForm=moduleForm
-                          )
+                          moduleForm=moduleForm)
 
 
 @app.route("/locations")

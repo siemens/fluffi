@@ -30,6 +30,8 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
 <script src="{{ url_for('static', filename = 'javascript/modifyViewProject.js') }}" type="text/javascript"></script>
 <script src="{{ url_for('static', filename = 'javascript/tooltip.js') }}" type="text/javascript"></script>
 <script src="{{ url_for('static', filename = 'javascript/inputValidator.js') }}" type="text/javascript"></script>
+<script src="{{ url_for('static', filename = 'javascript/infoUpdater.js') }}" type="text/javascript"></script>
+<script> var projId = {{ project.ID }}; </script>
 {{super()}}
 {% endblock %}
 
@@ -64,9 +66,13 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
                     <td style="text-align: center;">{{ project.testcases }}</td>
                 </tr>
                 <tr>
+                    <th scope="row">Time of latest population insert:</th>
+                    <td style="text-align: center;" id="timeOfLatestPopulation">{{ project.timeOfLatestPopulation }}</td>
+                </tr>
+                <tr>
                     <th scope="row"><a href="/projects/{{ project.ID }}/population/1">Population</a></th>
                     <td style="text-align: center;">{{ project.numPopulation }} / {{ project.numMinimizedPop }}</td>
-                </tr>
+                </tr>                
                 <tr>
                     <th scope="row"><a href="/projects/{{ project.ID }}/accessVioTotal/1">Access Violations (Total)</a>
                     </th>

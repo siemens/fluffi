@@ -110,7 +110,7 @@ $(function() {
     });
 });
 
-VALID_INPUT = true;
+var VALID_INPUT = true;
 
 function addTypeSetting(subType, name){
     var sum = 0;
