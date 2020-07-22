@@ -1045,7 +1045,7 @@ def insertFormInputForConfiguredInstances(request, system):
                                                                         InstanceCount=valueAsInt, Architecture=arch)
                             db.session.add(newInstance)
                     db.session.commit()                                                
-        return "Success: Configured Instances!", "success"            
+        return "Configured Instances!", "success"            
     except Exception as e:
         print(e)
         return "Error: Could not configure Instances!", "error"
@@ -1091,7 +1091,7 @@ def insertFormInputForConfiguredFuzzjobInstances(request, fuzzjob):
                                                                         InstanceCount=valueAsInt, Architecture=arch)
                             db.session.add(newInstance)
                     db.session.commit()                                                
-        return "Success: Configured Instances!", "success"            
+        return "Configured Instances!", "success"            
     except Exception as e:
         print(e)
         return "Error: Could not configure Instances!", "error"
@@ -1203,7 +1203,7 @@ def insertFormInputForProject(form, request):
             if form.subtype.data == "ALL_GDB":
                 setNewBasicBlocks(request.files['basicBlockFile'], project.ID)
 
-        return ["Success: Created new project", "success", project.ID]
+        return ["Created new project", "success", project.ID]
     except Exception as e:
         print(e)
         return ["Error: " + str(e), "error"]
@@ -1231,7 +1231,7 @@ def uploadNewTargetZipHandler(projId, targetFile):
     if existingPackage is not None:  
         try:
             FTP_CONNECTOR.saveTargetFileOnFTPServer(targetFileData, existingPackage.DeploymentPackages.name)
-            return "Success: Updated target!", "success"
+            return "Updated target!", "success"
         except Exception as e:
             print(e)  
             return "Error: Failed to update target!", "error"                                                     
@@ -1246,7 +1246,7 @@ def uploadNewTargetZipHandler(projId, targetFile):
         db.session.add(newFjDeploymentPackage)
         db.session.commit()
         
-        return "Success: Uploaded new target!", "success"
+        return "Uploaded new target!", "success"
     except Exception as e:
         print(e)
         return "Error: Failed saving target!", "error" 
