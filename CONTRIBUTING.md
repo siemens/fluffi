@@ -19,7 +19,7 @@ OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 
-Author(s): Abian Blome, Junes Najah, Thomas Riedmaier
+Author(s): Abian Blome, Thomas Riedmaier, Junes Najah
 -->
 
 # Contributing to FLUFFI

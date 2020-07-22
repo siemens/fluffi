@@ -19,7 +19,7 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 # 
-# Author(s): Thomas Riedmaier, Roman Bendt
+# Author(s): Thomas Riedmaier, Roman Bendt, Junes Najah
 
 # Getting bootstrap
 

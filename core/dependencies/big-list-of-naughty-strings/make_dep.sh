@@ -19,7 +19,7 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 # 
-# Author(s): Thomas Riedmaier
+# Author(s): Thomas Riedmaier, Roman Bendt
 
 THREADS=$(nproc)
 ARCH=$(file /bin/bash | awk -F',' '{print $2}' | tr -d ' ')

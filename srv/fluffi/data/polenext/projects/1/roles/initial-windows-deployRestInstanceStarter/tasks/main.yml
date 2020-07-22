@@ -18,7 +18,7 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 # 
-# Author(s): Michael Kraus, Thomas Riedmaier, Pascal Eckmann
+# Author(s): Michael Kraus, Pascal Eckmann, Thomas Riedmaier
 
 - name: Set file path to fetch
   set_fact:

@@ -18,7 +18,7 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 # 
-# Author(s): Thomas Riedmaier, Fabian Russwurm, Pascal Eckmann, Roman Bendt, Michael Kraus
+# Author(s): Fabian Russwurm, Thomas Riedmaier, Pascal Eckmann, Roman Bendt, Michael Kraus
 
 - name: Set default OSRootDirName and bootFile
   set_fact:

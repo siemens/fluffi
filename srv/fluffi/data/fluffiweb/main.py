@@ -19,7 +19,7 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 # 
-# Author(s): Thomas Riedmaier, Abian Blome, Junes Najah
+# Author(s): Abian Blome, Thomas Riedmaier, Junes Najah
 
 from app import app
 

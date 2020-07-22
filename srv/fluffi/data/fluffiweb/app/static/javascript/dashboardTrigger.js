@@ -19,7 +19,7 @@ OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 
-Author(s): Junes Najah, Thomas Riedmaier, Michael Kraus
+Author(s): Junes Najah
 */
 
 //needs to be adjusted if columns are added or removed

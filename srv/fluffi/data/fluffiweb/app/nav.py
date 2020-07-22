@@ -18,7 +18,7 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 # 
-# Author(s): Junes Najah, Thomas Riedmaier, Abian Blome, Pascal Eckmann, Michael Kraus
+# Author(s): Junes Najah, Thomas Riedmaier, Abian Blome, Michael Kraus
 
 from flask_nav import Nav
 from flask_nav.elements import Link, Navbar, Separator, Subgroup, View

@@ -18,7 +18,7 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 # 
-# Author(s): Junes Najah, Pascal Eckmann, Michael Kraus, Abian Blome, Thomas Riedmaier
+# Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael Kraus
 
 import io
 import csv
