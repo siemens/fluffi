@@ -18,7 +18,7 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 # 
-# Author(s): Michael Kraus, Thomas Riedmaier, Junes Najah
+# Author(s): Michael Kraus, Junes Najah, Thomas Riedmaier
 
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit

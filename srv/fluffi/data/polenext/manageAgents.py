@@ -18,7 +18,7 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 # 
-# Author(s): Pascal Eckmann, Thomas Riedmaier
+# Author(s): Pascal Eckmann, Thomas Riedmaier, Junes Najah
 
 import time
 

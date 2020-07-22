@@ -13,7 +13,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 # 
-# Author(s): Thomas Riedmaier, Pascal Eckmann
+# Author(s): Thomas Riedmaier, Pascal Eckmann, Roman Bendt
 
 THREADS=$(nproc)
 ARCH=$(file /bin/bash | awk -F',' '{print $2}' | tr -d ' ')

@@ -18,7 +18,7 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 # 
-# Author(s): Thomas Riedmaier, Fabian Russwurm
+# Author(s): Fabian Russwurm, Thomas Riedmaier
 
 #https://www.servernoobs.com/avoiding-cpu-speed-scaling-in-modern-linux-distributions-running-cpu-at-full-speed-tips/
 - name: Disable CPU scaling by changing /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor

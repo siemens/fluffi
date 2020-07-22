@@ -18,7 +18,7 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 # 
-# Author(s): Fabian Russwurm, Michael Kraus, Pascal Eckmann, Thomas Riedmaier, Junes Najah
+# Author(s): Fabian Russwurm, Pascal Eckmann, Michael Kraus, Thomas Riedmaier, Junes Najah
 
 import requests, json
 

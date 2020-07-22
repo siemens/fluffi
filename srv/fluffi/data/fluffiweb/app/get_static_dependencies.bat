@@ -18,7 +18,7 @@
 :: ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 :: DEALINGS IN THE SOFTWARE.
 :: 
-:: Author(s): Thomas Riedmaier
+:: Author(s): Thomas Riedmaier, Junes Najah
 
 :: Getting bootstrap
 
