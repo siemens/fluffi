@@ -26,6 +26,7 @@ import subprocess
 import time
 import re
 import binascii
+import difflib
 from base64 import b64encode
 from os import system, unlink
 

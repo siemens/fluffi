@@ -263,13 +263,13 @@ function loadHexdumpComp(projId, testcaseID, loopIndex, mode="dual", offset=0, c
                                     $.each(diff, function(x, value){
                                         var hovCheckCalc = parseInt(hovCheck.slice(1)) + ((currentPage - 1) * 960);
                                         if(/^p/.test(hovCheck)){
-                                            if(parseInt(value[1]) <= hovCheckCalc && hovCheckCalc < parseInt(value[2])){
+                                            if((parseInt(value[1]) <= hovCheckCalc) && (hovCheckCalc < parseInt(value[2]))){
                                                 $("#hovPStatus").text(parseInt(value[1]).toString(16) + " --> " + parseInt(value[2]).toString(16));
                                                 $("#hovTStatus").text(parseInt(value[3]).toString(16) + " --> " + parseInt(value[4]).toString(16));
                                             };
                                         };
                                         if(/^t/.test(hovCheck)){
-                                            if(parseInt(value[3]) <= hovCheckCalc && hovCheckCalc < parseInt(value[4])){
+                                            if((parseInt(value[3]) <= hovCheckCalc) && (hovCheckCalc < parseInt(value[4]))){
                                                 $("#hovPStatus").text(parseInt(value[1]).toString(16) + " --> " + parseInt(value[2]).toString(16));
                                                 $("#hovTStatus").text(parseInt(value[3]).toString(16) + " --> " + parseInt(value[4]).toString(16));
                                             };
