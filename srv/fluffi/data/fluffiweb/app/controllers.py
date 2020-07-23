@@ -744,17 +744,6 @@ def insertSettings(projId, request, settingForm):
     return "Added setting", "success"
 
 
-def uploadNewTarget(targetFile):
-    try:
-        targetFileData = targetFile.read()
-        targetFileName = targetFile.filename
-        FTP_CONNECTOR.saveTargetFileOnFTPServer(targetFileData, targetFileName)
-        return "Uploaded new Target!", "success"
-    except Exception as e:
-        print(e)
-        return "Error: Failed saving Target on FTP Server", "error"
-
-
 def setNewBasicBlocks(targetFile, projId):
     basicBlocks = []
     targetFile.seek(0)
@@ -1101,7 +1090,7 @@ def insertFormInputForConfiguredInstances(request, system):
                                                                         InstanceCount=valueAsInt, Architecture=arch)
                             db.session.add(newInstance)
                     db.session.commit()                                                
-        return "Success: Configured Instances!", "success"            
+        return "Configured Instances!", "success"            
     except Exception as e:
         print(e)
         return "Error: Could not configure Instances!", "error"
@@ -1147,7 +1136,7 @@ def insertFormInputForConfiguredFuzzjobInstances(request, fuzzjob):
                                                                         InstanceCount=valueAsInt, Architecture=arch)
                             db.session.add(newInstance)
                     db.session.commit()                                                
-        return "Success: Configured Instances!", "success"            
+        return "Configured Instances!", "success"            
     except Exception as e:
         print(e)
         return "Error: Could not configure Instances!", "error"
@@ -1259,7 +1248,7 @@ def insertFormInputForProject(form, request):
             if form.subtype.data == "ALL_GDB":
                 setNewBasicBlocks(request.files['basicBlockFile'], project.ID)
 
-        return ["Success: Created new project", "success", project.ID]
+        return ["Created new project", "success", project.ID]
     except Exception as e:
         print(e)
         return ["Error: " + str(e), "error"]
@@ -1268,14 +1257,44 @@ def insertFormInputForProject(form, request):
         engine.dispose()
 
 
-def addTargetZipToFuzzjob(projId, targetFileName):
-    deployment_package = models.DeploymentPackages(name=targetFileName)
-    db.session.add(deployment_package)
-    db.session.commit()
-    fuzzjob_deployment_package = models.FuzzjobDeploymentPackages(Fuzzjob=projId,
-                                                                  DeploymentPackage=deployment_package.ID)
-    db.session.add(fuzzjob_deployment_package)
-    db.session.commit()
+def uploadNewTargetZipHandler(projId, targetFile):
+    try:
+        targetFileData = targetFile.read()
+        targetFileName = targetFile.filename
+    except Exception as e:
+        print(e)
+        return "Error: Failed to read file!", "error"
+    
+    try:
+        existingPackage = db.session.query(models.DeploymentPackages, models.FuzzjobDeploymentPackages).filter(
+                models.DeploymentPackages.ID == models.FuzzjobDeploymentPackages.DeploymentPackage).filter(
+                    models.FuzzjobDeploymentPackages.Fuzzjob == projId).first()                                            
+    except Exception as e:
+        print(e)
+        return "Error: Failed to query existing packages!", "error"
+    
+    if existingPackage is not None:  
+        try:
+            FTP_CONNECTOR.saveTargetFileOnFTPServer(targetFileData, existingPackage.DeploymentPackages.name)
+            return "Updated target!", "success"
+        except Exception as e:
+            print(e)  
+            return "Error: Failed to update target!", "error"                                                     
+    try:
+        FTP_CONNECTOR.saveTargetFileOnFTPServer(targetFileData, targetFileName)
+        
+        newDeploymentPackage = models.DeploymentPackages(name=targetFileName)
+        db.session.add(newDeploymentPackage)
+        db.session.commit()
+        
+        newFjDeploymentPackage = models.FuzzjobDeploymentPackages(Fuzzjob=projId, DeploymentPackage=newDeploymentPackage.ID)
+        db.session.add(newFjDeploymentPackage)
+        db.session.commit()
+        
+        return "Uploaded new target!", "success"
+    except Exception as e:
+        print(e)
+        return "Error: Failed saving target!", "error" 
 
 
 def removeAgents(projId):
