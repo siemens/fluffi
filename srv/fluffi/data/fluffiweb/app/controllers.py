@@ -391,8 +391,13 @@ def getGeneralInformationData(projId, stmt):
         for row in result:
             testcase = type('', (), {})()
             testcase.testcaseID = row["ID"]
+            
             if "CrashFootprint" in row and row["CrashFootprint"] is not None:
-                    testcase.footprint = row["CrashFootprint"]
+                testcase.footprint = row["CrashFootprint"]
+            
+            if "CoveredBlocks" in row and row["CoveredBlocks"] is not None:
+                testcase.coveredBlocks = row["CoveredBlocks"]
+                     
             testcase.ID = "{}:{}".format(row["CreatorServiceDescriptorGUID"], row["CreatorLocalID"])
             testcase.rating = row["Rating"]
             
