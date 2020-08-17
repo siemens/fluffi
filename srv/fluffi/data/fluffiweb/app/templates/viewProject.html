@@ -441,7 +441,8 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
             <tr>
                 <th><label>Name</label></th>
                 <th><label>Path</label></th>
-                <th>Operations</th>
+                <th><label>Covered Blocks</label></th>
+                <th><label>Operations</label></th>
             </tr>
             </thead>
             <tbody>
@@ -449,6 +450,7 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
             <tr>
                 <td>{{ module.name }}</td>
                 <td>{{ module.path }}</td>
+                <td>{{ module.coveredBlocks }}</td>
                 <td>
                     <input class="btn btn-default" id="deleteModule{{ module.name }}{{ project.ID }}"
                             onclick="deleteModule({{ project.ID }}, {{ module.ID }})" type="button"

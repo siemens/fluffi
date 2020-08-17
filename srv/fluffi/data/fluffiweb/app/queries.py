@@ -37,7 +37,9 @@ GET_SETTINGS = (
 GET_RUNNERTYPE = (
     "SELECT SettingValue FROM settings WHERE SettingName='runnerType'")
 GET_TARGET_MODULES = (
-    "SELECT ID, ModuleName, ModulePath FROM target_modules")
+    "SELECT tm.ID, tm.ModuleName, tm.ModulePath, cbc.CoveredBlocks "
+    "FROM target_modules AS tm "
+    "LEFT JOIN (SELECT ModuleID, COUNT(*) AS CoveredBlocks FROM covered_blocks GROUP BY ModuleID) as cbc ON ID = cbc.ModuleID;")
 DELETE_TESTCASES = (
     "DELETE FROM interesting_testcases WHERE CreatorServiceDescriptorGUID <> 'initial'")
 RESET_RATING = (

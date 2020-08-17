@@ -268,6 +268,7 @@ def getProject(projId):
             module = type('', (), {})()
             module.name = row["ModuleName"]
             module.path = row["ModulePath"]
+            module.coveredBlocks = row["CoveredBlocks"]
             module.ID = row["ID"]
             project.modules.append(module)
 
