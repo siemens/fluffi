@@ -251,20 +251,21 @@ def createSetting(projId):
 @app.route("/projects/<int:projId>/uploadNewTargetZip", methods=["GET", "POST"])
 def uploadNewTargetZip(projId):
     if request.method == "POST":
-        addTarget = request.form.get("addTargetToFuzzjob") == "addTarget"
         targetFile = request.files["uploadFile"]
         targetFileName = targetFile.filename
+        
         if not targetFile:
             flash("Invalid file", "error")
             return redirect(request.url)
+        
         if not ('.' in targetFile.filename and targetFile.filename.rsplit('.', 1)[1].lower() in set(["zip"])):
             flash("Only *.zip files are allowed!", "error")
             return redirect(request.url)
-        msg, category = uploadNewTarget(targetFile)
-        if addTarget:
-            addTargetZipToFuzzjob(projId, targetFileName)
+               
+        msg, category = uploadNewTargetZipHandler(projId, targetFile)        
         flash(msg, category)
         return redirect("/projects/view/%d" % projId)
+    
     return redirect("/projects/view/%d" % projId)
 
 
