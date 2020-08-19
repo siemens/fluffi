@@ -79,7 +79,6 @@ $(function () {
 });
 
 function getURL(myProjectName, from, to){
-  // TODO is port always needed ?!
   if(myProjectName == 'grafana1'){      
     return MON_BASE_URL + MON_PORT + "/d/MAzsmLaik/fluffi-1?orgId=1&refresh=5s&kiosk";
   } 
