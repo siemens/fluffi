@@ -23,80 +23,64 @@ Author(s): Junes Najah
 */
 
 $(document).ready(function() {
-    var projId = window.location.hash.substr(1);
-
-    // TODO: get data...
-    // [{radius, title, color}, ...]
 
     var canvas = document.getElementById('canvas');
     var context = canvas.getContext('2d');    
 
     window.addEventListener('resize', resizeCanvas, false);
 
-    function resizeCanvas() {
+    var projId = window.location.hash.substr(1);
+    var url = "/projects/" + projId + "/coverageDistribution";
+
+    $.getJSON(url, function(response) {                 
+        resizeCanvas(response["data"]);
+    });    
+    
+
+    function resizeCanvas(data) {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
             
-            drawCircles(50, 'target3'); 
-    }
-    resizeCanvas();
+            drawBubbles(data); 
+    }    
 
     function getRandomColor() {
+        // TODO exclude white
         var letters = '0123456789ABCDEF';
         var color = '#';
         for (var i = 0; i < 6; i++) {
             color += letters[Math.floor(Math.random() * 16)];
         }
         return color;
-    }
+    }    
 
-    function drawCircles(radius, title){
+    function drawBubbles(circles){
         var pi2 = Math.PI * 2;
 
         var cx = canvas.width / 2;
         var cy = canvas.height / 2;
 
-        context.beginPath();
-        context.moveTo(cx, cy);
-        context.arc(cx, cy, radius, 0, pi2, false);
-        context.fillStyle = getRandomColor();  
-        context.fill();  
+        var oldRadius, newRadius;
 
-        var oldRadius = radius;
-        var newRadius = 100;
-        
-        cx = cx + (oldRadius + newRadius);
-        cy = cy;
-        context.beginPath();
-        context.moveTo(cx, cy);
-        context.arc(cx, cy, newRadius, 0, pi2, false);
-        context.fillStyle = getRandomColor();  
-        context.fill();
+        for (var index = 0; index < circles.length; index++) {
+            oldRadius = circles[index].radius;
+            context.beginPath();
+            context.moveTo(cx, cy);
+            context.arc(cx, cy, oldRadius, 0, pi2, false);
+            context.fillStyle = getRandomColor();                 
+            context.fill(); 
 
-        oldRadius = newRadius;
-        newRadius = 20;
-
-        cx = cx + (oldRadius + newRadius);
-        cy = cy;
-        context.beginPath();
-        context.moveTo(cx, cy);
-        context.arc(cx, cy, newRadius, 0, pi2, false);
-        context.fillStyle = getRandomColor();  
-        context.fill();
-
-        oldRadius = newRadius;
-        newRadius = 200;
-
-        cx = cx + (oldRadius + newRadius);
-        cy = cy;
-        context.beginPath();
-        context.moveTo(cx, cy);
-        context.arc(cx, cy, newRadius, 0, pi2, false);
-        context.fillStyle = getRandomColor();  
-        context.fill();
-        
-        // context.fillStyle = 'white';
-        // context.textAlign = 'center';
-        // context.fillText(title, centerX, centerY);          
+            context.textAlign = 'center';
+            context.fillStyle = 'white'; 
+            context.fillText(circles[index].title, cx, cy); 
+            
+            if(index < circles.length - 1){
+                newRadius = circles[index + 1].radius
+            }
+            
+            // TODO manage bubble layout and add scrolling for a lot of bubbles
+            cx = cx + (oldRadius + newRadius);
+            cy = cy;            
+        }                
     }
 });

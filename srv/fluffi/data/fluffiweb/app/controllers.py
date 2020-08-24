@@ -1312,7 +1312,7 @@ def removeAgents(projId):
     
 
 def getGraphData(projId):
-    project = models.Fuzzjob.query.filter_by(ID = projId).first()
+    project = models.Fuzzjob.query.filter_by(ID=projId).first()
     graphdata = dict()
     nodes = []    
     edges = []
@@ -1376,6 +1376,35 @@ def getGraphData(projId):
     graphdata["edges"] = edges
     
     return graphdata
+
+
+def getCoverageData(projId):
+    data = []
+    
+    try:
+        project = models.Fuzzjob.query.filter_by(ID = projId).first()
+        
+        engine = create_engine(
+            'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
+        connection = engine.connect()
+        
+        result = connection.execute(GET_TARGET_MODULES)
+
+        for row in result:
+            module = dict()
+            module["ID"]  = row["ID"]   
+            # rename to title for bubble chart         
+            module["title"] = row["ModuleName"]
+            module["CoveredBlocks"] = row["CoveredBlocks"]
+            data.append(module)
+        
+        connection.close()
+        engine.dispose()
+    except Exception as e:
+        print(e)
+
+    
+    return data
 
 
 class DownloadArchiveLockFile:
