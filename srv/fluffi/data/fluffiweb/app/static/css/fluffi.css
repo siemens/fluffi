@@ -461,6 +461,10 @@ Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Thomas Riedmaier
     table-layout:fixed;
 }
 
+#hexTable tr {
+    height: 20px;
+}
+
 #hexTable td, th {
     border: 0px;
 }
@@ -469,67 +473,67 @@ Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Thomas Riedmaier
     background-color: #f1f1f1;
 }
 
-#hexTable .by {
+.by {
     background-color: #337ab7;
     color: #fff;
 }
 
-#hexTable .bz {
+.bz {
     background-color: #1761a2;
     color: #fff;
     border-bottom: solid 1px #fff;
 }
 
-#hexTable tbody .br {
+tbody .br {
     border-right: solid 1px #777;
 }
 
-#hexTable thead .br {
+thead .br {
     border-right: solid 1px #fff;
 }
 
-#hexTable .bx {
+.bx {
     background: #ff9966;
     border-right: solid 1px #777;
 }
 
-#hexTable tbody .bp {
+tbody .bp {
     border-left: solid 1px #777;
 }
 
-#hexTable thead .bp {
+thead .bp {
     border-left: solid 1px #fff;
 }
 
-td[class*='hovEqual'] {
+[class*='hovEqual'] {
     background: rgba(0, 200, 0, 0.2) !important;
 }
 
-td[class*='hovEqual'].hovered {
+[class*='hovEqual'].hovered {
     background: rgba(0, 200, 0, 0.6) !important;
 }
 
-td[class*='hovReplace'] {
+[class*='hovReplace'] {
     background: rgba(215, 160, 15, 0.2) !important;
 }
 
-td[class*='hovReplace'].hovered {
+[class*='hovReplace'].hovered {
     background: rgba(215, 160, 15, 0.6) !important;
 }
 
-td[class*='hovDelete'] {
+[class*='hovDelete'] {
     background: rgba(215, 25, 15, 0.2) !important;
 }
 
-td[class*='hovDelete'].hovered {
+[class*='hovDelete'].hovered {
     background: rgba(215, 25, 15, 0.6) !important;
 }
 
-td[class*='hovInsert'] {
+[class*='hovInsert'] {
     background: rgba(15, 160, 215, 0.2) !important;
 }
 
-td[class*='hovInsert'].hovered {
+[class*='hovInsert'].hovered {
     background: rgba(15, 160, 215, 0.6) !important;
 }
 
