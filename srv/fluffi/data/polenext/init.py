@@ -18,7 +18,7 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 # 
-# Author(s): Pascal Eckmann, Thomas Riedmaier, Roman Bendt
+# Author(s): Pascal Eckmann, Roman Bendt, Thomas Riedmaier
 
 from distutils.dir_util import copy_tree
 import subprocess

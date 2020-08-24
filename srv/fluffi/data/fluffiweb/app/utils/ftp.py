@@ -33,6 +33,7 @@ class FTPConnector:
         self.ftpClient.connect(self.ftpURL)
         self.ftpClient.login()
         self.ftpClient.cwd(path)
+        
         ls = []
         ls = self.ftpClient.nlst()
         tupelsOfLS = zip(ls, ls)
@@ -65,13 +66,13 @@ class FTPConnector:
         target = open(path, 'wb')
         target.write(targetFileData)
         target.close()
+        
         self.ftpClient.connect(self.ftpURL)
         self.ftpClient.login()
         f = open('tmp.zip', 'rb')
         self.ftpClient.storbinary("STOR /SUT/" + name.split('.', 1)[0] + ".zip", f)
         self.ftpClient.quit()
 
-        return True
 
     def saveArchivedProjectOnFTPServer(self, fileName):
         self.ftpClient.connect(self.ftpURL)
@@ -80,13 +81,11 @@ class FTPConnector:
 
         if myFile:
             self.ftpClient.storbinary("STOR /archive/" + fileName, myFile)
-        else:
-            print("-------------------------------------------")
-            print("Error: File not found")
-            print("-------------------------------------------")
             self.ftpClient.quit()
-            return False
-
+            myFile.close()
+            return True
+        
+        print("Error: File not found")
         self.ftpClient.quit()
-
-        return True
+        myFile.close()
+        return False                

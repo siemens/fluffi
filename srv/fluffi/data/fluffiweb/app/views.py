@@ -250,20 +250,21 @@ def createSetting(projId):
 @app.route("/projects/<int:projId>/uploadNewTargetZip", methods=["GET", "POST"])
 def uploadNewTargetZip(projId):
     if request.method == "POST":
-        addTarget = request.form.get("addTargetToFuzzjob") == "addTarget"
         targetFile = request.files["uploadFile"]
         targetFileName = targetFile.filename
+        
         if not targetFile:
             flash("Invalid file", "error")
             return redirect(request.url)
+        
         if not ('.' in targetFile.filename and targetFile.filename.rsplit('.', 1)[1].lower() in set(["zip"])):
             flash("Only *.zip files are allowed!", "error")
             return redirect(request.url)
-        msg, category = uploadNewTarget(targetFile)
-        if addTarget:
-            addTargetZipToFuzzjob(projId, targetFileName)
+               
+        msg, category = uploadNewTargetZipHandler(projId, targetFile)        
         flash(msg, category)
         return redirect("/projects/view/%d" % projId)
+    
     return redirect("/projects/view/%d" % projId)
 
 
@@ -387,6 +388,17 @@ def renameElement(projId):
                                              request.json["command"], request.json["elemType"])
 
     return json.dumps({"message": message, "status": status, "command": request.json["command"]})
+
+
+@app.route("/projects/<int:projId>/updateInfo", methods=["POST"])
+def updateInfo(projId):
+    if not request.json:
+        abort(400)
+
+    infoType = request.json.get("infoType")
+    msg, info, status = updateInfoHandler(projId, infoType)
+
+    return json.dumps({"message": msg, "status": status, "info": info})
 
 
 @app.route("/projects/<int:projId>/download")
@@ -1201,8 +1213,7 @@ def viewProject(projId):
                           project=project,
                           locationForm=locationForm,
                           settingForm=settingForm,
-                          moduleForm=moduleForm
-                          )
+                          moduleForm=moduleForm)
 
 
 @app.route("/locations")

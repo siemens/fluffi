@@ -18,7 +18,7 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 # 
-# Author(s): Michael Kraus, Thomas Riedmaier, Abian Blome, Junes Najah
+# Author(s): Michael Kraus, Junes Najah, Abian Blome, Thomas Riedmaier
 
 from app import db
 from sqlalchemy import ForeignKey

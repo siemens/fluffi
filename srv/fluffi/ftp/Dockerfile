@@ -18,7 +18,7 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 # 
-# Author(s): Thomas Riedmaier, Fabian Russwurm, Roman Bendt
+# Author(s): Fabian Russwurm, Thomas Riedmaier, Roman Bendt
 
 FROM ubuntu:bionic
 

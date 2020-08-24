@@ -335,4 +335,13 @@ def getITQueryOfTypeNoRaw(n):
 
 
 def getMICountOfTypeQuery(n):
-    return "SELECT COUNT(*) FROM managed_instances WHERE AgentType=" + str(n)
+    return "SELECT COUNT(*) FROM managed_instances WHERE AgentType={};".format(n)
+
+
+def getLatestTestcaseOfType(n):
+    return (
+        "SELECT TimeOfInsertion FROM interesting_testcases "
+        "WHERE TestCaseType={} "
+        "ORDER BY TimeOfInsertion DESC LIMIT 1;".format(n)
+    )
+    

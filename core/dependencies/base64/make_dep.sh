@@ -19,7 +19,7 @@
 #                                                                               
 # 3. This notice may not be removed or altered from any source distribution.
 # 
-# Author(s): Thomas Riedmaier, Pascal Eckmann
+# Author(s): Thomas Riedmaier, Pascal Eckmann, Roman Bendt
 
 THREADS=$(nproc)
 ARCH=$(file /bin/bash | awk -F',' '{print $2}' | tr -d ' ')

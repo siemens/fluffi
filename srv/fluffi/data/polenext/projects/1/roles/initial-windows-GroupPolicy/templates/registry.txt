@@ -18,7 +18,7 @@
 ; ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 ; DEALINGS IN THE SOFTWARE.
 ; 
-; Author(s): Fabian Russwurm, Abian Blome, Thomas Riedmaier
+; Author(s): Fabian Russwurm, Thomas Riedmaier, Abian Blome
 
 ; ----------------------------------------------------------------------
 ; Computer POLICY FILE

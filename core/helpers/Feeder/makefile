@@ -18,7 +18,7 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 # 
-# Author(s): Junes Najah
+# Author(s): Junes Najah, Thomas Riedmaier
 
 ARCH := $(shell file /bin/bash | awk -F',' '{print $$2}' | tr -d ' ')
 

@@ -18,7 +18,7 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 # 
-# Author(s): Fabian Russwurm, Thomas Riedmaier
+# Author(s): Fabian Russwurm, Pascal Eckmann, Thomas Riedmaier
 
 - name: Check architecture for x86 installer
   set_fact:
