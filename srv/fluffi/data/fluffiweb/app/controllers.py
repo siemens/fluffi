@@ -1379,7 +1379,8 @@ def getGraphData(projId):
 
 
 def getCoverageData(projId):
-    data = []
+    coverageData = []
+    coveredBlocks = []
     
     try:
         project = models.Fuzzjob.query.filter_by(ID = projId).first()
@@ -1395,16 +1396,29 @@ def getCoverageData(projId):
             module["ID"]  = row["ID"]   
             # rename to title for bubble chart         
             module["title"] = row["ModuleName"]
-            module["CoveredBlocks"] = row["CoveredBlocks"]
-            data.append(module)
+            
+            if "CoveredBlocks" in row and row["CoveredBlocks"] is not None:
+                module["CoveredBlocks"] = row["CoveredBlocks"]
+                coveredBlocks.append(row["CoveredBlocks"])
+            else:
+                module["CoveredBlocks"] = 0
+                
+            coverageData.append(module)
         
         connection.close()
         engine.dispose()
     except Exception as e:
         print(e)
-
+        
+    maximum = max(coveredBlocks)    
     
-    return data
+    for cdObj in coverageData:
+        radius = int(round((cdObj["CoveredBlocks"] / maximum) * 100)) if maximum != 0 else 0
+        cdObj["radius"] = radius + 30
+    
+    sortedCoverageData = sorted(coverageData, key=lambda k: k["radius"], reverse=True)
+    
+    return sortedCoverageData
 
 
 class DownloadArchiveLockFile:

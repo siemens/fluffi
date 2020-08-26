@@ -27,39 +27,34 @@ $(document).ready(function() {
     var canvas = document.getElementById('canvas');
     var context = canvas.getContext('2d');    
 
-    window.addEventListener('resize', resizeCanvas, false);
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
     var projId = window.location.hash.substr(1);
     var url = "/projects/" + projId + "/coverageDistribution";
 
     $.getJSON(url, function(response) {                 
-        resizeCanvas(response["data"]);
-    });    
-    
-
-    function resizeCanvas(data) {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            
-            drawBubbles(data); 
-    }    
+        drawCircles(response["data"]);
+    });     
 
     function getRandomColor() {
-        // TODO exclude white
         var letters = '0123456789ABCDEF';
         var color = '#';
         for (var i = 0; i < 6; i++) {
             color += letters[Math.floor(Math.random() * 16)];
         }
-        return color;
+
+        return color == "#FFFFFF" ? "#011638" : color;
     }    
 
-    function drawBubbles(circles){
+    function drawCircles(circles){
         var pi2 = Math.PI * 2;
 
-        var cx = canvas.width / 2;
-        var cy = canvas.height / 2;
+        var cxFirst = canvas.width / 4;
+        var cx = cxFirst;
+        var cy = canvas.height / 4;
 
+        var firstRadius = circles.length > 0 ? circles[0].radius : 0;
         var oldRadius, newRadius;
 
         for (var index = 0; index < circles.length; index++) {
@@ -78,9 +73,12 @@ $(document).ready(function() {
                 newRadius = circles[index + 1].radius
             }
             
-            // TODO manage bubble layout and add scrolling for a lot of bubbles
-            cx = cx + (oldRadius + newRadius);
-            cy = cy;            
+            if(index > 0 && index % 5 == 0){
+                cx = cxFirst;
+                cy = cy + firstRadius + newRadius;
+            } else {
+                cx = cx + (oldRadius + newRadius);
+            }                                              
         }                
     }
 });

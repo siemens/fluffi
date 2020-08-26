@@ -1127,16 +1127,7 @@ def viewTestcaseGraph(projId):
 
 @app.route("/projects/<int:projId>/coverageDistribution", methods=["GET"])
 def viewCoverageDistribution(projId):
-    coverageData = getCoverageData(projId)
-    
-    coveredBlocks = [ c["CoveredBlocks"] for c in coverageData]       
-    maximum = max(coveredBlocks)    
-    
-    for cdObj in coverageData:
-        radius = int(round((cdObj["CoveredBlocks"] / maximum) * 100)) if maximum != 0 else 0
-        cdObj["radius"] = radius
-    
-    print(coverageData)
+    coverageData = getCoverageData(projId)                    
     
     return json.dumps({"data": coverageData})
 
