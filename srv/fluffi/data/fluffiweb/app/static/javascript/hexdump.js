@@ -150,7 +150,6 @@ function loadHexdump(projId, testcaseID, loopIndex, mode="single", offset=0, ini
 function loadHexdumpComp(projId, testcaseID, loopIndex, mode="dual", offset=0, init=true, marker=-1){
     var URL = "/hexdump/" + projId + "/" + testcaseID + "/" + offset + "/1";
     var data = {};
-    var hexData = [];
     var pageCount = 1;
     var linkElem = "";
     var navigateFuncStr = "";
