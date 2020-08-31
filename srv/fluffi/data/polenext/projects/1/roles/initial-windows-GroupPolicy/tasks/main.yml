@@ -1,12 +1,24 @@
-# Copyright 2017-2019 Siemens AG
+# Copyright 2017-2020 Siemens AG
 # 
-# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including without
+# limitation the rights to use, copy, modify, merge, publish, distribute,
+# sublicense, and/or sell copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following conditions:
 # 
-# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
 # 
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+# SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+# OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+# ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+# DEALINGS IN THE SOFTWARE.
 # 
-# Author(s): Fabian Russwurm, Thomas Riedmaier, Pascal Eckmann
+# Author(s): Fabian Russwurm, Pascal Eckmann, Thomas Riedmaier
 
 - name: Fetch LGPO from "{{ftpserverURL}}/{{initialAnsibleFTPPath}}/{{LGPOFTPDirname}}/{{LGPOExecutableFileName}}"
   win_get_url: 
@@ -17,16 +29,23 @@
 #  win_copy:
 #    src: "{{LGPOExecutableFileName}}"
 #    dest: "{{remoteUtilitiesFilePath}}"
+
+- name: Check file size
+  win_stat:
+    path: "{{remoteUtilitiesFilePath}}{{LGPOExecutableFileName}}"
+  register: file_size
     
 - name: Copy {{groupPolicyFileNameTxt}} to remote machine via template
   win_template:
     src: "{{groupPolicyFileNameTxt}}"
     dest: "{{remoteUtilitiesFilePath}}\\{{groupPolicyFileNameTxt}}"
+  when: file_size.stat.size > 200
 
 - name: Execute {{LGPOExecutableFileName}} to generate group policy {{groupPolicyFileNamePol}}
   win_command: "{{LGPOExecutableFileName}} /r {{groupPolicyFileNameTxt}} /w {{groupPolicyFileNamePol}}"
   args:
-    chdir: "{{remoteUtilitiesFilePath}}"    
+    chdir: "{{remoteUtilitiesFilePath}}"
+  when: file_size.stat.size > 200
 
 - name: Execute {{LGPOExecutableFileName}} to apply group policy {{groupPolicyFileNamePol}}
   win_command: "{{LGPOExecutableFileName}} /m .\\{{groupPolicyFileNamePol}}"
@@ -35,3 +54,9 @@
   notify:
     - Ensure Windows NTP service is running
     - Force Windows NTP time sync
+  when: file_size.stat.size > 200
+
+- fail:
+    msg: "File too small. Did you replace the stub files with the actual files?" 
+  when: file_size.stat.size <= 200
+

@@ -1,11 +1,23 @@
 /*
-Copyright 2017-2019 Siemens AG
+Copyright 2017-2020 Siemens AG
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including without
+limitation the rights to use, copy, modify, merge, publish, distribute,
+sublicense, and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
 
 Author(s): Thomas Riedmaier, Abian Blome, Roman Bendt
 */
@@ -394,10 +406,7 @@ bool TestExecutorGDB::isSetupFunctionable() {
 }
 
 bool TestExecutorGDB::waitUntilTargetIsBeingDebugged(std::shared_ptr<GDBThreadCommunication> gDBThreadCommunication, int timeoutMS) {
-	std::chrono::time_point<std::chrono::steady_clock> routineEntryTimeStamp = std::chrono::steady_clock::now();
-	std::chrono::time_point<std::chrono::steady_clock> latestRoutineExitTimeStamp = routineEntryTimeStamp + std::chrono::milliseconds(timeoutMS);
-
-	gDBThreadCommunication->waitForDebuggingReadyTimeout(latestRoutineExitTimeStamp - std::chrono::steady_clock::now());
+	gDBThreadCommunication->waitForDebuggingReadyWithTimeout(timeoutMS);
 
 	return gDBThreadCommunication->get_debuggingReady();
 }
@@ -406,11 +415,19 @@ bool TestExecutorGDB::waitUntilCoverageState(std::shared_ptr<GDBThreadCommunicat
 	std::chrono::time_point<std::chrono::steady_clock> routineEntryTimeStamp = std::chrono::steady_clock::now();
 	std::chrono::time_point<std::chrono::steady_clock> latestRoutineExitTimeStamp = routineEntryTimeStamp + std::chrono::milliseconds(timeoutMS);
 
-	while (!gDBThreadCommunication->get_gdbThreadShouldTerminate() && gDBThreadCommunication->get_coverageState() != desiredState && std::chrono::steady_clock::now() < latestRoutineExitTimeStamp) {
-		gDBThreadCommunication->waitForTerminateMessageOrCovStateChangeTimeout(latestRoutineExitTimeStamp - std::chrono::steady_clock::now(), &desiredState, 1);
+	while (std::chrono::steady_clock::now() < latestRoutineExitTimeStamp) {
+		gDBThreadCommunication->waitForTerminateOrNewMessageOrCovStateChangeWithTimeout(static_cast<int>(std::chrono::duration_cast<std::chrono::milliseconds>(latestRoutineExitTimeStamp - std::chrono::steady_clock::now()).count()), &desiredState, 1);
+
+		if (gDBThreadCommunication->get_gdbThreadShouldTerminate()) {
+			return false;
+		}
+
+		if (gDBThreadCommunication->get_coverageState() == desiredState) {
+			return true;
+		}
 	}
 
-	return gDBThreadCommunication->get_coverageState() == desiredState;
+	return false;
 }
 
 bool TestExecutorGDB::attemptStartTargetAndFeeder() {
@@ -578,7 +595,11 @@ void TestExecutorGDB::debuggerThreadMain(const std::string targetCMDline, std::s
 		gDBThreadCommunication->m_exOutput.m_debuggerThreadDone = true;
 		return;
 	}
-	*gDBThreadCommunication->m_ostreamToGdb << initCommandFile.rdbuf();
+	if (initCommandFile.rdbuf()->pubseekoff(0, std::ios_base::end) > 0) {
+		//Only pipe GDBInitfile if it has any content
+		initCommandFile.rdbuf()->pubseekpos(std::ios_base::beg);
+		*gDBThreadCommunication->m_ostreamToGdb << initCommandFile.rdbuf();
+	}
 	//*gDBThreadCommunication->m_ostreamToGdb << "set stop-on-solib-events 1" << std::endl; //stop on module load
 	*gDBThreadCommunication->m_ostreamToGdb << "set new-console on" << std::endl; //do not print the debugees output in our console
 	gDBThreadCommunication->m_ostreamToGdb->flush();
@@ -635,7 +656,7 @@ void TestExecutorGDB::debuggerThreadMain(const std::string targetCMDline, std::s
 	gDBThreadCommunication->set_gdbThreadShouldTerminate();
 	gDBThreadCommunication->m_exOutput.m_debuggerThreadDone = true;
 	return;
-}
+	}
 
 bool TestExecutorGDB::sendCommandToGDBAndWaitForResponse(const std::string command, std::string* response, std::shared_ptr<GDBThreadCommunication> gDBThreadCommunication, bool sendCtrlZ) {
 	//LOG(DEBUG) << "sendCommandToGDBAndWaitForResponse:\"" << command << "\"";
@@ -664,21 +685,22 @@ bool TestExecutorGDB::sendCommandToGDBAndWaitForResponse(const std::string comma
 			*response = "ERROR";
 			return false;
 		}
+
+		//Avoid race conditions (command processed before Ctrl+z is processed)
+		std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+		//Re-enable Ctrl-C handling or any subsequently started programs will inherit the disabled state.
+		SetConsoleCtrlHandler(NULL, false);
+
 #else
 		kill(gDBThreadCommunication->m_gdbPid, SIGINT);
 #endif
 	}
 
+	//Send the actual command
 	for (size_t i = 0; i < command.length(); i += 1000) {
 		//Handle gdbThreadShouldTerminate
 		if (gDBThreadCommunication->get_gdbThreadShouldTerminate()) {
-#if defined(_WIN32) || defined(_WIN64)
-			if (sendCtrlZ) {
-				//Re-enable Ctrl-C handling or any subsequently started
-				//programs will inherit the disabled state.
-				SetConsoleCtrlHandler(NULL, false);
-			}
-#endif
 			*response = "INTERRUPTED";
 			return false;
 		}
@@ -691,17 +713,11 @@ bool TestExecutorGDB::sendCommandToGDBAndWaitForResponse(const std::string comma
 	std::stringstream responseSS;
 	bool firstLine = true;
 	while (true) {
-		gDBThreadCommunication->waitForTerminateMessageOrCovStateChange(nullptr, 0);
+		//Wait for response
+		gDBThreadCommunication->waitForTerminateOrNewMessageOrCovStateChange(nullptr, 0);
 
 		//Handle gdbThreadShouldTerminate
 		if (gDBThreadCommunication->get_gdbThreadShouldTerminate()) {
-#if defined(_WIN32) || defined(_WIN64)
-			if (sendCtrlZ) {
-				//Re-enable Ctrl-C handling or any subsequently started
-				//programs will inherit the disabled state.
-				SetConsoleCtrlHandler(NULL, false);
-			}
-#endif
 			*response = "INTERRUPTED";
 			return false;
 		}
@@ -710,13 +726,6 @@ bool TestExecutorGDB::sendCommandToGDBAndWaitForResponse(const std::string comma
 		while (gDBThreadCommunication->get_gdbOutputQueue_size() > 0) {
 			std::string line = gDBThreadCommunication->gdbOutputQueue_pop_front();
 			if (line.find("Undefined command") != std::string::npos) {
-#if defined(_WIN32) || defined(_WIN64)
-				if (sendCtrlZ) {
-					//Re-enable Ctrl-C handling or any subsequently started
-					//programs will inherit the disabled state.
-					SetConsoleCtrlHandler(NULL, false);
-				}
-#endif
 				*response = responseSS.str();
 				return true;
 			}
@@ -765,10 +774,11 @@ bool TestExecutorGDB::handleSignal(std::shared_ptr<GDBThreadCommunication> gDBTh
 	while (!gotAddressLine) {
 		if (gDBThreadCommunication->get_gdbOutputQueue_size() == 0) {
 			//Try to wait for the message that contains the current ip
-			gDBThreadCommunication->waitForTerminateMessageOrCovStateChange(nullptr, 0);
+			gDBThreadCommunication->waitForTerminateOrNewMessageOrCovStateChange(nullptr, 0);
 
 			if (gDBThreadCommunication->get_gdbOutputQueue_size() == 0) {
 				//waiting failed: we should terminate
+				LOG(WARNING) << "Got Terminate message while waiting for signal details";
 				return false;
 			}
 		}
@@ -790,14 +800,14 @@ bool TestExecutorGDB::handleSignal(std::shared_ptr<GDBThreadCommunication> gDBTh
 
 	uint64_t signalAddress;
 	try {
-		signalAddress = std::stoll(addressLine.c_str(), 0, 0x10);
+		signalAddress = std::stoull(addressLine.c_str(), 0, 0x10);
 
 		if (signalAddress == 0) {
 			LOG(WARNING) << "handleSignal could not parse line " << addressLine << " as address";
 		}
 	}
 	catch (...) {
-		LOG(ERROR) << "handleSignal could not parse line " << addressLine << " as address: std::stoi/stoll failed";
+		LOG(ERROR) << "handleSignal could not parse line " << addressLine << " as address: std::stoi/stoull failed";
 		google::protobuf::ShutdownProtobufLibrary();
 		_exit(EXIT_FAILURE); //make compiler happy
 	}
@@ -810,6 +820,8 @@ bool TestExecutorGDB::handleSignal(std::shared_ptr<GDBThreadCommunication> gDBTh
 
 		if (breakPointKnown || breakPointKnownOffByOne) {
 			//Yep, this is one of our breakpoints
+			LOG(DEBUG) << "This is one of our breakpoints";
+
 			GDBBreakpoint gdbb = allBreakpoints->at(signalAddress - (breakPointKnown ? 0 : 1));
 			blocksCoveredSinceLastReset->insert(gdbb.m_fbb);
 
@@ -840,6 +852,8 @@ bool TestExecutorGDB::handleSignal(std::shared_ptr<GDBThreadCommunication> gDBTh
 			return true;
 		}
 	}
+	//This is not one of our breakpoints!
+	LOG(DEBUG) << "This is an unexpected bp - most likely a crash!";
 
 	std::vector<tModuleAddressesAndSizes> baseAddressesAndSizes;
 	std::string infoFilesResp;
@@ -857,6 +871,8 @@ bool TestExecutorGDB::handleSignal(std::shared_ptr<GDBThreadCommunication> gDBTh
 	}
 
 	std::string crashRVA = getCrashRVA(baseAddressesAndSizes, signalAddress);
+
+	LOG(DEBUG) << "Crash RVA: " << crashRVA;
 
 	if (gDBThreadCommunication->m_exOutput.m_firstCrash == "") {
 		//first crash
@@ -992,7 +1008,7 @@ void TestExecutorGDB::gdbDebug(std::shared_ptr<GDBThreadCommunication> gDBThread
 	std::set<FluffiBasicBlock> blocksCoveredSinceLastReset;
 	GDBThreadCommunication::COVERAGE_STATE statesToWaitFor[] = { GDBThreadCommunication::COVERAGE_STATE::SHOULD_DUMP, GDBThreadCommunication::COVERAGE_STATE::SHOULD_RESET_HARD, GDBThreadCommunication::COVERAGE_STATE::SHOULD_RESET_SOFT };
 	while (true) {
-		gDBThreadCommunication->waitForTerminateMessageOrCovStateChange(statesToWaitFor, 2);
+		gDBThreadCommunication->waitForTerminateOrNewMessageOrCovStateChange(statesToWaitFor, 3);
 
 		//Handle gdbThreadShouldTerminate
 		if (gDBThreadCommunication->get_gdbThreadShouldTerminate()) {
@@ -1009,11 +1025,13 @@ void TestExecutorGDB::gdbDebug(std::shared_ptr<GDBThreadCommunication> gDBThread
 		switch (cstate) {
 		case GDBThreadCommunication::COVERAGE_STATE::SHOULD_RESET_HARD: //Reset coverage to NULL and enable all breakpoints
 		{
+			std::string enableAllCommand = generateEnableAllCommand(allBreakpoints, bpInstr, bpInstrBytes);
+
 			//As there might be leftover commands we might need to clean that first
 			std::string resp;
 			bool noProblem = false;
 			while (true) {
-				noProblem = sendCommandToGDBAndWaitForResponse(generateEnableAllCommand(allBreakpoints, bpInstr, bpInstrBytes), &resp, gDBThreadCommunication, true);
+				noProblem = sendCommandToGDBAndWaitForResponse(enableAllCommand, &resp, gDBThreadCommunication, true);
 				if (noProblem) {
 					break;
 				}
@@ -1105,7 +1123,7 @@ bool TestExecutorGDB::gdbPrepareForDebug(std::shared_ptr<GDBThreadCommunication>
 			numOfDummyBreakpoint = std::stoi(resp.c_str() + 11);
 		}
 		catch (...) {
-			LOG(ERROR) << "std::stoi failed";
+			LOG(ERROR) << "std::stoi of " << (resp.c_str() + 11) << " failed";
 			google::protobuf::ShutdownProtobufLibrary();
 			_exit(EXIT_FAILURE); //make compiler happy
 		}
@@ -1179,10 +1197,10 @@ bool TestExecutorGDB::gdbPrepareForDebug(std::shared_ptr<GDBThreadCommunication>
 		size_t isPos = resp.find("process");
 		if (isPos != std::string::npos) {
 			try {
-				gDBThreadCommunication->m_exOutput.m_PID = std::stoi(resp.c_str() + isPos + 7);
+				gDBThreadCommunication->m_exOutput.m_PID = std::stoi(resp.c_str() + isPos + 7); //Fails if PID too big
 			}
 			catch (...) {
-				LOG(ERROR) << "std::stoi failed";
+				LOG(ERROR) << "std::stoi of \"" << (resp.c_str() + isPos + 7) << "\" failed";
 				google::protobuf::ShutdownProtobufLibrary();
 				_exit(EXIT_FAILURE); //make compiler happy
 			}
@@ -1247,7 +1265,7 @@ bool TestExecutorGDB::gdbPrepareForDebug(std::shared_ptr<GDBThreadCommunication>
 			}
 		}
 		catch (...) {
-			LOG(ERROR) << "std::stoi/stoll failed";
+			LOG(ERROR) << "std::stoi/stoull of " << linesIt << " failed";
 			google::protobuf::ShutdownProtobufLibrary();
 			_exit(EXIT_FAILURE); //make compiler happy
 		}
@@ -1370,11 +1388,11 @@ bool TestExecutorGDB::parseInfoFiles(std::vector<tModuleInformation>& loadedFile
 
 			uint64_t currentStartAddress, currentEndAddress;
 			try {
-				currentStartAddress = std::stoll(trimmedLine, NULL, 16);
-				currentEndAddress = std::stoll(trimmedLine.substr(trimmedLine.find("-") + 1), NULL, 16);
+				currentStartAddress = std::stoull(trimmedLine, NULL, 16);
+				currentEndAddress = std::stoull(trimmedLine.substr(trimmedLine.find("-") + 1), NULL, 16);
 			}
 			catch (...) {
-				LOG(ERROR) << "std::stoi/stoll failed";
+				LOG(ERROR) << "std::stoi/stoull of " << trimmedLine << ", or of " << trimmedLine.substr(trimmedLine.find("-") + 1) << " failed";
 				google::protobuf::ShutdownProtobufLibrary();
 				_exit(EXIT_FAILURE); //make compiler happy
 			}
@@ -1407,7 +1425,12 @@ void TestExecutorGDB::gdbLinereaderThread(std::shared_ptr<GDBThreadCommunication
 		if (totalBytesAvail != bytesRead) {
 #else
 	int nbytes = 0;
-	while (!gDBThreadCommunication->get_gdbThreadShouldTerminate() && 0 != ioctl(inputHandleFromGdb, FIONREAD, &nbytes)) {
+	while (!gDBThreadCommunication->get_gdbThreadShouldTerminate() && -1 != ioctl(inputHandleFromGdb, FIONREAD, &nbytes)) {
+		if (nbytes == 0) {
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			continue;
+		}
+
 		char* buff = new char[nbytes];
 		ssize_t bytesRead = read(inputHandleFromGdb, buff, nbytes);
 		if (bytesRead != nbytes) {

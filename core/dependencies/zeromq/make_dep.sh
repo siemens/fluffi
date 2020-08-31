@@ -1,6 +1,6 @@
 #!/bin/bash
 #    zeromq build script
-#    Copyright (C) 2017-2019 Siemens AG
+#    Copyright (C) 2017-2020 Siemens AG
 #
 #    This script is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 #
 # Author(s): Thomas Riedmaier, Roman Bendt, Pascal Eckmann
 
-THREADS=$(cat /proc/cpuinfo | grep processor | wc -l)
+THREADS=$(nproc)
 ARCH=$(file /bin/bash | awk -F',' '{print $2}' | tr -d ' ')
 
 rm -rf include

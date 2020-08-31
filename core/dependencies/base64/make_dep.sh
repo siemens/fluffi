@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2017-2019 Siemens AG
+# Copyright 2017-2020 Siemens AG
 # 
 # This source code is provided 'as-is', without any express or implied
 # warranty. In no event will the author be held liable for any damages
@@ -19,9 +19,9 @@
 #                                                                               
 # 3. This notice may not be removed or altered from any source distribution.
 # 
-# Author(s): Thomas Riedmaier, Pascal Eckmann
+# Author(s): Thomas Riedmaier, Pascal Eckmann, Roman Bendt
 
-THREADS=$(cat /proc/cpuinfo | grep processor | wc -l)
+THREADS=$(nproc)
 ARCH=$(file /bin/bash | awk -F',' '{print $2}' | tr -d ' ')
 
 rm -rf lib/$ARCH

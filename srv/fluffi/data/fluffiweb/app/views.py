@@ -1,35 +1,113 @@
-# Copyright 2017-2019 Siemens AG
+# Copyright 2017-2020 Siemens AG
 # 
-# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including without
+# limitation the rights to use, copy, modify, merge, publish, distribute,
+# sublicense, and/or sell copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following conditions:
 # 
-# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
 # 
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+# SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+# OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+# ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+# DEALINGS IN THE SOFTWARE.
 # 
 # Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Abian Blome, Fabian Russwurm, Thomas Riedmaier
 
-from flask import flash, redirect, url_for, request, send_file, Markup
+from flask import flash, get_flashed_messages, redirect, url_for, request, send_file, Markup
 from werkzeug.exceptions import HTTPException
+from functools import wraps
 
 from .controllers import *
 from .queries import *
 from .helpers import *
 from .forms import *
 from .constants import *
+from .utils.sync import *
 
 import json
 import os
 import requests
+import binascii
 
-lock = LockFile()
+lock = DownloadArchiveLockFile()
+
+
+@app.before_first_request
+def updateSystems():
+    try:
+        ANSIBLE_REST_CONNECTOR.execHostAlive()
+    except Exception as e:
+        print("Ansible Connector failed! " + str(e))
+
+
+@app.before_first_request
+@app.route("/syncSystems")
+def syncSystems():
+    loadSystems()
+    return redirect("/")
+
+
+def checkDBConnection(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        try:
+            _ = models.Locations.query.all()
+        except Exception as e:
+            print(e)
+            return renderTemplate("index.html",
+                          title="DB Error",
+                          fuzzjobs=[],
+                          locations=[],
+                          inactivefuzzjobs=[],
+                          errorMessage="Database connection failed! " + str(e),
+                          footer=FOOTER_SIEMENS)        
+            
+        return f(*args, **kwargs)
+    return wrapper
+
+
+def checkSystemsLoaded(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        locationsCount = len(models.Locations.query.all())
+
+        if getSyncStatus() and locationsCount == 0:
+            newFlash = 0
+            for messages in get_flashed_messages(with_categories=True):
+                if "addLocation" == messages[0]:
+                    newFlash += 1
+            if newFlash < 2:
+                flash("A location is necessary to add systems to the database.", "addLocation")
+        elif getSyncStatus() and locationsCount > 0:
+            loadSystems()
+            if not checkSyncedFile():
+                newFlash = 0
+                for messages in get_flashed_messages(with_categories=True):
+                    if "syncSystems" == messages[0]:
+                        newFlash += 1
+                if newFlash < 2:
+                    flash("Something went wrong at the inital synchronization between PoleMarch and the database. Please retry!", "syncSystems")
+            
+        return f(*args, **kwargs)
+    return wrapper
 
 
 @app.route("/")
 @app.route("/index")
+@checkDBConnection
+@checkSystemsLoaded
 def index():
-    fuzzjobs = listFuzzJobs()
     inactivefuzzjobs = []
     activefuzzjobs = []
+
+    fuzzjobs = listFuzzJobs()  
 
     for project in fuzzjobs:
         if ((int(project.numLM) > 0) and
@@ -41,18 +119,19 @@ def index():
             inactivefuzzjobs.append(project)
 
     locations = getLocations()
-    user = {"nickname": "amb"}
 
     return renderTemplate("index.html",
                           title="Home",
-                          user=user,
                           fuzzjobs=activefuzzjobs,
                           locations=locations,
                           inactivefuzzjobs=inactivefuzzjobs,
+                          errorMessage="",
                           footer=FOOTER_SIEMENS)
 
 
 @app.route("/projects")
+@checkDBConnection
+@checkSystemsLoaded
 def projects():
     projects = getProjects()
 
@@ -117,7 +196,38 @@ def locationRemoveProject(locId, projId):
     return redirect("/locations/view/%s" % locId)
 
 
+@app.route("/projects/<int:projId>/setModuleBinaryAndPath/<int:moduleId>", methods=["GET", "POST"])
+@checkDBConnection
+@checkSystemsLoaded
+def setModuleBinaryAndPath(projId, moduleId):       
+    if request.method == 'POST' and "moduleBinaryFile" in request.files:         
+        moduleName = request.form.get("moduleName")
+        modulePath = request.form.get("modulePath")
+        moduleBinaryFile = request.files["moduleBinaryFile"]
+
+        if moduleName or modulePath or moduleBinaryFile:
+            formData = { "ModuleName": moduleName, "ModulePath": modulePath }  
+            rawBytesData = { "RawBytes": moduleBinaryFile.read() }    
+            msg, category = updateModuleBinaryAndPath(projId, moduleId, formData, rawBytesData)
+        else:
+            msg, category = "Error: Form was empty.", "error"
+
+        flash(msg, category)
+        return redirect("/projects/view/%d" % projId)
+
+    project = getProject(projId)
+    locationForm = getLocationFormWithChoices(projId, AddProjectLocationForm())
+    moduleForm = CreateProjectModuleForm()
+
+    return renderTemplate("viewProject.html",
+                          title="Project details",
+                          project=project,
+                          locationForm=locationForm)
+
+
 @app.route("/projects/<int:projId>/addSetting", methods=["GET", "POST"])
+@checkDBConnection
+@checkSystemsLoaded
 def createSetting(projId):
     settingForm = CreateProjectSettingForm()
 
@@ -141,20 +251,21 @@ def createSetting(projId):
 @app.route("/projects/<int:projId>/uploadNewTargetZip", methods=["GET", "POST"])
 def uploadNewTargetZip(projId):
     if request.method == "POST":
-        addTarget = request.form.get("addTargetToFuzzjob") == "addTarget"
         targetFile = request.files["uploadFile"]
         targetFileName = targetFile.filename
+        
         if not targetFile:
             flash("Invalid file", "error")
             return redirect(request.url)
+        
         if not ('.' in targetFile.filename and targetFile.filename.rsplit('.', 1)[1].lower() in set(["zip"])):
             flash("Only *.zip files are allowed!", "error")
             return redirect(request.url)
-        msg, category = uploadNewTarget(targetFile)
-        if addTarget:
-            addTargetZipToFuzzjob(projId, targetFileName)
+               
+        msg, category = uploadNewTargetZipHandler(projId, targetFile)        
         flash(msg, category)
         return redirect("/projects/view/%d" % projId)
+    
     return redirect("/projects/view/%d" % projId)
 
 
@@ -185,11 +296,13 @@ def resetFuzzjob(projId):
 
 
 @app.route("/projects/<int:projId>/addModule", methods=["GET", "POST"])
+@checkDBConnection
+@checkSystemsLoaded
 def createProjectModule(projId):
     moduleForm = CreateProjectModuleForm()
 
     if request.method == "POST" and moduleForm.is_submitted:
-        msg, category = insertModules(projId, request.form)
+        msg, category = insertModules(projId, request)
         flash(msg, category)
         return redirect("/projects/view/%d" % projId)
 
@@ -206,6 +319,8 @@ def createProjectModule(projId):
 
 
 @app.route("/locations/<int:locId>/addProject", methods=["GET", "POST"])
+@checkDBConnection
+@checkSystemsLoaded
 def addLocationProject(locId):
     projects = []
 
@@ -230,6 +345,8 @@ def addLocationProject(locId):
 
 
 @app.route("/locations/createLocation", methods=["GET", "POST"])
+@checkDBConnection
+@checkSystemsLoaded
 def createLocation():
     form = CreateLocationForm()
 
@@ -237,6 +354,7 @@ def createLocation():
         location = models.Locations(Name=form.name.data)
         db.session.add(location)
         db.session.commit()
+        loadSystems()
         flash("Added Location", "success")
         return redirect("/locations")
 
@@ -248,16 +366,18 @@ def createLocation():
 @app.route("/locations/removeLocation/<int:locId>")
 def removeLocation(locId):
     location = models.Locations.query.filter_by(ID=locId).first()
+    sysLocation = models.SystemsLocation.query.filter_by(Location=location.ID).first()
     location_fuzzjobs = models.LocationFuzzjobs.query.filter_by(Location=location.ID)
-    db.session.delete(location)
-
-    for location_fuzzjob in location_fuzzjobs:
-        db.session.delete(location_fuzzjob)
-
-    db.session.commit()
-    flash("Location deleted", "success")
-
-    return redirect("/locations")
+    if sysLocation is None:
+        db.session.delete(location)
+        for location_fuzzjob in location_fuzzjobs:
+            db.session.delete(location_fuzzjob)
+        db.session.commit()
+        flash("Location deleted", "success")
+        return redirect("/locations")
+    else:
+        flash("Location couldn't be deleted, because it's being used", "error")
+        return redirect("/locations")
 
 
 @app.route("/projects/<int:projId>/renameElement", methods=["POST"])
@@ -265,10 +385,21 @@ def renameElement(projId):
     if not request.json:
         abort(400)
 
-    message, status = insertOrUpdateNiceName(projId, request.json["myId"], request.json["newName"],
+    message, status = insertOrUpdateNiceName(projId, request.json["myGUID"], request.json["myLocalID"], request.json["newName"],
                                              request.json["command"], request.json["elemType"])
 
     return json.dumps({"message": message, "status": status, "command": request.json["command"]})
+
+
+@app.route("/projects/<int:projId>/updateInfo", methods=["POST"])
+def updateInfo(projId):
+    if not request.json:
+        abort(400)
+
+    infoType = request.json.get("infoType")
+    msg, info, status = updateInfoHandler(projId, infoType)
+
+    return json.dumps({"message": msg, "status": status, "info": info})
 
 
 @app.route("/projects/<int:projId>/download")
@@ -365,6 +496,8 @@ def downloadArchive(archive):
 
 
 @app.route("/projects/<int:projId>/population/<int:page>")
+@checkDBConnection
+@checkSystemsLoaded
 def viewPopulation(projId, page):
     count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["population"]))
     if count % 1000 == 0:
@@ -398,6 +531,8 @@ def downloadPopulation(projId):
 
 
 @app.route("/projects/<int:projId>/accessVioTotal/<int:page>")
+@checkDBConnection
+@checkSystemsLoaded
 def viewAccessVioTotal(projId, page):
     count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["accessViolations"]))
     if count % 1000 == 0:
@@ -430,6 +565,8 @@ def downloadAccessVioTotal(projId):
 
 
 @app.route("/projects/<int:projId>/accessVioUnique")
+@checkDBConnection
+@checkSystemsLoaded
 def viewAccessVioUnique(projId):
     data = getGeneralInformationData(projId, UNIQUE_ACCESS_VIOLATION_NO_RAW)
     data.name = "Unique Access Violations"
@@ -454,6 +591,8 @@ def downloadAccessVioUnique(projId):
 
 
 @app.route("/projects/<int:projId>/totalCrashes/<int:page>")
+@checkDBConnection
+@checkSystemsLoaded
 def viewTotalCrashes(projId, page):
     count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["crashes"]))
     if count % 1000 == 0:
@@ -486,6 +625,8 @@ def downloadTotalCrashes(projId):
 
 
 @app.route("/projects/<int:projId>/uniqueCrashes")
+@checkDBConnection
+@checkSystemsLoaded
 def viewUniqueCrashes(projId):
     data = getGeneralInformationData(projId, UNIQUE_CRASHES_NO_RAW)
     data.name = "Unique Crashes"
@@ -510,6 +651,8 @@ def downloadUniqueCrashes(projId):
 
 
 @app.route("/projects/<int:projId>/hangs/<int:page>")
+@checkDBConnection
+@checkSystemsLoaded
 def viewHangs(projId, page):
     count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["hangs"]))
     if count % 1000 == 0:
@@ -542,6 +685,8 @@ def downloadHangs(projId):
 
 
 @app.route("/projects/<int:projId>/noResponse/<int:page>")
+@checkDBConnection
+@checkSystemsLoaded
 def viewNoResponses(projId, page):
     count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["noResponses"]))
     if count % 1000 == 0:
@@ -573,8 +718,9 @@ def downloadNoResponses(projId):
     return createZipArchive(projId, nice_name, type)
 
 
-
 @app.route("/projects/<int:projId>/violations")
+@checkDBConnection
+@checkSystemsLoaded
 def viewViolations(projId):
     violationsAndCrashes = getViolationsAndCrashes(projId)
 
@@ -583,13 +729,24 @@ def viewViolations(projId):
                           violationsAndCrashes=violationsAndCrashes)
 
 
-@app.route("/projects/<int:projId>/crashes/download/<string:footprint>/<int:testCaseType>")
-def downloadCrashes(projId, footprint, testCaseType):
-    project = models.Fuzzjob.query.filter_by(ID=projId).first()
-    type = "crashesFootprintTestcase " + str(footprint) + " " + str(testCaseType)
-    nice_name = project.name + ": Crashes (Footprint)"
-
-    return createZipArchive(projId, nice_name, type)
+@app.route("/projects/<int:projId>/crashes/download", methods=["GET", "POST"])
+def downloadCrashes(projId):
+    footprint = request.form.get("footprint", None)
+    testcaseType = request.form.get("testcaseType", None)
+    
+    if footprint is not None and testcaseType is not None:        
+        project = models.Fuzzjob.query.filter_by(ID=projId).first()
+        
+        if project:            
+            type = "crashesFootprintTestcase " + str(footprint) + " " + str(testcaseType)
+            nice_name = project.name + ": Crashes (Footprint)"
+            return createZipArchive(projId, nice_name, type)
+         
+        flash("Project does not exist!", "error")
+        return redirect(url_for('viewViolations', projId=projId))
+    
+    flash("Footprint or testcaseType does not exist!", "error")
+    return redirect(url_for('viewViolations', projId=projId))
 
 
 @app.route("/projects/<int:projId>/crashesorvio/download/<string:footprint>")
@@ -610,16 +767,25 @@ def getTestcase(projId, testcaseId):
                      as_attachment=True)
 
 
-@app.route("/projects/<int:projId>/getSmallestVioOrCrashTestcase/<string:footprint>")
-def getSmallestVioOrCrashTestcase(projId, footprint):
+@app.route("/projects/<int:projId>/getSmallestVioOrCrashTestcase", methods=["GET", "POST"])
+def getSmallestVioOrCrashTestcase(projId):
+    
+    footprint = request.form.get("footprint", None)
+    
+    if footprint is None:
+        flash("Footprint does not exist!", "error")
+        return redirect(url_for('viewViolations', projId=projId))
+    
     byteIO = createByteIOForSmallestVioOrCrash(projId, footprint)
-
+    
     return send_file(byteIO,
-                     attachment_filename=footprint.replace(":", "_"),
-                     as_attachment=True)
+                    attachment_filename=footprint.replace(":", "_"),
+                    as_attachment=True)        
 
 
 @app.route("/projects/<int:projId>/managedInstances")
+@checkDBConnection
+@checkSystemsLoaded
 def viewManagedInstances(projId):
     managedInstances, summarySection, localManagers = getManagedInstancesAndSummary(projId)
 
@@ -657,7 +823,50 @@ def getLogsOfManagedInstance(projId):
     return json.dumps({"status": "OK", "pageCount": pageCount, "miLogs": miLogs})
 
 
+@app.route("/hexdump/<int:projId>/<int:testcaseId>/<int:offset>", methods=["GET"])
+def getTestcaseHexdump(projId, testcaseId, offset):
+    result = getResultOfStatement(projId, GET_TESTCASE_HEXDUMP, {"testcaseID": testcaseId, "offset": offset + 1})
+
+    if result is not None:
+        textOutput = []
+        decodedData = []
+        pageCount = 0
+        rows = result.fetchall()
+        for row in rows:
+            for num, x in enumerate(row):
+                if num is 0:
+                    textOutput = [x[i:i + 2] for i in range(0, len(x), 2)]
+                elif num is 1:
+                    pageCount = int(x/320) + (x % 320 > 0)
+
+        targetLen = (int(len(textOutput)/16) + (len(textOutput) % 16 > 0)) * 16
+        for _ in range(len(textOutput), targetLen):
+            textOutput.append("00")
+
+        for b in textOutput:
+            if 0 <= int(b, 16) <= 31 or 127 <= int(b, 16) <= 159:
+                decodedText = "."
+            else:
+                decodedText = binascii.unhexlify(b).decode("latin-1", "ignore")
+            if not decodedText:
+                decodedData.append(".")
+            else:
+                decodedData.append(decodedText)
+
+        for _ in range(len(decodedData), targetLen):
+            decodedData.append(".")
+
+        textOutputF = [textOutput[x:x + 16] for x in range(0, len(textOutput), 16)]
+        decodedDataF = [decodedData[x:x + 16] for x in range(0, len(decodedData), 16)]
+
+        return json.dumps({"status": "OK", "pageCount": pageCount, "hex": textOutputF, "decoded": decodedDataF})
+    else:
+        return json.dumps({"status": "ERROR"})
+
+
 @app.route("/projects/<int:projId>/configSystemInstances")
+@checkDBConnection
+@checkSystemsLoaded
 def viewConfigSystemInstances(projId):
     # initialize forms
     systemInstanceConfigForm = SystemInstanceConfigForm()
@@ -675,11 +884,12 @@ def viewConfigSystemInstances(projId):
                                                     models.SystemFuzzjobInstances.Fuzzjob,
                                                     models.SystemFuzzjobInstances.AgentType,
                                                     models.SystemFuzzjobInstances.InstanceCount,
-                                                    models.SystemFuzzjobInstances.Architecture).filter_by(
-        Fuzzjob=projId).all()
+                                                    models.SystemFuzzjobInstances.Architecture).filter_by(Fuzzjob=projId).all()
+        
+    settingArch = getSettingArchitecture(projId)
     
     for system in sysList:
-        s = {'name': system.Name, 'tg': 0, 'tr': 0, 'te': 0, 'tgarch': "", 'trarch': "", 'tearch': ""}
+        s = {'name': system.Name, 'tg': 0, 'tr': 0, 'te': 0, 'tgarch': "", 'trarch': "", 'tearch': "", 'settingArch': settingArch}
         if 'lemming' not in system.Name:
             sysInstanceList.append(s)
         else:
@@ -688,18 +898,18 @@ def viewConfigSystemInstances(projId):
             if system.ID == conf.System:
                 if conf.AgentType == 0:
                     s['tg'] = conf.InstanceCount
-                    s['tgarch'] = "(" + conf.Architecture + ")"
+                    s['tgarch'] = conf.Architecture
                 if conf.AgentType == 1:
                     s['tr'] = conf.InstanceCount
-                    s['trarch'] = "(" + conf.Architecture + ")"
+                    s['trarch'] = conf.Architecture
                 if conf.AgentType == 2:
                     s['te'] = conf.InstanceCount
-                    s['tearch'] = "(" + conf.Architecture + ")"
-    
+                    s['tearch'] = conf.Architecture
+                        
     for conf in dbconfiguredFuzzjobInstances:
         if conf.AgentType == 4:
             lmCount = lmCount + conf.InstanceCount
-
+            
     return renderTemplate("viewConfigSystemInstances.html",
                           title="View Instance Configuration",
                           systemInstanceConfigForm=systemInstanceConfigForm,
@@ -732,6 +942,8 @@ def killInstanceType(projId, myType):
 
 
 @app.route("/projects/<int:projId>/addLocation", methods=["GET", "POST"])
+@checkDBConnection
+@checkSystemsLoaded
 def addProjectLocation(projId):
     locationForm = getLocationFormWithChoices(projId, AddProjectLocationForm())
 
@@ -774,22 +986,26 @@ def addTestcase(projId):
         return redirect("/projects/{}/population/1".format(projId))
 
 
-@app.route("/locations/assignWorker/<string:workerID>", methods=["POST"])
-def assignWorker(workerID):
-    message = ""
-
-    if not request.json:
-        abort(400)
-
-    try:
-        worker = models.Workers.query.filter_by(Servicedescriptorguid=workerID).first()
-        worker.Fuzzjob = request.json["ProjectID"]
-        db.session.commit()
+@app.route("/locations/assignWorker/<string:workerSdGUID>/<int:fuzzjobId>/<int:locationId>", methods=["GET", "POST"])
+def assignWorker(workerSdGUID, fuzzjobId, locationId):             
+    if fuzzjobId == 0:
+        flash("Cannot assign to 'Unassigned'", "error")
+        return redirect(url_for('viewLocation', locId=locationId))
+        
+    try:        
+        worker = models.Workers.query.filter_by(Servicedescriptorguid=workerSdGUID).first()
+        if worker:
+            worker.Fuzzjob = fuzzjobId
+            db.session.commit()
+            message, category = "Successfully assigned worker", "success"
+        else:
+            message, category = "Worker with Servicedescriptorguid {} does not exist".format(workerSdGUID), "error"
     except Exception as e:
         print(e)
-        message = "Could not assign worker"
+        message, category = "Failed to assign worker! " + str(e), "error"
 
-    return json.dumps({"message": message})
+    flash(message, category)
+    return redirect(url_for('viewLocation', locId=locationId))
 
 
 @app.route("/projects/<int:projId>/changeSetting/<int:settingId>", methods=["POST"])
@@ -842,9 +1058,11 @@ def removeProjectSetting(projId, settingId):
 
 
 @app.route("/projects/createProject", methods=["GET", "POST"])
+@checkDBConnection
+@checkSystemsLoaded
 def createProject():
     form = CreateProjectForm()
-    # msg, category = "", ""
+    # msg, category = "", "" 
 
     if request.method == 'POST' and form.is_submitted:
         result = []
@@ -872,6 +1090,8 @@ def createProject():
 
 
 @app.route("/projects/createCustomProject", methods=["GET", "POST"])
+@checkDBConnection
+@checkSystemsLoaded
 def createCustomProject():
     form = CreateCustomProjectForm()
 
@@ -906,15 +1126,20 @@ def viewTestcaseGraph(projId):
 
 
 @app.route("/locations/view/<int:locId>")
+@checkDBConnection
+@checkSystemsLoaded
 def viewLocation(locId):
     location = getLocation(locId)
 
     return renderTemplate("viewLocation.html",
                           title="Location details",
+                          locationId=locId,
                           location=location)
 
 
 @app.route("/projects/view/<int:projId>")
+@checkDBConnection
+@checkSystemsLoaded
 def viewProject(projId):
     project = getProject(projId)
     locationForm = getLocationFormWithChoices(projId, AddProjectLocationForm())
@@ -926,11 +1151,12 @@ def viewProject(projId):
                           project=project,
                           locationForm=locationForm,
                           settingForm=settingForm,
-                          moduleForm=moduleForm
-                          )
+                          moduleForm=moduleForm)
 
 
 @app.route("/locations")
+@checkDBConnection
+@checkSystemsLoaded
 def locations():
     locations = models.Locations.query.all()
 
@@ -940,6 +1166,8 @@ def locations():
 
 
 @app.route("/commands")
+@checkDBConnection
+@checkSystemsLoaded
 def commands():
     commands = models.CommandQueue.query.all()
 
@@ -947,7 +1175,10 @@ def commands():
                           title="Commands",
                           commands=commands)
 
+
 @app.route("/logs")
+@checkDBConnection
+@checkSystemsLoaded
 def logs():
     result = getResultOfStatementForGlobalManager(GET_LOCALMANAGER_LOGS)
     logs = [ row for row in result ]
@@ -957,7 +1188,12 @@ def logs():
 
 
 @app.route("/systems")
+@checkDBConnection
+@checkSystemsLoaded
 def systems():
+    ansibleConnectionWorks = True
+    ftpConnectionWorks = True  
+
     groups = []
     addNewSystemToPolemarchForm = AddNewSystemForm()
     projIds = models.Fuzzjob.query.all()
@@ -967,8 +1203,13 @@ def systems():
     changeAgentStarterModeForm = ChangeAgentStarterModeForm()
     changePXEForm = ChangePXEForm()
     bootsystemdir = models.GmOptions.query.filter_by(setting="bootsystemdir").first().value
-    availablePXEsystems = FTP_CONNECTOR.getListOfFilesOnFTPServer("tftp-roots/")
-    changePXEForm.pxesystem.choices = availablePXEsystems
+
+    try:
+        changePXEForm.pxesystem.choices = FTP_CONNECTOR.getListOfFilesOnFTPServer("tftp-roots/")              
+    except Exception as e:
+        print("Error", e)
+        ftpConnectionWorks = False
+        changePXEForm.pxesystem.choices = []
 
     for project in projIds:
         managedInstances, summarySection, localmanagers = getManagedInstancesAndSummary(project.ID)
@@ -1039,29 +1280,28 @@ def systems():
                         h.InstanceRun = h.InstanceRun + 1
                         if w.Agenttype == 4:
                             h.lms = h.lms + 1
+                if not hasattr(h, 'confLM'):
+                    h.confLM = 0
 
-        for group in groups:
-            for h in group.hosts:
-                if h.Name.startswith('dev-'):
-                    h.isNotPersistentDevSys = True
-                    h.Name = h.Name[4:]
-        locations = models.Locations.query.all()
+        locations = models.Locations.query.all()        
     except Exception as e:
         print(e)
-        flash(
-            "Error retrieving or parsing data from polemarch! Check polemarch history if polemarch is busy or other "
-            "error occured. Attach to webui docker container....",
-            "error")
+        ansibleConnectionWorks = False
         locations = []
+        try:
+            ANSIBLE_REST_CONNECTOR.execHostAlive()
+        except Exception as e:
+            print(e)        
 
     return renderTemplate("systems.html",
                           title="Systems",
                           systems=groups,
                           locations=locations,
                           addNewSystemToPolemarchForm=addNewSystemToPolemarchForm,
+                          ftpConnectionWorks=ftpConnectionWorks,
+                          ansibleConnectionWorks=ansibleConnectionWorks,
                           changePXEForm=changePXEForm,
                           bootsystemdir=bootsystemdir,
-                          availablePXEsystems=availablePXEsystems,
                           agentStarterMode=actualAgentStarterMode,
                           changeAgentStarterModeForm=changeAgentStarterModeForm)
 
@@ -1090,26 +1330,37 @@ def changePXEBootSystemPolemarch():
 def addNewSystemToPolemarch():
     hostname = str(request.form.getlist('hostname')[0])
     hostgroup = str(request.form.getlist('hostgroup')[0])
-    numberOfexistingSystems = models.Systems.query.filter_by(Name="dev-" + hostname).all()
 
-    if (len(numberOfexistingSystems) > 0):
+    if len(models.Systems.query.filter_by(Name=hostname).all()) > 0:
         flash("Error adding new system! System already exists (or check database)!", "error")
         return redirect(url_for('systems'))
 
-    addResult = ANSIBLE_REST_CONNECTOR.addNewSystem(hostname, hostgroup)
-
-    if addResult is False:
-        flash("Error adding new system! PoleMarch does not accept special characters like _underscore!", "error")
+    loc = models.Locations.query.first()
+    if loc is None:
+        flash("Error adding new system! No location exists!", "error")
         return redirect(url_for('systems'))
     else:
-        loc = models.Locations.query.first()
-        sys = models.Systems(Name="dev-" + hostname)
+        addResult = ANSIBLE_REST_CONNECTOR.addNewSystem(hostname, hostgroup)
+        if not addResult:
+            flash("Error adding new system! PoleMarch does not accept special characters like _underscore!", "error")
+            return redirect(url_for('systems'))
+
+    sys = models.Systems(Name=hostname)
+    if sys is None:
+        flash("Error adding new system: " + hostname + " does not exist in systems!", "error")
+        return redirect(url_for('systems'))
+
+    try:
         db.session.add(sys)
         db.session.commit()
         sysloc = models.SystemsLocation(System=sys.ID, Location=loc.ID)
         db.session.add(sysloc)
         db.session.commit()
+        updateSystems()
         flash("Added new system!", "success")
+        return redirect(url_for('systems'))
+    except AttributeError:
+        flash("Error adding new system: system and/or location has no attribute ID!", "error")
         return redirect(url_for('systems'))
 
 
@@ -1130,49 +1381,53 @@ def changeAgentStarterMode():
     return redirect(url_for('systems'))
 
 
-@app.route("/systems/removeDevSystem/<string:hostName>/<string:hostId>", methods=["GET"])
-def removeDevSystemFromPolemarch(hostName, hostId):
-    removeResult = ANSIBLE_REST_CONNECTOR.removeDevSystem(hostId)
+@app.route("/systems/removeSystem/<string:hostName>", methods=["GET"])
+def removeSystemFromPolemarch(hostName):
+    success = ANSIBLE_REST_CONNECTOR.removeSystem(hostName) 
 
-    if removeResult is False:
-        flash("Error removing dev system!", "error")
+    if not success:
+        flash("Error removing system! Failed to connect to polemarch", "error")
         return redirect(url_for('systems'))
-    else:
-        sys = models.Systems.query.filter_by(Name="dev-" + hostName).first()
+    
+    try:
+        sys = models.Systems.query.filter_by(Name=hostName).first()
         sysloc = models.SystemsLocation.query.filter_by(System=sys.ID).first()
         db.session.delete(sysloc)
         db.session.delete(sys)
         db.session.commit()
         flash("Removed " + hostName + "!", "success")
         return redirect(url_for('systems'))
+    except Exception as e:
+        print(e)
+        flash("Failed to remove " + hostName + " !", "error")
+        return redirect(url_for('systems'))
 
 
 @app.route("/systems/<string:hostName>/updateSystemLocation/<int:locationId>", methods=["POST"])
 def updateSystemLocation(hostName, locationId):
+    print(hostName, locationId)
     if (len(hostName) > 0) and (locationId > 0):
         try:
             sys = models.Systems.query.filter_by(Name=hostName).first()
             if sys is not None:
                 systemloc = models.SystemsLocation.query.filter_by(System=sys.ID).first()
-            if sys is None:
-                sys = models.Systems.query.filter_by(Name="dev-" + hostName).first()
-                systemloc = models.SystemsLocation.query.filter_by(System=sys.ID).first()
-            systemloc.Location = locationId
+                systemloc.Location = locationId
             db.session.commit()
             message = "Setting modified"
-            flash("Changed Location for " + hostName, "success")
+            flash("Changed location for " + hostName, "success")
             return json.dumps({"message": message, "status": "OK"})
         except Exception as e:
-            print(e)
             message = "Could not modify setting"
-            flash("Error changing Location for " + hostName, "error")
+            flash("Error changing location for " + hostName, "error")
+            return json.dumps({"message": message, "status": "Error"})
     else:
         message = "Value cannot be empty!"
-
-    return json.dumps({"message": message, "status": "Error"})
+        return json.dumps({"message": message, "status": "Error"})
 
 
 @app.route("/systems/view/<string:hostname>/<string:group>", methods=["GET"])
+@checkDBConnection
+@checkSystemsLoaded
 def viewSystem(hostname, group):
     if group == "odroids":
         group = "linux"
@@ -1184,11 +1439,29 @@ def viewSystem(hostname, group):
     deployFuzzjobPackageForm = ExecuteDeployFuzzjobInstallPackageForm()
     startFluffiComponentForm = StartFluffiComponentForm()
     systemInstanceConfigForm = SystemInstanceConfigForm()
-    availableInstallPackagesFromFTP = FTP_CONNECTOR.getListOfFilesOnFTPServer("SUT/")
+    
+    try:
+        availableInstallPackagesFromFTP = FTP_CONNECTOR.getListOfFilesOnFTPServer("SUT/")
+    except Exception as e:
+        print(e)
+        availableInstallPackagesFromFTP = []
+        
     deployPackageForm.installPackage.choices = availableInstallPackagesFromFTP
-    availableArchitecturesFromFTP = FTP_CONNECTOR.getListOfArchitecturesOnFTPServer("fluffi/" + group + "/", group)
+    
+    try:
+        availableArchitecturesFromFTP = FTP_CONNECTOR.getListOfArchitecturesOnFTPServer("fluffi/" + group + "/", group)
+    except Exception as e:
+        print(e)
+        availableArchitecturesFromFTP = []
+    
     fluffiDeployForm.architecture.choices = availableArchitecturesFromFTP
-    availableArchitecturesFromFTP = FTP_CONNECTOR.getListOfArchitecturesOnFTPServer("fluffi/" + group + "/", group)
+    
+    try:
+        availableArchitecturesFromFTP = FTP_CONNECTOR.getListOfArchitecturesOnFTPServer("fluffi/" + group + "/", group)
+    except Exception as e:
+        print(e)
+        availableArchitecturesFromFTP = []
+    
     startFluffiComponentForm.architecture.choices = availableArchitecturesFromFTP
     system = ANSIBLE_REST_CONNECTOR.getSystemObjectByName(hostname)
     jobList = []
@@ -1228,23 +1501,23 @@ def viewSystem(hostname, group):
                                                     models.SystemFuzzjobInstances.AgentType,
                                                     models.SystemFuzzjobInstances.InstanceCount,
                                                     models.SystemFuzzjobInstances.Architecture, models.Systems).join(
-        models.Systems).filter(models.SystemFuzzjobInstances.System == models.Systems.ID).filter_by(
-        Name=hostname).all()
+        models.Systems).filter(models.SystemFuzzjobInstances.System == models.Systems.ID).filter_by(Name=hostname).all()
 
     for fuzzjob in configFuzzjobs:
-        fj = {'name': fuzzjob.name, 'tg': 0, 'tr': 0, 'te': 0, 'tgarch': "", 'trarch': "", 'tearch': ""}
+        settingArch = getSettingArchitecture(fuzzjob.ID)
+        fj = {'name': fuzzjob.name, 'tg': 0, 'tr': 0, 'te': 0, 'tgarch': "", 'trarch': "", 'tearch': "", 'settingArch': settingArch}
         fuzzjobList.append(fj)
         for conf in dbconfiguredFuzzjobInstances:
             if fuzzjob.ID == conf.Fuzzjob:
                 if conf.AgentType == 0:
                     fj['tg'] = conf.InstanceCount
-                    fj['tgarch'] = "(" + conf.Architecture + ")"
+                    fj['tgarch'] = conf.Architecture
                 if conf.AgentType == 1:
                     fj['tr'] = conf.InstanceCount
-                    fj['trarch'] = "(" + conf.Architecture + ")"
+                    fj['trarch'] = conf.Architecture
                 if conf.AgentType == 2:
                     fj['te'] = conf.InstanceCount
-                    fj['tearch'] = "(" + conf.Architecture + ")"
+                    fj['tearch'] = conf.Architecture
 
     for conf in dbconfiguredFuzzjobInstances:
         if conf.AgentType == 4:
@@ -1262,8 +1535,7 @@ def viewSystem(hostname, group):
                           managed=managed,
                           systemInstanceConfigForm=systemInstanceConfigForm,
                           configFuzzjobs=fuzzjobList,
-                          lmCount=lmCount
-                          )
+                          lmCount=lmCount)
 
 
 @app.route("/systems/configureSystemInstances/<string:system>", methods=["POST"])
@@ -1273,8 +1545,8 @@ def configureSystemInstances(system):
 
     if request.method == 'POST' and form.is_submitted:
         msg, category = insertFormInputForConfiguredInstances(request, system)
+    
     flash(msg, category)
-
     return redirect(url_for("systems"))
 
 
@@ -1282,43 +1554,24 @@ def configureSystemInstances(system):
 def configureFuzzjobInstances(fuzzjob):
     form = SystemInstanceConfigForm()
     projId = db.session.query(models.Fuzzjob).filter_by(name=fuzzjob).first()
-    msg = ""
-    category = ""
+    msg, category = "", ""
 
     if request.method == 'POST' and form.is_submitted:
         msg, category = insertFormInputForConfiguredFuzzjobInstances(request, fuzzjob)
+    
     flash(msg, category)
-
     return redirect(url_for("viewConfigSystemInstances", projId=projId.ID))
 
 
-@app.route("/systems/removeConfiguredInstances/<string:system>/<string:fuzzjob>/<string:type>", methods=["POST"])
-def removeConfiguredInstances(system, fuzzjob, type):
-    status = 'OK'
-    try:
-        sys = models.Systems.query.filter_by(Name=system).first()
-        agenttype = 0
-        fuzzjobId = None
-        if "tr" in type:
-            agenttype = 1
-        if "te" in type:
-            agenttype = 2
-        if "lm" in type:
-            agenttype = 4
-        if agenttype != 4:
-            fj = models.Fuzzjob.query.filter_by(name=fuzzjob).first()
-            fuzzjobId = fj.ID
-
-        instance = models.SystemFuzzjobInstances.query.filter_by(System=sys.ID, Fuzzjob=fuzzjobId,
-                                                                 AgentType=int(agenttype)).first()
-        if instance is not None:
-            db.session.delete(instance)
-            db.session.commit()
-    except Exception as e:
-        status = 'error'
-
-    return json.dumps({"status": status})
-
+@app.route("/systems/removeConfiguredInstances", methods=["POST"])
+def removeConfiguredInstances():    
+    systemName = request.json.get("systemName", "")
+    fuzzjobName = request.json.get("fuzzjobName", "")
+    typeFromReq = request.json.get("type", "")
+    
+    status, msg = deleteConfiguredInstance(systemName, fuzzjobName, typeFromReq)
+    return json.dumps({"status": status, "message": msg})        
+                
 
 @app.route("/systems/reboot/<string:hostname>", methods=["GET"])
 def rebootSystem(hostname):
@@ -1400,18 +1653,27 @@ def viewInstallPackage(hostname):
 @app.route("/systems/view/<string:hostname>/deployFuzzPackage", methods=["POST"])
 def viewInstallFuzzjobPackage(hostname):
     # validate and execute playbook 
-    historyURL = None
     selectedFuzzJob = str(request.form.getlist('fuzzingJob')[0])
+
+    historyURL = None
     packages = []
-    res = db.session.query(models.Fuzzjob, models.FuzzjobDeploymentPackages, models.DeploymentPackages).filter_by(
-        name=selectedFuzzJob).join(models.FuzzjobDeploymentPackages).filter(
-        models.Fuzzjob.ID == models.FuzzjobDeploymentPackages.Fuzzjob).join(models.DeploymentPackages).filter(
-        models.FuzzjobDeploymentPackages.DeploymentPackage == models.DeploymentPackages.ID)
+    
+    fuzzjob = db.session.query(models.Fuzzjob).filter_by(name=selectedFuzzJob).first()
+        
+    if fuzzjob is None:
+        flash("Fuzzjob {} does not exist in db.".format(selectedFuzzJob), "error")
+        return redirect(url_for('systems'))
+    
 
-    for package in res:
-        packages.append(package[2].name)
+    result = (db.session.query(models.FuzzjobDeploymentPackages, models.DeploymentPackages)
+                    .join(models.DeploymentPackages, models.FuzzjobDeploymentPackages.DeploymentPackage == models.DeploymentPackages.ID)
+                    .filter(models.FuzzjobDeploymentPackages.Fuzzjob == fuzzjob.ID)
+                    .all())        
 
-    if len(packages) < 1:
+    for row in result:        
+        packages.append(row[1].name)
+
+    if len(packages) == 0:
         flash("No package found to deploy!", "error")
         return redirect(url_for('systems'))
 
@@ -1425,16 +1687,22 @@ def viewInstallFuzzjobPackage(hostname):
     else:
         return redirect(url_for('viewSystem', hostname=hostname))
 
-
 @app.route("/systems/view/<string:hostname>/<string:groupName>/startFluffi", methods=["POST"])
 def startFluffi(hostname, groupName):
     relevantHostnames = []
     if not groupName == '-':
-        groups = ANSIBLE_REST_CONNECTOR.getHostAliveState()
-        for group in groups:
-            if group.Name == groupName:
-                for h in group.hosts:
-                    relevantHostnames.append(h.Name)
+        try:
+            groups = ANSIBLE_REST_CONNECTOR.getHostAliveState()
+            for group in groups:
+                if group.Name == groupName:
+                    for h in group.hosts:
+                        relevantHostnames.append(h.Name)
+        except Exception as e:
+            try:
+                ANSIBLE_REST_CONNECTOR.execHostAlive()
+            except Exception as e:
+                print(e)
+            print(e)
     else:
         relevantHostnames.append(hostname)
 
@@ -1497,6 +1765,7 @@ def dashboardTrigger():
     fuzzjobs = listFuzzJobs()
     inactivefuzzjobs = []
     activefuzzjobs = []
+    
     for project in fuzzjobs:
         if (int(project.numLM) > 0) and (int(project.numTE) > 0) and (int(project.numTR) > 0) and (
                 int(project.numTG) > 0):
@@ -1504,11 +1773,11 @@ def dashboardTrigger():
             activefuzzjobs.append(project)
         else:
             inactivefuzzjobs.append(project)
+       
     fuzzjobLocations = getLocations()
-    user = {"nickname": "amb"}
+    
     return renderTemplate("dashboardTrigger.html",
                           title="Home",
-                          user=user,
                           fuzzjobs=activefuzzjobs,
                           locations=fuzzjobLocations,
                           inactivefuzzjobs=inactivefuzzjobs,
@@ -1517,7 +1786,6 @@ def dashboardTrigger():
 
 @app.route("/dashboard")
 def dashboard():
-    user = {"nickname": "amb"}
     return renderTemplate("dashboard.html",
-                          title="Home",
-                          user=user)
+                          title="Home")
+

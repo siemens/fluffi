@@ -1,11 +1,23 @@
 /*
-Copyright 2017-2019 Siemens AG
+Copyright 2017-2020 Siemens AG
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including without
+limitation the rights to use, copy, modify, merge, publish, distribute,
+sublicense, and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
 
 Author(s): Thomas Riedmaier, Abian Blome, Roman Bendt
 */
@@ -250,6 +262,11 @@ bool ExternalProcess::attachToProcess() {
 	//Opening target Process
 	m_pi = { 0 };
 	m_pi.dwProcessId = getPIDForProcessName(m_commandline);
+	if (m_pi.dwProcessId == 0) {
+		LOG(ERROR) << "Could not get PID for Process " << m_commandline;
+		return false;
+	}
+
 	m_pi.hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, m_pi.dwProcessId);
 	if (m_pi.hProcess == NULL) {
 		LOG(ERROR) << "Could not Open Process  " << m_pi.dwProcessId << " (Error " << GetLastError() << ")";
@@ -768,10 +785,10 @@ void ExternalProcess::debug(unsigned long timeoutMilliseconds, std::shared_ptr<D
 			case OUTPUT_DEBUG_STRING_EVENT:
 				if (!doPostMortemAnalysis) {
 					//https://github.com/DynamoRIO/dynamorio/wiki/Debugging
-					LOG(WARNING) << "The application uses OutputDebugString - Dynamo Rio cannot handle this! Please patch the target application if you get the message that drcovOutput is of length 0 (if not - you are fine - this is a known wtf)!";
+					LOG(ERROR) << "The application uses OutputDebugString - Dynamo Rio cannot handle this! Please patch the target application if you get the message that drcovOutput is of length 0 (if not - you are fine - this is a known wtf)!";
 				}
 				else {
-					LOG(INFO) << "The application uses OutputDebugString - No problem as long as Dynamo Rio is not used.";
+					LOG(INFO) << "The application uses OutputDebugString - As the current execution runs without dynamorio, this is not a problem.";
 				}
 				break;
 			case LOAD_DLL_DEBUG_EVENT:

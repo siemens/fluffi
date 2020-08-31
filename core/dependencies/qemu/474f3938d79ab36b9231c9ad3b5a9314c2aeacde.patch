@@ -1,5 +1,5 @@
 #    qemu compile script
-#    Copyright (C) 2017-2019 Siemens AG
+#    Copyright (C) 2017-2020 Siemens AG
 #
 #    This script is free software; you can redistribute it and/or
 #    modify it under the terms of the GNU General Public License
@@ -111,7 +111,7 @@ index 0000000000..a383d4839d
 +	fi
 +
 +	echo "FLUFFI: compiling for ${ARCH}"
-+	(cd build-${ARCH} && make -j$(cat /proc/cpuinfo | awk '/^processor/{print $3}' | wc -l))
++	(cd build-${ARCH} && make -j$(nproc))
 +	build-${ARCH}/${ARCH}-linux-user/qemu-${ARCH} --version
 +done
 diff --git a/linux-user/Makefile.objs b/linux-user/Makefile.objs

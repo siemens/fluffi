@@ -1,14 +1,14 @@
 #!/bin/bash
-# Copyright 2017-2019 Siemens AG. All Rights Reserved.
+# Copyright 2017-2020 Siemens AG. All Rights Reserved.
 #
 # Licensed under the Apache License 2.0 (the "License").  You may not use
 # this file except in compliance with the License.  You can obtain a copy
 # in the file LICENSE in the source distribution or at
 # https://www.openssl.org/source/license.html
 #
-# Author(s): Thomas Riedmaier
+# Author(s): Thomas Riedmaier, Roman Bendt
 
-THREADS=$(cat /proc/cpuinfo | grep processor | wc -l)
+HREADS=$(nproc)
 ARCH=$(file /bin/bash | awk -F',' '{print $2}' | tr -d ' ')
 
 rm -rf include

@@ -1,11 +1,23 @@
 <!--
-Copyright 2017-2019 Siemens AG
+Copyright 2017-2020 Siemens AG
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including without
+limitation the rights to use, copy, modify, merge, publish, distribute,
+sublicense, and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
 
 Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael Kraus
 -->
@@ -18,6 +30,8 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
 <script src="{{ url_for('static', filename = 'javascript/modifyViewProject.js') }}" type="text/javascript"></script>
 <script src="{{ url_for('static', filename = 'javascript/tooltip.js') }}" type="text/javascript"></script>
 <script src="{{ url_for('static', filename = 'javascript/inputValidator.js') }}" type="text/javascript"></script>
+<script src="{{ url_for('static', filename = 'javascript/infoUpdater.js') }}" type="text/javascript"></script>
+<script> var projId = {{ project.ID }}; </script>
 {{super()}}
 {% endblock %}
 
@@ -33,11 +47,9 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
     </div>
 </div>
 <div class="container">
-    <div class="row">
-        {{ flashMessages() }}
-    </div>
+    {{ flashMessages() }}
 </div>
-<hr>
+<br>
 
 <div class="container">
     <div class="row">
@@ -54,9 +66,13 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
                     <td style="text-align: center;">{{ project.testcases }}</td>
                 </tr>
                 <tr>
+                    <th scope="row">Time of latest population insert:</th>
+                    <td style="text-align: center;" id="timeOfLatestPopulation">{{ project.timeOfLatestPopulation }}</td>
+                </tr>
+                <tr>
                     <th scope="row"><a href="/projects/{{ project.ID }}/population/1">Population</a></th>
                     <td style="text-align: center;">{{ project.numPopulation }} / {{ project.numMinimizedPop }}</td>
-                </tr>
+                </tr>                
                 <tr>
                     <th scope="row"><a href="/projects/{{ project.ID }}/accessVioTotal/1">Access Violations (Total)</a>
                     </th>
@@ -163,14 +179,17 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
         <tr>
             <td><a href="/locations/view/{{ location.ID }}">{{ location.Name }}</a></td>
             <td>
-                <input onclick="deleteLocation({{ project.ID }}, '{{ location.Name }}')" type="button" value="Delete"/>
+                <input onclick="deleteLocation({{ project.ID }}, '{{ location.Name }}')" type="button" 
+                        class="btn btn-default"
+                        value="Delete"/>
             </td>
         </tr>
         {% endfor %}
         </tbody>
     </table>
-    <button data-target="#addLocationModal" data-toggle="modal" type="button"><span
-            class="glyphicon glyphicon-plus"></span></button>
+    <button data-target="#addLocationModal" data-toggle="modal" type="button" class="btn btn-default">
+        <span class="glyphicon glyphicon-plus"></span>
+    </button>
     <!-- Modal -->
     <div class="modal fade" id="addLocationModal" role="dialog">
         <div class="modal-dialog">
@@ -230,17 +249,19 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
                                 name="SettingValue-{{ setting.ID }}">
                             <option selected="selected">{{ setting.value }}</option>
                             {% for option in setting.options %}
-                            <option value="{{ option }}">{{ option }}</option>
+                                <option value="{{ option }}">{{ option }}</option>
                             {% endfor %}
                         </select>
                     </td>
                     <td>
                         <input onclick="updateSetting({{ project.ID }}, {{ setting.ID }}, {{ loop.index }})"
-                               type="button"
-                               value="Update"/>
+                            type="button"
+                            class="btn btn-default btn-sm"
+                            value="Update"/>
                         <input id="deleteSetting{{ setting.name }}{{ project.ID }}"
-                               onclick="deleteSetting({{ project.ID }}, {{ setting.ID }})" type="button"
-                               value="Delete"/>
+                            onclick="deleteSetting({{ project.ID }}, {{ setting.ID }})" type="button"
+                            class="btn btn-default btn-sm"
+                            value="Delete"/>
                     </td>
                     <td>
                         <span class="glyphicon glyphicon-ok" id="successIcon{{ loop.index }}"
@@ -254,10 +275,13 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
                         <div>{{ setting.value }}</div>
                     </td>
                     <td>
-                        <input data-target="#updateGeneratorTypes" data-toggle="modal" type="button" value="Update"/>
+                        <input data-target="#updateGeneratorTypes" data-toggle="modal" type="button" 
+                            class="btn btn-default btn-sm"
+                            value="Update"/>
                         <input id="deleteSetting{{ setting.name }}{{ project.ID }}"
-                               onclick="deleteSetting({{ project.ID }}, {{ setting.ID }})" type="button"
-                               value="Delete"/>
+                            onclick="deleteSetting({{ project.ID }}, {{ setting.ID }})" type="button"
+                            class="btn btn-default btn-sm"
+                            value="Delete"/>
                     </td>
                     <td>
                         <span class="glyphicon glyphicon-ok" id="successIcon{{ loop.index }}"
@@ -303,10 +327,13 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
                         <div>{{ setting.value }}</div>
                     </td>
                     <td>
-                        <input data-target="#updateevaluatorTypes" data-toggle="modal" type="button" value="Update"/>
+                        <input data-target="#updateevaluatorTypes" data-toggle="modal" type="button" 
+                            class="btn btn-default btn-sm"
+                            value="Update"/>
                         <input id="deleteSetting{{ setting.name }}{{ project.ID }}"
-                               onclick="deleteSetting({{ project.ID }}, {{ setting.ID }})" type="button"
-                               value="Delete"/>
+                            onclick="deleteSetting({{ project.ID }}, {{ setting.ID }})" type="button"
+                            class="btn btn-default btn-sm"
+                            value="Delete"/>
                     </td>
                     <td>
                         <span class="glyphicon glyphicon-ok" id="successIcon{{ loop.index }}"
@@ -348,15 +375,22 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
                     </div>
                     {% else %}
                     <td>{{ setting.name }}</td>
-                    <td><input id="SettingValue-{{ setting.ID }}" size="98" type="text" value="{{ setting.value }}"/>
+                    <td>
+                        <input id="SettingValue-{{ setting.ID }}" 
+                            class="form-control" 
+                            type="text" 
+                            value="{{ setting.value }}"/>
                     </td>
                     <td>
                         <input onclick="updateSetting({{ project.ID }}, {{ setting.ID }}, {{ loop.index }})"
-                               type="button"
-                               value="Update"/>
+                            type="button"
+                            class="btn btn-default btn-sm"
+                            value="Update"/>
                         <input id="deleteSetting{{ setting.name }}{{ project.ID }}"
-                               onclick="deleteSetting({{ project.ID }}, {{ setting.ID }})" type="button"
-                               value="Delete"/>
+                            onclick="deleteSetting({{ project.ID }}, {{ setting.ID }})" 
+                            type="button"
+                            class="btn btn-default btn-sm"
+                            value="Delete"/>
                     </td>
                     <td>
                         <span class="glyphicon glyphicon-ok" id="successIcon{{ loop.index }}"
@@ -391,8 +425,8 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
                             class="glyphicon glyphicon-plus"></span></button>
                 </div>
                 <div class="col-md-4"></div>
-                <div class="col-md-2" style="text-align: center"><input class="btn btn-primary" id="addSettings"
-                                                                        type="submit" value="Add Settings"/>
+                <div class="col-md-2" style="text-align: center">
+                    <input class="btn btn-primary" id="addSettings" type="submit" value="Add Settings"/>
                 </div>
             </div>
         </form>
@@ -401,54 +435,76 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
 
 <div class="container">
     <h2>Target Modules</h2>
-    <div data-toggle="fieldset" id="phone-fieldset">
-        <form action="{{ url_for('createProjectModule', projId=project.ID) }}" method="POST" name="addModule">
-            <table class="table">
-                <thead>
-                <tr>
-                    <th><label for="target_module">Name</label></th>
-                    <th><label for="target_module_path">Path</label></th>
-                    <th>Operations</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for module in project.modules %}
-                <tr>
-                    <td>{{ module.name }}</td>
-                    <td>{{ module.path }}</td>
-                    <td>
-                        <input id="deleteModule{{ module.name }}{{ project.ID }}"
-                               onclick="deleteModule({{ project.ID }}, {{ module.ID }})" type="button"
-                               value="Delete"/>
-                    </td>
-                </tr>
-                {% endfor %}
-                <tr data-toggle="fieldset-entry">
-                    <td><input class="form-control" id="1_targetname" name="1_targetname" placeholder="example.dll"
-                               type="text"></td>
-                    <td><input class="form-control" id="1_targetpath" name="1_targetpath" type="text" value="*"></td>
-                    <td>
-                        <button data-toggle="fieldset-remove-row" id="phone-remove" type="button" type="button"><span
-                                class="glyphicon glyphicon-remove-circle"></span></button>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-            <button data-target="#phone-fieldset" data-toggle="fieldset-add-row" type="button">
-                <span class="glyphicon glyphicon-plus"></span>
-            </button>
+    <div>        
+        <table class="table">
+            <thead>
+            <tr>
+                <th><label>Name</label></th>
+                <th><label>Path</label></th>
+                <th>Operations</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for module in project.modules %}
+            <tr>
+                <td>{{ module.name }}</td>
+                <td>{{ module.path }}</td>
+                <td>
+                    <input class="btn btn-default" id="deleteModule{{ module.name }}{{ project.ID }}"
+                            onclick="deleteModule({{ project.ID }}, {{ module.ID }})" type="button"
+                            value="Delete"/>
+                    <input class="btn btn-default" id="setModuleBinary{{ module.name }}{{ project.ID }}"
+                            data-target="#setModuleBinary{{ module.ID }}" data-toggle="modal" type="button"
+                            value="Edit Module"/>
+                </td>
+            </tr>
+            <!-- setModuleBinary Modal -->
+            <div class="modal fade" id="setModuleBinary{{ module.ID }}" role="dialog">
+                <div class="modal-dialog">
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button class="close" data-dismiss="modal" type="button">&times;</button>
+                            <h4 class="modal-title">Edit Module</h4>
+                        </div>
+                        <div class="modal-body">                                
+                            <div class="form-group">
+                                <form action="{{ url_for('setModuleBinaryAndPath', projId=project.ID, moduleId=module.ID) }}" enctype="multipart/form-data" method="POST" name="setModuleBinaryAndPath">
+                                    <div>
+                                        <label for="moduleName">Module Name:</label>
+                                        <input type="text" class="form-control" name="moduleName" value="{{ module.name }}">
+                                    </div>
+                                    <div class="targetModuleMargin">
+                                        <label for="modulePath">Module Path:</label>
+                                        <input type="text" class="form-control" name="modulePath" value="{{ module.path }}">
+                                    </div>                                                                        
+                                    <input class="targetModuleMargin" name="moduleBinaryFile" type="file">
+                                    <input class="btn btn-primary" type="submit" value="Save"/>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-default" data-dismiss="modal" type="button">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}                
+            </tbody>
+        </table>                        
+        <form action="{{ url_for('createProjectModule', projId=project.ID) }}" enctype="multipart/form-data" method="POST" name="addModule">
             <div class="row" style="margin-bottom: 40px">
                 <div class="col-md-4">
-                    <p>Or select multiple Target Modules:</p>
+                    <p>Select Target Modules to add</p>
                     <input id="targetModules" multiple name="targetModules" type="file">
-                </div>
+                </div> 
                 <div class="col-md-7" style="text-align: right">
-                    <input class="btn btn-primary" id="addTargetModules" type="submit" value="Add Target Modules"/>
+                    <input class="btn btn-primary" id="addTargetModules" type="submit" value="Add new Target Modules"/>
                 </div>
                 <div class="col-md-1"></div>
             </div>
         </form>
-    </div>
+    </div>    
 </div>
 
 {% set glob = {} %}
@@ -468,10 +524,7 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
                                             style="font-size: 20px" title="This will only save the new *.zip file!"></span>
             </h2>
             <form action="{{ url_for('uploadNewTargetZip', projId=project.ID) }}" method="POST" enctype=multipart/form-data>
-                <p>Upload new Target as *.zip file:</p>
-                <div class="checkbox">
-                    <label><input name="addTargetToFuzzjob" type="checkbox" value="addTarget">Add target files to Fuzzjob</label>
-                </div>
+                <p>Upload new Target as *.zip file:</p>                
                 <input name="uploadFile" type="file" required>
                 <input class="btn btn-primary" type="submit" value="Upload" style="margin-top:15px"/>
             </form>

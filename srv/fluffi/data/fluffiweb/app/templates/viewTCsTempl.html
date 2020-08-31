@@ -1,11 +1,23 @@
 <!--
-Copyright 2017-2019 Siemens AG
+Copyright 2017-2020 Siemens AG
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including without
+limitation the rights to use, copy, modify, merge, publish, distribute,
+sublicense, and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
 
 Author(s): Pascal Eckmann, Junes Najah, Thomas Riedmaier
 -->
@@ -16,76 +28,28 @@ Author(s): Pascal Eckmann, Junes Najah, Thomas Riedmaier
 {% block scripts  %}
 <script src="{{ url_for('static', filename = 'javascript/tooltip.js') }}" type="text/javascript"></script>
 <script src="{{ url_for('static', filename = 'javascript/renamer.js') }}" type="text/javascript"></script>
+<script src="{{ url_for('static', filename = 'javascript/tcTemplate.js') }}" type="text/javascript"></script>
+<script src="{{ url_for('static', filename = 'javascript/hexdump.js') }}" type="text/javascript"></script>
+
+<script>
+    $( document ).ready(function() {
+    if({{actual_page}} && {{page_count}}){
+        addPages({{actual_page}}, {{page_count}});
+    }
+});
+</script>
+
 {{super()}}
 {% endblock %}
 
 {% block content %}
 
-<script>
-    
-function deleteTestcase(testcaseId, tcType) {
-    var deleteUrl = "/projects/" + "{{ data.project.ID }}" + "/delTestcase/" + testcaseId + "/" + tcType;
-    window.location.replace(deleteUrl);
-}
-
-$( document ).ready(function() {
-    if({{actual_page}} && {{page_count}}){
-        addPages({{actual_page}}, {{page_count}});
-    }    
-});
-
-function addSinglePage(i, actualPage){
-    var link = ""
-    var singlePage = document.createElement('div');
-    $(singlePage).addClass('single_page');
-    $(singlePage).html(i);
-    if(i == actualPage){
-        $(singlePage).addClass('single_page_active');
-    }else if(i == "..."){
-        $(singlePage).addClass('single_page_dots');
-    }else{
-        link = "{{base_link}}" + i.toString()
-        $(singlePage).addClass('single_page_inactive');
-        $(singlePage).addClass("link_" + i.toString());
-    }
-    $(".pages").append(singlePage);
-    if($(".single_page").hasClass("link_" + i.toString())){
-        $(".link_" + i.toString()).wrap('<a href="' + link + '"></a>');
-    }
-}
-
-function addPages(actualPage, pageCount){
-    var margin = 3;
-    maxPages = actualPage + margin;
-    if(maxPages > pageCount){
-        maxPages = pageCount;
-    }
-    if(actualPage >= margin + 3){
-        addSinglePage(1, actualPage);
-        addSinglePage("...", actualPage);
-
-        for(var i = actualPage - margin; i <= maxPages; i++) {
-            addSinglePage(i, actualPage);
-        }
-    }else{
-        for(var i = 1; i <= maxPages; i++) {
-            addSinglePage(i, actualPage);
-        }
-    }
-    if(actualPage < pageCount - margin){
-        if(actualPage != pageCount - (margin + 1)){
-            addSinglePage("...", actualPage);
-        }
-        addSinglePage(pageCount, actualPage);
-    }
-}
-</script>
-
 <div class="container">
     <h1><a href="/projects/view/{{data.project.ID}}">{{ data.name }} details: {{ data.project.name }}</a></h1>
 </div>
-{{ flashMessages() }}
-<hr>
+<div class="container">
+    {{ flashMessages() }}
+</div>
 
 <div class="container">
     <div class="row">
@@ -137,20 +101,20 @@ function addPages(actualPage, pageCount){
             <td>{% if testcase.footprint %}
                 {{ testcase.footprint }}
                 {% else %}
-                    {% if testcase.niceName %}
-                    <button id="tcBtn{{loop.index}}"
-                            onclick="addOrRenameNiceName({{ loop.index }}, {{ data.project.ID }}, 'update', '{{ testcase.testcaseID }}', '')"
+                    {% if testcase.triggerInsert %}
+                    <button id="tcBtnNew{{loop.index}}"
+                            onclick="addOrRenameNiceName({{ loop.index }}, {{ data.project.ID }}, 'insert', '{{ testcase.ID.split(':')[0] }}', '{{ testcase.ID.split(':')[1] }}', '')"
                             class="btn-desgin">
                         {{ testcase.niceName }}
                     </button>
-                    <input class="form-control" id="tcInput{{loop.index}}" style="display: none;" type="text">
-                    {% else %}
-                    <button id="tcBtnNew{{loop.index}}"
-                            onclick="addOrRenameNiceName({{ loop.index }}, {{ data.project.ID }}, 'insert', '{{ testcase.testcaseID }}', '')"
-                            class="btn-desgin">
-                        {{ testcase.ID }}
-                    </button>
                     <input class="form-control" id="tcInputNew{{loop.index}}" style="display: none;" type="text">
+                    {% else %}
+                    <button id="tcBtn{{loop.index}}"
+                            onclick="addOrRenameNiceName({{ loop.index }}, {{ data.project.ID }}, 'update', '{{ testcase.ID.split(':')[0] }}', '{{ testcase.ID.split(':')[1] }}', '')"
+                            class="btn-desgin">
+                        {{ testcase.niceName }}
+                    </button>
+                    <input class="form-control" id="tcInput{{loop.index}}" style="display: none;" type="text">                    
                     {% endif %}
                 {% endif %}
             </td>
@@ -159,6 +123,9 @@ function addPages(actualPage, pageCount){
             {% endif %}
             <td>{{ testcase.timeOfInsertion | default('', True) }}</td>
             <td>
+                <button class="btn btn-default btn-desgin" data-target="#modalHexDump{{loop.index}}" data-toggle="modal" type="button" onclick="loadHexdump( {{ data.project.ID }}, {{ testcase.testcaseID }}, {{loop.index}} )">
+                    <span class="glyphicon glyphicon-sunglasses"></span>
+                </button>
                 <button class="btn btn-default btn-desgin" onclick="deleteTestcase('{{ testcase.ID }}', '{{ data.redirect }}')"
                         type="button">
                     <span class="glyphicon glyphicon-remove"></span>
@@ -169,9 +136,33 @@ function addPages(actualPage, pageCount){
                 </button>
             </td>
         </tr>
+
+        <div class="modal fade" id="modalHexDump{{loop.index}}" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        {{ testcase.niceName }}
+                    </div>
+                    <div class="modal-body">
+                        <div style="text-align: center;"><div class="modal-loader" style="display: none;"></div></div>
+                        <div id="buildHexdump{{loop.index}}"></div>
+                        <div style="text-align: center;"><ul class="pagination" id="buildLinks{{loop.index}}"></ul></div>
+                        <div id="jumpPagination{{loop.index}}">
+                            <label for="offset">Go to offset:</label>
+                            <input class="form-control" onkeydown="jumpToOffset({{ data.project.ID }}, {{ testcase.testcaseID }}, {{loop.index}}, this)" type="text" id="offset" name="offset" placeholder="Offset">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-default" data-dismiss="modal" type="button">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         {% endfor %}
         </tbody>
     </table>
+
     <hr>
     <div class="pages_box">
         <div class="pages"></div>

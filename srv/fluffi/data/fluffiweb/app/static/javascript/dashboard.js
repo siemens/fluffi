@@ -1,3 +1,30 @@
+/*
+Copyright 2017-2020 Siemens AG
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including without
+limitation the rights to use, copy, modify, merge, publish, distribute,
+sublicense, and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+Author(s): Junes Najah
+*/
+
+var MON_BASE_URL = "http://mon.fluffi";
+var MON_PORT = ":8885";
+
 var socket;
 var id = "#icontainer";
 var i = 0;
@@ -52,12 +79,13 @@ $(function () {
 });
 
 function getURL(myProjectName, from, to){
+  // TODO is port always needed ?!
   if(myProjectName == 'grafana1'){      
-    return "http://mon.fluffi/d/MAzsmLaik/fluffi-1?orgId=1&refresh=5s&kiosk";
+    return MON_BASE_URL + MON_PORT + "/d/MAzsmLaik/fluffi-1?orgId=1&refresh=5s&kiosk";
   } 
   if(myProjectName == 'grafana2'){      
-    return "http://mon.fluffi/d/jlWq9GtWk/fluffi-2?orgId=1&refresh=5s&kiosk";
+    return MON_BASE_URL + MON_PORT + "/d/jlWq9GtWk/fluffi-2?orgId=1&refresh=5s&kiosk";
   }    
   
-  return "http://mon.fluffi/dashboard/script/scripted.js?fuzzjobname=" + myProjectName + "&from=" + from + "&to=" + to + "&orgId=1&kiosk";
+  return MON_BASE_URL + MON_PORT + "/dashboard/script/scripted.js?fuzzjobname=" + myProjectName + "&from=" + from + "&to=" + to + "&orgId=1&kiosk";
 }

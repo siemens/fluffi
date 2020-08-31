@@ -1,14 +1,27 @@
-# Copyright 2017-2019 Siemens AG
+# Copyright 2017-2020 Siemens AG
 # 
-# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including without
+# limitation the rights to use, copy, modify, merge, publish, distribute,
+# sublicense, and/or sell copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following conditions:
 # 
-# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
 # 
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+# SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+# OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+# ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+# DEALINGS IN THE SOFTWARE.
 # 
-# Author(s): Fabian Russwurm, Michael Kraus, Pascal Eckmann, Thomas Riedmaier, Junes Najah
+# Author(s): Fabian Russwurm, Pascal Eckmann, Michael Kraus, Thomas Riedmaier, Junes Najah
 
 import requests, json
+
 
 class AnsibleRESTConnector:
 
@@ -35,6 +48,15 @@ class AnsibleRESTConnector:
             if result['name'].lower() == "fluffi":
                 return url + str(result['id']) + "/"
 
+    def checkFluffiInventory(self):
+        url = self.ansibleURL + "inventory/"
+        response = requests.get(url, auth = self.auth)
+        jsonResults = json.loads(response.text)
+        for result in jsonResults['results']:
+            if result['name'].lower() == "fluffi":
+                return True
+        return False
+
     def executePlaybook(self, playbookName, limit, arguments = None):
         inventoryID = self.getFluffiInventoryID()
         fluffiProjectURL = self.getFluffiProjectURL()
@@ -51,14 +73,12 @@ class AnsibleRESTConnector:
             data['extra_vars'] = extraVarsString
         # Sending post request to execute a playbook
         response = requests.post(fluffiProjectURL, json = data, auth = self.auth)
-        print(str(data))
         jsonResult = json.loads(response.text)
         if 'history_id' in jsonResult:
             historyID = jsonResult['history_id']
             return "http://" + self.ansibleURL.split("/")[2] + "/?history/" + str(historyID)
         else:
             return None
-        print(str(jsonResult))
 
     def getSystemObjectByName(self, hostname):
         system = type('', (), {})()
@@ -70,6 +90,25 @@ class AnsibleRESTConnector:
 
         return system
 
+    def getSystems(self):
+        systems = []
+        url = self.ansibleURL + "group/"
+        try:
+            # Sending post request to execute playbook to add new system
+            response = requests.get(url, auth=self.auth)
+            jsonResult = json.loads(response.text)
+            for entry in jsonResult['results']:
+                if entry['name'] in self.SHOWN_GROUPS:
+                    url = self.ansibleURL + "group/" + str(entry['id']) + "/host/"
+                    response = requests.get(url, auth=self.auth)
+                    jsonResult = json.loads(response.text)
+                    for host in jsonResult['results']:
+                        systems.append((host['name'], host['id']))
+        except Exception as e:
+            print(e)
+        finally:
+            return systems
+
     def getSystemsOfGroup(self, group):
         systems = []
         url = self.ansibleURL + "group/"
@@ -80,12 +119,9 @@ class AnsibleRESTConnector:
             jsonResult = json.loads(response.text)
             for entry in jsonResult['results']:
                 if entry['name'] == group:
-                    print(entry['id'])
                     url = self.ansibleURL + "group/" + str(entry['id']) + "/host/"
-                    print(url)
                     response = requests.get(url, auth=self.auth)
                     jsonResult = json.loads(response.text)
-                    print(jsonResult)
                     for entry in jsonResult['results']:
                         systems.append(entry['name'])
 
@@ -99,7 +135,7 @@ class AnsibleRESTConnector:
     def addNewSystem(self, hostname, group):
         url = self.ansibleURL + "group/"+group+"/host/"
         data = {}
-        data['name'] = "dev-" + hostname
+        data['name'] = hostname
         data['type'] = "HOST"
 
         result = ""
@@ -108,7 +144,6 @@ class AnsibleRESTConnector:
             # Sending post request to execute playbook to add new system
             response = requests.post(url, json = data, auth = self.auth)
             jsonResult = json.loads(response.text)
-            print(jsonResult)
 
             # get id of newly created host
             newHostId = jsonResult['id']
@@ -127,17 +162,47 @@ class AnsibleRESTConnector:
         
         return True
 
-    # calls Polemarch REST API to remove a self created dev system to fluffi network
-    def removeDevSystem(self, hostId):
-        url = self.ansibleURL + "host/" + hostId + "/"
-        data = {}
-
-        try:                                              
-            # Sending post request to execute playbook to add new system
-            response = requests.delete(url, json = data, auth = self.auth)
-            return True            
+    # calls Polemarch REST API to remove a system from fluffi network
+    def removeSystem(self, hostName):
+        systems = self.getSystems()
             
-        except Exception as e:
+        url = ""
+        for system in systems:
+            if system[0] == hostName:
+                url = self.ansibleURL + "host/" + str(system[1])
+                break
+            
+        if url != "":
+            try:
+                response = requests.delete(url, auth = self.auth)
+                return True
+            except Exception as e:
+                print(e)
+                return False
+        else:
+            return False
+
+    def execHostAlive(self):
+        fluffiProjectURL = self.getFluffiProjectURL()
+        fluffiPeriodicTasksURL = fluffiProjectURL + "periodic_task/"
+        response = requests.get(fluffiPeriodicTasksURL, auth=self.auth,
+                                headers={'User-Agent': 'Python', 'Connection': 'close'})
+        jsonResults = json.loads(response.text)
+
+        taskId = '0'
+        for result in jsonResults['results']:
+            if result['name'] == 'checkHostsAlive':
+                taskId = str(result['id'])
+                break
+
+        if taskId != '0':
+            execCheckHostAliveURL = fluffiPeriodicTasksURL + taskId + '/execute/'
+            try:
+                response = requests.post(execCheckHostAliveURL, auth=self.auth)
+                return True
+            except Exception as e:
+                return False
+        else:
             return False
 
     def getHostAliveState(self):
@@ -153,7 +218,7 @@ class AnsibleRESTConnector:
 
         response = requests.get(lastHostCheckResultURL, auth=self.auth, headers = {'User-Agent':'Python', 'Connection':'close'})
         jsonResults = json.loads(response.text)
-        getResultURL = jsonResults['raw_stdout']# --> get result
+        getResultURL = jsonResults['raw_stdout']  # --> get result
         response = requests.get(getResultURL, auth = self.auth, headers = {'User-Agent':'Python', 'Connection':'close'})
 
         hosts = []
@@ -162,7 +227,7 @@ class AnsibleRESTConnector:
         for p in resultHostData:
             if "RECAP" in p:
                 break
-            aliveProtocol+=1
+            aliveProtocol += 1
         for i, line in enumerate(resultHostData[aliveProtocol].split("\n")):
             line = line.strip()
             parts = line.split()
@@ -218,8 +283,8 @@ class AnsibleRESTConnector:
                                 else:
                                     host.Status = "Failed"
                         group.hosts.append(host)
+                resHosts.close()
             response.close()
             res.close()
-            resHosts.close()
             requests.session().close()
             return groups

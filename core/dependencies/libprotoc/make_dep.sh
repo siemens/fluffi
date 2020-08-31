@@ -1,6 +1,6 @@
 #!/bin/bash
 # ***************************************************************************
-# Copyright (c) 2017-2019 Siemens AG  All rights reserved.
+# Copyright (c) 2017-2020 Siemens AG  All rights reserved.
 # ***************************************************************************/
 #
 #
@@ -28,7 +28,7 @@
 # 
 # Author(s): Thomas Riedmaier, Pascal Eckmann, Roman Bendt
 
-THREADS=$(cat /proc/cpuinfo | grep processor | wc -l)
+THREADS=$(nproc)
 ARCH=$(file /bin/bash | awk -F',' '{print $2}' | tr -d ' ')
 
 rm -rf include

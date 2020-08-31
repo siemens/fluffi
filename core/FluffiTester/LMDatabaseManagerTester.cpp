@@ -1,11 +1,23 @@
 /*
-Copyright 2017-2019 Siemens AG
+Copyright 2017-2020 Siemens AG
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including without
+limitation the rights to use, copy, modify, merge, publish, distribute,
+sublicense, and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
 
 Author(s): Thomas Riedmaier, Abian Blome, Pascal Eckmann
 */
@@ -428,7 +440,8 @@ namespace LMDatabaseManagerTester
 			Assert::IsTrue(dbman->addDeltaToTestcaseRating(ftid1, 10));
 			Assert::IsTrue(stoi(dbman->EXECUTE_TEST_STATEMENT("SELECT Rating from interesting_testcases WHERE CreatorLocalID = " + std::to_string(localid1) + " AND CreatorServiceDescriptorGUID = '" + guid1 + "'")) == 10, L"Testcase rating could not be increased");
 
-			Assert::IsTrue(dbman->addDeltaToTestcaseRating(ftid1, -20));
+			__int32 decrease = 20;
+			Assert::IsTrue(dbman->addDeltaToTestcaseRating(ftid1, 0 - decrease));
 			Assert::IsTrue(stoi(dbman->EXECUTE_TEST_STATEMENT("SELECT Rating from interesting_testcases WHERE CreatorLocalID = " + std::to_string(localid1) + " AND CreatorServiceDescriptorGUID = '" + guid1 + "'")) == -10, L"Testcase rating could not be decreased");
 
 			Assert::IsTrue(stoi(dbman->EXECUTE_TEST_STATEMENT("SELECT Rating from interesting_testcases WHERE CreatorLocalID = " + std::to_string(localid2) + " AND CreatorServiceDescriptorGUID = '" + guid2 + "'")) == 0, L"Wrong testcase was updated");
@@ -563,7 +576,7 @@ namespace LMDatabaseManagerTester
 			std::ifstream f(testfile);
 			Assert::IsFalse(f.good());
 
-			//duplicate insert should result in an update and delete dependants such as worst case scenarios and coverage
+			//duplicate insert should result in an update and delete dependants such as crash descriptors and coverage. Nice names, however should remain
 			Assert::IsTrue(dbman->addEntryToCrashDescriptionsTable(ftid2, "here a crash fp"));
 			Assert::IsTrue(stoi(dbman->EXECUTE_TEST_STATEMENT("SELECT Count(*) from crash_descriptions")) == 1);
 			std::set<FluffiBasicBlock> blocks;

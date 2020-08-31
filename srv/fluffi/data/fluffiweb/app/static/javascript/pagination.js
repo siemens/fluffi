@@ -1,13 +1,25 @@
 /*
-Copyright 2017-2019 Siemens AG
+Copyright 2017-2020 Siemens AG
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including without
+limitation the rights to use, copy, modify, merge, publish, distribute,
+sublicense, and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
 
-Author(s): Junes Najah, Thomas Riedmaier
+Author(s): Junes Najah
 */
 
 var MARGIN = 5;
@@ -19,6 +31,9 @@ function loadPagination(projId, sdguid, loopIndex, offset=0, currentPage=1, init
     var pageCount = 1;
     var linkElem = "";
     var navigateFuncStr = "";
+
+    $(".modal-loader").css("display", "inline");
+    $("#buildLogs" + loopIndex).css("visibility", "hidden");
 
     $.ajax({
         url: URL,
@@ -50,11 +65,14 @@ function loadPagination(projId, sdguid, loopIndex, offset=0, currentPage=1, init
                     else {
                         var style = index > 5 && index < pageCount ? "style='display:none'" : "";
                         linkElem = "<li id='" + loopIndex + "link" + index + "' " + style + "><a href='#' onclick='" + navigateFuncStr + "'>" + index + "</a></li>";
-                    }            
+                    }   
+
                     $("#buildLinks" + loopIndex).append(linkElem); 
 
-                    if(index == 1) { $("#buildLinks" + loopIndex).append("<li class='startDots' style='display:none;'><a href='#'>...</a></li>"); }                  
-                    if(index == (pageCount-1)){ 
+                    if(index == 1 && pageCount > (MARGIN + 1)) {                        
+                        $("#buildLinks" + loopIndex).append("<li class='startDots' style='display:none;'><a href='#'>...</a></li>"); 
+                    }                  
+                    if(index == (pageCount-1) && pageCount > (MARGIN + 1)){ 
                         var liTagEndDots = pageCount <= MARGIN ? "<li class='endDots' style='display:none;'><a href='#'>...</a></li>" : "<li class='endDots'><a href='#'>...</a></li>";
                         $("#buildLinks" + loopIndex).append(liTagEndDots);
                     }         
@@ -62,11 +80,13 @@ function loadPagination(projId, sdguid, loopIndex, offset=0, currentPage=1, init
                 $("#buildLinks" + loopIndex).append("<li onclick='next(" + loopIndex + ")' class='rightArrow'><a href='#' aria-label='Next'><span aria-hidden='true'>&raquo;</span></a></li>");
                 $("#modalLink" + loopIndex).text("LogMessage(s)");
             }
-            else if(pageCount > MARGIN) {
+            else if(pageCount > (MARGIN + 1)) {
                 updatePageLinks(loopIndex);
-            }            
-        }
-    });         
+            } 
+            $(".modal-loader").css("display", "none");
+            $("#buildLogs" + loopIndex).css("visibility", "visible");
+        }        
+    });    
 }
 
 function navigate(projId, sdguid, loopIndex, currentPage){      
@@ -99,17 +119,39 @@ function prev(loopIndex){
     } 
 }
 
-function updatePageLinks(loopIndex){    
-    // Used for distance from indexOfActiveLink to last element
-    var distance = 0;
+function updatePageLinks(loopIndex){        
     var links = $("#buildLinks" + loopIndex).children();
     var indexOfActiveLink = null;
-    links.each(function(i){ if($(this).hasClass("active")){ indexOfActiveLink = i; }}); 
+    var indexOfRightArrowLink = null;
+    var indexOfLeftArrowLink = null;
     var endIndex = links.length-2; 
-    distance = (links.length-2) - indexOfActiveLink;
 
-    // Disable (...)-buttons if active link is next to it
+    links.each(function(i){
+        if ($(this).hasClass("active"))
+            indexOfActiveLink = i;
+        else if ($(this).hasClass("rightArrow"))
+            indexOfRightArrowLink = i;
+        else if ($(this).hasClass("leftArrow"))
+            indexOfLeftArrowLink = i;
+    });
 
+    // Used for distance from indexOfActiveLink to last element
+    var distance = (links.length-2) - indexOfActiveLink;
+
+    //disable arrow buttons if there are no more pages
+    if (indexOfActiveLink !== null && indexOfRightArrowLink !== null && indexOfLeftArrowLink !== null) {
+        if (links.eq(indexOfActiveLink+1).hasClass("rightArrow")) {
+            links.eq(indexOfActiveLink+1).addClass("disabled");
+        } else {
+            links.eq(indexOfRightArrowLink).removeClass("disabled");
+        }
+
+        if (links.eq(indexOfActiveLink-1).hasClass("leftArrow")) {
+            links.eq(indexOfActiveLink-1).addClass("disabled");
+        } else {
+            links.eq(indexOfLeftArrowLink).removeClass("disabled");
+        }
+    }    
 
     // Ending of pages  
     if (distance >= 0 && distance <= MARGIN) {

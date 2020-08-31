@@ -1,37 +1,60 @@
 <!---
-Copyright 2017-2019 Siemens AG
+Copyright 2017-2020 Siemens AG
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including without
+limitation the rights to use, copy, modify, merge, publish, distribute,
+sublicense, and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
 
-Author(s): Thomas Riedmaier, Abian Blome, Junes Najah, Roman Bendt
+Author(s): Thomas Riedmaier, Junes Najah, Abian Blome, Roman Bendt
 -->
 
 # Usage
 
 ## 1) Adding runner systems to FUN
-All FuzzJobs are run on dedicated Runner systems in the FLUFFI Utility Network (FUN). To add new systems:
+All FuzzJobs are run on dedicated Runner systems in the FLUFFI Utility Network (FUN). You can bring your own system or use the FLUFFI PXE images (recommended). How to build these images is documented [here](agents/pxe_images).
+
+To add new systems:
 
 * Physically plug your system into FUN
-* Assign a host name. (Other systems within FUN must be able to reach your system with that hostname. The DNS server should be able to handle this). On linux: `sudo hostnamectl set-hostname mysystem`
-* Check connectivity to `gm.fluffi`
-* For problems: check the firewall
-* Create a user for ansible. To do so you need to create a user that matches whatever username and password you specified in ansible's [hosts](srv/fluffi/data/polenext/projects/1/hosts) file (see [the getting started section](getting_started.md)). On Linux, this user needs to be a sudoer. On Windows, this user needs to be local administrator.
-* Prepare the system for ansible: 
+* Check connectivity to `gm.fluffi`. For problems: check the firewall
+* Decide on the host name for that system, and put it in the [MAC2Host.csv](srv/fluffi/data/smb/files/initial/MAC2Host.csv).  Other systems within FUN must be able to reach your system with that hostname.
+* Create a user for ansible. To do so you need to create a user that matches whatever username and password you specified in ansible's [hosts](srv/fluffi/data/polenext/projects/1/hosts) file (see [the getting started section](./getting_started.md)). On Linux, this user needs to be a sudoer. On Windows, this user needs to be local administrator.
+* Prepare the system for ansible. To do so run the following commands on the new agent system:
   * Windows:
     * `net use y: \\smb.fluffi\install\initial /user:nobody pass`
     * `y:\initialConfiguration.bat`
     * `net use y: /Delete /yes`
   * Linux:
+    * Make sure, your system is able to reach a packet mirror from within FUN (see also [the package mirror section in the getting_started.md](./getting_started.md)).
+    * `apt-get install openssh-server smbclient net-tools`
     * `smbclient '//smb.fluffi/install' -c 'cd initial; get MAC2Host.csv; get initialConfiguration.sh' -U anonymous%pass;`
-    * `chmod 777 /initialConfiguration.sh`
-    * `/bin/bash /initialConfiguration.sh`
+    * `chmod 777 initialConfiguration.sh`
+    * `/bin/bash initialConfiguration.sh`
     * `rm MAC2Host.csv`
     * `rm initialConfiguration.sh`
-* Finally, you need to tell FLUFFI about the system. To do so you have two options: either add it to ansible's [hosts](srv/fluffi/data/polenext/projects/1/hosts) file, or use the `Add System` button in FLUFFI's web GUI.
+* Tell FLUFFI about the system. To do so you have two options: either add it as a new windows/linux/odroid host to ansible's [hosts](srv/fluffi/data/polenext/projects/1/hosts) file (persistent), or use the `Add System` button in FLUFFI's web GUI. When adding it via the web GUI just use the system's host name without any domain suffix. When adding it via the hosts file, the line needs to look like this: `<hostname> ansible_ssh_host=<hostname>.fluffi`. Remember: When modifying the hosts file, you need to restart the polemarch and fluffi_web containers.
++ Assign a location to the system in the `Systems` tab. An explication of the location concept can be found [here](./technical_details.md).
+
+## 1.1) Deploying FLUFFI
+Now that the new agent system is part of the FUN, the system needs to be configured for FLUFFI. Furthermore, the FLUFFI agent binaries need to be copied to the agent system.
+
+You can do this by navigating to the 'Systems' tab in FLUFFI's web GUI, and clicking on the system's name. Now you should click on 'Initial Setup' and let Pelemarch/Ansible configure the target system for FLUFFI.
+
+Once this is done, you should go to the 'Deploy FLUFFI' tab and deploy those FLUFFI binaries that correspond to the target's architecture. If your target is an X64 system, you might also want to copy the x86 binaries, to be able to fuzz both architectures on a single machine.
 
 ## 2) Preparing your target
 
@@ -85,22 +108,15 @@ To help FLUFFI handle this we added the [fuzzcmp](core/helpers/fuzzcmp) helper. 
 We recommend using it always!
 
 
-## 3) Create a FLUFFI Fuzz Job
+## 3) Create a FLUFFI FuzzJob
 
-All FuzzJobs are run on dedicated Runner systems in the FLUFFI Utility Network (FUN). Your test target, which should be prepared as a *package*, needs to be deployed to these Runner systems.
-
-A package is a zip file containing either an `install.bat`, an `install.ps1`, or an `install.sh` file as well as arbitrary data. When you deploy this package, it is copied to the FLUFFI runner systems, extracted (on Windows to  `C:\fluffi\SUT\<ZipFileName>\`, on Linux to `/home/<FluffiUser>/fluffi/persistent/SUT/<ZipfileName>\`), and the corresponding install script is executed. You should prepare the package so that it installs all the required dependencies for the target as well as the target itself. Once you have such a zip file, you should upload it to the FLUFFI FTP server at `ftp.fluffi` using anonymous login.
-
-If you create a Windows package, you should add page heap checks using gflags for the target binary. This allows FLUFFI to better detect access violations in the heap. As gflags is already installed on all our systems, you only need to add a line to your `install.ps1` or `install.bat` such as: `C:\utils\GFlags\x86\gflags.exe /p /enable TargetBinary.exe`
-
-Once the package is on the FTP server, you are ready to deploy it on the selected runner systems. You can do this in the `Systems` tab or while creating a fuzz job.
 
 If you want to create a FuzzJob go to the FLUFFI web page (currently reachable on `http://web.fluffi/`).
 
 
 Having done so, you need to create a FuzzJob via `FuzzJobs->Create FuzzJob`.
 
-![alt text](CreateNewProject.png "The dialog to create a new FuzzJob")
+![The dialog to create a new FuzzJob](CreateNewProject.png)
 
 **Name**
 
@@ -136,13 +152,13 @@ FLUFFI supports various test case generators. You can use as many of them as you
 - [OedipusMutator](core/Oedipus)
 - `ExternalMutator` (Allows easy addition of custom mutators):
    in this case you need to specify an additional setting: `extGeneratorDirectory`
-   This setting points to a directory, where FLUFFI will insert a file called `fuzzjob.name` containing the name of the current FuzzJob.
+   This setting points to a directory, where FLUFFI will insert a file called `FuzzJob.name` containing the name of the current FuzzJob.
    It is the job of the external mutator to:
   1. Come up with a unique ID (UUID)
   2. Create a subdirectory in the `extGeneratorDirectory` named like that UUID
-  3. Connect to the GM database and extracts the connection parameters for the fuzzjob's database from the `fuzzjob` table
-  4. Connect to the fuzzjob's database and place a nice name in the fuzzjob's `nice_names_managed_instance` table for the chosen UUID
-  5. Place new mutations in the UUID subdirectory following this schema: `ParentGUID_ParentLocalID_GeneratorLocalID`. `GeneratorLocalID` needs to be a decimal number that is unique for the current mutator instance (i.e. you must ensure that the touple (`UUID`,`GeneratorLocalID`) is unique). If you want you can use any information from the fuzzjob's database to generate good testcases.
+  3. Connect to the GM database and extracts the connection parameters for the FuzzJob's database from the `fuzzjob` table
+  4. Connect to the FuzzJob's database and place a nice name in the FuzzJob's `nice_names_managed_instance` table for the chosen UUID
+  5. Place new mutations in the UUID subdirectory following this schema: `ParentGUID_ParentLocalID_GeneratorLocalID`. `GeneratorLocalID` needs to be a decimal number that is unique for the current mutator instance (i.e. you must ensure that the touple (`UUID`,`GeneratorLocalID`) is unique). If you want you can use any information from the FuzzJob's database to generate good testcases.
   6. Ensure that the hard drive does not fill up (e.g. by implementing a upper limit of files in the directory)
   7. Adapt ratings of Testcases that were used for mutations. Rule of thumb: each mutation that was done based on a parent should decrease the parent's rating by one.
 
@@ -223,9 +239,16 @@ For ALL_GDB:
 
 FLUFFI is a coverage-based evolutionary fuzzer. In order to reduce the noise in the coverage, only those modules that are listed here will be used to calculate the coverage. Examples for modules are `test.dll`, or `target.exe`.
 
+When creating or modifying a project, you can upload the target modules as files. Their filename and binary will be saved and their path will be initialized with a `*`.
+Therefore, you can edit them in the project view by renaming the filename, path and/or uploading a new binary. 
+FLUFFI itself only uses the filename but some generators will use the binary. 
+
 If there are several modules with the same name but different paths, you can specify which one should be used for coverage calculation by specifying the path. If it is left to `*`, the path of a module is ignored.
 
 **PLEASE NOTE**: If you are using a GDB runner, the module name is actually a segment name. An example therefore is `target.exe/.text` 
+
+**Target Upload**
+See section 4) below.
 
 **Population**
 
@@ -242,7 +265,7 @@ target.exe/.text,0x2
 helper.dll/.text,0x100 
 ```
 
-If you want, you can alternatively insert the blocks in the database table `blocks_to_cover` yourself (e.g. by using an IDA python script).
+If you want, you can alternatively insert the blocks in the database table `blocks_to_cover` yourself (e.g. by using [this](ida_scripts/exportBBs.py) IDA python script).
 
 ### TestcaseGenerator
 
@@ -256,23 +279,65 @@ Which evaluator types should be used is set by the evaluatorTypes parameter. It 
 
 **PLEASE NOTE** that the LocalManagers will try to stick as close to your setting as possible. However, if that is not possible (for example, if only evaluators that have only type A implemented register), the ratio might not be as desired.
 
+## 4) Deploy the FuzzJob on the target machines
 
-## 4) Start the FLUFFI Agents
-You can control the number of running FLUFFI agents (LM, TR, TE, TG) via the web GUI.
 
-To do so, you can click on 
-- the `Config System Instances` button on the FuzzJob overview page
-- a group name in the `Systems` tab
-- a system name in the `Systems` tab
+All FuzzJobs are run on dedicated Runner systems in the FLUFFI Utility Network (FUN). Your test target, which should be wrapped as a *package*, needs to be deployed to these Runner systems.
 
-Furthermore, you can stop running agents by clicking the `Managed Instances` button when viewing the FuzzJob overview page.
+A package is a zip file containing either an `install.bat`, an `install.ps1`, or an `install.sh` file as well as arbitrary data. When you deploy this package, it is copied to the FLUFFI runner systems, extracted (on Windows to  `C:\fluffi\SUT\<ZipFileName>\`, on Linux to `/home/<FluffiUser>/fluffi/persistent/SUT/<ZipfileName>\`), and the corresponding install script is executed. You should prepare the package so that it installs all the required dependencies for the target as well as the target itself.
 
-Alternatively, you can connect to the system directly (SSH, RDP), and start the agents there.
+If you create a Windows package, you should add page heap checks using gflags for the target binary. This allows FLUFFI to better detect access violations in the heap. As gflags is by default copied to all agent systems, you only need to add a line to your `install.ps1` or `install.bat` such as: `C:\utils\GFlags\x86\gflags.exe /p /enable TargetBinary.exe`
+
+The package needs to be copied somehow to the FLUFFI ftp server (ftp.fluffi). You have two options to do so. Option one is you connect directly to the ftp server using anonymous login, and place the package in the SUT folder. Option two is, you upload the package while creating the FuzzJob. It will then be placed in that very folder. Additionally, it will be associated with the FuzzJob.
+
+
+Once the package is on the FTP server, you can deploy it to runner systems. You can do so in the `Systems` tab by selecting a system or group and chosing the 'Deploy SUT/Dependency' option (SUT stands for Software Under Test).
+
+
+## 5) Start the FLUFFI Agents
+
+Currently there are two ways of how you can manage how many agents (LM, TR, TE, TG)  run on which system, and  work on which FuzzJob.
+
+### Manually
+
+You can connect to the systems directly (SSH, RDP), and start the agents there.
 
 The credentials to do so can be looked up in polemarch's [hosts](srv/fluffi/data/polenext/projects/1/hosts) file.
 On Windows, start one LM (if there is not already one for your FuzzJob, such as on another machine in the same location) and as many TRs / TGs / TEs as you like, e.g. by clicking on the icons on the Desktop. On Linux, just start the appropriate agent binary from the command line, ensuring that you add the location name as the argument for the agent.
 
-You should always monitor your FuzzJob in the `Managed Instances` view in order to make sure that:
-1. The system is not overloaded (e.g. CPU>90%),
+After having been started, LMs register at the GlobalManager (GM) and keep asking for a yet unmanaged FuzzJob in their location. As soon as such a FuzzJob becomes available, the LM will start managing it.
+
+TRs / TGs / TEs will connect to the GM and wait until they are assigned a FuzzJob. This can be done in the Location page of the web application. Once a FuzzJob is assigned, they will connect to the LM in their location managing that FuzzJob.
+
+IMPORTANT: When managing agents manually, you need to disable the agent manager by setting it to `INACTIVE` in the `Settings` button on the `Systems` tab.
+
+### Automatically
+
+FLUFFI implements a so called agent manager. This manager checks how many agents should be run on which machine and will enforce that this is actually the case. It runs periodicly every few minutes (so you need a little patience after configuring new instances).
+
+
+You can control the number of running FLUFFI agents (LM, TR, TE, TG) via the web GUI.
+
+To do so you need go to one of the following locations: 
+- the `Config System Instances` section on the FuzzJob overview page
+- the properties of a group in the `Systems` tab (click on a group name)
+- the properties of a system in the `Systems` tab (click on a system name)
+
+IMPORTANT:  When managing agents with the agent manager, you need to enable the agent manager by setting it to `ACTIVE` in the `Settings` button on the `Systems` tab. Setting it to `KILL` will kill all currently running agents. As a result, you can easily replace FLUFFI or targets binaries.
+
+Note: The agent manager is implemented by two components: A periodic [polemarch task](srv/fluffi/data/polenext/manageAgents.py), and a [python REST server](srv/fluffi/data/ftp/files/restStarter) that is deployed to the runner machines and waits for commands to execute. The latter is one of the reasons why you should NEVER run FLUFFI in an untrusted environment.
+
+## 6) Monitoring FLUFFI Agents
+
+You should always monitor your FuzzJob.
+
+First of all, you should make sure that the number of executions and the number of covered blocks is rising. If one of them doesn't there is something wrong with your setup.
+
+Furthermore, in the `Managed Instances` view make sure that:
+1. The systems are not overloaded (e.g. CPU>90%),
 2. The TG queues are not close to 0, and
 3. The TE queues are not growing and growing.
+
+You can stop running agents by clicking the `Managed Instances` button when viewing the FuzzJob overview page.
+
+Finally, you should keep one eye on log messages. Currenlty, FLUFFI agents store all ERROR messages in the database. They can then be displayed in the web application (for agents in the `Managed Instances` view, for LMs there is a global tab).

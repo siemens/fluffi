@@ -1,5 +1,5 @@
 #!/bin/bash
-#   Copyright 2017-2019 Siemens AG
+#   Copyright 2017-2020 Siemens AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -13,9 +13,9 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 # 
-# Author(s): Thomas Riedmaier, Pascal Eckmann
+# Author(s): Thomas Riedmaier, Pascal Eckmann, Roman Bendt
 
-THREADS=$(cat /proc/cpuinfo | grep processor | wc -l)
+THREADS=$(nproc)
 ARCH=$(file /bin/bash | awk -F',' '{print $2}' | tr -d ' ')
 
 rm -rf lib/$ARCH

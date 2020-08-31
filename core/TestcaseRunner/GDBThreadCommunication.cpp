@@ -1,11 +1,23 @@
 /*
-Copyright 2017-2019 Siemens AG
+Copyright 2017-2020 Siemens AG
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including without
+limitation the rights to use, copy, modify, merge, publish, distribute,
+sublicense, and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
 
 Author(s): Thomas Riedmaier, Roman Bendt
 */
@@ -58,29 +70,75 @@ void GDBThreadCommunication::set_coverageState(GDBThreadCommunication::COVERAGE_
 	m_gdb_mutex_cv.notify_all();
 }
 
-void GDBThreadCommunication::waitForTerminateMessageOrCovStateChange(GDBThreadCommunication::COVERAGE_STATE statesToWaitFor[], int numOfStatesToWaitFor) {
+void GDBThreadCommunication::waitForTerminateOrNewMessageOrCovStateChange(GDBThreadCommunication::COVERAGE_STATE statesToWaitFor[], int numOfStatesToWaitFor) {
 	std::unique_lock<std::mutex> lk(m_gdb_mutex);
-	//Dont wait, if the state we want to wait for is already reached
-	if (m_gdbThreadShouldTerminate || m_gdbOutputQueue.size() > 0) {
-		return;
-	}
-	for (int i = 0; i < numOfStatesToWaitFor; i++) {
-		if (statesToWaitFor[i] == m_coverageState) {
+	while (true) {
+		//Dont wait, if the state we want to wait for is already reached
+		if (m_gdbThreadShouldTerminate || m_gdbOutputQueue.size() > 0) {
 			return;
 		}
-	}
+		for (int i = 0; i < numOfStatesToWaitFor; i++) {
+			if (statesToWaitFor[i] == m_coverageState) {
+				return;
+			}
+		}
 
-	m_gdb_mutex_cv.wait(lk);
+		m_gdb_mutex_cv.wait(lk);
+	}
+}
+
+std::cv_status GDBThreadCommunication::waitForTerminateOrNewMessageOrCovStateChangeWithTimeout(int timeoutMS, GDBThreadCommunication::COVERAGE_STATE statesToWaitFor[], int numOfStatesToWaitFor) {
+	std::unique_lock<std::mutex> lk(m_gdb_mutex);
+	std::chrono::time_point<std::chrono::steady_clock> routineEntryTimeStamp = std::chrono::steady_clock::now();
+	std::chrono::time_point<std::chrono::steady_clock> latestRoutineExitTimeStamp = routineEntryTimeStamp + std::chrono::milliseconds(timeoutMS);
+
+	while (true) {
+		//Dont wait, if the state we want to wait for is already reached
+		if (m_gdbThreadShouldTerminate || m_gdbOutputQueue.size() > 0) {
+			return std::cv_status::no_timeout;
+		}
+		for (int i = 0; i < numOfStatesToWaitFor; i++) {
+			if (statesToWaitFor[i] == m_coverageState) {
+				return std::cv_status::no_timeout;
+			}
+		}
+
+		std::cv_status waitResult = m_gdb_mutex_cv.wait_for(lk, latestRoutineExitTimeStamp - std::chrono::steady_clock::now());
+		if (waitResult == std::cv_status::timeout) {
+			return std::cv_status::timeout;
+		}
+	}
 }
 
 void GDBThreadCommunication::waitForDebuggingReady() {
 	std::unique_lock<std::mutex> lk(m_readyDebug_mutex);
-	//Dont wait, if the state we want to wait for is already reached
-	if (m_debuggingReady) {
-		return;
-	}
 
-	m_readyDebug_cv.wait(lk);
+	while (true) {
+		//Dont wait, if the state we want to wait for is already reached
+		if (m_debuggingReady) {
+			return;
+		}
+
+		m_readyDebug_cv.wait(lk);
+	}
+}
+
+std::cv_status GDBThreadCommunication::waitForDebuggingReadyWithTimeout(int timeoutMS) {
+	std::unique_lock<std::mutex> lk(m_readyDebug_mutex);
+	std::chrono::time_point<std::chrono::steady_clock> routineEntryTimeStamp = std::chrono::steady_clock::now();
+	std::chrono::time_point<std::chrono::steady_clock> latestRoutineExitTimeStamp = routineEntryTimeStamp + std::chrono::milliseconds(timeoutMS);
+
+	while (true) {
+		//Dont wait, if the state we want to wait for is already reached
+		if (m_debuggingReady) {
+			return std::cv_status::no_timeout;
+		}
+
+		std::cv_status waitResult = m_readyDebug_cv.wait_for(lk, latestRoutineExitTimeStamp - std::chrono::steady_clock::now());
+		if (waitResult == std::cv_status::timeout) {
+			return std::cv_status::timeout;
+		}
+	}
 }
 
 size_t GDBThreadCommunication::get_gdbOutputQueue_size() {

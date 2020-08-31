@@ -1,4 +1,4 @@
-#   Copyright 2017-2019 Siemens AG
+#   Copyright 2017-2020 Siemens AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -16,7 +16,13 @@
 
 --- afl-fuzz.c	2019-06-27 16:39:49.892716200 +0200
 +++ afl-fuzz.c	2019-06-27 16:28:16.999467100 +0200
-@@ -27,252 +27,13 @@
+@@ -23,256 +23,19 @@
+ #define AFL_MAIN
+ #define MESSAGES_TO_STDOUT
+ 
++#if !defined(_GNU_SOURCE)
+ #define _GNU_SOURCE
++#endif
  #define _FILE_OFFSET_BITS 64
  
  #include "config.h"

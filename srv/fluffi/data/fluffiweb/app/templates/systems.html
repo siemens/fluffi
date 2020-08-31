@@ -1,11 +1,23 @@
 <!--
-Copyright 2017-2019 Siemens AG
+Copyright 2017-2020 Siemens AG
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including without
+limitation the rights to use, copy, modify, merge, publish, distribute,
+sublicense, and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
 
 Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Thomas Riedmaier
 -->
@@ -22,12 +34,11 @@ Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Thomas Riedmaier
 {% block content %}
 
 <div class="container">
-    <h1>Systems in FluffiNET</h1>
-    <hr>
+    <h1>Systems in the FUN</h1>
+</div>
+<div class="container">
     {{ flashMessages() }}
 </div>
-
-
 <div class="jumbotron">
     <div class="container"></div>
 </div>
@@ -54,7 +65,7 @@ Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Thomas Riedmaier
             <div class="modal-content">
                 <div class="modal-header">
                     <button class="close" data-dismiss="modal" type="button">&times;</button>
-                    <h4 class="modal-title">Add new system to FluffiNET</h4>
+                    <h4 class="modal-title">Add new system to the FUN</h4>
                 </div>
                 <div class="modal-body">
                     <form action="{{ url_for('addNewSystemToPolemarch') }}" method="post">
@@ -64,7 +75,7 @@ Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Thomas Riedmaier
                         {{addNewSystemToPolemarchForm.hostgroup(class='form-control modal-form')}}
                         {{addNewSystemToPolemarchForm.add_host(class='btn btn-primary modal-button')}}
                     </form>
-                    <p>The extension .fluffi to reach the system is set automatically. Ex. TestVM1</p>
+                    <p>The extension <b>.fluffi</b> to reach the system is set automatically.</p>
                     <hr>
                     <p>
                     <h3>HowTo:</h3>
@@ -95,7 +106,7 @@ Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Thomas Riedmaier
                     <p>
                     <h3>HowTo:</h3>
                     <ul>
-                        <li>Assure that the Odroid systems are connected to the FluffiNet</li>
+                        <li>Assure that the Odroid systems are connected to the FUN</li>
                         <li>Follow the link (LEMMINGS LAIR) to power on and manage the boards</li>
                         <li>Check connections, hostname & dns (ping by hostname e.g. "ping lemming01.fluffi")</li>
                         <li>On the Odroids an operating system has to be rolled out (Usually Linux). Automation is still
@@ -110,7 +121,7 @@ Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Thomas Riedmaier
                     </p>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-default" data-dismiss="modal" type="button">Close</button>
+                    <button class="btn btn-danger" data-dismiss="modal" type="button">Close</button>
                 </div>
             </div>
         </div>
@@ -166,8 +177,15 @@ Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Thomas Riedmaier
                     <p>This image is loaded from the FTP server when the PXE-boot is triggered.</p>
                     <form action="{{ url_for('changePXEBootSystemPolemarch', pxebootsystem=pxesystem) }}" method="post">
                         {{changePXEForm.pxesystem.label }}
+
                         {{changePXEForm.pxesystem(class='form-control modal-form')}}
-                        {{changePXEForm.execute_change_pxe(class='btn btn-primary modal-button')}}
+
+                        {% if ftpConnectionWorks %}                            
+                            {{changePXEForm.execute_change_pxe(class='btn btn-primary modal-button')}}
+                        {% else %}
+                            <div class="alert alert-danger">Error: Failed to get files from FTP-Server</div>
+                            {{changePXEForm.execute_change_pxe(class='btn btn-primary modal-button disabled')}}
+                        {% endif %}                        
                     </form>
                     <hr>
                     <p>
@@ -188,6 +206,9 @@ Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Thomas Riedmaier
 <hr>
 
 <div class="container">
+    {% if not ansibleConnectionWorks %}
+    <div class="alert alert-danger">Ansible connector failed</div>
+    {% endif %}
     {% for group in systems %}
     <h2>Group: <a href="/systems/view/{{ group.Name }}/{{ group.Name }}">{{ group.Name }}</a></h2>
     <div class="container" style="padding-left: 50px">
@@ -209,13 +230,7 @@ Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Thomas Riedmaier
             <tbody>
             {% for host in group.hosts %}
             <tr>
-                {% if host.isNotPersistentDevSys == True %}
-                <td style="text-align: left; width: 20%;"><a href="/systems/view/dev-{{ host.Name }}/{{ group.Name }}">{{
-                    host.Name }}</a></td>
-                {% else %}
-                <td style="text-align: left; width: 20%;"><a href="/systems/view/{{ host.Name }}/{{ group.Name }}">{{
-                    host.Name }}</a></td>
-                {% endif %}
+                <td style="text-align: left; width: 20%;"><a href="/systems/view/{{ host.Name }}/{{ group.Name }}">{{ host.Name }}</a></td>
                 <td style="text-align: left; width: 15%;">{{ host.Status }}</td>
                 <td style="text-align: left; width: 15%;">
                     {{ host.InstanceCount }} {% if host.confLM > 0 %} <div class="systems-lm-text">({{host.confLM}} LM)</div> {% endif %}
@@ -228,8 +243,8 @@ Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Thomas Riedmaier
                 <td class="instance-run-error">{{ host.InstanceRun }}</td>
                 {% endif %}
                 <td class="update-system-loc">
-                    <select class="form-control" id="SystemLocationValue-{{ host.ID }}"
-                            name="SystemLocationValue-{{ host.ID }}"
+                    <select class="form-control" id="SystemLocationValue"
+                            name="SystemLocationValue"
                             onchange="updateSystemLocation('{{ host.Name }}', this.value)">
                         <option selected="selected">{{ host.Location }}</option>
                         {% for location in locations %}
@@ -244,12 +259,10 @@ Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Thomas Riedmaier
                                                              role="button"><span
                         class="glyphicon glyphicon-repeat"></span></a></td>
                 <td class="remove">
-                {% if host.isNotPersistentDevSys == True %}
                 <a class="btn btn-secondary"
-                                                             href="/systems/removeDevSystem/{{ host.Name }}/{{ host.ID }}"
+                                                             href="/systems/removeSystem/{{ host.Name }}"
                                                              role="button"><span
                         class="glyphicon glyphicon-remove"></span></a>
-                {% endif %}
                 </td>
             </tr>
             {% endfor %}

@@ -1,11 +1,23 @@
 /*
-Copyright 2017-2019 Siemens AG
+Copyright 2017-2020 Siemens AG
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including without
+limitation the rights to use, copy, modify, merge, publish, distribute,
+sublicense, and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
 
 Author(s): Thomas Riedmaier
 */
@@ -21,7 +33,9 @@ GDBEmulator::GDBEmulator() :
 	m_mutex_(),
 	m_WinDbgMessageDispatcher(nullptr),
 	m_stopRequested(false),
-	m_SharedMemIPCInterruptEvent(NULL)
+	m_SharedMemIPCInterruptEvent(NULL),
+	m_waitingForForcedBreak(false),
+	m_fatalSystemErrorMessage()
 {
 }
 
@@ -66,13 +80,13 @@ bool GDBEmulator::init() {
 
 std::string GDBEmulator::sendCommandToWinDbgAndGetResponse(std::string command) {
 	//Make sure only one thread at a time communicates with WinDbg (Ctrl+C handling is asynchronous)
-	std::unique_lock<std::mutex> mlock(m_mutex_);
+	std::unique_lock<std::recursive_mutex> mlock(m_mutex_);
 
 	int timeoutMilliseconds = 10000;
 	SharedMemMessage response;
 	SharedMemMessage request = stringToMessage(command);
 	if (!m_requestIPC.sendMessageToServer(&request) || !m_requestIPC.waitForNewMessageToClient(&response, timeoutMilliseconds)) {
-		return "ERROR: Could not forward a command to WinDbg, or WinDbg did not respond in time!";
+		return "ERROR: Could not forward a command to WinDbg, or WinDbg did not respond in time for command \"" + command + "\"";
 	}
 	SharedMemMessageType messageType = response.getMessageType();
 	if (messageType != SHARED_MEM_MESSAGE_KFUZZ_RESPONSE) {
@@ -98,6 +112,7 @@ int GDBEmulator::handleConsoleCommands() {
 		}
 		else if (command == "fluffi") {
 			//implement hack to know if all data has been read
+			std::unique_lock<std::recursive_mutex> mlock(m_mutex_); //must wait for potential ctrl+c
 			std::cout << "Undefined command" << std::endl;
 			continue;
 		}
@@ -123,6 +138,12 @@ int GDBEmulator::handleConsoleCommands() {
 			std::cout << "  x/1xb" << std::endl;
 			std::cout << "  x/1xh" << std::endl;
 			std::cout << "  x/1xw" << std::endl;
+			continue;
+		}
+		else if (!m_fatalSystemErrorMessage.empty() && command == "c") {
+			//A fatal system error occured do not forward the continue request. Instead, replay the fatal error message
+			std::cout << m_fatalSystemErrorMessage << std::endl;
+			continue;
 		}
 		else {
 			//Forward command to WinDbg
@@ -164,8 +185,25 @@ void GDBEmulator::winDbgMessageDispatcher() {
 			m_subscriberIPC.sendMessageToServer(&response);
 			continue;
 		}
+		std::string newMsg = messageToString(message);
 
-		std::cout << messageToString(message) << std::endl;
+		if (newMsg.find("FATAL_SYSTEM_ERROR") != std::string::npos) {
+			//Store fatal system error message, so it can be replayed later
+			m_fatalSystemErrorMessage = newMsg;
+		}
+
+		if (newMsg.find("Program received signal SIGTRAP") != std::string::npos) {
+			//Check if we hit a ctrl+c induced breakpoint while not waiting for a forced break (happens if we request a break with ctrl+c but then hit another breakpoint)
+			if (newMsg.find("(DbgBreakPoint)") != std::string::npos && !m_waitingForForcedBreak) {
+				sendCommandToWinDbgAndGetResponse("c");
+				newMsg = "Continuing obsolete debug break";
+			}
+
+			//The target is in breaked state - it is now safe to send more messages
+			m_waitingForForcedBreak = false;
+			m_mutex_.unlock();
+		}
+		std::cout << newMsg << std::endl;
 
 		//We got a SHARED_MEM_MESSAGE_KFUZZ_REQUEST! Respond to it!
 		SharedMemMessage response{ SHARED_MEM_MESSAGE_KFUZZ_RESPONSE,nullptr,0 };
@@ -184,6 +222,8 @@ std::shared_ptr<GDBEmulator> GDBEmulator::getInstance() {
 BOOL WINAPI GDBEmulator::consoleHandler(DWORD dwCtrlType) {
 	if (dwCtrlType == CTRL_C_EVENT) {
 		std::shared_ptr<GDBEmulator> gdbEmu = GDBEmulator::getInstance();
+		gdbEmu->m_mutex_.lock();
+		gdbEmu->m_waitingForForcedBreak = true;
 		gdbEmu->sendCommandToWinDbgAndGetResponse("ctrl+c");
 		return TRUE;
 	}

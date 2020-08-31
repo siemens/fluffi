@@ -1,11 +1,23 @@
 <!--
-Copyright 2017-2019 Siemens AG
+Copyright 2017-2020 Siemens AG
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including without
+limitation the rights to use, copy, modify, merge, publish, distribute,
+sublicense, and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
 
 Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
 -->
@@ -13,14 +25,30 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
 {% extends "base.html" %}
 {% block title %}FLUFFI - Fuzzjobs - {{ violationsAndCrashes.project.name[:30] }} - Access Violations and Crashes{% endblock %}
 
+{% block scripts  %}
+<script>
+    function downloadSmallestVioOrCrash(loopIndex){
+        var form = $("#downloadSmallestVioOrCrash" + loopIndex);
+        form.submit();
+    }
+
+    function downloadCrashes(loopIndex){
+        var form = $("#downloadCrashes" + loopIndex);
+        form.submit();
+    }
+</script>
+{{super()}}
+{% endblock %}
+
 {% block content %}
 
 <div class="container">
     <h1><a href="/projects/view/{{violationsAndCrashes.project.ID}}">Access Violations and Crashes: {{
         violationsAndCrashes.project.name[:30] }}</a></h1>
 </div>
-{{ flashMessages() }}
-<hr>
+<div class="container">
+    {{ flashMessages() }}
+</div>
 <div class="jumbotron">
     <div class="container"></div>
 </div>
@@ -48,17 +76,22 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
             {% else %}
             <td style="text-align: center;">Other</td>
             {% endif %}
-            <td style="text-align: center;">
-                <a class="btn btn-secondary"
-                   href="/projects/{{ violationsAndCrashes.project.ID }}/getSmallestVioOrCrashTestcase/{{ testcase.footprint }}"
-                   role="button">
-                    <span class="glyphicon glyphicon-floppy-save"></span>
-                </a>
-                <a class="btn btn-secondary"
-                   href="/projects/{{ violationsAndCrashes.project.ID }}/crashes/download/{{ testcase.footprint }}/{{ testcase.type }}"
-                   role="button">
-                    <span class="glyphicon glyphicon-save"></span>
-                </a>
+            <td>                
+                <div style="text-align: center;">
+                    <form id="downloadSmallestVioOrCrash{{loop.index}}" style="display: inline-block; margin-right: 6px;" action="/projects/{{ violationsAndCrashes.project.ID }}/getSmallestVioOrCrashTestcase" method="POST">
+                        <a href="#">
+                            <input type="hidden" name="footprint" value="{{ testcase.footprint }}">
+                            <span onclick="downloadSmallestVioOrCrash({{loop.index}})" class="glyphicon glyphicon-floppy-save"></span>
+                        </a>
+                    </form>
+                    <form id="downloadCrashes{{loop.index}}" style="display: inline-block;" action="/projects/{{ violationsAndCrashes.project.ID }}/crashes/download" method="POST">
+                        <a href="#">
+                            <input type="hidden" name="footprint" value="{{ testcase.footprint }}">
+                            <input type="hidden" name="testcaseType" value="{{ testcase.type }}">
+                            <span onclick="downloadCrashes({{loop.index}})" class="glyphicon glyphicon-save"></span>
+                        </a>
+                    </form>
+                </div>                
             </td>
         </tr>
         {% endfor %}

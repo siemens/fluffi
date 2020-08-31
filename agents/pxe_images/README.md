@@ -1,13 +1,25 @@
 <!---
-Copyright 2017-2019 Siemens AG
+Copyright 2017-2020 Siemens AG
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including without
+limitation the rights to use, copy, modify, merge, publish, distribute,
+sublicense, and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
 
-Author(s): Pascal Eckmann
+Author(s): Pascal Eckmann, Thomas Riedmaier
 -->
 
 # PXE
@@ -29,16 +41,16 @@ __On _web.fluffi_ you can select the OS, which should be loaded over PXE.__
 - ##### SMB
     - `smb.fluffi/install/...`
         - `smb.fluffi/install/initial/` -> configuration of hostname, etc., for freshly deployed systems
-        - e.g. `smb.fluffi/install/server2016/` -> Windows image; detailed steps are in the instructions for [Windows](windows.md)
+        - e.g. `smb.fluffi/install/server2016/` -> Windows image; detailed steps are in the instructions for [Windows](./windows.md)
 
 ## Agent systems OS
 - ##### Windows
-    - [Create and configure Windows image for PXE](windows.md)
+    - [Create and configure Windows image for PXE](./windows.md)
 - ##### Ubuntu
-    - [Create and configure Ubuntu image for PXE](ubuntu.md)
+    - [Create and configure Ubuntu image for PXE](./ubuntu.md)
 - ##### Armbian/Odroid-XU4
-    - [Install and configure Odroid-XU4 for PXE](odroid.md)
-    - [Create and configure Armbian image for PXE](armbian.md)
+    - [Install and configure Odroid-XU4 for PXE](./odroid.md)
+    - [Create and configure Armbian image for PXE](./armbian.md)
     
 ## Add MAC address and hostname for automatic configuration
 - Add the MAC address with the associated hostname to the [MAC2Host.csv](../../srv/fluffi/data/smb/files/initial/MAC2Host.csv) file on the SMB share
@@ -50,4 +62,4 @@ __On _web.fluffi_ you can select the OS, which should be loaded over PXE.__
     - Use BIOS instead of UEFI
     - Bridge your network device to the VM to use PXE properly
     - Select OS in _webgui_ and boot your empty VM (it should now load the OS over PXE)
-- Now you can integrate the system in Fluffi according to [usage.md](../../usage.md)
+- Now you can integrate the system in Fluffi according to [usage.md](../../docs/usage.md)

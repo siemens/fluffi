@@ -1,11 +1,23 @@
 <!--
-Copyright 2017-2019 Siemens AG
+Copyright 2017-2020 Siemens AG
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including without
+limitation the rights to use, copy, modify, merge, publish, distribute,
+sublicense, and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
 
 Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
 -->
@@ -26,13 +38,14 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
 <div class="container">
     <h1><a href="/projects/view/{{fuzzjob.ID}}">Managed Instances: {{ fuzzjob.name[:30] }}</a></h1>
 </div>
-{{ flashMessages() }}
-<hr>
+<div class="container">
+    {{ flashMessages() }}
+</div>
 <div class="jumbotron">
     <div class="container"></div>
 </div>
 
-</br>
+<br>
 
 <div class="container">
     <div class="container">
@@ -53,76 +66,104 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
                                 <th scope="col">Count</th>
                                 <th scope="col">NewCount</th>
                                 <th scope="col">Architecture</th>
-                                <th scope="col">Delete All</th>
+                                <th scope="col">Delete</th>
                             </tr>
                             </thead>
                             <tbody>
                             <tr>
                                 <th scope="row">TestcaseGenerator</th>
-                                <td><p id="{{system.name}}_tg_count">{{system.tg}}<font
-                                        size="1">&ensp;{{system.tgarch}}</font></p></td>
+                                <td><p id="{{system.name}}_tg_count">
+                                        {{system.tg}}
+                                    </p>
+                                </td>
                                 <td><input class="form-control" id="{{system.name}}_tg" name="{{system.name}}_tg"
                                            placeholder="0" type="text"></td>
                                 <td>
-                                    <select class="form-control" id="{{system.name}}_tg_arch"
-                                            name="{{system.name}}_tg_arch" style="width: 90px">
-                                        <option name="choice1" value="x64">x64</option>
-                                        <option name="choice2" value="x86">x86</option>
-                                        <option name="choice2" value="arm32">arm32</option>
-                                        <option name="choice2" value="arm64">arm64</option>
+                                    <select class="form-control" id="{{system.name}}_tg_arch" name="{{system.name}}_tg_arch" style="width: 90px">
+                                        {% if system.tgarch|length > 0 %}
+                                            <option value="x64" {% if system.tgarch == "x64" %}selected="selected"{% endif %}>x64</option>
+                                            <option value="x86" {% if system.tgarch == "x86" %}selected="selected"{% endif %}>x86</option>
+                                            <option value="arm32" {% if system.tgarch == "arm32" %}selected="selected"{% endif %}>arm32</option>
+                                            <option value="arm64" {% if system.tgarch == "arm64" %}selected="selected"{% endif %}>arm64</option>
+                                        {% else %}
+                                            <option value="x64" {% if system.settingArch == "x64" %}selected="selected"{% endif %}>x64</option>
+                                            <option value="x86" {% if system.settingArch == "x86" %}selected="selected"{% endif %}>x86</option>
+                                            <option value="arm32" {% if system.settingArch == "arm32" %}selected="selected"{% endif %}>arm32</option>
+                                            <option value="arm64" {% if system.settingArch == "arm64" %}selected="selected"{% endif %}>arm64</option>
+                                        {% endif %}                                        
                                     </select>
                                 </td>
-                                <td class="remove"><a class="btn btn-secondary"
-                                                                             onclick="removeInstances('/systems/removeConfiguredInstances/{{ system.name }}/{{ fuzzjob.name }}/tg', '{{system.name}}_tg_count');"
-                                                                             role="button"><span
-                                        class="glyphicon glyphicon-remove"></span></a></td>
+                                <td class="remove">
+                                    <a class="btn btn-secondary"
+                                        onclick="removeInstances('{{ system.name }}', '{{ fuzzjob.name }}', 'tg', '{{system.name}}_tg_count')"
+                                        role="button">
+                                        <span class="glyphicon glyphicon-remove"></span>
+                                    </a>
+                                </td>
                             </tr>
                             <tr>
                                 <th scope="row">TestcaseRunner</th>
-                                <td><p id="{{system.name}}_tr_count">{{system.tr}}<font
-                                        size="1">&ensp;{{system.trarch}}</font></p></td>
-                                <td><input class="form-control" id="{{system.name}}_tr" name="{{system.name}}_tr"
-                                           placeholder="0" type="text"></td>
                                 <td>
-                                    <select class="form-control" id="{{system.name}}_tr_arch"
-                                            name="{{system.name}}_tr_arch" style="width: 90px">
-                                        <option name="choice1" value="x64">x64</option>
-                                        <option name="choice2" value="x86">x86</option>
-                                        <option name="choice2" value="arm32">arm32</option>
-                                        <option name="choice2" value="arm64">arm64</option>
+                                    <p id="{{system.name}}_tr_count">{{system.tr}}</p>
+                                </td>
+                                <td><input class="form-control" id="{{system.name}}_tr" name="{{system.name}}_tr" placeholder="0" type="text"></td>
+                                <td>
+                                    <select class="form-control" id="{{system.name}}_tr_arch" name="{{system.name}}_tr_arch" style="width: 90px">
+                                        {% if system.trarch|length > 0 %}
+                                            <option value="x64" {% if system.trarch == "x64" %}selected="selected"{% endif %}>x64</option>
+                                            <option value="x86" {% if system.trarch == "x86" %}selected="selected"{% endif %}>x86</option>
+                                            <option value="arm32" {% if system.trarch == "arm32" %}selected="selected"{% endif %}>arm32</option>
+                                            <option value="arm64" {% if system.trarch == "arm64" %}selected="selected"{% endif %}>arm64</option>
+                                        {% else %}
+                                            <option value="x64" {% if system.settingArch == "x64" %}selected="selected"{% endif %}>x64</option>
+                                            <option value="x86" {% if system.settingArch == "x86" %}selected="selected"{% endif %}>x86</option>
+                                            <option value="arm32" {% if system.settingArch == "arm32" %}selected="selected"{% endif %}>arm32</option>
+                                            <option value="arm64" {% if system.settingArch == "arm64" %}selected="selected"{% endif %}>arm64</option>
+                                        {% endif %}
                                     </select>
                                 </td>
-                                <td class="remove"><a class="btn btn-secondary"
-                                                                             onclick="removeInstances('/systems/removeConfiguredInstances/{{ system.name }}/{{ fuzzjob.name }}/tr', '{{system.name}}_tr_count');"
-                                                                             role="button"><span
-                                        class="glyphicon glyphicon-remove"></span></a></td>
+                                <td class="remove">
+                                    <a class="btn btn-secondary"
+                                        onclick="removeInstances('{{ system.name }}', '{{ fuzzjob.name }}', 'tr', '{{system.name}}_tr_count')"
+                                        role="button">
+                                        <span class="glyphicon glyphicon-remove"></span>
+                                    </a>
+                                </td>
                             </tr>
                             <tr>
                                 <th scope="row">TestcaseEvaluator</th>
-                                <td><p id="{{system.name}}_te_count">{{system.te}}<font
-                                        size="1">&ensp;{{system.tearch}}</font></p></td>
+                                <td><p id="{{system.name}}_te_count">{{system.te}}</p></td>
                                 <td><input class="form-control" id="{{system.name}}_te" name="{{system.name}}_te"
                                            placeholder="0" type="text"></td>
                                 <td>
-                                    <select class="form-control" id="{{system.name}}_te_arch"
-                                            name="{{system.name}}_te_arch" style="width: 90px">
-                                        <option name="choice1" value="x64">x64</option>
-                                        <option name="choice2" value="x86">x86</option>
-                                        <option name="choice2" value="arm32">arm32</option>
-                                        <option name="choice2" value="arm64">arm64</option>
+                                    <select class="form-control" id="{{system.name}}_te_arch" name="{{system.name}}_te_arch" style="width: 90px">
+                                        {% if system.tearch|length > 0 %}
+                                            <option value="x64" {% if system.tearch == "x64" %}selected="selected"{% endif %}>x64</option>
+                                            <option value="x86" {% if system.tearch == "x86" %}selected="selected"{% endif %}>x86</option>
+                                            <option value="arm32" {% if system.tearch == "arm32" %}selected="selected"{% endif %}>arm32</option>
+                                            <option value="arm64" {% if system.tearch == "arm64" %}selected="selected"{% endif %}>arm64</option>
+                                        {% else %}
+                                            <option value="x64" {% if system.settingArch == "x64" %}selected="selected"{% endif %}>x64</option>
+                                            <option value="x86" {% if system.settingArch == "x86" %}selected="selected"{% endif %}>x86</option>
+                                            <option value="arm32" {% if system.settingArch == "arm32" %}selected="selected"{% endif %}>arm32</option>
+                                            <option value="arm64" {% if system.settingArch == "arm64" %}selected="selected"{% endif %}>arm64</option>
+                                        {% endif %}
                                     </select>
                                 </td>
-                                <td class="remove"><a class="btn btn-secondary"
-                                                                             onclick="removeInstances('/systems/removeConfiguredInstances/{{ system.name }}/{{ fuzzjob.name }}/te', '{{system.name}}_te_count');"
-                                                                             role="button"><span
-                                        class="glyphicon glyphicon-remove"></span></a></td>
+                                <td class="remove">
+                                    <a class="btn btn-secondary"
+                                        onclick="removeInstances('{{ system.name }}', '{{ fuzzjob.name }}', 'te', '{{system.name}}_te_count')"
+                                        role="button">
+                                        <span class="glyphicon glyphicon-remove"></span>
+                                    </a>
+                                </td>
                             </tr>
                             </tbody>
                         </table>
                     </div>
                     {% endfor %}
                     <hr>
-                    </br>
+                    <br>
                     <hr>
                     {% for system in lemmingSystems %}
                     <div style="background-color:lightgray">
@@ -134,77 +175,99 @@ Author(s): Junes Najah, Michael Kraus, Thomas Riedmaier, Pascal Eckmann
                                 <th scope="col">Count</th>
                                 <th scope="col">NewCount</th>
                                 <th scope="col">Architecture</th>
-                                <th scope="col">Delete All</th>
+                                <th scope="col">Delete</th>
                             </tr>
                             </thead>
                             <tbody>
                             <tr>
                                 <th scope="row">TestcaseGenerator</th>
-                                <td><p id="{{system.name}}_tg_count">{{system.tg}}<font
-                                        size="1">&ensp;{{system.tgarch}}</font></p></td>
-                                <td><input class="form-control" id="{{system.name}}_tg" name="{{system.name}}_tg"
-                                           placeholder="0" type="text"></td>
+                                <td><p id="{{system.name}}_tg_count">{{system.tg}}</p></td>
+                                <td><input class="form-control" id="{{system.name}}_tg" name="{{system.name}}_tg" placeholder="0" type="text"></td>
                                 <td>
-                                    <select class="form-control" id="{{system.name}}_tg_arch"
-                                            name="{{system.name}}_tg_arch" style="width: 90px">
-                                        <option name="choice1" value="x64">x64</option>
-                                        <option name="choice2" value="x86">x86</option>
-                                        <option name="choice2" value="arm32">arm32</option>
-                                        <option name="choice2" value="arm64">arm64</option>
+                                    <select class="form-control" id="{{system.name}}_tg_arch" name="{{system.name}}_tg_arch" style="width: 90px">
+                                        {% if system.tgarch|length > 0 %}
+                                            <option value="x64" {% if system.tgarch == "x64" %}selected="selected"{% endif %}>x64</option>
+                                            <option value="x86" {% if system.tgarch == "x86" %}selected="selected"{% endif %}>x86</option>
+                                            <option value="arm32" {% if system.tgarch == "arm32" %}selected="selected"{% endif %}>arm32</option>
+                                            <option value="arm64" {% if system.tgarch == "arm64" %}selected="selected"{% endif %}>arm64</option>
+                                        {% else %}
+                                            <option value="x64" {% if system.settingArch == "x64" %}selected="selected"{% endif %}>x64</option>
+                                            <option value="x86" {% if system.settingArch == "x86" %}selected="selected"{% endif %}>x86</option>
+                                            <option value="arm32" {% if system.settingArch == "arm32" %}selected="selected"{% endif %}>arm32</option>
+                                            <option value="arm64" {% if system.settingArch == "arm64" %}selected="selected"{% endif %}>arm64</option>
+                                        {% endif %} 
                                     </select>
                                 </td>
-                                <td class="remove"><a class="btn btn-secondary"
-                                                                             onclick="removeInstances('/systems/removeConfiguredInstances/{{ system.name }}/{{ fuzzjob.name }}/tg', '{{system.name}}_tg_count');"
-                                                                             role="button"><span
-                                        class="glyphicon glyphicon-remove"></span></a></td>
+                                <td class="remove">
+                                    <a class="btn btn-secondary"
+                                        onclick="removeInstances('{{ system.name }}', '{{ fuzzjob.name }}', 'tg', '{{system.name}}_te_count')"
+                                        role="button">
+                                        <span class="glyphicon glyphicon-remove"></span>
+                                    </a>
+                                </td>
                             </tr>
                             <tr>
                                 <th scope="row">TestcaseRunner</th>
-                                <td><p id="{{system.name}}_tr_count">{{system.tr}}<font
-                                        size="1">&ensp;{{system.trarch}}</font></p></td>
+                                <td><p id="{{system.name}}_tr_count">{{system.tr}}</p></td>
                                 <td><input class="form-control" id="{{system.name}}_tr" name="{{system.name}}_tr"
                                            placeholder="0" type="text"></td>
                                 <td>
-                                    <select class="form-control" id="{{system.name}}_tr_arch"
-                                            name="{{system.name}}_tr_arch" style="width: 90px">
-                                        <option name="choice1" value="x64">x64</option>
-                                        <option name="choice2" value="x86">x86</option>
-                                        <option name="choice2" value="arm32">arm32</option>
-                                        <option name="choice2" value="arm64">arm64</option>
+                                    <select class="form-control" id="{{system.name}}_tr_arch" name="{{system.name}}_tr_arch" style="width: 90px">
+                                        {% if system.trarch|length > 0 %}
+                                            <option value="x64" {% if system.trarch == "x64" %}selected="selected"{% endif %}>x64</option>
+                                            <option value="x86" {% if system.trarch == "x86" %}selected="selected"{% endif %}>x86</option>
+                                            <option value="arm32" {% if system.trarch == "arm32" %}selected="selected"{% endif %}>arm32</option>
+                                            <option value="arm64" {% if system.trarch == "arm64" %}selected="selected"{% endif %}>arm64</option>
+                                        {% else %}
+                                            <option value="x64" {% if system.settingArch == "x64" %}selected="selected"{% endif %}>x64</option>
+                                            <option value="x86" {% if system.settingArch == "x86" %}selected="selected"{% endif %}>x86</option>
+                                            <option value="arm32" {% if system.settingArch == "arm32" %}selected="selected"{% endif %}>arm32</option>
+                                            <option value="arm64" {% if system.settingArch == "arm64" %}selected="selected"{% endif %}>arm64</option>
+                                        {% endif %}
                                     </select>
                                 </td>
-                                <td class="remove"><a class="btn btn-secondary"
-                                                                             onclick="removeInstances('/systems/removeConfiguredInstances/{{ system.name }}/{{ fuzzjob.name }}/tr', '{{system.name}}_tr_count');"
-                                                                             role="button"><span
-                                        class="glyphicon glyphicon-remove"></span></a></td>
+                                <td class="remove">
+                                    <a class="btn btn-secondary"
+                                        onclick="removeInstances('{{ system.name }}', '{{ fuzzjob.name }}', 'tr', '{{system.name}}_tr_count')"
+                                        role="button">
+                                        <span class="glyphicon glyphicon-remove"></span>
+                                    </a>
+                                </td>
                             </tr>
                             <tr>
                                 <th scope="row">TestcaseEvaluator</th>
-                                <td><p id="{{system.name}}_te_count">{{system.te}}<font
-                                        size="1">&ensp;{{system.tearch}}</font></p></td>
-                                <td><input class="form-control" id="{{system.name}}_te" name="{{system.name}}_te"
-                                           placeholder="0" type="text"></td>
+                                <td><p id="{{system.name}}_te_count">{{system.te}}</p></td>
+                                <td><input class="form-control" id="{{system.name}}_te" name="{{system.name}}_te" placeholder="0" type="text"></td>
                                 <td>
-                                    <select class="form-control" id="{{system.name}}_te_arch"
-                                            name="{{system.name}}_te_arch" style="width: 90px">
-                                        <option name="choice1" value="x64">x64</option>
-                                        <option name="choice2" value="x86">x86</option>
-                                        <option name="choice2" value="arm32">arm32</option>
-                                        <option name="choice2" value="arm64">arm64</option>
+                                    <select class="form-control" id="{{system.name}}_te_arch" name="{{system.name}}_te_arch" style="width: 90px">
+                                        {% if system.tearch|length > 0 %}
+                                            <option value="x64" {% if system.tearch == "x64" %}selected="selected"{% endif %}>x64</option>
+                                            <option value="x86" {% if system.tearch == "x86" %}selected="selected"{% endif %}>x86</option>
+                                            <option value="arm32" {% if system.tearch == "arm32" %}selected="selected"{% endif %}>arm32</option>
+                                            <option value="arm64" {% if system.tearch == "arm64" %}selected="selected"{% endif %}>arm64</option>
+                                        {% else %}
+                                            <option value="x64" {% if system.settingArch == "x64" %}selected="selected"{% endif %}>x64</option>
+                                            <option value="x86" {% if system.settingArch == "x86" %}selected="selected"{% endif %}>x86</option>
+                                            <option value="arm32" {% if system.settingArch == "arm32" %}selected="selected"{% endif %}>arm32</option>
+                                            <option value="arm64" {% if system.settingArch == "arm64" %}selected="selected"{% endif %}>arm64</option>
+                                        {% endif %}
                                     </select>
                                 </td>
-                                <td class="remove"><a class="btn btn-secondary"
-                                                                             onclick="removeInstances('/systems/removeConfiguredInstances/{{ system.name }}/{{ fuzzjob.name }}/te', '{{system.name}}_te_count');"
-                                                                             role="button"><span
-                                        class="glyphicon glyphicon-remove"></span></a></td>
+                                <td class="remove">
+                                    <a class="btn btn-secondary"
+                                        onclick="removeInstances('{{ system.name }}', '{{ fuzzjob.name }}', 'te', '{{system.name}}_te_count')"
+                                        role="button">
+                                        <span class="glyphicon glyphicon-remove"></span>
+                                    </a>
+                                </td>
                             </tr>
                             </tbody>
                         </table>
                     </div>
                     {% endfor %} 
                     <button class="btn btn-success stickyBtn" id="configFuzzjobInstancesButton" type="submit">Save Config</button>
-                    </br>
-                    </br>
+                    <br>
+                    <br>
             </div>
             <div class="col-xs-6 col-sm-1"></div>
         </div>

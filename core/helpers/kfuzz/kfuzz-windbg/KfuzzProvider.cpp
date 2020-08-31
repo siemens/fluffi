@@ -1,11 +1,23 @@
 /*
-Copyright 2017-2019 Siemens AG
+Copyright 2017-2020 Siemens AG
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including without
+limitation the rights to use, copy, modify, merge, publish, distribute,
+sublicense, and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
 
 Author(s): Thomas Riedmaier
 */
@@ -27,7 +39,9 @@ namespace Debugger::DataModel::Libraries::Kfuzz
 		m_numOfProcessedCommands(-1),
 		m_responseIPC("kfuzz_windbg_request_response", 1 * 1024 * 1024),
 		m_SharedMemIPCInterruptEvent(NULL),
-		m_eventCallback()
+		m_publisher(),
+		m_eventCallback(&m_publisher),
+		m_outputCallback(&m_publisher)
 	{
 		m_spKfuzzExtension = std::make_unique<KfuzzExtension>();
 
@@ -38,7 +52,9 @@ namespace Debugger::DataModel::Libraries::Kfuzz
 			ComPtr<IDebugClient> dbgClient;
 			if (SUCCEEDED(spPrivate.As(&dbgClient)))
 			{
+				PDEBUG_OUTPUT_CALLBACKS pOutputCallback = reinterpret_cast<PDEBUG_OUTPUT_CALLBACKS>(&m_outputCallback);
 				dbgClient->SetEventCallbacks(&m_eventCallback);
+				dbgClient->SetOutputCallbacks(pOutputCallback);
 			}
 		}
 
@@ -197,21 +213,24 @@ namespace Debugger::DataModel::Libraries::Kfuzz
 
 			unsigned long bytesWritten = 0;
 			HRESULT res = E_UNEXPECTED;
-			while (res == E_UNEXPECTED) {
+			while (res != S_OK) {
 				switch (width) {
 				case'b':
 				{
 					res = dbgData->WriteVirtualUncached(address, &value, 1, &bytesWritten);
+					res |= dbgData->WriteVirtual(address, &value, 1, &bytesWritten);
 					break;
 				}
 				case'h':
 				{
 					res = dbgData->WriteVirtualUncached(address, &value, 2, &bytesWritten);
+					res |= dbgData->WriteVirtual(address, &value, 2, &bytesWritten);
 					break;
 				}
 				case'w':
 				{
 					res = dbgData->WriteVirtualUncached(address, &value, 4, &bytesWritten);
+					res |= dbgData->WriteVirtual(address, &value, 4, &bytesWritten);
 					break;
 				}
 				default:
@@ -320,6 +339,12 @@ namespace Debugger::DataModel::Libraries::Kfuzz
 		dbgControl->SetInterrupt(DEBUG_INTERRUPT_ACTIVE);
 	}
 
+	bool KfuzzProvider::ends_with(std::string const & value, std::string const & ending)
+	{
+		if (ending.size() > value.size()) return false;
+		return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
+	}
+
 	void KfuzzProvider::handleInfo(std::string command, std::stringstream& responseSS, ComPtr<IDebugSymbols> dbgSymbols, ComPtr<IDebugSystemObjects> dbgSystemObj, ComPtr<IDebugDataSpaces3> dbgData) {
 		char nameBuffer[MAX_PATH + 1];
 
@@ -327,8 +352,15 @@ namespace Debugger::DataModel::Libraries::Kfuzz
 			responseSS << "  Num  Description       Executable" << std::endl;
 
 			dbgSymbols->GetModuleNames(0, NULL, nameBuffer, sizeof(nameBuffer) - 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-			unsigned long systemID;
-			dbgSystemObj->GetProcessIdsByIndex(0, 1, NULL, &systemID);
+			unsigned long systemID = 0;
+			if (!ends_with(nameBuffer, ".sys")) {
+				if (S_OK != dbgSystemObj->GetProcessIdsByIndex(0, 1, NULL, &systemID)) {
+					systemID = 0;
+				}
+			}
+			if (systemID > INT_MAX) {
+				systemID = 0;
+			}
 			responseSS << "* 1    process " << systemID << "     " << nameBuffer;
 			return;
 		}

@@ -1,17 +1,29 @@
-# Copyright 2017-2019 Siemens AG
+# Copyright 2017-2020 Siemens AG
 # 
-# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including without
+# limitation the rights to use, copy, modify, merge, publish, distribute,
+# sublicense, and/or sell copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following conditions:
 # 
-# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
 # 
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+# SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+# OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+# ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+# DEALINGS IN THE SOFTWARE.
 # 
 # Author(s): Junes Najah, Pascal Eckmann, Thomas Riedmaier, Abian Blome
 
 INSERT_SETTINGS = (
     "INSERT INTO settings(SettingName, SettingValue) VALUES(:SettingName, :SettingValue)")
 INSERT_MODULE = (
-    "INSERT INTO target_modules(ModuleName, ModulePath) VALUES(:ModuleName, :ModulePath)")
+    "INSERT INTO target_modules(ModuleName, ModulePath, RawBytes) VALUES(:ModuleName, :ModulePath, :RawBytes)")
 INSERT_BLOCK_TO_COVER = (
     "INSERT INTO blocks_to_cover(ModuleID, Offset) VALUES(:ModuleID, :Offset) ON DUPLICATE KEY UPDATE ModuleID = :ModuleID, Offset = :Offset")
 NUMBER_OF_NO_LONGER_LISTED = (
@@ -22,6 +34,8 @@ NUM_BLOCKS = (
     "SELECT COUNT(DISTINCT ModuleID, Offset) FROM covered_blocks")
 GET_SETTINGS = (
     "SELECT ID, SettingName, SettingValue FROM settings")
+GET_RUNNERTYPE = (
+    "SELECT SettingValue FROM settings WHERE SettingName='runnerType'")
 GET_TARGET_MODULES = (
     "SELECT ID, ModuleName, ModulePath FROM target_modules")
 DELETE_TESTCASES = (
@@ -37,7 +51,7 @@ GET_MAX_LOCALID = (
 UPDATE_SETTINGS = (
     "UPDATE settings SET SettingValue=:SettingValue WHERE ID=:ID")
 UPDATE_NICE_NAME_TESTCASE = (
-    "UPDATE nice_names_testcase SET NiceName=:newName WHERE TestcaseID=:testcaseID")
+    "UPDATE nice_names_testcase SET NiceName=:newName WHERE CreatorServiceDescriptorGUID=:guid AND CreatorLocalID=:localId")
 UPDATE_NICE_NAME_MANAGED_INSTANACE = (
     "UPDATE nice_names_managed_instance SET NiceName=:newName WHERE ServiceDescriptorGUID=:sdguid")
 DELETE_TC_WTIH_LOCALID = (
@@ -55,7 +69,7 @@ GET_LOCAL_MANAGERS = (
     "SELECT ServiceDescriptorGUID, ServiceDescriptorHostAndPort FROM localmanagers WHERE FuzzJob=:fuzzjobID")
 GET_MANAGED_INSTANCES = (
     "SELECT managed_instances.ServiceDescriptorGUID, managed_instances.ServiceDescriptorHostAndPort, "
-    "managed_instances.AgentType, managed_instances.Location, mis.TimeOfStatus, mis.Status,"
+    "managed_instances.AgentType, managed_instances.Location, mis.TimeOfStatus, mis.Status, "
     "nice_names_managed_instance.NiceName FROM managed_instances "
     "LEFT JOIN (SELECT ServiceDescriptorGUID, Status, TimeOfStatus FROM  managed_instances_statuses t1 "
     "WHERE TimeOfStatus = (SELECT MAX(TimeOfStatus) "
@@ -109,11 +123,11 @@ UNIQUE_ACCESS_VIOLATION = (
     "av.TimeOfInsertion, av.ID, av.RawBytes, nn.NiceName "
     "FROM "
     "(SELECT cd.CrashFootprint, it.TestCaseType, it.CreatorServiceDescriptorGUID, it.CreatorLocalID, it.Rating, "
-    "it.TimeOfInsertion, it.ID, it.RawBytes"
-    " FROM interesting_testcases AS it"
+    "it.TimeOfInsertion, it.ID, it.RawBytes "
+    " FROM interesting_testcases AS it "
     " JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
     " WHERE it.TestCaseType=2 Group by cd.CrashFootprint) av "     
-    "LEFT JOIN nice_names_testcase AS nn ON av.ID = nn.TestcaseID;")
+    "LEFT JOIN nice_names_testcase AS nn ON (av.CreatorServiceDescriptorGUID = nn.CreatorServiceDescriptorGUID AND  av.CreatorLocalID = nn.CreatorLocalID);")
 
 UNIQUE_ACCESS_VIOLATION_NO_RAW = (
     "SELECT av.ID, av.CrashFootprint, av.TestCaseType, av.CreatorServiceDescriptorGUID, av.CreatorLocalID, av.Rating, "
@@ -125,7 +139,7 @@ UNIQUE_ACCESS_VIOLATION_NO_RAW = (
 	"WHERE it.TestCaseType=2 "
 	"Group by cd.CrashFootprint) as av "
     "LEFT JOIN nice_names_managed_instance as nnmi on av.CreatorServiceDescriptorGUID = nnmi.ServiceDescriptorGUID "
-    "LEFT JOIN nice_names_testcase AS nn ON av.ID = nn.TestcaseID "
+    "LEFT JOIN nice_names_testcase AS nn ON (av.CreatorServiceDescriptorGUID = nn.CreatorServiceDescriptorGUID AND  av.CreatorLocalID = nn.CreatorLocalID) "
     "ORDER BY av.TimeOfInsertion asc;")
 
 NUM_UNIQUE_CRASH = (
@@ -133,19 +147,19 @@ NUM_UNIQUE_CRASH = (
     "FROM (SELECT cd.CrashFootprint, it.TestCaseType FROM interesting_testcases AS it "
     "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
     "GROUP BY cd.CrashFootprint) " 
-    "observedCrashes WHERE TestCaseType=3")
+    "observedCrashes WHERE TestCaseType=3;")
 
 UNIQUE_CRASHES = (
     "SELECT oc.CrashFootprint, oc.ID, oc.TestCaseType, oc.RawBytes, oc.CreatorServiceDescriptorGUID, "
     "oc.CreatorLocalID, oc.Rating, oc.TimeOfInsertion, nn.NiceName "
     "FROM "
     "(SELECT cd.CrashFootprint, it.TestCaseType, it.CreatorServiceDescriptorGUID, it.CreatorLocalID, "
-    "it.Rating, it.TimeOfInsertion, it.ID, it.RawBytes"
-    " FROM interesting_testcases AS it"
-    " JOIN crash_descriptions AS cd"
+    "it.Rating, it.TimeOfInsertion, it.ID, it.RawBytes "
+    " FROM interesting_testcases AS it "
+    " JOIN crash_descriptions AS cd "
     " ON it.ID = cd.CreatorTestcaseID "
     " GROUP BY cd.CrashFootprint) oc " 
-    "LEFT JOIN nice_names_testcase AS nn ON oc.ID = nn.TestcaseID "
+    "LEFT JOIN nice_names_testcase AS nn ON (oc.CreatorServiceDescriptorGUID = nn.CreatorServiceDescriptorGUID AND oc.CreatorLocalID = nn.CreatorLocalID) "
     "WHERE TestCaseType=3;")
 
 UNIQUE_CRASHES_NO_RAW = (
@@ -159,7 +173,7 @@ UNIQUE_CRASHES_NO_RAW = (
     "WHERE TestCaseType=3 "
     "GROUP BY cd.CrashFootprint) as oc "
     "LEFT JOIN nice_names_managed_instance as nnmi on oc.CreatorServiceDescriptorGUID = nnmi.ServiceDescriptorGUID "
-    "LEFT JOIN nice_names_testcase AS nn ON oc.ID = nn.TestcaseID "
+    "LEFT JOIN nice_names_testcase AS nn ON (oc.CreatorServiceDescriptorGUID = nn.CreatorServiceDescriptorGUID AND oc.CreatorLocalID = nn.CreatorLocalID) "
     "ORDER BY oc.TimeOfInsertion asc;")
 
 MANAGED_INSTANCES_HOST_AND_PORT_AGENT_TYPE = (
@@ -178,8 +192,8 @@ INSERT_TESTCASE_POPULATION = (
     "VALUES('initial', :localId, 'initial', :localId, :rawData, 10000, 0)")
 
 INSERT_NICE_NAME_TESTCASE = (
-    "INSERT INTO nice_names_testcase(NiceName, TestcaseID) "
-    "VALUES(:newName, :testcaseID)")
+    "INSERT INTO nice_names_testcase(NiceName, CreatorServiceDescriptorGUID, CreatorLocalID) "
+    "VALUES(:newName, :guid, :localId)")
 
 INSERT_NICE_NAME_MANAGED_INSTANACE = (
     "INSERT INTO nice_names_managed_instance(NiceName, ServiceDescriptorGUID) "
@@ -189,7 +203,7 @@ GET_POPULATION_DETAILS = (
     "SELECT DISTINCT it.CreatorServiceDescriptorGUID, it.CreatorLocalID, it.ParentServiceDescriptorGUID, "
     "it.ParentLocalID, nnt.NiceName as NiceNameTC, nnmi.NiceName as NiceNameMI, it.TestCaseType "
     "FROM interesting_testcases as it "
-    "LEFT JOIN nice_names_testcase as nnt on it.ID = nnt.TestcaseID "
+    "LEFT JOIN nice_names_testcase as nnt on it.CreatorServiceDescriptorGUID = nnt.CreatorServiceDescriptorGUID AND it.CreatorLocalID = nnt.CreatorLocalID "
     "LEFT JOIN nice_names_managed_instance as nnmi on it.CreatorServiceDescriptorGUID = nnmi.ServiceDescriptorGUID "
     "WHERE (it.TestCaseType=0 OR it.TestCaseType=5);")
 
@@ -210,20 +224,25 @@ GET_CRASH_PARENTS = (
 
 GET_NN_TESTCASE_RAWBYTES = (
     "SELECT it.RawBytes, nnt.NiceName FROM interesting_testcases as it LEFT JOIN nice_names_testcase as nnt "
-    "ON it.ID = nnt.TestcaseID "
-    "WHERE CreatorServiceDescriptorGUID=:guid AND CreatorLocalID=:localId;")
-	
+    "ON (it.CreatorServiceDescriptorGUID = nnt.CreatorServiceDescriptorGUID AND it.CreatorLocalID = nnt.CreatorLocalID) "
+    "WHERE it.CreatorServiceDescriptorGUID=:guid AND it.CreatorLocalID=:localId;")
+
+GET_TESTCASE_HEXDUMP = (
+    "SELECT HEX(SUBSTR(it.RawBytes, :offset, 320)), LENGTH(it.RawBytes) FROM interesting_testcases as it LEFT JOIN nice_names_testcase as nnt "
+    "ON (it.CreatorServiceDescriptorGUID = nnt.CreatorServiceDescriptorGUID AND it.CreatorLocalID = nnt.CreatorLocalID) "
+    "WHERE it.ID=:testcaseID ;")
+
 GET_PROJECTS = (
     "SELECT"
-        "(SELECT COUNT(*) FROM completed_testcases),"
-        "(SELECT Amount FROM billing WHERE Resource='RunTestcasesNoLongerListed'),"
-        "SUM(CASE WHEN TestCaseType = 0 THEN 1 ELSE 0 END),"
-        "SUM(CASE WHEN TestCaseType = 1 THEN 1 ELSE 0 END),"
-        "SUM(CASE WHEN TestCaseType = 2 THEN 1 ELSE 0 END),"
-        "SUM(CASE WHEN TestCaseType = 3 THEN 1 ELSE 0 END),"
-        "SUM(CASE WHEN TestCaseType = 4 THEN 1 ELSE 0 END),"
+        "(SELECT COUNT(*) FROM completed_testcases), "
+        "(SELECT Amount FROM billing WHERE Resource='RunTestcasesNoLongerListed'), "
+        "SUM(CASE WHEN TestCaseType = 0 THEN 1 ELSE 0 END), "
+        "SUM(CASE WHEN TestCaseType = 1 THEN 1 ELSE 0 END), "
+        "SUM(CASE WHEN TestCaseType = 2 THEN 1 ELSE 0 END), "
+        "SUM(CASE WHEN TestCaseType = 3 THEN 1 ELSE 0 END), "
+        "SUM(CASE WHEN TestCaseType = 4 THEN 1 ELSE 0 END), "
         "(SELECT Rating FROM interesting_testcases WHERE TestCaseType=0 AND Rating > "
-        "(SELECT o.Value FROM fluffi_gm.gm_options AS o WHERE Setting = 'checkrating') LIMIT 1)"
+        "(SELECT o.Value FROM fluffi_gm.gm_options AS o WHERE Setting = 'checkrating') LIMIT 1) "
     "FROM interesting_testcases;"
 )
 
@@ -242,7 +261,7 @@ def getCrashesOrViosOfFootprint(footprint):
         "SELECT it.CreatorServiceDescriptorGUID, it.RawBytes, it.ID, nn.NiceName "
         "FROM interesting_testcases AS it "
         "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
-        "LEFT JOIN nice_names_testcase AS nn ON it.ID = nn.TestcaseID "
+        "LEFT JOIN nice_names_testcase AS nn (ON it.CreatorServiceDescriptorGUID = nn.CreatorServiceDescriptorGUID AND  it.CreatorLocalID = nn.CreatorLocalID) "
         "WHERE cd.CrashFootprint='{}' AND (it.TestCaseType=2 OR it.TestCaseType=3);".format(footprint)
     )
 
@@ -251,7 +270,7 @@ def getCrashesOrViosOfFootprintCount(footprint):
         "SELECT count(*) "
         "FROM interesting_testcases AS it "
         "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
-        "LEFT JOIN nice_names_testcase AS nn ON it.ID = nn.TestcaseID "
+        "LEFT JOIN nice_names_testcase AS nn ON (it.CreatorServiceDescriptorGUID = nn.CreatorServiceDescriptorGUID AND  it.CreatorLocalID = nn.CreatorLocalID) "
         "WHERE cd.CrashFootprint='{}' AND (it.TestCaseType=2 OR it.TestCaseType=3);".format(footprint)
     )
 
@@ -261,17 +280,17 @@ def getCrashesQuery(footprint, testCaseType):
         "SELECT it.CreatorServiceDescriptorGUID, it.RawBytes, it.ID, nn.NiceName "
         "FROM interesting_testcases AS it "
         "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
-        "LEFT JOIN nice_names_testcase AS nn ON it.ID = nn.TestcaseID "
+        "LEFT JOIN nice_names_testcase AS nn ON (it.CreatorServiceDescriptorGUID = nn.CreatorServiceDescriptorGUID AND  it.CreatorLocalID = nn.CreatorLocalID) "
         "WHERE cd.CrashFootprint='{}' AND it.TestCaseType={};".format(footprint, testCaseType)
     )
 
 
 def getCrashesQueryCount(footprint, testCaseType):
     return (
-        "SELECT COUNT(*)"
+        "SELECT COUNT(*) "
         "FROM interesting_testcases AS it "
         "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
-        "LEFT JOIN nice_names_testcase AS nn ON it.ID = nn.TestcaseID "
+        "LEFT JOIN nice_names_testcase AS nn ON (it.CreatorServiceDescriptorGUID = nn.CreatorServiceDescriptorGUID AND  it.CreatorLocalID = nn.CreatorLocalID) "
         "WHERE cd.CrashFootprint='{}' AND it.TestCaseType={};".format(footprint, testCaseType)
     )
 
@@ -285,7 +304,7 @@ def getITQueryOfType(n):
         "SELECT it.ID, it.RawBytes, it.CreatorServiceDescriptorGUID, it.CreatorLocalID, it.Rating, it.TimeOfInsertion, "
         "nn.NiceName, nnmi.NiceName as NiceNameMI "
         "FROM interesting_testcases AS it "
-        "LEFT JOIN nice_names_testcase AS nn ON it.ID = nn.TestcaseID "
+        "LEFT JOIN nice_names_testcase AS nn ON (it.CreatorServiceDescriptorGUID = nn.CreatorServiceDescriptorGUID AND  it.CreatorLocalID = nn.CreatorLocalID) "
         "LEFT JOIN nice_names_managed_instance as nnmi on it.CreatorServiceDescriptorGUID = nnmi.ServiceDescriptorGUID "
         "WHERE TestCaseType={};".format(n)
     )
@@ -296,11 +315,20 @@ def getITQueryOfTypeNoRaw(n):
         "SELECT it.ID, it.CreatorServiceDescriptorGUID, it.CreatorLocalID, it.Rating, it.TimeOfInsertion, "
         "nn.NiceName, nnmi.NiceName as NiceNameMI "
         "FROM interesting_testcases AS it "
-        "LEFT JOIN nice_names_testcase AS nn ON it.ID = nn.TestcaseID "
+        "LEFT JOIN nice_names_testcase AS nn ON (it.CreatorServiceDescriptorGUID = nn.CreatorServiceDescriptorGUID AND  it.CreatorLocalID = nn.CreatorLocalID) "
         "LEFT JOIN nice_names_managed_instance as nnmi on it.CreatorServiceDescriptorGUID = nnmi.ServiceDescriptorGUID "
         "WHERE TestCaseType={};".format(n)
     )
 
 
 def getMICountOfTypeQuery(n):
-    return "SELECT COUNT(*) FROM managed_instances WHERE AgentType=" + str(n)
+    return "SELECT COUNT(*) FROM managed_instances WHERE AgentType={};".format(n)
+
+
+def getLatestTestcaseOfType(n):
+    return (
+        "SELECT TimeOfInsertion FROM interesting_testcases "
+        "WHERE TestCaseType={} "
+        "ORDER BY TimeOfInsertion DESC LIMIT 1;".format(n)
+    )
+    

@@ -1,11 +1,23 @@
 /*
-Copyright 2017-2019 Siemens AG
+Copyright 2017-2020 Siemens AG
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including without
+limitation the rights to use, copy, modify, merge, publish, distribute,
+sublicense, and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
 
 Author(s): Thomas Riedmaier, Abian Blome, Roman Bendt
 */
@@ -387,10 +399,10 @@ bool TestExecutorDynRioMulti::attemptStartTargetAndFeeder(bool use_dyn_rio) {
 #if defined(_WIN32) || defined(_WIN64)
 	//Appending a parameter to the Environment is currently not implemented in Windows, so additionalEnvParam is ignored
 	m_debuggeeProcess = std::make_shared<ExternalProcess>(cmdlineWithReplacements, m_child_output_mode);
-	std::thread debuggerThread(&TestExecutorDynRioMulti::debuggerThreadMain, m_exOutput_FROM_TARGET_DEBUGGING, m_debuggeeProcess, m_SharedMemIPCInterruptEvent, m_attachInsteadOfStart, m_treatAnyAccessViolationAsFatal);
+	std::thread debuggerThread(&TestExecutorDynRioMulti::debuggerThreadMain, m_exOutput_FROM_TARGET_DEBUGGING, m_debuggeeProcess, m_SharedMemIPCInterruptEvent, m_attachInsteadOfStart, !use_dyn_rio, m_treatAnyAccessViolationAsFatal);
 #else
 	m_debuggeeProcess = std::make_shared<ExternalProcess>(cmdlineWithReplacements, m_child_output_mode, m_additionalEnvParam, use_dyn_rio);
-	std::thread debuggerThread(&TestExecutorDynRioMulti::debuggerThreadMain, m_exOutput_FROM_TARGET_DEBUGGING, m_debuggeeProcess, m_SharedMemIPCInterruptFD[1], m_attachInsteadOfStart, m_treatAnyAccessViolationAsFatal);
+	std::thread debuggerThread(&TestExecutorDynRioMulti::debuggerThreadMain, m_exOutput_FROM_TARGET_DEBUGGING, m_debuggeeProcess, m_SharedMemIPCInterruptFD[1], m_attachInsteadOfStart, !use_dyn_rio, m_treatAnyAccessViolationAsFatal);
 #endif
 	debuggerThread.detach(); //we do not want to join this. It will terminate as soon as the debugee terminates
 	LOG(DEBUG) << "started debugger thread";
@@ -939,8 +951,8 @@ std::shared_ptr<DebugExecutionOutput> TestExecutorDynRioMulti::execute(const Flu
 			_exit(EXIT_FAILURE); //make compiler happy;
 		}
 		//Case "Target terminated without an Exception" - treat this like an Exception
+		LOG(DEBUG) << "Target terminated \"cleanly\" although it should not have";
 		/* fall through */
-
 	case DebugExecutionOutput::EXCEPTION_OTHER:
 	case DebugExecutionOutput::EXCEPTION_ACCESSVIOLATION:
 		LOG(DEBUG) << "Testcase execution yielded an exception - or the target terminated \"cleanly\" by itself. Let's try to reproduce this without dynamorio";
@@ -1017,10 +1029,10 @@ void TestExecutorDynRioMulti::waitForDebuggerToTerminate() {
 }
 
 #if defined(_WIN32) || defined(_WIN64)
-void TestExecutorDynRioMulti::debuggerThreadMain(std::shared_ptr<DebugExecutionOutput> exOutput_FROM_TARGET_DEBUGGING, std::shared_ptr<ExternalProcess> debuggeeProcess, HANDLE sharedMemIPCInterruptEvent, bool attachInsteadOfStart, bool treatAnyAccessViolationAsFatal) {
+void TestExecutorDynRioMulti::debuggerThreadMain(std::shared_ptr<DebugExecutionOutput> exOutput_FROM_TARGET_DEBUGGING, std::shared_ptr<ExternalProcess> debuggeeProcess, HANDLE sharedMemIPCInterruptEvent, bool attachInsteadOfStart, bool doPostMortemAnalysis, bool treatAnyAccessViolationAsFatal) {
 #else
 #define INFINITE            0xFFFFFFFF  // Infinite timeout
-void TestExecutorDynRioMulti::debuggerThreadMain(std::shared_ptr<DebugExecutionOutput> exOutput_FROM_TARGET_DEBUGGING, std::shared_ptr<ExternalProcess> debuggeeProcess, int sharedMemIPCInterruptWriteFD, bool attachInsteadOfStart, bool treatAnyAccessViolationAsFatal) {
+void TestExecutorDynRioMulti::debuggerThreadMain(std::shared_ptr<DebugExecutionOutput> exOutput_FROM_TARGET_DEBUGGING, std::shared_ptr<ExternalProcess> debuggeeProcess, int sharedMemIPCInterruptWriteFD, bool attachInsteadOfStart, bool doPostMortemAnalysis, bool treatAnyAccessViolationAsFatal) {
 #endif
 	exOutput_FROM_TARGET_DEBUGGING->m_terminationType = DebugExecutionOutput::PROCESS_TERMINATION_TYPE::ERR;
 	exOutput_FROM_TARGET_DEBUGGING->m_terminationDescription = "The target did not run!";
@@ -1047,7 +1059,7 @@ void TestExecutorDynRioMulti::debuggerThreadMain(std::shared_ptr<DebugExecutionO
 
 	LOG(DEBUG) << "Current target process ID " << debuggeeProcess->getProcessID();
 
-	debuggeeProcess->debug(INFINITE, exOutput_FROM_TARGET_DEBUGGING, true, treatAnyAccessViolationAsFatal);
+	debuggeeProcess->debug(INFINITE, exOutput_FROM_TARGET_DEBUGGING, doPostMortemAnalysis, treatAnyAccessViolationAsFatal);
 
 	if (exOutput_FROM_TARGET_DEBUGGING->m_terminationType == DebugExecutionOutput::PROCESS_TERMINATION_TYPE::EXCEPTION_ACCESSVIOLATION || exOutput_FROM_TARGET_DEBUGGING->m_terminationType == DebugExecutionOutput::PROCESS_TERMINATION_TYPE::EXCEPTION_OTHER) {
 		//In case an exception occured, set sharedMemIPCInterruptEvent / write to the sharedMemIPCInterruptWriteFD, so the shared mem communication does not need to wait for an timeout but terminates early
