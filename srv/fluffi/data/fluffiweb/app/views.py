@@ -1132,6 +1132,13 @@ def viewCoverageDistribution(projId):
     return json.dumps({"data": coverageData})
 
 
+@app.route("/projects/coverageDistribution", methods=["GET"])
+def viewCoverageDistributionAll():
+    allCoverageData = getAllCoverageData()                    
+    
+    return json.dumps({"data": allCoverageData})
+
+
 @app.route("/locations/view/<int:locId>")
 @checkDBConnection
 @checkSystemsLoaded

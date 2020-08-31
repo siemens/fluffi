@@ -1378,9 +1378,64 @@ def getGraphData(projId):
     return graphdata
 
 
+MIN_RADIUS = 30
+
+def prepareAllCoverageData(coverageData, maximum):
+    """
+    Calculate radius and add it to data structure
+    Sort data by radius
+    """
+    
+    for cdObj in coverageData:
+        radius = calculateRadius(cdObj["CoveredBlocks"], maximum)
+        cdObj["radius"] = radius + 30
+    
+    sortedCoverageData = sorted(coverageData, key=lambda k: k["radius"], reverse=True)
+    
+    return sortedCoverageData
+
+
+def getAllCoverageData():
+    try:
+        projects = models.Fuzzjob.query.all()
+    except Exception as e:
+        print(e)
+        projects = []
+        
+    allCoverageData = []
+    allCoveredBlocks = []
+    
+    for project in projects:
+        try:
+            myProject = models.Fuzzjob.query.filter_by(ID = project.ID).first()
+            engine = create_engine(
+                'mysql://%s:%s@%s/%s' % (myProject.DBUser, myProject.DBPass, fluffiResolve(myProject.DBHost), myProject.DBName))
+            connection = engine.connect()
+        
+            result = connection.execute(GET_COUNT_OF_COVERED_BLOCKS).first()  
+                      
+            cd = dict()
+            cd["ID"] = myProject.ID 
+            cd["title"] = myProject.name            
+            if "CoveredBlocks" in result and result["CoveredBlocks"] is not None:
+                cd["CoveredBlocks"] = result["CoveredBlocks"]
+                allCoveredBlocks.append(result["CoveredBlocks"])
+            else:
+                cd["CoveredBlocks"] = 0
+            
+            allCoverageData.append(cd)
+            
+            connection.close()
+            engine.dispose()
+        except Exception as e:
+            print(e)
+        
+    allCoverageData = prepareAllCoverageData(allCoverageData, max(allCoveredBlocks))
+    return allCoverageData
+
+
 def getCoverageData(projId):
     coverageData = []
-    coveredBlocks = []
     
     try:
         project = models.Fuzzjob.query.filter_by(ID = projId).first()
@@ -1390,35 +1445,35 @@ def getCoverageData(projId):
         connection = engine.connect()
         
         result = connection.execute(GET_TARGET_MODULES)
-
-        for row in result:
+        
+        first = True 
+        maximum = 0
+        
+        for row in result:            
             module = dict()
             module["ID"]  = row["ID"]   
-            # rename to title for bubble chart         
             module["title"] = row["ModuleName"]
             
             if "CoveredBlocks" in row and row["CoveredBlocks"] is not None:
-                module["CoveredBlocks"] = row["CoveredBlocks"]
-                coveredBlocks.append(row["CoveredBlocks"])
+                cb = row["CoveredBlocks"]
+                if first: 
+                    maximum = cb
+                    first = False
+                    
+                module["CoveredBlocks"] = cb
+                radius = calculateRadius(cb, maximum)  
+                module["radius"] = radius + MIN_RADIUS                                  
             else:
                 module["CoveredBlocks"] = 0
-                
+                module["radius"] = MIN_RADIUS            
             coverageData.append(module)
         
         connection.close()
         engine.dispose()
     except Exception as e:
         print(e)
-        
-    maximum = max(coveredBlocks)    
-    
-    for cdObj in coverageData:
-        radius = int(round((cdObj["CoveredBlocks"] / maximum) * 100)) if maximum != 0 else 0
-        cdObj["radius"] = radius + 30
-    
-    sortedCoverageData = sorted(coverageData, key=lambda k: k["radius"], reverse=True)
-    
-    return sortedCoverageData
+            
+    return coverageData
 
 
 class DownloadArchiveLockFile:

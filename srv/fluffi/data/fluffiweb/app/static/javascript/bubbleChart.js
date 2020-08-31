@@ -31,7 +31,7 @@ $(document).ready(function() {
     canvas.height = window.innerHeight;
 
     var projId = window.location.hash.substr(1);
-    var url = "/projects/" + projId + "/coverageDistribution";
+    var url = projId === "all" ? "/projects/coverageDistribution" : "/projects/" + projId + "/coverageDistribution";
 
     $.getJSON(url, function(response) {                 
         drawCircles(response["data"]);
@@ -47,7 +47,7 @@ $(document).ready(function() {
         return color == "#FFFFFF" ? "#011638" : color;
     }    
 
-    function drawCircles(circles){
+    function drawCircles(circles) {
         var pi2 = Math.PI * 2;
 
         var cxFirst = canvas.width / 4;
@@ -79,6 +79,6 @@ $(document).ready(function() {
             } else {
                 cx = cx + (oldRadius + newRadius);
             }                                              
-        }                
+        }        
     }
 });

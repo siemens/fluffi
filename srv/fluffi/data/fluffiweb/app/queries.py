@@ -36,10 +36,12 @@ GET_SETTINGS = (
     "SELECT ID, SettingName, SettingValue FROM settings")
 GET_RUNNERTYPE = (
     "SELECT SettingValue FROM settings WHERE SettingName='runnerType'")
+GET_COUNT_OF_COVERED_BLOCKS = (
+    "SELECT COUNT(*) AS CoveredBlocks FROM covered_blocks")
 GET_TARGET_MODULES = (
     "SELECT tm.ID, tm.ModuleName, tm.ModulePath, cbc.CoveredBlocks "
     "FROM target_modules AS tm "
-    "LEFT JOIN (SELECT ModuleID, COUNT(*) AS CoveredBlocks FROM covered_blocks GROUP BY ModuleID) as cbc ON ID = cbc.ModuleID;")
+    "LEFT JOIN (SELECT ModuleID, COUNT(*) AS CoveredBlocks FROM covered_blocks GROUP BY ModuleID) as cbc ON ID = cbc.ModuleID ORDER BY CoveredBlocks DESC;")
 DELETE_TESTCASES = (
     "DELETE FROM interesting_testcases WHERE CreatorServiceDescriptorGUID <> 'initial'")
 RESET_RATING = (

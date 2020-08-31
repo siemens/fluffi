@@ -87,7 +87,12 @@ def createDefaultSubtypesList(subTypes):
         default.append(default_count)
     return default
 
+
 def chunks(l, n):
     """ Yield n-sized chunks from l """
     for i in range(0, len(l), n):
         yield l[i:i + n]
+ 
+       
+def calculateRadius(coveredBlocks, maximum):
+    return int(round((coveredBlocks / maximum) * 100)) if maximum != 0 else 0
