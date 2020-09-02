@@ -268,7 +268,7 @@ def getProject(projId):
             module = type('', (), {})()
             module.name = row["ModuleName"]
             module.path = row["ModulePath"]
-            module.coveredBlocks = row["CoveredBlocks"]
+            module.coveredBlocks = row["CoveredBlocks"] if row["CoveredBlocks"] is not None else 0
             module.ID = row["ID"]
             project.modules.append(module)
 
@@ -378,6 +378,7 @@ def updateInfoHandler(projId, infoType):
     
     return msg, info, status
 
+
 def getGeneralInformationData(projId, stmt):
     project = models.Fuzzjob.query.filter_by(ID = projId).first()
     data = type('', (), {})()
@@ -396,8 +397,8 @@ def getGeneralInformationData(projId, stmt):
             if "CrashFootprint" in row and row["CrashFootprint"] is not None:
                 testcase.footprint = row["CrashFootprint"]
             
-            if "CoveredBlocks" in row and row["CoveredBlocks"] is not None:
-                testcase.coveredBlocks = row["CoveredBlocks"]
+            if "CoveredBlocks" in row:
+                testcase.coveredBlocks = row["CoveredBlocks"] if row["CoveredBlocks"] is not None else 0
                      
             testcase.ID = "{}:{}".format(row["CreatorServiceDescriptorGUID"], row["CreatorLocalID"])
             testcase.rating = row["Rating"]
