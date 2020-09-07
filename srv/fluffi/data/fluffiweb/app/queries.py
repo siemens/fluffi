@@ -233,10 +233,23 @@ GET_NN_TESTCASE_RAWBYTES = (
     "ON (it.CreatorServiceDescriptorGUID = nnt.CreatorServiceDescriptorGUID AND it.CreatorLocalID = nnt.CreatorLocalID) "
     "WHERE it.CreatorServiceDescriptorGUID=:guid AND it.CreatorLocalID=:localId;")
 
-GET_TESTCASE_HEXDUMP = (
-    "SELECT HEX(SUBSTR(it.RawBytes, :offset, 320)), LENGTH(it.RawBytes) FROM interesting_testcases as it LEFT JOIN nice_names_testcase as nnt "
+GET_TESTCASE_DUMP = (
+    "SELECT SUBSTR(it.RawBytes, :offset, 960), LENGTH(it.RawBytes), it.ParentLocalID, it.ParentServiceDescriptorGUID "
+    "FROM interesting_testcases as it LEFT JOIN nice_names_testcase as nnt "
     "ON (it.CreatorServiceDescriptorGUID = nnt.CreatorServiceDescriptorGUID AND it.CreatorLocalID = nnt.CreatorLocalID) "
     "WHERE it.ID=:testcaseID ;")
+
+GET_TESTCASE_PARENT = (
+    "SELECT it.ParentLocalID, it.ParentServiceDescriptorGUID "
+    "FROM interesting_testcases as it LEFT JOIN nice_names_testcase as nnt "
+    "ON (it.CreatorServiceDescriptorGUID = nnt.CreatorServiceDescriptorGUID AND it.CreatorLocalID = nnt.CreatorLocalID) "
+    "WHERE it.ID=:testcaseID ;")
+
+GET_TESTCASE_PARENT_ID = (
+    "SELECT it.ID "
+    "FROM interesting_testcases as it LEFT JOIN nice_names_testcase as nnt "
+    "ON (it.CreatorServiceDescriptorGUID = nnt.CreatorServiceDescriptorGUID AND it.CreatorLocalID = nnt.CreatorLocalID) "
+    "WHERE it.CreatorLocalID=:parentID and it.CreatorServiceDescriptorGUID=:parentGUID;")
 
 GET_PROJECTS = (
     "SELECT"

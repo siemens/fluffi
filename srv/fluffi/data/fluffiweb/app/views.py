@@ -34,7 +34,6 @@ from .utils.sync import *
 import json
 import os
 import requests
-import binascii
 
 lock = DownloadArchiveLockFile()
 
@@ -823,45 +822,108 @@ def getLogsOfManagedInstance(projId):
     return json.dumps({"status": "OK", "pageCount": pageCount, "miLogs": miLogs})
 
 
-@app.route("/hexdump/<int:projId>/<int:testcaseId>/<int:offset>", methods=["GET"])
-def getTestcaseHexdump(projId, testcaseId, offset):
-    result = getResultOfStatement(projId, GET_TESTCASE_HEXDUMP, {"testcaseID": testcaseId, "offset": offset + 1})
+@app.route("/hexdump/<int:projId>/<int:testcaseId>/<int:offset>/<int:comp>", methods=["GET"])
+def getTestcaseHexdump(projId, testcaseId, offset, comp):
+    diffFileName = "diffTemp"
+    deleteOldHexdumpFiles(diffFileName)
 
-    if result is not None:
-        textOutput = []
-        decodedData = []
-        pageCount = 0
-        rows = result.fetchall()
-        for row in rows:
-            for num, x in enumerate(row):
-                if num is 0:
-                    textOutput = [x[i:i + 2] for i in range(0, len(x), 2)]
-                elif num is 1:
-                    pageCount = int(x/320) + (x % 320 > 0)
+    testcaseDumpFileName = "testcaseHexTemp"
+    deleteOldHexdumpFiles(testcaseDumpFileName)
 
-        targetLen = (int(len(textOutput)/16) + (len(textOutput) % 16 > 0)) * 16
-        for _ in range(len(textOutput), targetLen):
-            textOutput.append("00")
+    testcaseHexdumpFile = "/" + testcaseDumpFileName + "." + str(projId) + "." + str(testcaseId)
+    parentTestcaseId = ""
+    parentTestcaseGuid = ""
+    pageCount = 0
 
-        for b in textOutput:
-            if 0 <= int(b, 16) <= 31 or 127 <= int(b, 16) <= 159:
-                decodedText = "."
-            else:
-                decodedText = binascii.unhexlify(b).decode("latin-1", "ignore")
-            if not decodedText:
-                decodedData.append(".")
-            else:
-                decodedData.append(decodedText)
-
-        for _ in range(len(decodedData), targetLen):
-            decodedData.append(".")
-
-        textOutputF = [textOutput[x:x + 16] for x in range(0, len(textOutput), 16)]
-        decodedDataF = [decodedData[x:x + 16] for x in range(0, len(decodedData), 16)]
-
-        return json.dumps({"status": "OK", "pageCount": pageCount, "hex": textOutputF, "decoded": decodedDataF})
+    if comp is 1 or not os.path.isfile(testcaseHexdumpFile):
+        parentTestcaseId, parentTestcaseGuid, pageCount = loadHexInFile(projId, testcaseId, testcaseHexdumpFile)
     else:
-        return json.dumps({"status": "ERROR"})
+        pageCount = int(os.path.getsize(testcaseHexdumpFile) / 960) + (os.path.getsize(testcaseHexdumpFile) % 960 > 0)
+        parentTestcaseId, parentTestcaseGuid = getTestcaseParentInfo(projId, testcaseId)
+
+    if comp is 1 and parentTestcaseId is not "" and parentTestcaseGuid is not "":
+        resultParentIdRes = getResultOfStatement(projId, GET_TESTCASE_PARENT_ID,
+                                              {"parentID": parentTestcaseId, "parentGUID": parentTestcaseGuid})
+        if resultParentIdRes is not None:
+            rows = resultParentIdRes.fetchall()
+            resultParentId = rows[0][0]
+
+            testcaseParentHexdumpFile = "/" + testcaseDumpFileName + "." + str(projId) + "." + str(resultParentId)
+            if not os.path.exists(testcaseParentHexdumpFile):
+                loadHexInFile(projId, resultParentId, testcaseParentHexdumpFile)
+
+            diffResultFile = "/" + diffFileName + "." + str(projId) + "." + str(testcaseId) + "." + str(parentTestcaseId)
+            if not os.path.exists(diffResultFile):
+                writeHexDiffFile(testcaseParentHexdumpFile, testcaseHexdumpFile, diffResultFile)
+
+            diff = getHexDiff(diffResultFile)
+            newDiff, insSpaceT, insSpacePT = getScaledDiff(diff)
+            pageCount = getPageCountList(diff, newDiff, insSpaceT)
+
+            if offset not in pageCount:
+                for pageNum, page in enumerate(pageCount):
+                    if len(pageCount) > pageNum + 1:
+                        if page < offset < pageCount[pageNum + 1]:
+                            offset = page
+                            break
+
+            offsetP, testcaseHexList, testcaseParentHexList = getTestcaseHexFromFileDiff(diff, newDiff, insSpaceT,
+                                                                                         insSpacePT, pageCount,
+                                                                                         testcaseHexdumpFile,
+                                                                                         testcaseParentHexdumpFile,
+                                                                                         offset)
+
+            if len(testcaseHexList) >= len(testcaseParentHexList):
+                targetLen = (int(len(testcaseHexList) / 8) + (len(testcaseHexList) % 8 > 0)) * 8
+                for _ in range(len(testcaseParentHexList), targetLen):
+                    testcaseParentHexList.append("  ")
+            else:
+                targetLen = (int(len(testcaseParentHexList) / 8) + (len(testcaseParentHexList) % 8 > 0)) * 8
+                for _ in range(len(testcaseHexList), targetLen):
+                    testcaseHexList.append("  ")
+
+            textOutputT, decodedDataT = getTextByHex(testcaseHexList, 8)
+            textOutputP, decodedDataP = getTextByHex(testcaseParentHexList, 8)
+
+            retDiff = []
+            retNewDiff = []
+            insertionsPT = 0
+            insertionsT = 0
+
+            for num, row in enumerate(newDiff):
+                x = set(range(int(row[1]), int(row[2])))
+                y = set(range(int(row[3]), int(row[4])))
+                z = set(range(offset, offset + 960))
+
+                if len(list(set.intersection(x, z))) > 0 or len(list(set.intersection(y, z))) > 0:
+                    retDiff.append(diff[num])
+                    newDiffRow = [newDiff[num][0]]
+                    if int(newDiff[num][1]) < offset:
+                        newDiffRow.append("0")
+                    else:
+                        newDiffRow.append(str(int(newDiff[num][1]) - offset - insertionsPT))
+                    newDiffRow.append(str(int(newDiff[num][2]) - offset - insertionsPT))
+                    if int(newDiff[num][3]) < offset:
+                        newDiffRow.append("0")
+                    else:
+                        newDiffRow.append(str(int(newDiff[num][1]) - offset - insertionsT))
+                    newDiffRow.append(str(int(newDiff[num][2]) - offset - insertionsT))
+                    retNewDiff.append(newDiffRow)
+
+            return json.dumps({"status": "OK", "pageCount": pageCount, "offsetP": offsetP, "hexT": textOutputT, "decodedT": decodedDataT,
+                               "hexP": textOutputP, "decodedP": decodedDataP, "diff": retNewDiff, "realDiff": retDiff})
+        else:
+            return json.dumps({"status": "ERROR"})
+    else:
+        if offset % 960 != 0:
+            offset = int(offset / 960) * 960
+        testcaseHexList = getTestcaseHexFromFile(testcaseHexdumpFile, offset, 960)
+        textOutputF, decodedDataF = getTextByHex(testcaseHexList, 16)
+
+        if parentTestcaseGuid != "initial":
+            return json.dumps({"status": "OK", "pageCount": pageCount, "hexT": textOutputF, "decodedT": decodedDataF, "parent": parentTestcaseGuid})
+        else:
+            return json.dumps({"status": "OK", "pageCount": pageCount, "hexT": textOutputF, "decodedT": decodedDataF, "parent": ""})
 
 
 @app.route("/projects/<int:projId>/configSystemInstances")
