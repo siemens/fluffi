@@ -1773,6 +1773,28 @@ def getCoverageData(projId):
     return coverageData
 
 
+def getCoverageDiffData(projId, testcaseId):
+    data = dict()
+    
+    try:
+        project = models.Fuzzjob.query.filter_by(ID = projId).first()
+        
+        engine = create_engine(
+            'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
+        connection = engine.connect()
+        
+        # result = connection.execute()
+        print(projId, testcaseId)
+        
+        
+        
+        connection.close()
+        engine.dispose()
+    except Exception as e:
+        print(e)    
+        
+    return data
+
 class DownloadArchiveLockFile:
     file_path = "/download.lock"
     tmp_path = "/downloadTemp"

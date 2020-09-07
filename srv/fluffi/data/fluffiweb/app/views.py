@@ -1201,6 +1201,19 @@ def viewCoverageDistributionAll():
     return json.dumps({"data": allCoverageData})
 
 
+@app.route("/projects/coverageDiff", methods=["POST"])
+def viewCoverageDiff():
+    projId = request.json.get("projId", None)
+    testcaseId = request.json.get("testcaseId", None)       
+    
+    if projId and testcaseId:
+        data = getCoverageDiffData(projId, testcaseId)
+    else:
+        data = {"status": "ERROR", "message": "Project Id or testcase Id missing!"}                       
+    
+    return json.dumps({"data": data})
+
+
 @app.route("/locations/view/<int:locId>")
 @checkDBConnection
 @checkSystemsLoaded
