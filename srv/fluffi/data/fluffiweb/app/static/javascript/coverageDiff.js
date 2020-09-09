@@ -23,7 +23,7 @@ Author(s): Junes Najah
 */
 
 function loadCoverageDiff(projId, testcaseId, loopIndex) {
-    const data = {projId, testcaseId, loopIndex};
+    const data = {projId, testcaseId};
 
     $.ajax({
         url: "/projects/coverageDiff",
@@ -32,7 +32,16 @@ function loadCoverageDiff(projId, testcaseId, loopIndex) {
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
         success: function(response) {
-            console.log(response);
+            if (response.status === "OK"){
+                response.coverageTestcase.forEach(function(elem){
+                    $("#coverageDiffTestcase" + loopIndex).append("<p>" + elem.moduleName + ": " + elem.coveredBlocks + "</p>");
+                });  
+                response.coverageParent.forEach(function(elem){
+                    $("#coverageDiffParent" + loopIndex).append("<p>" + elem.moduleName + ": " + elem.coveredBlocks + "</p>");
+                });              
+            } else {
+                console.log(response["message"]);
+            }
         },
         error: function(response) {
             console.log(response);            

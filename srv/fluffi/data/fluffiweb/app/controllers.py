@@ -1774,7 +1774,8 @@ def getCoverageData(projId):
 
 
 def getCoverageDiffData(projId, testcaseId):
-    data = dict()
+    coverageTestcase = []
+    coverageParent = []
     
     try:
         project = models.Fuzzjob.query.filter_by(ID = projId).first()
@@ -1783,17 +1784,38 @@ def getCoverageDiffData(projId, testcaseId):
             'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
         connection = engine.connect()
         
-        # result = connection.execute()
-        print(projId, testcaseId)
+        data = { "ID": testcaseId }
+        statement = text(GET_CREATOR_LOCAL_ID_AND_PARENT)
+        result = connection.execute(statement, data).fetchone()
         
-        
-        
+        creatorLocalID = result["CreatorLocalID"]
+        parentLocalID = result["ParentLocalID"]
+        print(creatorLocalID)
+        print(parentLocalID)
+                
+        data = { "ctID": creatorLocalID }
+        statement = text(GET_COVERED_BLOCKS_OF_TESTCASE_FOR_EVERY_MODULDE)
+        result = connection.execute(statement, data)        
+        for row in result:
+            moduleName = row["ModuleName"] if row["ModuleName"] is not None else ""
+            coveredBlocks = row["CoveredBlocks"] if row["CoveredBlocks"] is not None else 0
+            coverageTestcase.append({ "moduleName": moduleName, "coveredBlocks": coveredBlocks })    
+            
+            
+        data = { "ctID": parentLocalID }
+        statement = text(GET_COVERED_BLOCKS_OF_TESTCASE_FOR_EVERY_MODULDE)
+        result = connection.execute(statement, data)          
+        for row in result:
+            moduleName = row["ModuleName"] if row["ModuleName"] is not None else ""
+            coveredBlocks = row["CoveredBlocks"] if row["CoveredBlocks"] is not None else 0
+            coverageParent.append({ "moduleName": moduleName, "coveredBlocks": coveredBlocks })   
+                        
         connection.close()
         engine.dispose()
     except Exception as e:
         print(e)    
         
-    return data
+    return coverageTestcase, coverageParent
 
 class DownloadArchiveLockFile:
     file_path = "/download.lock"

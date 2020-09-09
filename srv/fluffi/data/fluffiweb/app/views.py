@@ -1207,11 +1207,12 @@ def viewCoverageDiff():
     testcaseId = request.json.get("testcaseId", None)       
     
     if projId and testcaseId:
-        data = getCoverageDiffData(projId, testcaseId)
+        coverageTestcase, coverageParent = getCoverageDiffData(projId, testcaseId)
+        data = {"status": "OK", "coverageTestcase": coverageTestcase, "coverageParent": coverageParent} 
     else:
-        data = {"status": "ERROR", "message": "Project Id or testcase Id missing!"}                       
-    
-    return json.dumps({"data": data})
+        data = {"status": "ERROR", "message": "Project Id or testcase Id missing!"}  
+                             
+    return json.dumps(data)
 
 
 @app.route("/locations/view/<int:locId>")
