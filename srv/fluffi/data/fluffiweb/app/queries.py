@@ -144,7 +144,7 @@ UNIQUE_ACCESS_VIOLATION_NO_RAW = (
 	"Group by cd.CrashFootprint) as av "
     "LEFT JOIN nice_names_managed_instance as nnmi on av.CreatorServiceDescriptorGUID = nnmi.ServiceDescriptorGUID "
     "LEFT JOIN nice_names_testcase AS nn ON (av.CreatorServiceDescriptorGUID = nn.CreatorServiceDescriptorGUID AND av.CreatorLocalID = nn.CreatorLocalID) "
-    "LEFT JOIN (SELECT CreatorTestcaseID, COUNT(*) AS CoveredBlocks FROM covered_blocks GROUP BY CreatorTestcaseID) as cbc on it.ID = cbc.CreatorTestcaseID "
+    "LEFT JOIN (SELECT CreatorTestcaseID, COUNT(*) AS CoveredBlocks FROM covered_blocks GROUP BY CreatorTestcaseID) as cbc on it.CreatorLocalID = cbc.CreatorTestcaseID "
     "ORDER BY av.TimeOfInsertion asc;")
 
 NUM_UNIQUE_CRASH = (
@@ -179,7 +179,7 @@ UNIQUE_CRASHES_NO_RAW = (
     "GROUP BY cd.CrashFootprint) as oc "
     "LEFT JOIN nice_names_managed_instance as nnmi on oc.CreatorServiceDescriptorGUID = nnmi.ServiceDescriptorGUID "
     "LEFT JOIN nice_names_testcase AS nn ON (oc.CreatorServiceDescriptorGUID = nn.CreatorServiceDescriptorGUID AND oc.CreatorLocalID = nn.CreatorLocalID) "
-    "LEFT JOIN (SELECT CreatorTestcaseID, COUNT(*) AS CoveredBlocks FROM covered_blocks GROUP BY CreatorTestcaseID) as cbc on it.ID = cbc.CreatorTestcaseID "
+    "LEFT JOIN (SELECT CreatorTestcaseID, COUNT(*) AS CoveredBlocks FROM covered_blocks GROUP BY CreatorTestcaseID) as cbc on it.CreatorLocalID = cbc.CreatorTestcaseID "
     "ORDER BY oc.TimeOfInsertion asc;")
 
 MANAGED_INSTANCES_HOST_AND_PORT_AGENT_TYPE = (
@@ -312,7 +312,7 @@ def getITQueryOfType(n):
         "FROM interesting_testcases AS it "
         "LEFT JOIN nice_names_testcase AS nn ON (it.CreatorServiceDescriptorGUID = nn.CreatorServiceDescriptorGUID AND  it.CreatorLocalID = nn.CreatorLocalID) "
         "LEFT JOIN nice_names_managed_instance as nnmi on it.CreatorServiceDescriptorGUID = nnmi.ServiceDescriptorGUID "
-        "LEFT JOIN (SELECT CreatorTestcaseID, COUNT(*) AS CoveredBlocks FROM covered_blocks GROUP BY CreatorTestcaseID) as cbc on it.ID = cbc.CreatorTestcaseID "
+        "LEFT JOIN (SELECT CreatorTestcaseID, COUNT(*) AS CoveredBlocks FROM covered_blocks GROUP BY CreatorTestcaseID) as cbc on it.CreatorLocalID = cbc.CreatorTestcaseID "
         "WHERE TestCaseType={};".format(n)
     )
 
@@ -324,7 +324,7 @@ def getITQueryOfTypeNoRaw(n):
         "FROM interesting_testcases AS it "
         "LEFT JOIN nice_names_testcase AS nn ON (it.CreatorServiceDescriptorGUID = nn.CreatorServiceDescriptorGUID AND  it.CreatorLocalID = nn.CreatorLocalID) "
         "LEFT JOIN nice_names_managed_instance as nnmi on it.CreatorServiceDescriptorGUID = nnmi.ServiceDescriptorGUID "
-        "LEFT JOIN (SELECT CreatorTestcaseID, COUNT(*) AS CoveredBlocks FROM covered_blocks GROUP BY CreatorTestcaseID) as cbc on it.ID = cbc.CreatorTestcaseID "
+        "LEFT JOIN (SELECT CreatorTestcaseID, COUNT(*) AS CoveredBlocks FROM covered_blocks GROUP BY CreatorTestcaseID) as cbc on it.CreatorLocalID = cbc.CreatorTestcaseID "
         "WHERE TestCaseType={};".format(n)
     )
 
