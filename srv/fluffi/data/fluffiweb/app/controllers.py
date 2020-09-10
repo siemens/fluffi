@@ -25,6 +25,9 @@ import csv
 import subprocess
 import time
 import re
+import binascii
+import difflib
+import copy
 from base64 import b64encode
 from os import system, unlink
 
@@ -35,9 +38,6 @@ from app import db, models
 from .constants import *
 from .helpers import *
 from .queries import *
-
-
-
 
 
 def createNewDatabase(name):
@@ -436,6 +436,302 @@ def getRowCount(projId, stmt, params=None):
         engine.dispose()
 
     return data
+    
+    
+def writeHexDiffFile(hexOneFile, hexTwoFile, diffFile):
+    with open(hexOneFile, "rb") as f1, open(hexTwoFile, "rb") as f2:
+        matcher = difflib.SequenceMatcher(None, f1.read(), f2.read())
+        with open(diffFile, 'a') as csvfile:
+            w = csv.writer(csvfile, delimiter=' ')
+            for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+                w.writerow([tag, i1, i2, j1, j2])
+        return matcher.ratio()
+
+
+def getHexDiff(diffFile):
+    diff = []
+    file = open(diffFile, "rU")
+    reader = csv.reader(file, delimiter=' ')
+    for row in reader:
+        diff.append(row)
+
+    return diff
+
+
+def loadHexInFile(projId, testcaseId, filePath):
+    offset = 1
+    hexLen = 0
+    pageCount = 0
+    testcaseParentId = ""
+    testcaseParentGuid = ""
+
+    with open(filePath, 'wb') as testcaseHexfile:
+        while True:
+            resultTestcaseHex = getResultOfStatement(projId, GET_TESTCASE_DUMP,
+                                                     {"testcaseID": testcaseId, "offset": offset})
+            if resultTestcaseHex is not None:
+                rows = resultTestcaseHex.fetchall()
+                for row in rows:
+                    for num, x in enumerate(row):
+                        if num is 0:
+                            testcaseHexfile.write(x)
+                        elif num is 1:
+                            hexLen = x
+                            offset += 960
+                            pageCount = max(int(x / 960) + (x % 960 > 0), pageCount)
+                        elif num is 2:
+                            testcaseParentId = x
+                        elif num is 3:
+                            testcaseParentGuid = x
+            if offset > hexLen:
+                break
+    return testcaseParentId, testcaseParentGuid, pageCount
+
+
+def getScaledDiff(diff):
+    insSpacePT = []
+    insSpaceT = []
+    newTempDiff = copy.deepcopy(diff)
+    newDiff = []
+
+    for num, row in enumerate(diff):
+        if (max(int(row[2]), int(newTempDiff[num][2])) - max(int(row[1]), int(newTempDiff[num][1])) >
+            max(int(row[4]), int(newTempDiff[num][4])) - max(int(row[3]), int(newTempDiff[num][3]))):
+            newTempDiff[num][4] = str(int(newTempDiff[num][2]))
+            for subNum in range(num, len(diff)):
+                space = int(newTempDiff[subNum][4]) - int(newTempDiff[subNum][3])
+                newTempDiff[subNum][3] = newTempDiff[subNum-1][4] if subNum > 0 else 0
+                newTempDiff[subNum][4] = str(int(newTempDiff[subNum][3]) + space)
+
+        elif (max(int(row[2]), int(newTempDiff[num][2])) - max(int(row[1]), int(newTempDiff[num][1])) < max(int(row[4]),
+              int(newTempDiff[num][4])) - max(int(row[3]), int(newTempDiff[num][3]))):
+            newTempDiff[num][2] = str(int(newTempDiff[num][4]))
+            for subNum in range(num, len(diff)):
+                space = int(newTempDiff[subNum][2]) - int(newTempDiff[subNum][1])
+                newTempDiff[subNum][1] = newTempDiff[subNum-1][2] if subNum > 0 else 0
+                newTempDiff[subNum][2] = str(int(newTempDiff[subNum][1]) + space)
+
+        if ((int(row[2]) - int(row[1])) - (int(row[4]) - int(row[3]))) > 0:
+            insSpaceT.append([int(newTempDiff[num][3]) + (int(row[4]) - int(row[3])),
+                              (int(row[2]) - int(row[1])) - (int(row[4]) - int(row[3]))])
+        elif ((int(row[4]) - int(row[3])) - (int(row[2]) - int(row[1]))) > 0:
+            insSpacePT.append([int(newTempDiff[num][1]) + (int(row[2]) - int(row[1])),
+                               (int(row[4]) - int(row[3])) - (int(row[2]) - int(row[1]))])
+
+        newDiff.append(newTempDiff[num])
+
+    return newDiff, insSpaceT, insSpacePT
+
+
+def getPageCountList(diff, newDiff, insSpaceT):
+    pageCount = []
+
+    pageCount.append(0)
+    offsetPage = 0
+    allCharCount = int(newDiff[-1][4])
+    remainCharCount = int(diff[-1][4])
+    for _ in range(0, int(int(newDiff[-1][4]) / 960) + (int(newDiff[-1][4]) % 960 > 0)):
+        chunkCount = 960
+        for insertion in insSpaceT:
+            if offsetPage < insertion[0] < (offsetPage + chunkCount):
+                if (insertion[0] + insertion[1]) <= (offsetPage + chunkCount):
+                    chunkCount -= insertion[1]
+                else:
+                    chunkCount -= (offsetPage + 960) - insertion[0]
+            offsetPage = chunkCount + offsetPage
+            remainCharCount -= chunkCount
+        if allCharCount >= chunkCount:
+            if remainCharCount <= 0:
+                chunkCount += (960 - chunkCount)
+            allCharCount -= chunkCount
+            pageCount.append(chunkCount + pageCount[-1])
+
+    return pageCount
+
+
+def getTestcaseHexFromFileDiff(diff, newDiff, insSpaceT, insSpacePT, pageCount, testcaseHexdumpFile, testcaseParentHexdumpFile, offset):
+    chunkCount = 960
+    for insertion in insSpaceT:
+        if offset < insertion[0] < (offset + chunkCount):
+            if (insertion[0] + insertion[1]) <= (offset + chunkCount):
+                chunkCount -= insertion[1]
+            else:
+                chunkCount -= (offset + 960) - insertion[0]
+
+    testcaseHexdump = getTestcaseHexFromFile(testcaseHexdumpFile, offset, chunkCount)
+
+    pageNext = 0
+    for num, page in enumerate(pageCount):
+        if page == offset:
+            if len(pageCount) > num + 1:
+                pageNext = pageCount[num + 1]
+            else:
+                pageNext = int(newDiff[-1][4])
+
+    pointer = offset
+    for num, row in enumerate(newDiff):
+
+        x = set(range(int(row[1]), int(row[2])))
+        y = set(range(int(row[3]), int(row[4])))
+        z = set(range(offset, pageNext))
+
+        if len(list(set.intersection(x, z))) > 0 or len(list(set.intersection(y, z))) > 0:
+            if row[0] == "delete":
+                if (int(diff[num][4]) - int(diff[num][3])) < (int(diff[num][2]) - int(diff[num][1])):
+                    for x in range(pointer, min((int(newDiff[num][2]) - int(newDiff[num][1])) + pointer, pageNext)):
+                        testcaseHexdump.insert(x - offset, "  ")
+                        pointer += 1
+                else:
+                    if int(row[3]) < offset:
+                        pointer += (int(row[4]) - offset)
+                    else:
+                        pointer += (int(row[4]) - int(row[3]))
+            elif row[0] == "replace":
+                if (int(diff[num][4]) - int(diff[num][3])) <= (int(diff[num][2]) - int(diff[num][1])):
+                    if (int(diff[num][2]) - int(diff[num][1])) + int(newDiff[num][1]) > offset:
+                        pointer += (int(diff[num][4]) - int(diff[num][3]))
+                    for x in range(pointer, min(int(newDiff[num][2]), pageNext)):
+                        if pageNext > int(newDiff[num][1]):
+                            testcaseHexdump.insert(x - offset, "  ")
+                        else:
+                            testcaseHexdump.insert(int(newDiff[num][1]), "  ")
+                        pointer += 1
+                else:
+                    if int(row[3]) < offset:
+                        pointer += int(row[4]) - offset
+                    else:
+                        pointer += int(row[4]) - int(row[3])
+            else:
+                if int(row[3]) < offset:
+                    pointer += int(row[4]) - offset
+                else:
+                    pointer += int(row[4]) - int(row[3])
+        if pointer >= pageNext:
+            break
+
+    pOffset = offset
+    for insertion in insSpacePT:
+        if offset > (insertion[0] + insertion[1]):
+            pOffset -= insertion[1]
+        elif insertion[0] < offset < (offset + 960) > (insertion[0] + insertion[1]):
+            pOffset -= (offset - insertion[0])
+    chunkCount = 960
+    for insertion in insSpacePT:
+        if pOffset < insertion[0] < (pOffset + chunkCount):
+            if (insertion[0] + insertion[1]) <= (pOffset + chunkCount):
+                chunkCount -= insertion[1]
+            else:
+                chunkCount -= (pOffset + 960) - insertion[0]
+
+    testcaseParentHexdump = getTestcaseHexFromFile(testcaseParentHexdumpFile, pOffset, chunkCount)
+
+    pointer = offset
+    for num, row in enumerate(newDiff):
+
+        x = set(range(int(row[1]), int(row[2])))
+        y = set(range(int(row[3]), int(row[4])))
+        z = set(range(offset, pageNext))
+
+        if len(list(set.intersection(x, z))) > 0 or len(list(set.intersection(y, z))) > 0:
+            if row[0] == "insert":
+                if (int(diff[num][2]) - int(diff[num][1])) < (int(diff[num][4]) - int(diff[num][3])):
+                    if int(newDiff[num][3]) < pointer:
+                        insEnd = int(diff[num][4])
+                    else:
+                        insEnd = (int(newDiff[num][4]) - int(newDiff[num][3])) + pointer
+                    for x in range(pointer, min(insEnd, pageNext)):
+                        testcaseParentHexdump.insert(x - offset, "  ")
+                        pointer += 1
+                else:
+                    if int(row[1]) < offset:
+                        pointer += (int(row[2]) - offset)
+                    else:
+                        pointer += (int(row[2]) - int(row[1]))
+            elif row[0] == "replace":
+                if (int(diff[num][2]) - int(diff[num][1])) <= (int(diff[num][4]) - int(diff[num][3])):
+                    if (int(diff[num][2]) - int(diff[num][1])) + int(newDiff[num][3]) > offset:
+                        pointer += (int(diff[num][2]) - int(diff[num][1]))
+                    for x in range(pointer, min(int(newDiff[num][4]), pageNext)):
+                        if pageNext > int(newDiff[num][3]):
+                            testcaseParentHexdump.insert(x - offset, "  ")
+                        else:
+                            testcaseParentHexdump.insert(int(newDiff[num][3]), "  ")
+                        pointer += 1
+                else:
+                    if int(row[1]) < offset:
+                        pointer += int(row[2]) - offset
+                    else:
+                        pointer += int(row[2]) - int(row[1])
+            else:
+                if int(row[1]) < offset:
+                    pointer += int(row[2]) - offset
+                else:
+                    pointer += int(row[2]) - int(row[1])
+        if pointer >= pageNext:
+            break
+
+    return pOffset, testcaseHexdump, testcaseParentHexdump
+
+
+def getTestcaseHexFromFile(testcaseHexdumpFile, offset, chunksize):
+    with open(testcaseHexdumpFile, "rb") as f:
+        f.seek(offset, 0)
+        hexChunk = binascii.hexlify(f.read(chunksize)).decode('ascii')
+        hexList = [hexChunk[i:i + 2] for i in range(0, len(hexChunk), 2)]
+    return hexList
+
+
+def getTestcaseParentInfo(projId, testcaseId):
+    testcaseParentId = ""
+    testcaseParentGuid = ""
+    resultTestcaseParent = getResultOfStatement(projId, GET_TESTCASE_PARENT,
+                                             {"testcaseID": testcaseId})
+    if resultTestcaseParent is not None:
+        rows = resultTestcaseParent.fetchall()
+        for row in rows:
+            for num, x in enumerate(row):
+                if num is 0:
+                    testcaseParentId = x
+                elif num is 1:
+                    testcaseParentGuid = x
+    return testcaseParentId, testcaseParentGuid
+
+
+def deleteOldHexdumpFiles(fileNameSub):
+    for element in os.listdir("/"):
+        if fileNameSub in element and element.count(".") >= 2:
+            if (int(round(time.time())) - int(round(os.stat("/" + element).st_mtime))) / 60 > 30:
+                os.remove("/" + element)
+
+
+def getTextByHex(hexTable, split):
+    decodedData = []
+    count = 0
+    targetLen = (int(len(hexTable) / split) + (len(hexTable) % split > 0)) * split
+    for _ in range(len(hexTable), targetLen):
+        hexTable.append("  ")
+        count += 1
+
+    for b in hexTable:
+        if b == "  ":
+            decodedData.append(" ")
+        else:
+            if 0 <= int(b, 16) <= 31 or 127 <= int(b, 16) <= 159:
+                decodedText = "."
+            else:
+                decodedText = binascii.unhexlify(b).decode("latin-1", "ignore")
+            if not decodedText:
+                decodedData.append(".")
+            else:
+                decodedData.append(decodedText)
+
+    for _ in range(len(decodedData), targetLen):
+        decodedData.append(" ")
+
+    textOutputF = [hexTable[x:x + split] for x in range(0, len(hexTable), split)]
+    decodedDataF = [decodedData[x:x + split] for x in range(0, len(decodedData), split)]
+
+    return textOutputF, decodedDataF
 
 
 def getResultOfStatement(projId, stmt, params=None):
