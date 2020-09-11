@@ -137,14 +137,14 @@ UNIQUE_ACCESS_VIOLATION_NO_RAW = (
     "SELECT av.ID, av.CrashFootprint, av.TestCaseType, av.CreatorServiceDescriptorGUID, av.CreatorLocalID, av.Rating, "
 	"av.TimeOfInsertion, cbc.CoveredBlocks, nn.NiceName, nnmi.NiceName as NiceNameMI "
     "FROM (SELECT cd.CrashFootprint, it.TestCaseType, it.CreatorServiceDescriptorGUID, it.CreatorLocalID, "
-	"MIN(it.TimeOfInsertion) as TimeOfInsertion, it.ID, count(cd.CrashFootprint) as Rating "
-	"FROM interesting_testcases AS it "
-	"JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
-	"WHERE it.TestCaseType=2 "
-	"Group by cd.CrashFootprint) as av "
+            "MIN(it.TimeOfInsertion) as TimeOfInsertion, it.ID, count(cd.CrashFootprint) as Rating "
+            "FROM interesting_testcases AS it "
+            "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
+            "WHERE it.TestCaseType=2 "
+            "Group by cd.CrashFootprint) as av "
     "LEFT JOIN nice_names_managed_instance as nnmi on av.CreatorServiceDescriptorGUID = nnmi.ServiceDescriptorGUID "
     "LEFT JOIN nice_names_testcase AS nn ON (av.CreatorServiceDescriptorGUID = nn.CreatorServiceDescriptorGUID AND av.CreatorLocalID = nn.CreatorLocalID) "
-    "LEFT JOIN (SELECT CreatorTestcaseID, COUNT(*) AS CoveredBlocks FROM covered_blocks GROUP BY CreatorTestcaseID) as cbc on it.CreatorLocalID = cbc.CreatorTestcaseID "
+    "LEFT JOIN (SELECT CreatorTestcaseID, COUNT(*) AS CoveredBlocks FROM covered_blocks GROUP BY CreatorTestcaseID) as cbc on av.CreatorLocalID = cbc.CreatorTestcaseID "
     "ORDER BY av.TimeOfInsertion asc;")
 
 NUM_UNIQUE_CRASH = (
@@ -171,15 +171,15 @@ UNIQUE_CRASHES_NO_RAW = (
     "SELECT oc.ID, oc.CrashFootprint, oc.TestCaseType, oc.CreatorServiceDescriptorGUID, oc.CreatorLocalID, oc.Rating, "
     "oc.TimeOfInsertion, cbc.CoveredBlocks, nn.NiceName, nnmi.NiceName as NiceNameMI "
     "FROM (SELECT cd.CrashFootprint, it.TestCaseType, it.CreatorServiceDescriptorGUID, it.CreatorLocalID, "
-    "MIN(it.TimeOfInsertion) as TimeOfInsertion, it.ID, count(cd.CrashFootprint) as Rating "
-    "FROM interesting_testcases AS it "
-    "JOIN crash_descriptions AS cd "
-    "ON it.ID = cd.CreatorTestcaseID "
-    "WHERE TestCaseType=3 "
-    "GROUP BY cd.CrashFootprint) as oc "
+            "MIN(it.TimeOfInsertion) as TimeOfInsertion, it.ID, count(cd.CrashFootprint) as Rating "
+            "FROM interesting_testcases AS it "
+            "JOIN crash_descriptions AS cd "
+            "ON it.ID = cd.CreatorTestcaseID "
+            "WHERE TestCaseType=3 "
+            "GROUP BY cd.CrashFootprint) as oc "
     "LEFT JOIN nice_names_managed_instance as nnmi on oc.CreatorServiceDescriptorGUID = nnmi.ServiceDescriptorGUID "
     "LEFT JOIN nice_names_testcase AS nn ON (oc.CreatorServiceDescriptorGUID = nn.CreatorServiceDescriptorGUID AND oc.CreatorLocalID = nn.CreatorLocalID) "
-    "LEFT JOIN (SELECT CreatorTestcaseID, COUNT(*) AS CoveredBlocks FROM covered_blocks GROUP BY CreatorTestcaseID) as cbc on it.CreatorLocalID = cbc.CreatorTestcaseID "
+    "LEFT JOIN (SELECT CreatorTestcaseID, COUNT(*) AS CoveredBlocks FROM covered_blocks GROUP BY CreatorTestcaseID) as cbc on oc.CreatorLocalID = cbc.CreatorTestcaseID "
     "ORDER BY oc.TimeOfInsertion asc;")
 
 MANAGED_INSTANCES_HOST_AND_PORT_AGENT_TYPE = (
