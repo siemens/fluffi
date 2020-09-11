@@ -1207,8 +1207,7 @@ def viewCoverageDiff():
     testcaseId = request.json.get("testcaseId", None)       
     
     if projId and testcaseId:
-        coverageTestcase, coverageParent = getCoverageDiffData(projId, testcaseId)
-        data = {"status": "OK", "coverageTestcase": coverageTestcase, "coverageParent": coverageParent} 
+        data = getCoverageDiffData(projId, testcaseId)
     else:
         data = {"status": "ERROR", "message": "Project Id or testcase Id missing!"}  
                              

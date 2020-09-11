@@ -22,6 +22,7 @@ DEALINGS IN THE SOFTWARE.
 Author(s): Junes Najah
 */
 
+
 function loadCoverageDiff(projId, testcaseId, loopIndex) {
     const data = {projId, testcaseId};
 
@@ -31,14 +32,25 @@ function loadCoverageDiff(projId, testcaseId, loopIndex) {
         data: JSON.stringify(data),
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
-        success: function(response) {
+        success: function(response) {            
             if (response.status === "OK"){
-                response.coverageTestcase.forEach(function(elem){
-                    $("#coverageDiffTestcase" + loopIndex).append("<p>" + elem.moduleName + ": " + elem.coveredBlocks + "</p>");
-                });  
-                response.coverageParent.forEach(function(elem){
-                    $("#coverageDiffParent" + loopIndex).append("<p>" + elem.moduleName + ": " + elem.coveredBlocks + "</p>");
-                });              
+
+                if ($("#coverageDiffTestcase" + loopIndex).children().length == 1) {
+                    response.coverageTestcase.forEach(function(elem){                    
+                        $("#coverageDiffTestcase" + loopIndex).append("<p>" + elem.moduleName + ": " + elem.coveredBlocks + "</p>");                    
+                    });  
+                }
+
+                if ($("#coverageDiffParent" + loopIndex).children().length == 0) {
+                    $("#coverageDiffParent" + loopIndex).append("<h4>Coverage of parent " + response.parentNiceName + "</h4>");
+                    response.coverageParent.forEach(function(elem){
+                        $("#coverageDiffParent" + loopIndex).append("<p>" + elem.moduleName + ": " + elem.coveredBlocks + "</p>");
+                    });
+                }  
+
+                $("#loader" + loopIndex).css('display', 'none');
+                $("#coverageDiffTestcase" + loopIndex).css('visibility', 'visible');          
+                $("#coverageDiffParent" + loopIndex).css('visibility', 'visible');    
             } else {
                 console.log(response["message"]);
             }

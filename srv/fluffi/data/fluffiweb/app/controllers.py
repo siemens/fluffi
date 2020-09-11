@@ -1775,7 +1775,7 @@ def getCoverageData(projId):
 
 def getCoverageDiffData(projId, testcaseId):
     coverageTestcase = []
-    coverageParent = []
+    coverageParent = []    
     
     try:
         project = models.Fuzzjob.query.filter_by(ID = projId).first()
@@ -1785,14 +1785,17 @@ def getCoverageDiffData(projId, testcaseId):
         connection = engine.connect()
         
         data = { "ID": testcaseId }
-        statement = text(GET_CREATOR_LOCAL_ID_AND_PARENT)
+        statement = text(GET_TESTCASE_AND_PARENT)
         result = connection.execute(statement, data).fetchone()
         
         creatorLocalID = result["CreatorLocalID"]
-        parentLocalID = result["ParentLocalID"]
-        print(creatorLocalID)
-        print(parentLocalID)
-                
+        parentLocalID = result["ParentLocalID"]  
+        
+        if result["ParentNiceName"] is not None:   
+            parentNiceName = result["ParentNiceName"]    
+        else:
+            parentNiceName = "{}:{}".format(result["ParentServiceDescriptorGUID"], result["ParentLocalID"])   
+            
         data = { "ctID": creatorLocalID }
         statement = text(GET_COVERED_BLOCKS_OF_TESTCASE_FOR_EVERY_MODULDE)
         result = connection.execute(statement, data)        
@@ -1813,9 +1816,11 @@ def getCoverageDiffData(projId, testcaseId):
         connection.close()
         engine.dispose()
     except Exception as e:
-        print(e)    
+        print(e)
         
-    return coverageTestcase, coverageParent
+    coverageDiffData = { "coverageTestcase": coverageTestcase, "coverageParent": coverageParent, "parentNiceName": parentNiceName, "status": "OK" }       
+        
+    return coverageDiffData
 
 class DownloadArchiveLockFile:
     file_path = "/download.lock"

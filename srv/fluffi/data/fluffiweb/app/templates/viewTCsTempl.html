@@ -150,8 +150,11 @@ Author(s): Pascal Eckmann, Junes Najah, Thomas Riedmaier
                         <p>Coverage of testcase {{ testcase.niceName }} and parent</p>
                     </div>
                     <div class="modal-body">
-                        <div id="coverageDiffTestcase{{loop.index}}" style="margin-bottom: 25px;"><h4>Coverage of {{ testcase.niceName }}</h4></div>
-                        <div id="coverageDiffParent{{loop.index}}"><h4>Coverage of Parent</h4></div>
+                        <div id="loader{{loop.index}}" class="modal-loader"></div>
+                        <div id="coverageDiffTestcase{{loop.index}}" style="margin-bottom: 25px; visibility: hidden;">
+                            <h4>Coverage of testcase{{ testcase.niceName }}</h4>
+                        </div>
+                        <div id="coverageDiffParent{{loop.index}}" style="margin-bottom: 25px; visibility: hidden;"></div>
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-default" data-dismiss="modal" type="button">Close</button>
