@@ -22,6 +22,10 @@ DEALINGS IN THE SOFTWARE.
 Author(s): Junes Najah
 */
 
+const TC_CONTAINER_ID = "#testcaseCovContainer";
+const OVERLAP_CONTAINER_ID = "#overlapCoverageContainer";
+const PARENT_CONTAINER_ID = "#parentCoverageContainer";
+
 
 function loadCoverageDiff(projId, testcaseId, loopIndex) {
     const data = {projId, testcaseId};
@@ -33,24 +37,27 @@ function loadCoverageDiff(projId, testcaseId, loopIndex) {
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
         success: function(response) {            
-            if (response.status === "OK"){
-
-                if ($("#coverageDiffTestcase" + loopIndex).children().length == 1) {
-                    response.coverageTestcase.forEach(function(elem){                    
-                        $("#coverageDiffTestcase" + loopIndex).append("<p>" + elem.moduleName + ": " + elem.coveredBlocks + "</p>");                    
+            if (response.status === "OK"){                
+                
+                if ($(TC_CONTAINER_ID + loopIndex).children().length == 1) {
+                    response.coverageTestcase.forEach(function(elem){  
+                        var style = response.overlapModuleNames.includes(elem.moduleName) ? "style='color:red;'" : "";
+                        $(TC_CONTAINER_ID + loopIndex).append("<p " + style + ">" + elem.moduleName + ": " + elem.coveredBlocks + "</p>");                                                            
                     });  
-                }
+                }                
 
-                if ($("#coverageDiffParent" + loopIndex).children().length == 0) {
-                    $("#coverageDiffParent" + loopIndex).append("<h4>Coverage of parent " + response.parentNiceName + "</h4>");
+                if ($(PARENT_CONTAINER_ID + loopIndex).children().length == 0) {
+                    $(PARENT_CONTAINER_ID + loopIndex).append("<h4>Covered Blocks of parent " + response.parentNiceName + "</h4>");                    
                     response.coverageParent.forEach(function(elem){
-                        $("#coverageDiffParent" + loopIndex).append("<p>" + elem.moduleName + ": " + elem.coveredBlocks + "</p>");
+                        var style = response.overlapModuleNames.includes(elem.moduleName) ? "style='color:red;'" : "";
+                        $(PARENT_CONTAINER_ID + loopIndex).append("<p " + style + ">" + elem.moduleName + ": " + elem.coveredBlocks + "</p>");
                     });
                 }  
 
                 $("#loader" + loopIndex).css('display', 'none');
-                $("#coverageDiffTestcase" + loopIndex).css('visibility', 'visible');          
-                $("#coverageDiffParent" + loopIndex).css('visibility', 'visible');    
+                $(TC_CONTAINER_ID + loopIndex).css('visibility', 'visible');          
+                $(OVERLAP_CONTAINER_ID + loopIndex).css('visibility', 'visible');          
+                $(PARENT_CONTAINER_ID + loopIndex).css('visibility', 'visible');    
             } else {
                 console.log(response["message"]);
             }

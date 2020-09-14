@@ -1775,8 +1775,11 @@ def getCoverageData(projId):
 
 def getCoverageDiffData(projId, testcaseId):
     coverageTestcase = []
-    coverageParent = []    
+    coverageParent = [] 
     
+    moduleNamesOfTc = []   
+    overlapModuleNames = []  
+         
     try:
         project = models.Fuzzjob.query.filter_by(ID = projId).first()
         
@@ -1798,11 +1801,14 @@ def getCoverageDiffData(projId, testcaseId):
             
         data = { "ctID": creatorLocalID }
         statement = text(GET_COVERED_BLOCKS_OF_TESTCASE_FOR_EVERY_MODULDE)
-        result = connection.execute(statement, data)        
+        result = connection.execute(statement, data)   
+                  
         for row in result:
             moduleName = row["ModuleName"] if row["ModuleName"] is not None else ""
+            if moduleName:
+                moduleNamesOfTc.append(moduleName)                
             coveredBlocks = row["CoveredBlocks"] if row["CoveredBlocks"] is not None else 0
-            coverageTestcase.append({ "moduleName": moduleName, "coveredBlocks": coveredBlocks })    
+            coverageTestcase.append({ "moduleName": moduleName, "coveredBlocks": coveredBlocks })              
             
             
         data = { "ctID": parentLocalID }
@@ -1810,6 +1816,8 @@ def getCoverageDiffData(projId, testcaseId):
         result = connection.execute(statement, data)          
         for row in result:
             moduleName = row["ModuleName"] if row["ModuleName"] is not None else ""
+            if moduleName in moduleNamesOfTc:
+                overlapModuleNames.append(moduleName)
             coveredBlocks = row["CoveredBlocks"] if row["CoveredBlocks"] is not None else 0
             coverageParent.append({ "moduleName": moduleName, "coveredBlocks": coveredBlocks })   
                         
@@ -1817,11 +1825,14 @@ def getCoverageDiffData(projId, testcaseId):
         engine.dispose()
     except Exception as e:
         print(e)
+            
+    return {
+        "coverageTestcase": coverageTestcase, 
+        "coverageParent": coverageParent, 
+        "overlapModuleNames": overlapModuleNames,
+        "parentNiceName": parentNiceName, 
+        "status": "OK"}       
         
-    coverageDiffData = { "coverageTestcase": coverageTestcase, "coverageParent": coverageParent, "parentNiceName": parentNiceName, "status": "OK" }       
-        
-    return coverageDiffData
-
 class DownloadArchiveLockFile:
     file_path = "/download.lock"
     tmp_path = "/downloadTemp"
