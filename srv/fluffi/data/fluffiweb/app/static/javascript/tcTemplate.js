@@ -37,7 +37,7 @@ function addSinglePage(i, actualPage){
     }else if(i == "..."){
         $(singlePage).addClass('single_page_dots');
     }else{
-        link = "{{base_link}}" + i.toString()
+        link = i.toString()
         $(singlePage).addClass('single_page_inactive');
         $(singlePage).addClass("link_" + i.toString());
     }
