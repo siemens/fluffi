@@ -1790,28 +1790,30 @@ def getCoverageDiffData(projId, testcaseId):
         statement = text(GET_TESTCASE_AND_PARENT)
         result = connection.execute(statement, data).fetchone()
         
-        creatorLocalID = result["CreatorLocalID"]
-        parentLocalID = result["ParentLocalID"]                  
+        parentLocalID = result["ParentLocalID"]
+        parentSdGuid = result["ParentServiceDescriptorGUID"]                  
         
         if result["ParentNiceName"] is not None:   
             parentNiceName = result["ParentNiceName"]    
         else:
-            parentNiceName = "{}:{}".format(result["ParentServiceDescriptorGUID"], result["ParentLocalID"])   
+            parentNiceName = "{}:{}".format(parentSdGuid, parentLocalID)   
         
-        data = { "ctID": creatorLocalID }
-        statement = text(GET_COVERED_BLOCKS_OF_TESTCASE_FOR_EVERY_MODULDE)
+        data = { "ctID": testcaseId }
+        statement = text(GET_COVERED_BLOCKS_OF_TESTCASE_FOR_EVERY_MODULE)
         result = connection.execute(statement, data)   
-                  
+
         for row in result:
             moduleName = row["ModuleName"] if row["ModuleName"] is not None else ""
             if moduleName:
                 moduleNamesOfTc.append(moduleName)                
             coveredBlocks = row["CoveredBlocks"] if row["CoveredBlocks"] is not None else 0
             coverageTestcase.append({ "moduleName": moduleName, "coveredBlocks": coveredBlocks })              
-            
-            
-        data = { "ctID": parentLocalID }
-        statement = text(GET_COVERED_BLOCKS_OF_TESTCASE_FOR_EVERY_MODULDE)
+                    
+        result = connection.execute(text(GET_PARENT_ID), { "parentID": parentLocalID, "parentSdGuid": parentSdGuid }).fetchone()            
+        parentID = result["ID"] if result["ID"] is not None else 0 
+               
+        data = { "ctID": parentID }
+        statement = text(GET_COVERED_BLOCKS_OF_TESTCASE_FOR_EVERY_MODULE)
         result = connection.execute(statement, data)          
         for row in result:
             moduleName = row["ModuleName"] if row["ModuleName"] is not None else ""
@@ -1823,8 +1825,10 @@ def getCoverageDiffData(projId, testcaseId):
         connection.close()
         engine.dispose()
     except Exception as e:
-        print(e)
-            
+        print(e) 
+          
+    print(coverageTestcase)  
+    print(coverageParent)  
     return {
         "coverageTestcase": coverageTestcase, 
         "coverageParent": coverageParent, 

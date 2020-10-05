@@ -37,18 +37,20 @@ GET_SETTINGS = (
 GET_RUNNERTYPE = (
     "SELECT SettingValue FROM settings WHERE SettingName='runnerType'")
 GET_TESTCASE_AND_PARENT = (
-    "SELECT  it.CreatorLocalID, it.ParentServiceDescriptorGUID, it.ParentLocalID, nn.NiceName, pnn.NiceName AS ParentNiceName "
+    "SELECT it.ParentLocalID, it.ParentServiceDescriptorGUID, pnn.NiceName AS ParentNiceName "
     "FROM interesting_testcases AS it "
-    "LEFT JOIN nice_names_testcase AS nn ON nn.CreatorLocalID = it.CreatorLocalID "
     "LEFT JOIN nice_names_testcase AS pnn ON pnn.CreatorLocalID = it.ParentLocalID "
     "WHERE it.ID=:ID;")
+GET_PARENT_ID = (
+    "SELECT ID FROM interesting_testcases "
+    "WHERE CreatorLocalID=:parentID AND ParentServiceDescriptorGUID=:parentSdGuid;")
 GET_COUNT_OF_COVERED_BLOCKS = (
     "SELECT COUNT(DISTINCT ModuleID, Offset) AS CoveredBlocks FROM covered_blocks")
 GET_TARGET_MODULES = (
     "SELECT tm.ID, tm.ModuleName, tm.ModulePath, cbc.CoveredBlocks "
     "FROM target_modules AS tm "
     "LEFT JOIN (SELECT ModuleID, COUNT(DISTINCT ModuleID, Offset) AS CoveredBlocks FROM covered_blocks GROUP BY ModuleID) as cbc ON tm.ID = cbc.ModuleID ORDER BY CoveredBlocks DESC;")
-GET_COVERED_BLOCKS_OF_TESTCASE_FOR_EVERY_MODULDE = (
+GET_COVERED_BLOCKS_OF_TESTCASE_FOR_EVERY_MODULE = (
     "SELECT tm.ModuleName, COUNT(*) AS CoveredBlocks "
     "FROM target_modules AS tm "
     "LEFT JOIN covered_blocks as cb ON tm.ID = cb.ModuleID "
@@ -156,7 +158,7 @@ UNIQUE_ACCESS_VIOLATION_NO_RAW = (
             "Group by cd.CrashFootprint) as av "
     "LEFT JOIN nice_names_managed_instance as nnmi on av.CreatorServiceDescriptorGUID = nnmi.ServiceDescriptorGUID "
     "LEFT JOIN nice_names_testcase AS nn ON (av.CreatorServiceDescriptorGUID = nn.CreatorServiceDescriptorGUID AND av.CreatorLocalID = nn.CreatorLocalID) "
-    "LEFT JOIN (SELECT CreatorTestcaseID, COUNT(DISTINCT ModuleID, Offset) AS CoveredBlocks FROM covered_blocks GROUP BY CreatorTestcaseID) as cbc on av.CreatorLocalID = cbc.CreatorTestcaseID "
+    "LEFT JOIN (SELECT CreatorTestcaseID, COUNT(DISTINCT ModuleID, Offset) AS CoveredBlocks FROM covered_blocks GROUP BY CreatorTestcaseID) as cbc on av.ID = cbc.CreatorTestcaseID "
     "ORDER BY av.TimeOfInsertion asc;")
 
 NUM_UNIQUE_CRASH = (
@@ -191,7 +193,7 @@ UNIQUE_CRASHES_NO_RAW = (
             "GROUP BY cd.CrashFootprint) as oc "
     "LEFT JOIN nice_names_managed_instance as nnmi on oc.CreatorServiceDescriptorGUID = nnmi.ServiceDescriptorGUID "
     "LEFT JOIN nice_names_testcase AS nn ON (oc.CreatorServiceDescriptorGUID = nn.CreatorServiceDescriptorGUID AND oc.CreatorLocalID = nn.CreatorLocalID) "
-    "LEFT JOIN (SELECT CreatorTestcaseID, COUNT(DISTINCT ModuleID, Offset) AS CoveredBlocks FROM covered_blocks GROUP BY CreatorTestcaseID) as cbc on oc.CreatorLocalID = cbc.CreatorTestcaseID "
+    "LEFT JOIN (SELECT CreatorTestcaseID, COUNT(DISTINCT ModuleID, Offset) AS CoveredBlocks FROM covered_blocks GROUP BY CreatorTestcaseID) as cbc on oc.ID = cbc.CreatorTestcaseID "
     "ORDER BY oc.TimeOfInsertion asc;")
 
 MANAGED_INSTANCES_HOST_AND_PORT_AGENT_TYPE = (
@@ -337,7 +339,8 @@ def getITQueryOfType(n):
         "FROM interesting_testcases AS it "
         "LEFT JOIN nice_names_testcase AS nn ON (it.CreatorServiceDescriptorGUID = nn.CreatorServiceDescriptorGUID AND  it.CreatorLocalID = nn.CreatorLocalID) "
         "LEFT JOIN nice_names_managed_instance as nnmi on it.CreatorServiceDescriptorGUID = nnmi.ServiceDescriptorGUID "
-        "LEFT JOIN (SELECT CreatorTestcaseID, COUNT(DISTINCT ModuleID, Offset) AS CoveredBlocks FROM covered_blocks GROUP BY CreatorTestcaseID) as cbc on it.CreatorLocalID = cbc.CreatorTestcaseID "
+        "LEFT JOIN (SELECT CreatorTestcaseID, COUNT(DISTINCT ModuleID, Offset) AS CoveredBlocks FROM covered_blocks GROUP BY CreatorTestcaseID) as cbc "
+        "on it.ID = cbc.CreatorTestcaseID "
         "WHERE TestCaseType={};".format(n)
     )
 
@@ -349,7 +352,7 @@ def getITQueryOfTypeNoRaw(n):
         "FROM interesting_testcases AS it "
         "LEFT JOIN nice_names_testcase AS nn ON (it.CreatorServiceDescriptorGUID = nn.CreatorServiceDescriptorGUID AND  it.CreatorLocalID = nn.CreatorLocalID) "
         "LEFT JOIN nice_names_managed_instance as nnmi on it.CreatorServiceDescriptorGUID = nnmi.ServiceDescriptorGUID "
-        "LEFT JOIN (SELECT CreatorTestcaseID, COUNT(DISTINCT ModuleID, Offset) AS CoveredBlocks FROM covered_blocks GROUP BY CreatorTestcaseID) as cbc on it.CreatorLocalID = cbc.CreatorTestcaseID "
+        "LEFT JOIN (SELECT CreatorTestcaseID, COUNT(DISTINCT ModuleID, Offset) AS CoveredBlocks FROM covered_blocks GROUP BY CreatorTestcaseID) as cbc on it.ID = cbc.CreatorTestcaseID "
         "WHERE TestCaseType={};".format(n)
     )
 
