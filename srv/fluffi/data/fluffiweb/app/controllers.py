@@ -195,8 +195,8 @@ def getProject(projId):
         project.numPopulation = result.fetchone()[0]
         
         result = connection.execute(getLatestTestcaseOfType(0))
-        dateTimeOfLatestPopulation = result.fetchone()[0]        
-        timeOfLatestPopulation = dateTimeOfLatestPopulation.strftime("%H:%M - %d.%m.%Y")      
+        dateTimeOfLatestPopulation = result.fetchone()[0]               
+        timeOfLatestPopulation = dateTimeOfLatestPopulation.strftime("%H:%M - %d.%m.%Y") if dateTimeOfLatestPopulation is not None else ""
         project.timeOfLatestPopulation = timeOfLatestPopulation
 
         result = connection.execute(getITCountOfTypeQuery(5))
@@ -361,9 +361,8 @@ def updateInfoHandler(projId, infoType):
         if infoType == "timeOfLatestPopulation":        
             result = connection.execute(getLatestTestcaseOfType(0))
             dateTimeOfLatestPopulation = result.fetchone()[0]               
-            info = dateTimeOfLatestPopulation.strftime("%H:%M - %d.%m.%Y")  
+            info = dateTimeOfLatestPopulation.strftime("%H:%M - %d.%m.%Y") if dateTimeOfLatestPopulation is not None else ""
         # other infos can be added here
-        # else: 
         
         msg = "Success"    
         status = "OK" 
@@ -1792,13 +1791,13 @@ def getCoverageDiffData(projId, testcaseId):
         result = connection.execute(statement, data).fetchone()
         
         creatorLocalID = result["CreatorLocalID"]
-        parentLocalID = result["ParentLocalID"]  
+        parentLocalID = result["ParentLocalID"]                  
         
         if result["ParentNiceName"] is not None:   
             parentNiceName = result["ParentNiceName"]    
         else:
             parentNiceName = "{}:{}".format(result["ParentServiceDescriptorGUID"], result["ParentLocalID"])   
-            
+        
         data = { "ctID": creatorLocalID }
         statement = text(GET_COVERED_BLOCKS_OF_TESTCASE_FOR_EVERY_MODULDE)
         result = connection.execute(statement, data)   

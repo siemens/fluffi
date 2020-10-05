@@ -125,9 +125,11 @@ Author(s): Pascal Eckmann, Junes Najah, Thomas Riedmaier
             {% endif %}
             <td>
                 {{ testcase.coveredBlocks }} 
+                {% if testcase.coveredBlocks > 0 %}
                 <button class="btn btn-default btn-desgin" data-target="#modalCoverageDiff{{loop.index}}" data-toggle="modal" type="button" onclick="loadCoverageDiff({{ data.project.ID }}, {{ testcase.testcaseID }}, {{loop.index}})">
                     <span class="glyphicon glyphicon-info-sign"></span>
                 </button>
+                {% endif %}
             </td>
             <td>{{ testcase.timeOfInsertion | default('', True) }}</td>
             <td>
@@ -154,7 +156,7 @@ Author(s): Pascal Eckmann, Junes Najah, Thomas Riedmaier
                         <div class="row">
                             <div class="col-md-6">
                                 <div id="testcaseCovContainer{{loop.index}}" style="margin-bottom: 25px; visibility: hidden;">
-                                    <h4>Covered Blocks of testcase{{ testcase.niceName }}</h4>                                    
+                                    <h4>Covered Blocks of testcase {{ testcase.niceName }}</h4>                                    
                                 </div>
                             </div>                            
                             <div class="col-md-6">                                
