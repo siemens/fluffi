@@ -36,8 +36,12 @@ GET_SETTINGS = (
     "SELECT ID, SettingName, SettingValue FROM settings")
 GET_RUNNERTYPE = (
     "SELECT SettingValue FROM settings WHERE SettingName='runnerType'")
+GET_COUNT_OF_COVERED_BLOCKS = (
+    "SELECT COUNT(DISTINCT ModuleID, Offset) AS CoveredBlocks FROM covered_blocks")
 GET_TARGET_MODULES = (
-    "SELECT ID, ModuleName, ModulePath FROM target_modules")
+    "SELECT tm.ID, tm.ModuleName, tm.ModulePath, cbc.CoveredBlocks "
+    "FROM target_modules AS tm "
+    "LEFT JOIN (SELECT ModuleID, COUNT(DISTINCT ModuleID, Offset) AS CoveredBlocks FROM covered_blocks GROUP BY ModuleID) as cbc ON tm.ID = cbc.ModuleID ORDER BY CoveredBlocks DESC;")
 DELETE_TESTCASES = (
     "DELETE FROM interesting_testcases WHERE CreatorServiceDescriptorGUID <> 'initial'")
 RESET_RATING = (
@@ -131,15 +135,16 @@ UNIQUE_ACCESS_VIOLATION = (
 
 UNIQUE_ACCESS_VIOLATION_NO_RAW = (
     "SELECT av.ID, av.CrashFootprint, av.TestCaseType, av.CreatorServiceDescriptorGUID, av.CreatorLocalID, av.Rating, "
-	"av.TimeOfInsertion, nn.NiceName, nnmi.NiceName as NiceNameMI "
+	"av.TimeOfInsertion, cbc.CoveredBlocks, nn.NiceName, nnmi.NiceName as NiceNameMI "
     "FROM (SELECT cd.CrashFootprint, it.TestCaseType, it.CreatorServiceDescriptorGUID, it.CreatorLocalID, "
-	"MIN(it.TimeOfInsertion) as TimeOfInsertion, it.ID, count(cd.CrashFootprint) as Rating "
-	"FROM interesting_testcases AS it "
-	"JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
-	"WHERE it.TestCaseType=2 "
-	"Group by cd.CrashFootprint) as av "
+            "MIN(it.TimeOfInsertion) as TimeOfInsertion, it.ID, count(cd.CrashFootprint) as Rating "
+            "FROM interesting_testcases AS it "
+            "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
+            "WHERE it.TestCaseType=2 "
+            "Group by cd.CrashFootprint) as av "
     "LEFT JOIN nice_names_managed_instance as nnmi on av.CreatorServiceDescriptorGUID = nnmi.ServiceDescriptorGUID "
-    "LEFT JOIN nice_names_testcase AS nn ON (av.CreatorServiceDescriptorGUID = nn.CreatorServiceDescriptorGUID AND  av.CreatorLocalID = nn.CreatorLocalID) "
+    "LEFT JOIN nice_names_testcase AS nn ON (av.CreatorServiceDescriptorGUID = nn.CreatorServiceDescriptorGUID AND av.CreatorLocalID = nn.CreatorLocalID) "
+    "LEFT JOIN (SELECT CreatorTestcaseID, COUNT(DISTINCT ModuleID, Offset) AS CoveredBlocks FROM covered_blocks GROUP BY CreatorTestcaseID) as cbc on av.ID = cbc.CreatorTestcaseID "
     "ORDER BY av.TimeOfInsertion asc;")
 
 NUM_UNIQUE_CRASH = (
@@ -164,16 +169,17 @@ UNIQUE_CRASHES = (
 
 UNIQUE_CRASHES_NO_RAW = (
     "SELECT oc.ID, oc.CrashFootprint, oc.TestCaseType, oc.CreatorServiceDescriptorGUID, oc.CreatorLocalID, oc.Rating, "
-    "oc.TimeOfInsertion, nn.NiceName, nnmi.NiceName as NiceNameMI "
+    "oc.TimeOfInsertion, cbc.CoveredBlocks, nn.NiceName, nnmi.NiceName as NiceNameMI "
     "FROM (SELECT cd.CrashFootprint, it.TestCaseType, it.CreatorServiceDescriptorGUID, it.CreatorLocalID, "
-    "MIN(it.TimeOfInsertion) as TimeOfInsertion, it.ID, count(cd.CrashFootprint) as Rating "
-    "FROM interesting_testcases AS it "
-    "JOIN crash_descriptions AS cd "
-    "ON it.ID = cd.CreatorTestcaseID "
-    "WHERE TestCaseType=3 "
-    "GROUP BY cd.CrashFootprint) as oc "
+            "MIN(it.TimeOfInsertion) as TimeOfInsertion, it.ID, count(cd.CrashFootprint) as Rating "
+            "FROM interesting_testcases AS it "
+            "JOIN crash_descriptions AS cd "
+            "ON it.ID = cd.CreatorTestcaseID "
+            "WHERE TestCaseType=3 "
+            "GROUP BY cd.CrashFootprint) as oc "
     "LEFT JOIN nice_names_managed_instance as nnmi on oc.CreatorServiceDescriptorGUID = nnmi.ServiceDescriptorGUID "
     "LEFT JOIN nice_names_testcase AS nn ON (oc.CreatorServiceDescriptorGUID = nn.CreatorServiceDescriptorGUID AND oc.CreatorLocalID = nn.CreatorLocalID) "
+    "LEFT JOIN (SELECT CreatorTestcaseID, COUNT(DISTINCT ModuleID, Offset) AS CoveredBlocks FROM covered_blocks GROUP BY CreatorTestcaseID) as cbc on oc.ID = cbc.CreatorTestcaseID "
     "ORDER BY oc.TimeOfInsertion asc;")
 
 MANAGED_INSTANCES_HOST_AND_PORT_AGENT_TYPE = (
@@ -227,10 +233,23 @@ GET_NN_TESTCASE_RAWBYTES = (
     "ON (it.CreatorServiceDescriptorGUID = nnt.CreatorServiceDescriptorGUID AND it.CreatorLocalID = nnt.CreatorLocalID) "
     "WHERE it.CreatorServiceDescriptorGUID=:guid AND it.CreatorLocalID=:localId;")
 
-GET_TESTCASE_HEXDUMP = (
-    "SELECT HEX(SUBSTR(it.RawBytes, :offset, 320)), LENGTH(it.RawBytes) FROM interesting_testcases as it LEFT JOIN nice_names_testcase as nnt "
+GET_TESTCASE_DUMP = (
+    "SELECT SUBSTR(it.RawBytes, :offset, 960), LENGTH(it.RawBytes), it.ParentLocalID, it.ParentServiceDescriptorGUID "
+    "FROM interesting_testcases as it LEFT JOIN nice_names_testcase as nnt "
     "ON (it.CreatorServiceDescriptorGUID = nnt.CreatorServiceDescriptorGUID AND it.CreatorLocalID = nnt.CreatorLocalID) "
     "WHERE it.ID=:testcaseID ;")
+
+GET_TESTCASE_PARENT = (
+    "SELECT it.ParentLocalID, it.ParentServiceDescriptorGUID "
+    "FROM interesting_testcases as it LEFT JOIN nice_names_testcase as nnt "
+    "ON (it.CreatorServiceDescriptorGUID = nnt.CreatorServiceDescriptorGUID AND it.CreatorLocalID = nnt.CreatorLocalID) "
+    "WHERE it.ID=:testcaseID ;")
+
+GET_TESTCASE_PARENT_ID = (
+    "SELECT it.ID "
+    "FROM interesting_testcases as it LEFT JOIN nice_names_testcase as nnt "
+    "ON (it.CreatorServiceDescriptorGUID = nnt.CreatorServiceDescriptorGUID AND it.CreatorLocalID = nnt.CreatorLocalID) "
+    "WHERE it.CreatorLocalID=:parentID and it.CreatorServiceDescriptorGUID=:parentGUID;")
 
 GET_PROJECTS = (
     "SELECT"
@@ -301,22 +320,25 @@ def getITCountOfTypeQuery(n):
 
 def getITQueryOfType(n):
     return (
-        "SELECT it.ID, it.RawBytes, it.CreatorServiceDescriptorGUID, it.CreatorLocalID, it.Rating, it.TimeOfInsertion, "
+        "SELECT it.ID, it.RawBytes, it.CreatorServiceDescriptorGUID, it.CreatorLocalID, cbc.CoveredBlocks, it.Rating, it.TimeOfInsertion, "
         "nn.NiceName, nnmi.NiceName as NiceNameMI "
         "FROM interesting_testcases AS it "
         "LEFT JOIN nice_names_testcase AS nn ON (it.CreatorServiceDescriptorGUID = nn.CreatorServiceDescriptorGUID AND  it.CreatorLocalID = nn.CreatorLocalID) "
         "LEFT JOIN nice_names_managed_instance as nnmi on it.CreatorServiceDescriptorGUID = nnmi.ServiceDescriptorGUID "
+        "LEFT JOIN (SELECT CreatorTestcaseID, COUNT(DISTINCT ModuleID, Offset) AS CoveredBlocks FROM covered_blocks GROUP BY CreatorTestcaseID) as cbc "
+        "on it.ID = cbc.CreatorTestcaseID "
         "WHERE TestCaseType={};".format(n)
     )
 
 
 def getITQueryOfTypeNoRaw(n):
     return (
-        "SELECT it.ID, it.CreatorServiceDescriptorGUID, it.CreatorLocalID, it.Rating, it.TimeOfInsertion, "
+        "SELECT it.ID, it.CreatorServiceDescriptorGUID, it.CreatorLocalID, cbc.CoveredBlocks, it.Rating, it.TimeOfInsertion, "
         "nn.NiceName, nnmi.NiceName as NiceNameMI "
         "FROM interesting_testcases AS it "
         "LEFT JOIN nice_names_testcase AS nn ON (it.CreatorServiceDescriptorGUID = nn.CreatorServiceDescriptorGUID AND  it.CreatorLocalID = nn.CreatorLocalID) "
         "LEFT JOIN nice_names_managed_instance as nnmi on it.CreatorServiceDescriptorGUID = nnmi.ServiceDescriptorGUID "
+        "LEFT JOIN (SELECT CreatorTestcaseID, COUNT(DISTINCT ModuleID, Offset) AS CoveredBlocks FROM covered_blocks GROUP BY CreatorTestcaseID) as cbc on it.ID = cbc.CreatorTestcaseID "
         "WHERE TestCaseType={};".format(n)
     )
 

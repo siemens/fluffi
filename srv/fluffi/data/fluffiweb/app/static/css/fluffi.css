@@ -433,11 +433,40 @@ Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Thomas Riedmaier
     margin: 50px 0;
 }
 
+.btn-fake {
+    padding: 6px 12px;
+}
+
 #hexTable {
     font-family: monospace;
     border-collapse: collapse;
     width: 100%;
     text-align: center;
+    display: block;
+}
+
+#hexTable tbody {
+    display: block;
+    max-height: 450px;
+    overflow-y: scroll;
+    scrollbar-width: thin;
+    border: solid 1px #ddd;
+}
+
+#hexTable thead {
+    display: table;
+    width: calc( 100% - 6px);
+    table-layout:fixed;
+}
+
+#hexTable tbody tr {
+    display: table;
+    width: 100%;
+    table-layout:fixed;
+}
+
+#hexTable tr {
+    height: 20px;
 }
 
 #hexTable td, th {
@@ -448,23 +477,74 @@ Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Thomas Riedmaier
     background-color: #f1f1f1;
 }
 
-#hexTable .by {
+.by {
     background-color: #337ab7;
     color: #fff;
-    border-bottom: solid 1px #777;
 }
 
-#hexTable .br {
+.bz {
+    background-color: #1761a2;
+    color: #fff;
+    border-bottom: solid 1px #fff;
+}
+
+tbody .br {
     border-right: solid 1px #777;
 }
 
-#hexTable .br {
+thead .br {
+    border-right: solid 1px #fff;
+}
+
+.bx {
+    background: #ff9966;
     border-right: solid 1px #777;
 }
 
-#hexTable .bp {
-    padding-left: 10px;
+tbody .bp {
     border-left: solid 1px #777;
+}
+
+thead .bp {
+    border-left: solid 1px #fff;
+}
+
+[class*='hovEqual'] {
+    background: rgba(0, 200, 0, 0.2) !important;
+}
+
+[class*='hovEqual'].hovered {
+    background: rgba(0, 200, 0, 0.6) !important;
+}
+
+[class*='hovReplace'] {
+    background: rgba(215, 160, 15, 0.2) !important;
+}
+
+[class*='hovReplace'].hovered {
+    background: rgba(215, 160, 15, 0.6) !important;
+}
+
+[class*='hovDelete'] {
+    background: rgba(215, 25, 15, 0.2) !important;
+}
+
+[class*='hovDelete'].hovered {
+    background: rgba(215, 25, 15, 0.6) !important;
+}
+
+[class*='hovInsert'] {
+    background: rgba(15, 160, 215, 0.2) !important;
+}
+
+[class*='hovInsert'].hovered {
+    background: rgba(15, 160, 215, 0.6) !important;
+}
+
+#compare {
+    display: block;
+    margin-top: 10px;
+    margin-left: auto;
 }
 
 /* Safari */

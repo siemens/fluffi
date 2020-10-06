@@ -216,21 +216,23 @@ Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Thomas Riedmaier
             <thead>
             <tr>
                 <th style="text-align: left; width: 20%;">Name</th>
+                <th style="text-align: left; width: 13%;">IP</th>
                 <th style="text-align: left; width: 15%;">Status</th>
-                <th style="text-align: left; width: 15%;">Conf. Instances</th>
-                <th style="text-align: left; width: 15%;">Run. Instances</th>
-                <th style="text-align: left; width: 23%;">Location</th>
+                <th style="text-align: left; width: 10%;">Conf. Instances</th>
+                <th style="text-align: left; width: 10%;">Run. Instances</th>
+                <th style="text-align: left; width: 20%;">Location</th>
                 <th class="remove"><a class="btn btn-secondary"
                                                              href="/systems/reboot/{{ group.Name }}"
                                                              role="button"><span
                         class="glyphicon glyphicon-repeat"></span></a></th>
-                <th class="remove"><span class="glyphicon glyphicon-trash"></span></th>
+                <th class="remove"><span class="glyphicon glyphicon-trash btn-fake"></span></th>
             </tr>
             </thead>
             <tbody>
             {% for host in group.hosts %}
             <tr>
                 <td style="text-align: left; width: 20%;"><a href="/systems/view/{{ host.Name }}/{{ group.Name }}">{{ host.Name }}</a></td>
+                <td style="text-align: left; width: 13%;">{{ host.IP }}</td>
                 <td style="text-align: left; width: 15%;">{{ host.Status }}</td>
                 <td style="text-align: left; width: 15%;">
                     {{ host.InstanceCount }} {% if host.confLM > 0 %} <div class="systems-lm-text">({{host.confLM}} LM)</div> {% endif %}

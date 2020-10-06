@@ -141,7 +141,9 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
                             Download Testcase Set &raquo;</a>
                         </p>
                         <p><a class="btn btn-primary btn-lg analysis-btn" href="/static/viewPopulationGraph.html?#{{ project.ID }}"
-                              role="button">Population Graph &raquo;</a></p>
+                              role="button" target="_blank">Population Graph &raquo;</a></p>
+                        <p><a class="btn btn-primary btn-lg analysis-btn" href="/static/viewCoverageDistribution.html?#{{ project.ID }}"
+                              role="button" target="_blank">Coverage Distribution &raquo;</a></p>
                     </div>
                     <div class="col-md-6">
                         <p><a class="btn btn-primary btn-lg analysis-btn" href="/projects/diagrams/{{ project.ID }}" role="button">
@@ -441,7 +443,8 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
             <tr>
                 <th><label>Name</label></th>
                 <th><label>Path</label></th>
-                <th>Operations</th>
+                <th><label>Covered Blocks</label></th>
+                <th><label>Operations</label></th>
             </tr>
             </thead>
             <tbody>
@@ -449,6 +452,7 @@ Author(s): Junes Najah, Pascal Eckmann, Abian Blome, Thomas Riedmaier, Michael K
             <tr>
                 <td>{{ module.name }}</td>
                 <td>{{ module.path }}</td>
+                <td>{{ module.coveredBlocks }}</td>
                 <td>
                     <input class="btn btn-default" id="deleteModule{{ module.name }}{{ project.ID }}"
                             onclick="deleteModule({{ project.ID }}, {{ module.ID }})" type="button"
