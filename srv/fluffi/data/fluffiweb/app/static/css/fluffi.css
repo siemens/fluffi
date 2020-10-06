@@ -433,6 +433,10 @@ Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Thomas Riedmaier
     margin: 50px 0;
 }
 
+.btn-fake {
+    padding: 6px 12px;
+}
+
 #hexTable {
     font-family: monospace;
     border-collapse: collapse;

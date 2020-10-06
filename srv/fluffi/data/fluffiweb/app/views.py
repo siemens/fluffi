@@ -34,6 +34,7 @@ from .utils.sync import *
 import json
 import os
 import requests
+import socket
 
 lock = DownloadArchiveLockFile()
 
@@ -1344,6 +1345,14 @@ def systems():
                             h.lms = h.lms + 1
                 if not hasattr(h, 'confLM'):
                     h.confLM = 0
+                print(h.Name)
+                if hasattr(h, 'Status'):
+                    if h.Status == "OK":
+                        h.IP = str(socket.gethostbyname(h.Name))
+                    else:
+                        h.IP = "Offline"
+                else:
+                    h.IP = "---"
 
         locations = models.Locations.query.all()        
     except Exception as e:
