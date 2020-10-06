@@ -91,6 +91,7 @@ Author(s): Pascal Eckmann, Junes Najah, Thomas Riedmaier
             {% if show_occurences %}
             <th>Occurences</th>
             {% endif %}
+            <th>Covered Blocks</th>
             <th>Time Of Insertion</th>
             <th>Operations</th>
         </tr>
@@ -121,6 +122,7 @@ Author(s): Pascal Eckmann, Junes Najah, Thomas Riedmaier
             {% if show_rating or show_occurences %}
             <td>{{ testcase.rating }}</td>
             {% endif %}
+            <td>{{ testcase.coveredBlocks }}</td>
             <td>{{ testcase.timeOfInsertion | default('', True) }}</td>
             <td>
                 <button class="btn btn-default btn-desgin" data-target="#modalHexDump{{loop.index}}" data-toggle="modal" type="button" onclick="loadHexdump( {{ data.project.ID }}, {{ testcase.testcaseID }}, {{loop.index}}, 'single' )">

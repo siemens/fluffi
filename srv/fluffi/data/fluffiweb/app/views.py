@@ -1188,6 +1188,20 @@ def viewTestcaseGraph(projId):
     return json.dumps(graphdata)
 
 
+@app.route("/projects/<int:projId>/coverageDistribution", methods=["GET"])
+def viewCoverageDistribution(projId):
+    coverageData = getCoverageData(projId)                    
+    
+    return json.dumps({"data": coverageData})
+
+
+@app.route("/projects/coverageDistribution", methods=["GET"])
+def viewCoverageDistributionAll():
+    allCoverageData = getAllCoverageData()                    
+    
+    return json.dumps({"data": allCoverageData})
+
+
 @app.route("/locations/view/<int:locId>")
 @checkDBConnection
 @checkSystemsLoaded

@@ -268,6 +268,7 @@ def getProject(projId):
             module = type('', (), {})()
             module.name = row["ModuleName"]
             module.path = row["ModulePath"]
+            module.coveredBlocks = row["CoveredBlocks"] if row["CoveredBlocks"] is not None else 0
             module.ID = row["ID"]
             project.modules.append(module)
 
@@ -377,6 +378,7 @@ def updateInfoHandler(projId, infoType):
     
     return msg, info, status
 
+
 def getGeneralInformationData(projId, stmt):
     project = models.Fuzzjob.query.filter_by(ID = projId).first()
     data = type('', (), {})()
@@ -391,8 +393,13 @@ def getGeneralInformationData(projId, stmt):
         for row in result:
             testcase = type('', (), {})()
             testcase.testcaseID = row["ID"]
+            
             if "CrashFootprint" in row and row["CrashFootprint"] is not None:
-                    testcase.footprint = row["CrashFootprint"]
+                testcase.footprint = row["CrashFootprint"]
+            
+            if "CoveredBlocks" in row:
+                testcase.coveredBlocks = row["CoveredBlocks"] if row["CoveredBlocks"] is not None else 0
+                     
             testcase.ID = "{}:{}".format(row["CreatorServiceDescriptorGUID"], row["CreatorLocalID"])
             testcase.rating = row["Rating"]
             
@@ -1602,7 +1609,7 @@ def removeAgents(projId):
     
 
 def getGraphData(projId):
-    project = models.Fuzzjob.query.filter_by(ID = projId).first()
+    project = models.Fuzzjob.query.filter_by(ID=projId).first()
     graphdata = dict()
     nodes = []    
     edges = []
@@ -1666,6 +1673,104 @@ def getGraphData(projId):
     graphdata["edges"] = edges
     
     return graphdata
+
+
+MIN_RADIUS = 30
+
+def prepareAllCoverageData(coverageData, maximum):
+    """
+    Calculate radius and add it to data structure
+    Sort data by radius
+    """
+    
+    for cdObj in coverageData:
+        radius = calculateRadius(cdObj["CoveredBlocks"], maximum)
+        cdObj["radius"] = radius + 30
+    
+    sortedCoverageData = sorted(coverageData, key=lambda k: k["radius"], reverse=True)
+    
+    return sortedCoverageData
+
+
+def getAllCoverageData():
+    try:
+        projects = models.Fuzzjob.query.all()
+    except Exception as e:
+        print(e)
+        projects = []
+        
+    allCoverageData = []
+    allCoveredBlocks = []
+    
+    for project in projects:
+        try:
+            myProject = models.Fuzzjob.query.filter_by(ID = project.ID).first()
+            engine = create_engine(
+                'mysql://%s:%s@%s/%s' % (myProject.DBUser, myProject.DBPass, fluffiResolve(myProject.DBHost), myProject.DBName))
+            connection = engine.connect()
+        
+            result = connection.execute(GET_COUNT_OF_COVERED_BLOCKS).first()  
+                      
+            cd = dict()
+            cd["ID"] = myProject.ID 
+            cd["title"] = myProject.name            
+            if "CoveredBlocks" in result and result["CoveredBlocks"] is not None:
+                cd["CoveredBlocks"] = result["CoveredBlocks"]
+                allCoveredBlocks.append(result["CoveredBlocks"])
+            else:
+                cd["CoveredBlocks"] = 0
+            
+            allCoverageData.append(cd)
+            
+            connection.close()
+            engine.dispose()
+        except Exception as e:
+            print(e)
+        
+    allCoverageData = prepareAllCoverageData(allCoverageData, max(allCoveredBlocks))
+    return allCoverageData
+
+
+def getCoverageData(projId):
+    coverageData = []
+    
+    try:
+        project = models.Fuzzjob.query.filter_by(ID = projId).first()
+        
+        engine = create_engine(
+            'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
+        connection = engine.connect()
+        
+        result = connection.execute(GET_TARGET_MODULES)
+        
+        first = True 
+        maximum = 0
+        
+        for row in result:            
+            module = dict()
+            module["ID"]  = row["ID"]   
+            module["title"] = row["ModuleName"]
+            
+            if "CoveredBlocks" in row and row["CoveredBlocks"] is not None:
+                cb = row["CoveredBlocks"]
+                if first: 
+                    maximum = cb
+                    first = False
+                    
+                module["CoveredBlocks"] = cb
+                radius = calculateRadius(cb, maximum)  
+                module["radius"] = radius + MIN_RADIUS                                  
+            else:
+                module["CoveredBlocks"] = 0
+                module["radius"] = MIN_RADIUS            
+            coverageData.append(module)
+        
+        connection.close()
+        engine.dispose()
+    except Exception as e:
+        print(e)
+            
+    return coverageData
 
 
 class DownloadArchiveLockFile:
