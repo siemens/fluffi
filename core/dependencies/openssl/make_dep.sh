@@ -8,7 +8,7 @@
 #
 # Author(s): Thomas Riedmaier, Roman Bendt
 
-HREADS=$(nproc)
+THREADS=$(nproc)
 ARCH=$(file /bin/bash | awk -F',' '{print $2}' | tr -d ' ')
 
 rm -rf include
