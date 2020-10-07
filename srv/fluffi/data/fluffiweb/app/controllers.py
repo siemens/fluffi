@@ -1772,12 +1772,8 @@ def getCoverageData(projId):
     return coverageData
 
 
-def getCoverageDiffData(projId, testcaseId):
-    coverageTestcase = []
-    coverageParent = [] 
-    
-    moduleNamesOfTc = []   
-    overlapModuleNames = []  
+def getCoverageDiffData(projId, testcaseId):    
+    modules = []  
          
     try:
         project = models.Fuzzjob.query.filter_by(ID = projId).first()
@@ -1790,13 +1786,14 @@ def getCoverageDiffData(projId, testcaseId):
         statement = text(GET_TESTCASE_AND_PARENT)
         result = connection.execute(statement, data).fetchone()
         
-        parentLocalID = result["ParentLocalID"]
+        tcLocalID = result["CreatorLocalID"]
+        tcSdGuid = result["CreatorServiceDescriptorGUID"]
+        
+        parentLocalID = result["ParentLocalID"]                  
         parentSdGuid = result["ParentServiceDescriptorGUID"]                  
         
-        if result["ParentNiceName"] is not None:   
-            parentNiceName = result["ParentNiceName"]    
-        else:
-            parentNiceName = "{}:{}".format(parentSdGuid, parentLocalID)   
+        tcNiceName = result["NiceName"] if result["NiceName"] is not None else "{}:{}".format(tcSdGuid, tcLocalID)     
+        parentNiceName = result["ParentNiceName"] if result["ParentNiceName"] is not None else "{}:{}".format(parentSdGuid, parentLocalID) 
         
         data = { "ctID": testcaseId }
         statement = text(GET_COVERED_BLOCKS_OF_TESTCASE_FOR_EVERY_MODULE)
@@ -1805,36 +1802,42 @@ def getCoverageDiffData(projId, testcaseId):
         for row in result:
             moduleName = row["ModuleName"] if row["ModuleName"] is not None else ""
             if moduleName:
-                moduleNamesOfTc.append(moduleName)                
-            coveredBlocks = row["CoveredBlocks"] if row["CoveredBlocks"] is not None else 0
-            coverageTestcase.append({ "moduleName": moduleName, "coveredBlocks": coveredBlocks })              
+                coveredBlocks = row["CoveredBlocks"] if row["CoveredBlocks"] is not None else 0
+                modules.append({
+                    "moduleName": moduleName, 
+                    "data": {
+                        "tcName": tcNiceName, 
+                        "tcBlocks": coveredBlocks, 
+                        "parentName": parentNiceName
+                    }
+                })
                     
         result = connection.execute(text(GET_PARENT_ID), { "parentID": parentLocalID, "parentSdGuid": parentSdGuid }).fetchone()            
         parentID = result["ID"] if result["ID"] is not None else 0 
-               
+        print("parentID")
+        print(parentID)
         data = { "ctID": parentID }
         statement = text(GET_COVERED_BLOCKS_OF_TESTCASE_FOR_EVERY_MODULE)
         result = connection.execute(statement, data)          
         for row in result:
             moduleName = row["ModuleName"] if row["ModuleName"] is not None else ""
-            if moduleName in moduleNamesOfTc:
-                overlapModuleNames.append(moduleName)
-            coveredBlocks = row["CoveredBlocks"] if row["CoveredBlocks"] is not None else 0
-            coverageParent.append({ "moduleName": moduleName, "coveredBlocks": coveredBlocks })   
+            if moduleName:
+                coveredBlocks = row["CoveredBlocks"] if row["CoveredBlocks"] is not None else 0
+                for m in modules:
+                    if m["moduleName"] == moduleName:
+                        m["data"].update({ "parentBlocks": coveredBlocks })
+                        break
                         
         connection.close()
         engine.dispose()
     except Exception as e:
         print(e) 
           
-    print(coverageTestcase)  
-    print(coverageParent)  
+    
     return {
-        "coverageTestcase": coverageTestcase, 
-        "coverageParent": coverageParent, 
-        "overlapModuleNames": overlapModuleNames,
-        "parentNiceName": parentNiceName, 
-        "status": "OK"}       
+        "modules": modules,
+        "status": "OK"
+    }       
         
 class DownloadArchiveLockFile:
     file_path = "/download.lock"

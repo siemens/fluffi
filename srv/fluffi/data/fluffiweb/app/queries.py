@@ -37,8 +37,9 @@ GET_SETTINGS = (
 GET_RUNNERTYPE = (
     "SELECT SettingValue FROM settings WHERE SettingName='runnerType'")
 GET_TESTCASE_AND_PARENT = (
-    "SELECT it.ParentLocalID, it.ParentServiceDescriptorGUID, pnn.NiceName AS ParentNiceName "
+    "SELECT it.CreatorLocalID, it.CreatorServiceDescriptorGUID, it.ParentLocalID, it.ParentServiceDescriptorGUID, nn.NiceName, pnn.NiceName AS ParentNiceName "
     "FROM interesting_testcases AS it "
+    "LEFT JOIN nice_names_testcase AS nn ON nn.CreatorLocalID = it.CreatorLocalID "
     "LEFT JOIN nice_names_testcase AS pnn ON pnn.CreatorLocalID = it.ParentLocalID "
     "WHERE it.ID=:ID;")
 GET_PARENT_ID = (

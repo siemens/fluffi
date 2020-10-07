@@ -125,10 +125,10 @@ Author(s): Pascal Eckmann, Junes Najah, Thomas Riedmaier
             {% endif %}
             <td>
                 {{ testcase.coveredBlocks }} 
-                {% if testcase.coveredBlocks > 0 %}
-                <button class="btn btn-default btn-desgin" data-target="#modalCoverageDiff{{loop.index}}" data-toggle="modal" type="button" onclick="loadCoverageDiff({{ data.project.ID }}, {{ testcase.testcaseID }}, {{loop.index}})">
-                    <span class="glyphicon glyphicon-info-sign"></span>
-                </button>
+                {% if testcase.coveredBlocks > 0 %}                    
+                    <a href="/static/viewCoverageDiff.html?projectID={{ data.project.ID }}&testcaseID={{ testcase.testcaseID }}" target="_blank">
+                        <span class="glyphicon glyphicon-info-sign"></span>
+                    </a>
                 {% endif %}
             </td>
             <td>{{ testcase.timeOfInsertion | default('', True) }}</td>
@@ -144,32 +144,6 @@ Author(s): Pascal Eckmann, Junes Najah, Thomas Riedmaier
                 </button>
             </td>
         </tr>
-
-        <div class="modal fade" id="modalCoverageDiff{{loop.index}}" role="dialog">
-            <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <p>Coverage Diff of testcase {{ testcase.niceName }} and parent</p>
-                    </div>
-                    <div class="modal-body">
-                        <div id="loader{{loop.index}}" class="modal-loader"></div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div id="testcaseCovContainer{{loop.index}}" style="margin-bottom: 25px; visibility: hidden;">
-                                    <h4>Covered Blocks of testcase {{ testcase.niceName }}</h4>                                    
-                                </div>
-                            </div>                            
-                            <div class="col-md-6">                                
-                                <div id="parentCoverageContainer{{loop.index}}" style="margin-bottom: 25px; visibility: hidden;"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-default" data-dismiss="modal" type="button">Close</button>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <div class="modal fade" id="modalHexDump{{loop.index}}" role="dialog">
             <div class="modal-dialog modal-lg" role="document">

@@ -22,13 +22,25 @@ DEALINGS IN THE SOFTWARE.
 Author(s): Junes Najah
 */
 
-const TC_CONTAINER_ID = "#testcaseCovContainer";
-const OVERLAP_CONTAINER_ID = "#overlapCoverageContainer";
-const PARENT_CONTAINER_ID = "#parentCoverageContainer";
+const MODULES_CONTAINER_ID = "#ModulesContainer";
 
 
-function loadCoverageDiff(projId, testcaseId, loopIndex) {
-    const data = {projId, testcaseId};
+function getTableRow(row){
+    return "<tr><td>" + row.tcName + ": " + row.tcBlocks + "</td><td>" + row.overlap + "</td><td>" + row.parentName + ": " + row.parentBlocks + "</td></tr>";
+}
+
+
+function getModuleTable(moduleName, row){
+    var htmlString = "<h3>Module " + moduleName + "</h3><table class='table table-bordered table-hover'><thead><tr>\
+                    <th>Testcase: Covered Blocks</th><th>Overlap</th><th>Parent: Covered Blocks</th></tr></thead><tbody>";    
+    htmlString += getTableRow(row);
+    htmlString += "</tbody></table><br>";  
+    
+    return htmlString;
+}
+
+
+function loadCoverageDiff(data) {    
 
     $.ajax({
         url: "/projects/coverageDiff",
@@ -38,26 +50,9 @@ function loadCoverageDiff(projId, testcaseId, loopIndex) {
         dataType: 'json',
         success: function(response) {            
             if (response.status === "OK"){                
-                
-                if ($(TC_CONTAINER_ID + loopIndex).children().length == 1) {
-                    response.coverageTestcase.forEach(function(elem){  
-                        var style = response.overlapModuleNames.includes(elem.moduleName) ? "style='color:red;'" : "";
-                        $(TC_CONTAINER_ID + loopIndex).append("<p " + style + ">" + elem.moduleName + ": " + elem.coveredBlocks + "</p>");                                                            
-                    });  
-                }                
-
-                if ($(PARENT_CONTAINER_ID + loopIndex).children().length == 0) {
-                    $(PARENT_CONTAINER_ID + loopIndex).append("<h4>Covered Blocks of parent " + response.parentNiceName + "</h4>");                    
-                    response.coverageParent.forEach(function(elem){
-                        var style = response.overlapModuleNames.includes(elem.moduleName) ? "style='color:red;'" : "";
-                        $(PARENT_CONTAINER_ID + loopIndex).append("<p " + style + ">" + elem.moduleName + ": " + elem.coveredBlocks + "</p>");
-                    });
-                }  
-
-                $("#loader" + loopIndex).css('display', 'none');
-                $(TC_CONTAINER_ID + loopIndex).css('visibility', 'visible');          
-                $(OVERLAP_CONTAINER_ID + loopIndex).css('visibility', 'visible');          
-                $(PARENT_CONTAINER_ID + loopIndex).css('visibility', 'visible');    
+                response.modules.forEach(function(module){  
+                    $(MODULES_CONTAINER_ID).append(getModuleTable(module.moduleName, module.data));                                                            
+                });         
             } else {
                 console.log(response["message"]);
             }
@@ -67,3 +62,27 @@ function loadCoverageDiff(projId, testcaseId, loopIndex) {
         }
     });  
 }
+
+
+function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, '\\$&');
+    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
+
+
+$(document).ready(function() {
+    const projId = getParameterByName('projectID');
+    const testcaseId = getParameterByName('testcaseID');
+
+    if (projId !== undefined && testcaseId !== undefined){
+        const data = {projId, testcaseId};
+        loadCoverageDiff(data);   
+    } else {
+        console.log("Project Id or testcase Id is undefined");
+    }   
+});
