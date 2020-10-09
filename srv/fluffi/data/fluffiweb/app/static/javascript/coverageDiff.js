@@ -26,13 +26,20 @@ const MODULES_CONTAINER_ID = "#ModulesContainer";
 
 
 function getTableRow(row){
-    return "<tr><td>" + row.tcName + ": " + row.tcBlocks + "</td><td>" + row.overlap + "</td><td>" + row.parentName + ": " + row.parentBlocks + "</td></tr>";
+    return "<tr>\
+                <td><div style='float: left'>" + row.tcName + "</div><div style='float: right'>" + row.tcBlocks + "</div></td>\
+                <td><div style='float: left'>" + row.parentName + "</div><div style='float: right'>" + row.parentBlocks + "</div></td>\
+                <td style='text-align: center'>" + row.overlap + "</td>\
+            </tr>";
 }
 
-
+// TODO refactor to columns Module Name, Covered Blocks Testcase, Covered Blocks Parent, Delta
 function getModuleTable(moduleName, row){
     var htmlString = "<h3>Module " + moduleName + "</h3><table class='table table-bordered table-hover'><thead><tr>\
-                    <th>Testcase: Covered Blocks</th><th>Overlap</th><th>Parent: Covered Blocks</th></tr></thead><tbody>";    
+                    <th><div style='float: left'>Testcase</div><div style='float: right'>Covered Blocks</div></th>\
+                    <th><div style='float: left'>Parent</div><div style='float: right'>Covered Blocks</div></th>\
+                    <th style='text-align: center'><span class='glyphicon glyphicon-plus'></th></tr></thead><tbody>";    
+
     htmlString += getTableRow(row);
     htmlString += "</tbody></table><br>";  
     
@@ -51,7 +58,8 @@ function loadCoverageDiff(data) {
         success: function(response) {            
             if (response.status === "OK"){                
                 response.modules.forEach(function(module){  
-                    $(MODULES_CONTAINER_ID).append(getModuleTable(module.moduleName, module.data));                                                            
+                    $(MODULES_CONTAINER_ID).append(getModuleTable(module.moduleName, module.data));  
+                    $("#loader").css('display', "none");                                                          
                 });         
             } else {
                 console.log(response["message"]);

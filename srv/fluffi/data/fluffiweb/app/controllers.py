@@ -1790,11 +1790,22 @@ def getCoverageDiffData(projId, testcaseId):
         tcSdGuid = result["CreatorServiceDescriptorGUID"]
         
         parentLocalID = result["ParentLocalID"]                  
-        parentSdGuid = result["ParentServiceDescriptorGUID"]                  
-        
-        tcNiceName = result["NiceName"] if result["NiceName"] is not None else "{}:{}".format(tcSdGuid, tcLocalID)     
-        parentNiceName = result["ParentNiceName"] if result["ParentNiceName"] is not None else "{}:{}".format(parentSdGuid, parentLocalID) 
-        
+        parentSdGuid = result["ParentServiceDescriptorGUID"]   
+                                             
+        if result["NiceName"] is not None:
+            tcNiceName = result["NiceName"]
+        elif result["NiceNameMI"]:
+            tcNiceName = "{}:{}".format(result["NiceNameMI"], parentLocalID) 
+        else:
+            tcNiceName = "{}:{}".format(tcSdGuid, tcLocalID)
+            
+        if result["ParentNiceName"] is not None:
+            parentNiceName = result["ParentNiceName"]
+        elif result["ParentNiceNameMI"]:
+            parentNiceName = "{}:{}".format(result["ParentNiceNameMI"], parentLocalID) 
+        else:
+            parentNiceName = "{}:{}".format(parentSdGuid, parentLocalID) 
+
         data = { "ctID": testcaseId }
         statement = text(GET_COVERED_BLOCKS_OF_TESTCASE_FOR_EVERY_MODULE)
         result = connection.execute(statement, data)   
@@ -1812,9 +1823,12 @@ def getCoverageDiffData(projId, testcaseId):
                     }
                 })
                     
-        result = connection.execute(text(GET_PARENT_ID), { "parentID": parentLocalID, "parentSdGuid": parentSdGuid }).fetchone()            
-        parentID = result["ID"] if result["ID"] is not None else 0 
-        print("parentID")
+        result = connection.execute(text(GET_PARENT_ID), { "parentID": parentLocalID, "parentSdGuid": parentSdGuid }).fetchone()    
+        if "ID" in result:        
+            parentID = result["ID"] if result["ID"] is not None else 0 
+        else:
+            parentID = 0
+        
         print(parentID)
         data = { "ctID": parentID }
         statement = text(GET_COVERED_BLOCKS_OF_TESTCASE_FOR_EVERY_MODULE)
@@ -1826,17 +1840,21 @@ def getCoverageDiffData(projId, testcaseId):
                 for m in modules:
                     if m["moduleName"] == moduleName:
                         m["data"].update({ "parentBlocks": coveredBlocks })
+                        m["data"].update({ "overlap": m["data"]["tcBlocks"] - coveredBlocks })
                         break
                         
         connection.close()
         engine.dispose()
+        status, msg = "OK", ""
     except Exception as e:
         print(e) 
+        status, msg = "ERROR", str(e)
           
     
     return {
         "modules": modules,
-        "status": "OK"
+        "status": status,
+        "message": msg
     }       
         
 class DownloadArchiveLockFile:
