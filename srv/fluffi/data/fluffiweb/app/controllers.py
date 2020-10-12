@@ -1829,8 +1829,8 @@ def getCoverageDiffData(projId, testcaseId):
         else:
             parentID = 0
         
-        print(parentID)
         data = { "ctID": parentID }
+        
         statement = text(GET_COVERED_BLOCKS_OF_TESTCASE_FOR_EVERY_MODULE)
         result = connection.execute(statement, data)          
         for row in result:
@@ -1840,7 +1840,7 @@ def getCoverageDiffData(projId, testcaseId):
                 for m in modules:
                     if m["moduleName"] == moduleName:
                         m["data"].update({ "parentBlocks": coveredBlocks })
-                        m["data"].update({ "overlap": m["data"]["tcBlocks"] - coveredBlocks })
+                        m["data"].update({ "diff": m["data"]["tcBlocks"] - coveredBlocks })
                         break
                         
         connection.close()
@@ -1850,7 +1850,7 @@ def getCoverageDiffData(projId, testcaseId):
         print(e) 
         status, msg = "ERROR", str(e)
           
-    
+    print(modules)
     return {
         "modules": modules,
         "status": status,

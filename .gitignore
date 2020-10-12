@@ -155,3 +155,4 @@ core/x64/
 core/x86-64/
 srv/fluffi/data/fluffiweb/app/static/3rdParty/
 srv/fluffi/data/fluffiweb/app/static/bootstrap/
+*.pyc
