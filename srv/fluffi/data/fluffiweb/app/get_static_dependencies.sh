@@ -91,7 +91,7 @@ rm -rf dagre
 (
 rm -rf static/3rdParty/chartjs
 mkdir -p static/3rdParty/chartjs
-curl https://cdn.jsdelivr.net/npm/chart.js
+curl -O https://cdn.jsdelivr.net/npm/chart.js
 cp chart.js static/3rdParty/chartjs/chart.js
 rm chart.js
 )&
