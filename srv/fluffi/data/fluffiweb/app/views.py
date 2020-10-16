@@ -1192,14 +1192,14 @@ def viewTestcaseGraph(projId):
 def viewCoverageDistribution(projId):
     coverageData = getCoverageData(projId)                    
     
-    return json.dumps({"data": coverageData})
+    return json.dumps(coverageData)
 
 
 @app.route("/projects/coverageDistribution", methods=["GET"])
 def viewCoverageDistributionAll():
-    allCoverageData = getAllCoverageData()                    
+    allCoverageData = getAllCoverageData()  
     
-    return json.dumps({"data": allCoverageData})
+    return json.dumps(allCoverageData)
 
 
 @app.route("/projects/coverageDiff", methods=["POST"])

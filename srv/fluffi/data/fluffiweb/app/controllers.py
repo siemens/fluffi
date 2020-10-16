@@ -1674,23 +1674,6 @@ def getGraphData(projId):
     return graphdata
 
 
-MIN_RADIUS = 30
-
-def prepareAllCoverageData(coverageData, maximum):
-    """
-    Calculate radius and add it to data structure
-    Sort data by radius
-    """
-    
-    for cdObj in coverageData:
-        radius = calculateRadius(cdObj["CoveredBlocks"], maximum)
-        cdObj["radius"] = radius + 30
-    
-    sortedCoverageData = sorted(coverageData, key=lambda k: k["radius"], reverse=True)
-    
-    return sortedCoverageData
-
-
 def getAllCoverageData():
     try:
         projects = models.Fuzzjob.query.all()
@@ -1698,78 +1681,63 @@ def getAllCoverageData():
         print(e)
         projects = []
         
-    allCoverageData = []
-    allCoveredBlocks = []
+    labels = []
+    data = []
+    colors = ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"]
     
     for project in projects:
         try:
             myProject = models.Fuzzjob.query.filter_by(ID = project.ID).first()
             engine = create_engine(
                 'mysql://%s:%s@%s/%s' % (myProject.DBUser, myProject.DBPass, fluffiResolve(myProject.DBHost), myProject.DBName))
-            connection = engine.connect()
-        
+            connection = engine.connect()        
             result = connection.execute(GET_COUNT_OF_COVERED_BLOCKS).first()  
-                      
-            cd = dict()
-            cd["ID"] = myProject.ID 
-            cd["title"] = myProject.name            
-            if "CoveredBlocks" in result and result["CoveredBlocks"] is not None:
-                cd["CoveredBlocks"] = result["CoveredBlocks"]
-                allCoveredBlocks.append(result["CoveredBlocks"])
-            else:
-                cd["CoveredBlocks"] = 0
-            
-            allCoverageData.append(cd)
+                                              
+            if myProject.name and result["CoveredBlocks"]:
+                labels.append(myProject.name )
+                data.append(result["CoveredBlocks"])  
+                colors.append(getRandomColor())         
             
             connection.close()
             engine.dispose()
         except Exception as e:
             print(e)
-        
-    allCoverageData = prepareAllCoverageData(allCoverageData, max(allCoveredBlocks))
-    return allCoverageData
+            
+    return {
+        "labels": labels,
+        "data": data,
+        "colors": colors
+    }
 
 
 def getCoverageData(projId):
-    coverageData = []
+    labels = []
+    data = []
+    colors = ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"]
     
     try:
-        project = models.Fuzzjob.query.filter_by(ID = projId).first()
-        
+        project = models.Fuzzjob.query.filter_by(ID = projId).first()        
         engine = create_engine(
             'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
-        connection = engine.connect()
+        connection = engine.connect()        
+        result = connection.execute(GET_TARGET_MODULES) 
         
-        result = connection.execute(GET_TARGET_MODULES)
-        
-        first = True 
-        maximum = 0
-        
-        for row in result:            
-            module = dict()
-            module["ID"]  = row["ID"]   
-            module["title"] = row["ModuleName"]
-            
-            if "CoveredBlocks" in row and row["CoveredBlocks"] is not None:
-                cb = row["CoveredBlocks"]
-                if first: 
-                    maximum = cb
-                    first = False
+        for row in result:  
+            if row["ModuleName"] and row["CoveredBlocks"]:      
+                labels.append(row["ModuleName"])
+                data.append(row["CoveredBlocks"])  
+                colors.append(getRandomColor())
                     
-                module["CoveredBlocks"] = cb
-                radius = calculateRadius(cb, maximum)  
-                module["radius"] = radius + MIN_RADIUS                                  
-            else:
-                module["CoveredBlocks"] = 0
-                module["radius"] = MIN_RADIUS            
-            coverageData.append(module)
-        
         connection.close()
         engine.dispose()
     except Exception as e:
         print(e)
-            
-    return coverageData
+       
+    return {
+        "labels": labels,
+        "data": data,
+        "colors": colors
+    }
 
 
 def getCoverageDiffData(projId, testcaseId):    
