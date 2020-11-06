@@ -28,17 +28,8 @@ Author(s): Pascal Eckmann, Junes Najah, Thomas Riedmaier
 {% block scripts  %}
 <script src="{{ url_for('static', filename = 'javascript/tooltip.js') }}" type="text/javascript"></script>
 <script src="{{ url_for('static', filename = 'javascript/renamer.js') }}" type="text/javascript"></script>
-<script src="{{ url_for('static', filename = 'javascript/tcTemplate.js') }}" type="text/javascript"></script>
 <script src="{{ url_for('static', filename = 'javascript/hexdump.js') }}" type="text/javascript"></script>
 <script src="{{ url_for('static', filename = 'javascript/coverageDiff.js') }}" type="text/javascript"></script>
-
-<script>
-    $( document ).ready(function() {
-        if({{actual_page}} && {{page_count}}){
-            addPages({{actual_page}}, {{page_count}});
-        }
-    });
-</script>
 
 {{super()}}
 {% endblock %}
@@ -71,7 +62,21 @@ Author(s): Pascal Eckmann, Junes Najah, Thomas Riedmaier
     </div>
     <hr>
     <div class="pages_box">
-        <div class="pages"></div>
+        <div class="pages">
+            {% for page in pages %}
+                {% if page == "..." %}
+                <div class="single_page single_page_dots">{{ page }}</div>
+                {% else %}
+                <a href="{{ page }}">
+                    {% if page == actual_page %}
+                    <div class="single_page single_page_inactive">{{ page }}</div>
+                    {% else %}
+                    <div class="single_page single_page_active">{{ page }}</div>
+                    {% endif %}
+                </a>
+                {% endif %}
+            {% endfor %}
+        </div>
     </div>
     <table class="table">
         <thead>
@@ -173,9 +178,24 @@ Author(s): Pascal Eckmann, Junes Najah, Thomas Riedmaier
 
     <hr>
     <div class="pages_box">
-        <div class="pages"></div>
+        <div class="pages">
+            {% for page in pages %}
+                {% if page == "..." %}
+                <div class="single_page single_page_dots">{{ page }}</div>
+                {% else %}
+                <a href="{{ page }}">
+                    {% if page == actual_page %}
+                    <div class="single_page single_page_inactive">{{ page }}</div>
+                    {% else %}
+                    <div class="single_page single_page_active">{{ page }}</div>
+                    {% endif %}
+                </a>
+                {% endif %}
+            {% endfor %}
+        </div>
     </div>
 </div>
 
 {% endblock %}
+
 

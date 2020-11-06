@@ -169,8 +169,8 @@ NUM_UNIQUE_CRASH = (
     "SELECT count(*) "
     "FROM (SELECT cd.CrashFootprint, it.TestCaseType FROM interesting_testcases AS it "
     "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
-    "GROUP BY cd.CrashFootprint) " 
-    "observedCrashes WHERE TestCaseType=3;")
+    "WHERE TestCaseType=3 "
+    "GROUP BY cd.CrashFootprint) observedCrashes;")
 
 UNIQUE_CRASHES = (
     "SELECT oc.CrashFootprint, oc.ID, oc.TestCaseType, oc.RawBytes, oc.CreatorServiceDescriptorGUID, "

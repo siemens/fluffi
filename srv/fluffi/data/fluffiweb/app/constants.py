@@ -42,6 +42,9 @@ FLUFFI_VERSION = "1.0"
 
 FOOTER_SIEMENS = "Siemens AG, Corporate Technology {} | FLUFFI {}".format(datetime.datetime.now().year, FLUFFI_VERSION)
 
+NUM_OF_ELEMS_PER_PAGE = 1000
+PAGINATION_MARGIN = 3
+
 TESTCASE_TYPES = {
     "population": 0,
     "hangs": 1,
