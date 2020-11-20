@@ -22,6 +22,14 @@ DEALINGS IN THE SOFTWARE.
 Author(s): Pascal Eckmann, Junes Najah, Michael Kraus, Thomas Riedmaier
 */
 
+a {
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
 .dl-horizontal dt {
     text-align: left;
 }
