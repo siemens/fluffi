@@ -480,15 +480,15 @@ def loadHexInFile(projId, testcaseId, filePath):
                 rows = resultTestcaseHex.fetchall()
                 for row in rows:
                     for num, x in enumerate(row):
-                        if num is 0:
+                        if num == 0:
                             testcaseHexfile.write(x)
-                        elif num is 1:
+                        elif num == 1:
                             hexLen = x
                             offset += 960
                             pageCount = max(int(x / 960) + (x % 960 > 0), pageCount)
-                        elif num is 2:
+                        elif num == 2:
                             testcaseParentId = x
-                        elif num is 3:
+                        elif num == 3:
                             testcaseParentGuid = x
             if offset > hexLen:
                 break
@@ -697,9 +697,9 @@ def getTestcaseParentInfo(projId, testcaseId):
         rows = resultTestcaseParent.fetchall()
         for row in rows:
             for num, x in enumerate(row):
-                if num is 0:
+                if num == 0:
                     testcaseParentId = x
-                elif num is 1:
+                elif num == 1:
                     testcaseParentGuid = x
     return testcaseParentId, testcaseParentGuid
 
