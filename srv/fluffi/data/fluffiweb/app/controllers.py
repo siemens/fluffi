@@ -195,8 +195,8 @@ def getProject(projId):
         project.numPopulation = result.fetchone()[0]
         
         result = connection.execute(getLatestTestcaseOfType(0))
-        dateTimeOfLatestPopulation = result.fetchone()[0]        
-        timeOfLatestPopulation = dateTimeOfLatestPopulation.strftime("%H:%M - %d.%m.%Y")      
+        dateTimeOfLatestPopulation = result.fetchone()[0]               
+        timeOfLatestPopulation = dateTimeOfLatestPopulation.strftime("%H:%M - %d.%m.%Y") if dateTimeOfLatestPopulation is not None else ""
         project.timeOfLatestPopulation = timeOfLatestPopulation
 
         result = connection.execute(getITCountOfTypeQuery(5))
@@ -361,9 +361,8 @@ def updateInfoHandler(projId, infoType):
         if infoType == "timeOfLatestPopulation":        
             result = connection.execute(getLatestTestcaseOfType(0))
             dateTimeOfLatestPopulation = result.fetchone()[0]               
-            info = dateTimeOfLatestPopulation.strftime("%H:%M - %d.%m.%Y")  
+            info = dateTimeOfLatestPopulation.strftime("%H:%M - %d.%m.%Y") if dateTimeOfLatestPopulation is not None else ""
         # other infos can be added here
-        # else: 
         
         msg = "Success"    
         status = "OK" 
@@ -1773,6 +1772,91 @@ def getCoverageData(projId):
     return coverageData
 
 
+def getCoverageDiffData(projId, testcaseId):    
+    modules = []  
+         
+    try:
+        project = models.Fuzzjob.query.filter_by(ID = projId).first()
+        
+        engine = create_engine(
+            'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
+        connection = engine.connect()
+        
+        data = { "ID": testcaseId }
+        statement = text(GET_TESTCASE_AND_PARENT)
+        result = connection.execute(statement, data).fetchone()
+        
+        tcLocalID = result["CreatorLocalID"]
+        tcSdGuid = result["CreatorServiceDescriptorGUID"]
+        
+        parentLocalID = result["ParentLocalID"]                  
+        parentSdGuid = result["ParentServiceDescriptorGUID"]   
+                                             
+        if result["NiceName"] is not None:
+            tcNiceName = result["NiceName"]
+        elif result["NiceNameMI"]:
+            tcNiceName = "{}:{}".format(result["NiceNameMI"], parentLocalID) 
+        else:
+            tcNiceName = "{}:{}".format(tcSdGuid, tcLocalID)
+            
+        if result["ParentNiceName"] is not None:
+            parentNiceName = result["ParentNiceName"]
+        elif result["ParentNiceNameMI"]:
+            parentNiceName = "{}:{}".format(result["ParentNiceNameMI"], parentLocalID) 
+        else:
+            parentNiceName = "{}:{}".format(parentSdGuid, parentLocalID) 
+
+        data = { "ctID": testcaseId }
+        statement = text(GET_COVERED_BLOCKS_OF_TESTCASE_FOR_EVERY_MODULE)
+        result = connection.execute(statement, data)   
+
+        for row in result:
+            moduleName = row["ModuleName"] if row["ModuleName"] is not None else ""
+            if moduleName:
+                coveredBlocks = row["CoveredBlocks"] if row["CoveredBlocks"] is not None else 0
+                modules.append({
+                    "moduleName": moduleName, 
+                    "data": {
+                        "tcName": tcNiceName, 
+                        "tcBlocks": coveredBlocks, 
+                        "parentName": parentNiceName
+                    }
+                })
+                    
+        result = connection.execute(text(GET_PARENT_ID), { "parentID": parentLocalID, "parentSdGuid": parentSdGuid }).fetchone()    
+        if "ID" in result:        
+            parentID = result["ID"] if result["ID"] is not None else 0 
+        else:
+            parentID = 0
+        
+        data = { "ctID": parentID }
+        
+        statement = text(GET_COVERED_BLOCKS_OF_TESTCASE_FOR_EVERY_MODULE)
+        result = connection.execute(statement, data)          
+        for row in result:
+            moduleName = row["ModuleName"] if row["ModuleName"] is not None else ""
+            if moduleName:
+                coveredBlocks = row["CoveredBlocks"] if row["CoveredBlocks"] is not None else 0
+                for m in modules:
+                    if m["moduleName"] == moduleName:
+                        m["data"].update({ "parentBlocks": coveredBlocks })
+                        m["data"].update({ "diff": m["data"]["tcBlocks"] - coveredBlocks })
+                        break
+                        
+        connection.close()
+        engine.dispose()
+        status, msg = "OK", ""
+    except Exception as e:
+        print(e) 
+        status, msg = "ERROR", str(e)
+          
+    print(modules)
+    return {
+        "modules": modules,
+        "status": status,
+        "message": msg
+    }       
+        
 class DownloadArchiveLockFile:
     file_path = "/download.lock"
     tmp_path = "/downloadTemp"
