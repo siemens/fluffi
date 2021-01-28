@@ -26,7 +26,7 @@ from datetime import datetime, timedelta
 from app import app
 from .nav import nav, registerElementDynamically
 
-import shutil, os
+import shutil, os, random
 
 # we overwrite the render function to add new elements to the navbar dynamically
 _renderTemplate = render_template
@@ -92,7 +92,8 @@ def chunks(l, n):
     """ Yield n-sized chunks from l """
     for i in range(0, len(l), n):
         yield l[i:i + n]
- 
-       
-def calculateRadius(coveredBlocks, maximum):
-    return int(round((coveredBlocks / maximum) * 100)) if maximum != 0 else 0
+
+
+def getRandomColor():
+    r = lambda: random.randint(0,255)
+    return '#%02X%02X%02X' % (r(),r(),r())

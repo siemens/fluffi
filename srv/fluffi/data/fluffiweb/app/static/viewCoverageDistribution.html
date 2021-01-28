@@ -24,25 +24,19 @@ Author(s): Junes Najah
 
 <html>
 <head>
-    <script src="/static/3rdParty/jquery/jquery-2.1.4.js"></script>
-    <script src="/static/javascript/bubbleChart.js"></script>
     <title>FLUFFI - Coverage Distribution</title>
     <link href="/static/images/favicon.ico" rel="shortcut icon">
-    <link href="/static/css/bubbleChart.css" rel="stylesheet" type="text/css"/>
 </head>
 
 <body>
-    <!-- Add labels of colors --> 
-    <!-- <div class="label-boxes">    
-        <span class="label population-color">Population</span>
-        <span class="label minimized-color">Minimized</span>
-        <span class="label footprint-color">Footprint</span>
-    </div> -->
-
-    <!-- <div id="loader" class="centered-big-loader"></div> -->
     <div>
-        <canvas id="canvas" width="100%" height="100%"></canvas>
+        <canvas id="pieChart" width="800" height="400"></canvas>
     </div>
+
+    <script src="/static/3rdParty/jquery/jquery-2.1.4.js"></script>
+    <script src="/static/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/static/3rdParty/chartjs/chart.js"></script>
+    <script src="/static/javascript/pieChart.js"></script>
 </body>
 </html>
 
