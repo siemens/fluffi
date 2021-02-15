@@ -79,7 +79,7 @@ def registerElementDynamically():
         View('Home', '.index'),
         Subgroup('Locations', *locationsLinks),
         Subgroup('Fuzzjobs', *fuzzjobLinks),
-        View('LM Logs', '.logs'),
+        View('LM Logs', '.logs', page=1),
         View('Commands', '.commands'),
         View('Systems', '.systems')
     ))

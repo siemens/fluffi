@@ -1287,15 +1287,31 @@ def commands():
                           commands=commands)
 
 
-@app.route("/logs")
+@app.route("/logs/<int:page>")
 @checkDBConnection
 @checkSystemsLoaded
-def logs():
-    result = getResultOfStatementForGlobalManager(GET_LOCALMANAGER_LOGS)
+def logs(page):
+    res = getResultOfStatementForGlobalManager(GET_COUNT_OF_LOCALMANAGER_LOGS)
+    try:
+        count = int(res.fetchone()[0])
+    except:
+        count = 0
+
+    if count % NUM_OF_ELEMS_PER_PAGE == 0:
+        count = count // NUM_OF_ELEMS_PER_PAGE
+    else:
+        count = (count // NUM_OF_ELEMS_PER_PAGE) + 1
+    if page > count:
+        page = 1
+
+    statement = "{} LIMIT {}, {};".format(GET_LOCALMANAGER_LOGS[:-1], (page - 1) * NUM_OF_ELEMS_PER_PAGE, NUM_OF_ELEMS_PER_PAGE)  
+    result = getResultOfStatementForGlobalManager(statement)
     logs = [ row for row in result ]
-    pages = list(chunks(logs, 10))
+
     return renderTemplate("viewLogs.html",
-                            pages=pages)
+                            actual_page=page,
+                            logs=logs,
+                            pages=getPages(page, count))
 
 
 @app.route("/systems")
