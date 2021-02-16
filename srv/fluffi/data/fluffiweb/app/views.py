@@ -474,7 +474,6 @@ def progressDownload():
             return error_message
         else:
             return file_content['PROGRESS']
-
     else:
         return "NONE"
 
@@ -500,24 +499,27 @@ def downloadArchive(archive):
 @checkSystemsLoaded
 def viewPopulation(projId, page):
     count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["population"]))
-    if count % 1000 == 0:
-        count = count // 1000
+    
+    if count % NUM_OF_ELEMS_PER_PAGE == 0:
+        count = count // NUM_OF_ELEMS_PER_PAGE
     else:
-        count = (count // 1000) + 1
+        count = (count // NUM_OF_ELEMS_PER_PAGE) + 1
+        
     if page > count:
         page = 1
-    statement = getITQueryOfTypeNoRaw(TESTCASE_TYPES["population"])[:-1] + " LIMIT " + str((page - 1) * 1000) + ", 1000;"
+        
+    statement = "{}, {};".format(getITQueryOfTypeNoRaw(TESTCASE_TYPES["population"])[:-1] + " LIMIT " + str((page - 1) * NUM_OF_ELEMS_PER_PAGE), NUM_OF_ELEMS_PER_PAGE)
     data = getGeneralInformationData(projId, statement)
     data.name = "Population"
     data.redirect = "population"
     data.downloadName = "downloadPopulation"
-
+        
     return renderTemplate("viewTCsTempl.html",
                           title="View Population",
                           data=data,
                           show_rating=True,
                           actual_page=page,
-                          page_count=count,
+                          pages=getPages(page, count),
                           base_link="/projects/" + str(projId) + "/population/")
 
 
@@ -535,13 +537,13 @@ def downloadPopulation(projId):
 @checkSystemsLoaded
 def viewAccessVioTotal(projId, page):
     count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["accessViolations"]))
-    if count % 1000 == 0:
-        count = count // 1000
+    if count % NUM_OF_ELEMS_PER_PAGE == 0:
+        count = count // NUM_OF_ELEMS_PER_PAGE
     else:
-        count = (count // 1000) + 1
+        count = (count // NUM_OF_ELEMS_PER_PAGE) + 1
     if page > count:
         page = 1
-    statement = getITQueryOfTypeNoRaw(TESTCASE_TYPES["accessViolations"])[:-1] + " LIMIT " + str((page - 1) * 1000) + ", 1000;"
+    statement = "{}, {};".format(getITQueryOfTypeNoRaw(TESTCASE_TYPES["accessViolations"])[:-1] + " LIMIT " + str((page - 1) * NUM_OF_ELEMS_PER_PAGE), NUM_OF_ELEMS_PER_PAGE)    
     data = getGeneralInformationData(projId, statement)
     data.name = "Access Violations"
     data.redirect = "accessVioTotal"
@@ -551,7 +553,7 @@ def viewAccessVioTotal(projId, page):
                           title="View Access Violations",
                           data=data,
                           actual_page=page,
-                          page_count=count,
+                          pages=getPages(page, count),
                           base_link="/projects/" + str(projId) + "/accessVioTotal/")
 
 
@@ -564,20 +566,29 @@ def downloadAccessVioTotal(projId):
     return createZipArchive(projId, nice_name, type)
 
 
-@app.route("/projects/<int:projId>/accessVioUnique")
+@app.route("/projects/<int:projId>/accessVioUnique/<int:page>")
 @checkDBConnection
 @checkSystemsLoaded
-def viewAccessVioUnique(projId):
-    data = getGeneralInformationData(projId, UNIQUE_ACCESS_VIOLATION_NO_RAW)
+def viewAccessVioUnique(projId, page):
+    count = getRowCount(projId, NUM_UNIQUE_ACCESS_VIOLATION)
+    if count % NUM_OF_ELEMS_PER_PAGE == 0:
+        count = count // NUM_OF_ELEMS_PER_PAGE
+    else:
+        count = (count // NUM_OF_ELEMS_PER_PAGE) + 1
+    if page > count:
+        page = 1
+    statement = "{}, {};".format(UNIQUE_ACCESS_VIOLATION_NO_RAW[:-1] + " LIMIT " + str((page - 1) * NUM_OF_ELEMS_PER_PAGE), NUM_OF_ELEMS_PER_PAGE)    
+    data = getGeneralInformationData(projId, statement)
     data.name = "Unique Access Violations"
     data.redirect = "accessVioUnique"
     data.downloadName = "downloadAccessVioUnique"
-
+    
     return renderTemplate("viewTCsTempl.html",
                           title="View Unique Access Violations",
                           data=data,
-                          actual_page=0,
-                          page_count=0,
+                          actual_page=page,
+                          pages=getPages(page, count),
+                          base_link="/projects/" + str(projId) + "/accessVioUnique/",
                           show_occurences=True)
 
 
@@ -595,13 +606,14 @@ def downloadAccessVioUnique(projId):
 @checkSystemsLoaded
 def viewTotalCrashes(projId, page):
     count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["crashes"]))
-    if count % 1000 == 0:
-        count = count // 1000
+    if count % NUM_OF_ELEMS_PER_PAGE == 0:
+        count = count // NUM_OF_ELEMS_PER_PAGE
     else:
-        count = (count // 1000) + 1
+        count = (count // NUM_OF_ELEMS_PER_PAGE) + 1
     if page > count:
         page = 1
-    statement = getITQueryOfTypeNoRaw(TESTCASE_TYPES["crashes"])[:-1] + " LIMIT " + str((page - 1) * 1000) + ", 1000;"
+        
+    statement = "{}, {};".format(getITQueryOfTypeNoRaw(TESTCASE_TYPES["crashes"])[:-1] + " LIMIT " + str((page - 1) * NUM_OF_ELEMS_PER_PAGE), NUM_OF_ELEMS_PER_PAGE)
     data = getGeneralInformationData(projId, statement)
     data.name = "Crashes"
     data.redirect = "totalCrashes"
@@ -610,8 +622,8 @@ def viewTotalCrashes(projId, page):
     return renderTemplate("viewTCsTempl.html",
                           title="View Total Crashes",
                           data=data,
-                          actual_page = page,
-                          page_count = count,
+                          actual_page=page,
+                          pages=getPages(page, count),
                           base_link = "/projects/" + str(projId) + "/totalCrashes/")
 
 
@@ -624,20 +636,29 @@ def downloadTotalCrashes(projId):
     return createZipArchive(projId, nice_name, type)
 
 
-@app.route("/projects/<int:projId>/uniqueCrashes")
+@app.route("/projects/<int:projId>/uniqueCrashes/<int:page>")
 @checkDBConnection
 @checkSystemsLoaded
-def viewUniqueCrashes(projId):
-    data = getGeneralInformationData(projId, UNIQUE_CRASHES_NO_RAW)
+def viewUniqueCrashes(projId, page):
+    count = getRowCount(projId, NUM_UNIQUE_CRASH)
+    if count % NUM_OF_ELEMS_PER_PAGE == 0:
+        count = count // NUM_OF_ELEMS_PER_PAGE
+    else:
+        count = (count // NUM_OF_ELEMS_PER_PAGE) + 1
+    if page > count:
+        page = 1
+    statement = "{}, {};".format(UNIQUE_CRASHES_NO_RAW[:-1] + " LIMIT " + str((page - 1) * NUM_OF_ELEMS_PER_PAGE), NUM_OF_ELEMS_PER_PAGE)   
+    data = getGeneralInformationData(projId, statement)
     data.name = "Unique Crashes"
     data.redirect = "uniqueCrashes"
     data.downloadName = "downloadUniqueCrashes"
-
+    
     return renderTemplate("viewTCsTempl.html",
                           title="View Unique Crashes",
                           data=data,
-                          actual_page=0,
-                          page_count=0,
+                          actual_page=page,
+                          pages=getPages(page, count),
+                          base_link="/projects/" + str(projId) + "/uniqueCrashes/",
                           show_occurences=True)
 
 
@@ -655,13 +676,13 @@ def downloadUniqueCrashes(projId):
 @checkSystemsLoaded
 def viewHangs(projId, page):
     count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["hangs"]))
-    if count % 1000 == 0:
-        count = count // 1000
+    if count % NUM_OF_ELEMS_PER_PAGE == 0:
+        count = count // NUM_OF_ELEMS_PER_PAGE
     else:
-        count = (count // 1000) + 1
+        count = (count // NUM_OF_ELEMS_PER_PAGE) + 1
     if page > count:
         page = 1
-    statement = getITQueryOfTypeNoRaw(TESTCASE_TYPES["hangs"])[:-1] + " LIMIT " + str((page - 1) * 1000) + ", 1000;"
+    statement = "{}, {};".format(getITQueryOfTypeNoRaw(TESTCASE_TYPES["hangs"])[:-1] + " LIMIT " + str((page - 1) * NUM_OF_ELEMS_PER_PAGE), NUM_OF_ELEMS_PER_PAGE)
     data = getGeneralInformationData(projId, statement)
     data.name = "Hangs"
     data.redirect = "hangs"
@@ -670,8 +691,8 @@ def viewHangs(projId, page):
     return renderTemplate("viewTCsTempl.html",
                           title="View Hangs",
                           data=data,
-                          actual_page = page,
-                          page_count = count,
+                          actual_page=page,
+                          pages=getPages(page, count),
                           base_link = "/projects/" + str(projId) + "/hangs/")
 
 
@@ -689,13 +710,13 @@ def downloadHangs(projId):
 @checkSystemsLoaded
 def viewNoResponses(projId, page):
     count = getRowCount(projId, getITCountOfTypeQuery(TESTCASE_TYPES["noResponses"]))
-    if count % 1000 == 0:
-        count = count // 1000
+    if count % NUM_OF_ELEMS_PER_PAGE == 0:
+        count = count // NUM_OF_ELEMS_PER_PAGE
     else:
-        count = (count // 1000) + 1
+        count = (count // NUM_OF_ELEMS_PER_PAGE) + 1
     if page > count:
         page = 1
-    statement = getITQueryOfTypeNoRaw(TESTCASE_TYPES["noResponses"])[:-1] + " LIMIT " + str((page - 1) * 1000) + ", 1000;"
+    statement = "{}, {};".format(getITQueryOfTypeNoRaw(TESTCASE_TYPES["noResponses"])[:-1] + " LIMIT " + str((page - 1) * NUM_OF_ELEMS_PER_PAGE), NUM_OF_ELEMS_PER_PAGE)
     data = getGeneralInformationData(projId, statement)
     data.name = "No Responses"
     data.redirect = "noResponse"
@@ -705,7 +726,7 @@ def viewNoResponses(projId, page):
                           title="View No Responses",
                           data=data,
                           actual_page=page,
-                          page_count=count,
+                          pages=getPages(page, count),
                           base_link="/projects/" + str(projId) + "/noResponse/")
 
 
@@ -836,13 +857,13 @@ def getTestcaseHexdump(projId, testcaseId, offset, comp):
     parentTestcaseGuid = ""
     pageCount = 0
 
-    if comp is 1 or not os.path.isfile(testcaseHexdumpFile):
+    if comp == 1 or not os.path.isfile(testcaseHexdumpFile):
         parentTestcaseId, parentTestcaseGuid, pageCount = loadHexInFile(projId, testcaseId, testcaseHexdumpFile)
     else:
         pageCount = int(os.path.getsize(testcaseHexdumpFile) / 960) + (os.path.getsize(testcaseHexdumpFile) % 960 > 0)
         parentTestcaseId, parentTestcaseGuid = getTestcaseParentInfo(projId, testcaseId)
 
-    if comp is 1 and parentTestcaseId is not "" and parentTestcaseGuid is not "":
+    if comp == 1 and parentTestcaseId != "" and parentTestcaseGuid != "":
         resultParentIdRes = getResultOfStatement(projId, GET_TESTCASE_PARENT_ID,
                                               {"parentID": parentTestcaseId, "parentGUID": parentTestcaseGuid})
         if resultParentIdRes is not None:
@@ -1192,14 +1213,27 @@ def viewTestcaseGraph(projId):
 def viewCoverageDistribution(projId):
     coverageData = getCoverageData(projId)                    
     
-    return json.dumps({"data": coverageData})
+    return json.dumps(coverageData)
 
 
 @app.route("/projects/coverageDistribution", methods=["GET"])
 def viewCoverageDistributionAll():
-    allCoverageData = getAllCoverageData()                    
+    allCoverageData = getAllCoverageData()  
     
-    return json.dumps({"data": allCoverageData})
+    return json.dumps(allCoverageData)
+
+
+@app.route("/projects/coverageDiff", methods=["POST"])
+def viewCoverageDiff():
+    projId = request.json.get("projId", None)
+    testcaseId = request.json.get("testcaseId", None)       
+    
+    if projId and testcaseId:
+        data = getCoverageDiffData(projId, testcaseId)
+    else:
+        data = {"status": "ERROR", "message": "Project Id or testcase Id missing!"}  
+                             
+    return json.dumps(data)
 
 
 @app.route("/locations/view/<int:locId>")
@@ -1490,7 +1524,6 @@ def removeSystemFromPolemarch(hostName):
 
 @app.route("/systems/<string:hostName>/updateSystemLocation/<int:locationId>", methods=["POST"])
 def updateSystemLocation(hostName, locationId):
-    print(hostName, locationId)
     if (len(hostName) > 0) and (locationId > 0):
         try:
             sys = models.Systems.query.filter_by(Name=hostName).first()

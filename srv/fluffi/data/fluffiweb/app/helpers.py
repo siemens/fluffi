@@ -25,8 +25,9 @@ from datetime import datetime, timedelta
 
 from app import app
 from .nav import nav, registerElementDynamically
+from .constants import PAGINATION_MARGIN
 
-import shutil, os
+import shutil, os, random
 
 # we overwrite the render function to add new elements to the navbar dynamically
 _renderTemplate = render_template
@@ -92,7 +93,38 @@ def chunks(l, n):
     """ Yield n-sized chunks from l """
     for i in range(0, len(l), n):
         yield l[i:i + n]
- 
-       
-def calculateRadius(coveredBlocks, maximum):
-    return int(round((coveredBlocks / maximum) * 100)) if maximum != 0 else 0
+
+
+def getRandomColor():
+    r = lambda: random.randint(0,255)
+    return '#%02X%02X%02X' % (r(),r(),r())
+
+
+def getPages(actualPage, pageCount):
+    pages = []
+    maxPages = actualPage + PAGINATION_MARGIN
+    
+    if maxPages > pageCount:
+        maxPages = pageCount
+    
+    if actualPage >= PAGINATION_MARGIN + 3:
+        pages.append(1)
+        pages.append("...")
+        
+        i = actualPage - PAGINATION_MARGIN 
+        while i <= maxPages:
+            pages.append(i)
+            i += 1    
+    else:
+        i = 1 
+        while i <= maxPages:
+            pages.append(i)
+            i += 1
+        
+    if actualPage < pageCount - PAGINATION_MARGIN:
+        if actualPage != pageCount - (PAGINATION_MARGIN + 1):
+            pages.append("...")
+        
+        pages.append(pageCount)
+    
+    return pages

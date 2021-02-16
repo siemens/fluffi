@@ -101,6 +101,16 @@ copy dagre\dist\dagre.min.js static\3rdParty\dagre\dagre.min.js
 
 RMDIR /Q/S  dagre
 
+:: Getting chartjs
+
+RMDIR /Q/S static\3rdParty\chartjs
+MKDIR static\3rdParty\chartjs
+
+powershell -Command "Invoke-WebRequest https://cdn.jsdelivr.net/npm/chart.js -OutFile chart.js"
+copy chart.js static\3rdParty\chartjs\chart.js
+
+del chart.js
+
 :: Getting jquery
 
 RMDIR /Q/S  jquery

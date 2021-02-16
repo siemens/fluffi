@@ -22,8 +22,46 @@ DEALINGS IN THE SOFTWARE.
 Author(s): Junes Najah
 */
 
-* { margin:0; padding:0; } /* to remove the top and left whitespace */
+function loadDataAndCreatePieChart(url) {
+  $.getJSON(url, function (response) {
+    createPieChart(response);
+  });
+}
 
-html, body { width:100%; height:100%; } /* just to be sure these are full screen*/
+function createPieChart({ labels, colors, data }) {
+  var ctx = document.getElementById("pieChart");
 
-canvas { display:block; } /* To remove the scrollbars */
+  new Chart(ctx, {
+    type: "pie",
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: "Coverage Distribution",
+          backgroundColor: colors,
+          data: data,
+        },
+      ],
+    },
+    options: {
+      title: {
+        display: true,
+        text: "Coverage Distribution",
+      },
+    },
+  });
+}
+
+$(document).ready(function () {
+  const projId = window.location.hash.substr(1);
+  const url =
+    projId === "all"
+      ? "/projects/coverageDistribution"
+      : "/projects/" + projId + "/coverageDistribution";
+
+  if (projId !== undefined) {
+    loadDataAndCreatePieChart(url);
+  } else {
+    console.log("Project Id is undefined");
+  }
+});

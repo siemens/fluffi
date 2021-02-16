@@ -86,6 +86,16 @@ cp dagre/dist/dagre.min.js static/3rdParty/dagre/dagre.min.js
 rm -rf dagre
 )&
 
+# Getting chartjs
+
+(
+rm -rf static/3rdParty/chartjs
+mkdir -p static/3rdParty/chartjs
+curl -O https://cdn.jsdelivr.net/npm/chart.js
+cp chart.js static/3rdParty/chartjs/chart.js
+rm chart.js
+)&
+
 # Getting jquery
 
 (

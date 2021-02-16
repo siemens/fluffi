@@ -195,8 +195,8 @@ def getProject(projId):
         project.numPopulation = result.fetchone()[0]
         
         result = connection.execute(getLatestTestcaseOfType(0))
-        dateTimeOfLatestPopulation = result.fetchone()[0]        
-        timeOfLatestPopulation = dateTimeOfLatestPopulation.strftime("%H:%M - %d.%m.%Y")      
+        dateTimeOfLatestPopulation = result.fetchone()[0]               
+        timeOfLatestPopulation = dateTimeOfLatestPopulation.strftime("%H:%M - %d.%m.%Y") if dateTimeOfLatestPopulation is not None else ""
         project.timeOfLatestPopulation = timeOfLatestPopulation
 
         result = connection.execute(getITCountOfTypeQuery(5))
@@ -361,9 +361,8 @@ def updateInfoHandler(projId, infoType):
         if infoType == "timeOfLatestPopulation":        
             result = connection.execute(getLatestTestcaseOfType(0))
             dateTimeOfLatestPopulation = result.fetchone()[0]               
-            info = dateTimeOfLatestPopulation.strftime("%H:%M - %d.%m.%Y")  
+            info = dateTimeOfLatestPopulation.strftime("%H:%M - %d.%m.%Y") if dateTimeOfLatestPopulation is not None else ""
         # other infos can be added here
-        # else: 
         
         msg = "Success"    
         status = "OK" 
@@ -480,15 +479,15 @@ def loadHexInFile(projId, testcaseId, filePath):
                 rows = resultTestcaseHex.fetchall()
                 for row in rows:
                     for num, x in enumerate(row):
-                        if num is 0:
+                        if num == 0:
                             testcaseHexfile.write(x)
-                        elif num is 1:
+                        elif num == 1:
                             hexLen = x
                             offset += 960
                             pageCount = max(int(x / 960) + (x % 960 > 0), pageCount)
-                        elif num is 2:
+                        elif num == 2:
                             testcaseParentId = x
-                        elif num is 3:
+                        elif num == 3:
                             testcaseParentGuid = x
             if offset > hexLen:
                 break
@@ -697,9 +696,9 @@ def getTestcaseParentInfo(projId, testcaseId):
         rows = resultTestcaseParent.fetchall()
         for row in rows:
             for num, x in enumerate(row):
-                if num is 0:
+                if num == 0:
                     testcaseParentId = x
-                elif num is 1:
+                elif num == 1:
                     testcaseParentGuid = x
     return testcaseParentId, testcaseParentGuid
 
@@ -1359,40 +1358,47 @@ def insertFormInputForConfiguredInstances(request, system):
         if sys is None:
             return "Error: Could not configure Instances. System does not exist!", "error"
                                         
-        for key, value in request.form.items(): 
-            agentType = AGENT_TYPES.get(key[-2:], None)                                                  
+        for key, value in request.form.items():
+            agentType = AGENT_TYPES.get(key[-2:], None)                                                             
             
-            if agentType is not None and agentType != 4:
-                fuzzjobName = key[:-3]
-                fj = models.Fuzzjob.query.filter_by(name=fuzzjobName).first()           
-                if fj is not None:                                             
-                    instance = models.SystemFuzzjobInstances.query.filter_by(System=sys.ID, Fuzzjob=fj.ID,
-                                                                            AgentType=agentType).first()
-                    
-                    arch = request.form.get(key + '_arch', None) 
-                    
-                    try:
-                        valueAsInt = int(value)
-                    except ValueError:
-                        valueAsInt = -1 
+            if agentType is not None:    
+                arch = request.form.get(key + '_arch', None)     
+
+                try:
+                    valueAsInt = int(value)
+                except ValueError:
+                    valueAsInt = -1              
+                 
+                if agentType == 4:
+                    fuzzjobId = None
+                else: 
+                    fuzzjobName = key[:-3]      
+                    fj = models.Fuzzjob.query.filter_by(name=fuzzjobName).first()   
+                    if fj is None:
+                        continue
+                    else:           
+                        fuzzjobId = fj.ID       
+
+                instance = models.SystemFuzzjobInstances.query.filter_by(System=sys.ID, Fuzzjob=fuzzjobId,
+                                                                        AgentType=agentType).first()
+                                                        
+                # update system fuzzjob instance
+                if instance is not None:                                                   
+                    if valueAsInt > 0:                                
+                        instance.InstanceCount = valueAsInt
+                    elif valueAsInt == 0:
+                        db.session.delete(instance)   
+                    if arch is not None:
+                        instance.Architecture = arch 
                         
-                    # update system fuzzjob instance
-                    if instance is not None:                                                   
-                        if valueAsInt > 0:                                
-                            instance.InstanceCount = valueAsInt
-                        elif valueAsInt == 0:
-                            db.session.delete(instance)                               
-                        if arch is not None:
-                            instance.Architecture = arch 
-                            
-                    # Add new system fuzzjob instance
-                    else:
-                        if arch is not None and valueAsInt > 0:
-                            newInstance = models.SystemFuzzjobInstances(System=sys.ID, Fuzzjob=fj.ID,
-                                                                        AgentType=agentType,
-                                                                        InstanceCount=valueAsInt, Architecture=arch)
-                            db.session.add(newInstance)
-                    db.session.commit()                                                
+                # Add new system fuzzjob instance
+                else:
+                    if arch is not None and valueAsInt > 0:
+                        newInstance = models.SystemFuzzjobInstances(System=sys.ID, Fuzzjob=fuzzjobId,
+                                                                    AgentType=agentType,
+                                                                    InstanceCount=valueAsInt, Architecture=arch)
+                        db.session.add(newInstance)
+                db.session.commit()                                                
         return "Configured Instances!", "success"            
     except Exception as e:
         print(e)
@@ -1675,23 +1681,6 @@ def getGraphData(projId):
     return graphdata
 
 
-MIN_RADIUS = 30
-
-def prepareAllCoverageData(coverageData, maximum):
-    """
-    Calculate radius and add it to data structure
-    Sort data by radius
-    """
-    
-    for cdObj in coverageData:
-        radius = calculateRadius(cdObj["CoveredBlocks"], maximum)
-        cdObj["radius"] = radius + 30
-    
-    sortedCoverageData = sorted(coverageData, key=lambda k: k["radius"], reverse=True)
-    
-    return sortedCoverageData
-
-
 def getAllCoverageData():
     try:
         projects = models.Fuzzjob.query.all()
@@ -1699,41 +1688,68 @@ def getAllCoverageData():
         print(e)
         projects = []
         
-    allCoverageData = []
-    allCoveredBlocks = []
+    labels = []
+    data = []
+    colors = ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"]
     
     for project in projects:
         try:
             myProject = models.Fuzzjob.query.filter_by(ID = project.ID).first()
             engine = create_engine(
                 'mysql://%s:%s@%s/%s' % (myProject.DBUser, myProject.DBPass, fluffiResolve(myProject.DBHost), myProject.DBName))
-            connection = engine.connect()
-        
+            connection = engine.connect()        
             result = connection.execute(GET_COUNT_OF_COVERED_BLOCKS).first()  
-                      
-            cd = dict()
-            cd["ID"] = myProject.ID 
-            cd["title"] = myProject.name            
-            if "CoveredBlocks" in result and result["CoveredBlocks"] is not None:
-                cd["CoveredBlocks"] = result["CoveredBlocks"]
-                allCoveredBlocks.append(result["CoveredBlocks"])
-            else:
-                cd["CoveredBlocks"] = 0
-            
-            allCoverageData.append(cd)
+                                              
+            if myProject.name and result["CoveredBlocks"]:
+                labels.append(myProject.name )
+                data.append(result["CoveredBlocks"])  
+                colors.append(getRandomColor())         
             
             connection.close()
             engine.dispose()
         except Exception as e:
             print(e)
-        
-    allCoverageData = prepareAllCoverageData(allCoverageData, max(allCoveredBlocks))
-    return allCoverageData
+            
+    return {
+        "labels": labels,
+        "data": data,
+        "colors": colors
+    }
 
 
 def getCoverageData(projId):
-    coverageData = []
+    labels = []
+    data = []
+    colors = ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"]
     
+    try:
+        project = models.Fuzzjob.query.filter_by(ID = projId).first()        
+        engine = create_engine(
+            'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
+        connection = engine.connect()        
+        result = connection.execute(GET_TARGET_MODULES) 
+        
+        for row in result:  
+            if row["ModuleName"] and row["CoveredBlocks"]:      
+                labels.append(row["ModuleName"])
+                data.append(row["CoveredBlocks"])  
+                colors.append(getRandomColor())
+                    
+        connection.close()
+        engine.dispose()
+    except Exception as e:
+        print(e)
+       
+    return {
+        "labels": labels,
+        "data": data,
+        "colors": colors
+    }
+
+
+def getCoverageDiffData(projId, testcaseId):    
+    modules = []  
+         
     try:
         project = models.Fuzzjob.query.filter_by(ID = projId).first()
         
@@ -1741,38 +1757,81 @@ def getCoverageData(projId):
             'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
         connection = engine.connect()
         
-        result = connection.execute(GET_TARGET_MODULES)
+        data = { "ID": testcaseId }
+        statement = text(GET_TESTCASE_AND_PARENT)
+        result = connection.execute(statement, data).fetchone()
         
-        first = True 
-        maximum = 0
+        tcLocalID = result["CreatorLocalID"]
+        tcSdGuid = result["CreatorServiceDescriptorGUID"]
         
-        for row in result:            
-            module = dict()
-            module["ID"]  = row["ID"]   
-            module["title"] = row["ModuleName"]
+        parentLocalID = result["ParentLocalID"]                  
+        parentSdGuid = result["ParentServiceDescriptorGUID"]   
+                                             
+        if result["NiceName"] is not None:
+            tcNiceName = result["NiceName"]
+        elif result["NiceNameMI"]:
+            tcNiceName = "{}:{}".format(result["NiceNameMI"], parentLocalID) 
+        else:
+            tcNiceName = "{}:{}".format(tcSdGuid, tcLocalID)
             
-            if "CoveredBlocks" in row and row["CoveredBlocks"] is not None:
-                cb = row["CoveredBlocks"]
-                if first: 
-                    maximum = cb
-                    first = False
+        if result["ParentNiceName"] is not None:
+            parentNiceName = result["ParentNiceName"]
+        elif result["ParentNiceNameMI"]:
+            parentNiceName = "{}:{}".format(result["ParentNiceNameMI"], parentLocalID) 
+        else:
+            parentNiceName = "{}:{}".format(parentSdGuid, parentLocalID) 
+
+        data = { "ctID": testcaseId }
+        statement = text(GET_COVERED_BLOCKS_OF_TESTCASE_FOR_EVERY_MODULE)
+        result = connection.execute(statement, data)   
+
+        for row in result:
+            moduleName = row["ModuleName"] if row["ModuleName"] is not None else ""
+            if moduleName:
+                coveredBlocks = row["CoveredBlocks"] if row["CoveredBlocks"] is not None else 0
+                modules.append({
+                    "moduleName": moduleName, 
+                    "data": {
+                        "tcName": tcNiceName, 
+                        "tcBlocks": coveredBlocks, 
+                        "parentName": parentNiceName
+                    }
+                })
                     
-                module["CoveredBlocks"] = cb
-                radius = calculateRadius(cb, maximum)  
-                module["radius"] = radius + MIN_RADIUS                                  
-            else:
-                module["CoveredBlocks"] = 0
-                module["radius"] = MIN_RADIUS            
-            coverageData.append(module)
+        result = connection.execute(text(GET_PARENT_ID), { "parentID": parentLocalID, "parentSdGuid": parentSdGuid }).fetchone()    
+        if "ID" in result:        
+            parentID = result["ID"] if result["ID"] is not None else 0 
+        else:
+            parentID = 0
         
+        data = { "ctID": parentID }
+        
+        statement = text(GET_COVERED_BLOCKS_OF_TESTCASE_FOR_EVERY_MODULE)
+        result = connection.execute(statement, data)          
+        for row in result:
+            moduleName = row["ModuleName"] if row["ModuleName"] is not None else ""
+            if moduleName:
+                coveredBlocks = row["CoveredBlocks"] if row["CoveredBlocks"] is not None else 0
+                for m in modules:
+                    if m["moduleName"] == moduleName:
+                        m["data"].update({ "parentBlocks": coveredBlocks })
+                        m["data"].update({ "diff": m["data"]["tcBlocks"] - coveredBlocks })
+                        break
+                        
         connection.close()
         engine.dispose()
+        status, msg = "OK", ""
     except Exception as e:
-        print(e)
-            
-    return coverageData
-
-
+        print(e) 
+        status, msg = "ERROR", str(e)
+          
+    print(modules)
+    return {
+        "modules": modules,
+        "status": status,
+        "message": msg
+    }       
+        
 class DownloadArchiveLockFile:
     file_path = "/download.lock"
     tmp_path = "/downloadTemp"

@@ -23,20 +23,25 @@ Author(s): Junes Najah
 -->
 
 <html>
-<head>
-    <title>FLUFFI - Coverage Distribution</title>
+<head>    
+    <title>FLUFFI - Coverage Diff</title>
     <link href="/static/images/favicon.ico" rel="shortcut icon">
+    <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+    <link href="/static/css/fluffi.css" rel="stylesheet" type="text/css"/>
 </head>
 
-<body>
-    <div>
-        <canvas id="pieChart" width="800" height="400"></canvas>
+<body>    
+    <div id="loader" class="centered-big-loader"></div>
+    <div class="container">
+        <h2>Coverage Diff</h2>
+        <br>
+        <div id="ModulesContainer"></div>        
     </div>
 
     <script src="/static/3rdParty/jquery/jquery-2.1.4.js"></script>
     <script src="/static/bootstrap/js/bootstrap.min.js"></script>
     <script src="/static/3rdParty/chartjs/chart.js"></script>
-    <script src="/static/javascript/pieChart.js"></script>
+    <script src="/static/javascript/coverageDiff.js"></script>
 </body>
 </html>
 

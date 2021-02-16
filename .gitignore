@@ -4,6 +4,7 @@
 *.ipch
 *.opendb
 *.opensdf
+*.pyc
 *.retry
 *.sdf
 *.suo
