@@ -226,30 +226,9 @@ bool LMDatabaseManager::writeManagedInstance(const FluffiServiceDescriptor servi
 			PERFORMANCE_WATCH_FUNCTION_EXIT("writeManagedInstance")
 				return false;
 		}
-
-		//Find out how many nice names there are already
-		if (mysql_query(getDBConnection(), "SELECT COUNT(*) FROM nice_names_managed_instance") != 0) {
-			LOG(ERROR) << "LMDatabaseManager::writeManagedInstance failed to figure out how many entries there are already in the nice_names_managed_instance table (1)";
-			PERFORMANCE_WATCH_FUNCTION_EXIT("writeManagedInstance")
-				return false;
-		}
-
-		MYSQL_RES* result = mysql_store_result(getDBConnection());
-		if (result == NULL) {
-			LOG(ERROR) << "LMDatabaseManager::writeManagedInstance failed to figure out how many entries there are already in the nice_names_managed_instance table (2)";
-			PERFORMANCE_WATCH_FUNCTION_EXIT("writeManagedInstance")
-				return false;
-		}
-
-		MYSQL_ROW row = mysql_fetch_row(result);
-		if (row == NULL) {
-			mysql_free_result(result);
-			LOG(ERROR) << "LMDatabaseManager::writeManagedInstance failed to figure out how many entries there are already in the nice_names_managed_instance table (3)";
-			PERFORMANCE_WATCH_FUNCTION_EXIT("writeManagedInstance")
-				return false;
-		}
-
-		std::string niceName = subtype + row[0];
+		
+		//This should be unique, but still acceptably readable
+		std::string niceName = subtype + serviceDescriptor.m_serviceHostAndPort;
 		const char* cNiceName = niceName.c_str();
 		unsigned long cNiceNameLength = static_cast<unsigned long>(niceName.length());
 
