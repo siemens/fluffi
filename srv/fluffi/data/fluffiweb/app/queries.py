@@ -117,6 +117,9 @@ GET_LOCALMANAGER_LOGS = (
     "ON fj.ID = lm.FuzzJob "
     "ORDER BY lmlogs.TimeOfInsertion DESC;")
 
+GET_COUNT_OF_LOCALMANAGER_LOGS = (
+    "SELECT COUNT(*) FROM localmanagers_logmessages;")
+
 GET_COUNT_OF_MANAGED_INSTANCE_LOGS = (
     "SELECT COUNT(ServiceDescriptorGUID) FROM managed_instances_logmessages "
     "WHERE ServiceDescriptorGUID=:sdguid;")
