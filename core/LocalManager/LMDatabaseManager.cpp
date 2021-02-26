@@ -232,8 +232,6 @@ bool LMDatabaseManager::writeManagedInstance(const FluffiServiceDescriptor servi
 		const char* cNiceName = niceName.c_str();
 		unsigned long cNiceNameLength = static_cast<unsigned long>(niceName.length());
 
-		mysql_free_result(result);
-
 		// Try setting the nice name
 		MYSQL_STMT* sql_stmt = mysql_stmt_init(getDBConnection());
 		const char* stmt = "INSERT INTO nice_names_managed_instance (ServiceDescriptorGUID,NiceName ) values (?, ?)";
