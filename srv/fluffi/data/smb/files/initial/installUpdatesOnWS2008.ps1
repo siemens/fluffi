@@ -38,7 +38,7 @@ If((Get-WmiObject -class Win32_OperatingSystem).Caption -like '*2008*'){
 	do {start-sleep -Milliseconds 500}
 	until ($proc1.HasExited)
 
-	$updatePath = "C:\updatesWS2008\Windows6.1-KB2819745-x64-MultiPkg.msu" 
+	$updatePath = "C:\updatesWS2008\Win7AndW2K8R2-KB3191566-x64.msu" 
 	$proc2 = Start-Process "wusa" -argumentlist "$updatePath /quiet /norestart" -Passthru
 	do {start-sleep -Milliseconds 500}
 	until ($proc2.HasExited)
