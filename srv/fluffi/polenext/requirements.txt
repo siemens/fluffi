@@ -85,7 +85,7 @@ pytz==2019.1
 pyuwsgi==2.0.18
 pywinrm==0.3.0
 pyxdg==0.25
-PyYAML==5.1.1
+PyYAML==5.4
 redis==3.2.1
 requests==2.22.0
 requests-kerberos==0.12.0
