@@ -22,7 +22,7 @@
 
 alabaster==0.7.12
 amqp==2.5.0
-ansible==2.8.2
+ansible==2.9.20
 argh==0.26.2
 asn1crypto==0.24.0
 Babel==2.7.0
