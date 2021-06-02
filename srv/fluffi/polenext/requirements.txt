@@ -58,7 +58,7 @@ keyring==10.6.0
 keyrings.alt==3.0
 kombu==4.5.0
 livereload==2.6.1
-markdown2==2.3.8
+markdown2==2.4.0
 MarkupSafe==1.1.1
 mysql-connector==2.2.9
 mysql-connector-python==8.0.15
