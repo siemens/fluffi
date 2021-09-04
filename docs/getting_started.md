@@ -358,5 +358,5 @@ Please note: We strongly discourage connecting FLUFFI to an untrusted network (s
 FLUFFI was not meant to be used in hostile environments, which is why FLUFFI's internal protocol is not hardened against attacks.
 It is therefore recommended to operate FLUFFI in an isolated environment, to which you can restrict access, and only consider allowing the master to connect to the internet via NAT.
 Please note that there are currently several outdated dependencies, including at least one known vulnerability in the django version used in the Polemarch subcomponent.
-Since it is very fragile, changing any dependency version in this component bears the risk of loosing its functionality.
-Due to the isolated environment mentioned above, we do not consider the vulnerability a problem right now and are keeping the version for the time being.
+Since this component is very fragile, changing any dependency version in this component bears the risk of loosing its functionality.
+Due to the isolated enviroment recommendation mentioned above, we do not consider the vulnerability a problem right now and are keeping the version for the time being.
