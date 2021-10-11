@@ -36,12 +36,30 @@ GET_SETTINGS = (
     "SELECT ID, SettingName, SettingValue FROM settings")
 GET_RUNNERTYPE = (
     "SELECT SettingValue FROM settings WHERE SettingName='runnerType'")
+GET_TESTCASE_AND_PARENT = (
+    "SELECT it.CreatorLocalID, it.CreatorServiceDescriptorGUID, it.ParentLocalID, it.ParentServiceDescriptorGUID, nn.NiceName, pnn.NiceName AS ParentNiceName, "
+    "pnnmi.NiceName AS ParentNiceNameMI, nnmi.NiceName AS NiceNameMI "
+    "FROM interesting_testcases AS it "
+    "LEFT JOIN nice_names_testcase AS nn ON nn.CreatorLocalID = it.CreatorLocalID AND nn.CreatorServiceDescriptorGUID = it.CreatorServiceDescriptorGUID "
+    "LEFT JOIN nice_names_testcase AS pnn ON pnn.CreatorLocalID = it.ParentLocalID AND nn.CreatorServiceDescriptorGUID = it.ParentServiceDescriptorGUID "
+    "LEFT JOIN nice_names_managed_instance as nnmi on it.CreatorServiceDescriptorGUID = nnmi.ServiceDescriptorGUID "
+    "LEFT JOIN nice_names_managed_instance as pnnmi on it.ParentServiceDescriptorGUID = pnnmi.ServiceDescriptorGUID "
+    "WHERE it.ID=:ID;")
+GET_PARENT_ID = (
+    "SELECT ID FROM interesting_testcases "
+    "WHERE CreatorLocalID=:parentID AND CreatorServiceDescriptorGUID=:parentSdGuid;")
 GET_COUNT_OF_COVERED_BLOCKS = (
     "SELECT COUNT(DISTINCT ModuleID, Offset) AS CoveredBlocks FROM covered_blocks")
 GET_TARGET_MODULES = (
     "SELECT tm.ID, tm.ModuleName, tm.ModulePath, cbc.CoveredBlocks "
     "FROM target_modules AS tm "
     "LEFT JOIN (SELECT ModuleID, COUNT(DISTINCT ModuleID, Offset) AS CoveredBlocks FROM covered_blocks GROUP BY ModuleID) as cbc ON tm.ID = cbc.ModuleID ORDER BY CoveredBlocks DESC;")
+GET_COVERED_BLOCKS_OF_TESTCASE_FOR_EVERY_MODULE = (
+    "SELECT tm.ModuleName, COUNT(DISTINCT ModuleID, Offset) AS CoveredBlocks "
+    "FROM target_modules AS tm "
+    "LEFT JOIN covered_blocks as cb ON tm.ID = cb.ModuleID "
+    "WHERE CreatorTestcaseID=:ctID "
+    "GROUP BY ModuleID;")
 DELETE_TESTCASES = (
     "DELETE FROM interesting_testcases WHERE CreatorServiceDescriptorGUID <> 'initial'")
 RESET_RATING = (
@@ -99,6 +117,9 @@ GET_LOCALMANAGER_LOGS = (
     "ON fj.ID = lm.FuzzJob "
     "ORDER BY lmlogs.TimeOfInsertion DESC;")
 
+GET_COUNT_OF_LOCALMANAGER_LOGS = (
+    "SELECT COUNT(*) FROM localmanagers_logmessages;")
+
 GET_COUNT_OF_MANAGED_INSTANCE_LOGS = (
     "SELECT COUNT(ServiceDescriptorGUID) FROM managed_instances_logmessages "
     "WHERE ServiceDescriptorGUID=:sdguid;")
@@ -151,8 +172,8 @@ NUM_UNIQUE_CRASH = (
     "SELECT count(*) "
     "FROM (SELECT cd.CrashFootprint, it.TestCaseType FROM interesting_testcases AS it "
     "JOIN crash_descriptions AS cd ON it.ID = cd.CreatorTestcaseID "
-    "GROUP BY cd.CrashFootprint) " 
-    "observedCrashes WHERE TestCaseType=3;")
+    "WHERE TestCaseType=3 "
+    "GROUP BY cd.CrashFootprint) observedCrashes;")
 
 UNIQUE_CRASHES = (
     "SELECT oc.CrashFootprint, oc.ID, oc.TestCaseType, oc.RawBytes, oc.CreatorServiceDescriptorGUID, "

@@ -89,7 +89,7 @@ class TestURLs(unittest.TestCase):
     def test_accessVioUnique_redirect(self):
         """ Tests if the accessVioUnique view URL gives a 200 """
 
-        result = self.client.get("/projects/{}/accessVioUnique".format(self.projId))
+        result = self.client.get("/projects/{}/accessVioUnique/1".format(self.projId))
         self.assertEqual(result.status_code, 200)
 
     def test_totalCrashes_redirect(self):

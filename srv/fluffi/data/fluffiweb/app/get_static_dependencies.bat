@@ -101,6 +101,16 @@ copy dagre\dist\dagre.min.js static\3rdParty\dagre\dagre.min.js
 
 RMDIR /Q/S  dagre
 
+:: Getting chartjs
+
+RMDIR /Q/S static\3rdParty\chartjs
+MKDIR static\3rdParty\chartjs
+
+powershell -Command "Invoke-WebRequest https://cdn.jsdelivr.net/npm/chart.js -OutFile chart.js"
+copy chart.js static\3rdParty\chartjs\chart.js
+
+del chart.js
+
 :: Getting jquery
 
 RMDIR /Q/S  jquery
@@ -128,10 +138,10 @@ MKDIR static\3rdParty\socket.io-client
 
 git clone https://github.com/socketio/socket.io-client.git
 cd socket.io-client
-git checkout d30914d11b13e51ce1c1419d5cc99a74df72c2a7
+git checkout 78ec5a6e43a33b2e9a29eae64e99634bdc5426cd
 cd ..
 
-copy socket.io-client\dist\socket.io.slim.js static\3rdParty\socket.io-client\socket.io.slim.js
+copy socket.io-client\dist\socket.io.min.js static\3rdParty\socket.io-client\socket.io.min.js
 
 
 RMDIR /Q/S  socket.io-client
