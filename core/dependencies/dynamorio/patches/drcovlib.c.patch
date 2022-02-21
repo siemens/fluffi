@@ -1,0 +1,449 @@
+--- ext/drcovlib/drcovlib.c
++++ ext/drcovlib/drcovlib.c
+@@ -52,15 +52,22 @@
+ 
+ #include "dr_api.h"
+ #include "drmgr.h"
++#include "drreg.h" // drMultiCov - include drreg
+ #include "drx.h"
+ #include "drcovlib.h"
+ #include "hashtable.h"
+-#include "drtable.h"
+-#include "modules.h"
++#include "drtable.h" // Edge coverage - remove unnecessary modules.h include
+ #include "drcovlib_private.h"
+ #include <limits.h>
+ #include <string.h>
+ 
++// Edge coverage - includes for hashing and constants
++#include <stdint.h>
++#define XXH_INLINE_ALL
++#include "xxhash.h"
++#undef XXH_INLINE_ALL
++#define EDGE_COVERAGE_MAP_SIZE 65536
++
+ #define UNKNOWN_MODULE_ID USHRT_MAX
+ 
+ /* This is not exposed: internal use only */
+@@ -86,6 +93,18 @@
+ static int tls_idx = -1;
+ static int drcovlib_init_count;
+ 
++// Edge coverage - new globals
++static const char *target_module;
++static unsigned char *edge_coverage_area;
++static int edge_coverage_tls = -1;
++
++// Edge coverage - add inline hash function
++static inline uint64_t
++hash64(uint8_t *key, uint32_t len)
++{
++    return XXH3_64bits(key, len);
++}
++
+ /****************************************************************************
+  * Utility Functions
+  */
+@@ -125,9 +144,12 @@
+ {
+     per_thread_t *data = iter_data;
+     bb_entry_t *bb_entry = (bb_entry_t *)entry;
+-    dr_fprintf(data->log, "module[%3u]: " PFX ", %3u", bb_entry->mod_id, bb_entry->start,
+-               bb_entry->size);
+-    dr_fprintf(data->log, "\n");
++    if (bb_entry->hits_since_last_reset != 0) // drMultiCov - add if statement
++    {
++        dr_fprintf(data->log, "module[%3u]: " PFX ", %3u", bb_entry->mod_id, bb_entry->start,
++                   bb_entry->size);
++        dr_fprintf(data->log, "\n");
++    }
+     return true; /* continue iteration */
+ }
+ 
+@@ -147,7 +169,7 @@
+         drtable_dump_entries(data->bb_table, data->log);
+ }
+ 
+-static void
++static bb_entry_t * // drMultiCov - change return type
+ bb_table_entry_add(void *drcontext, per_thread_t *data, app_pc start, uint size)
+ {
+     bb_entry_t *bb_entry = drtable_alloc(data->bb_table, 1, NULL);
+@@ -157,6 +179,7 @@
+     /* we do not de-duplicate repeated bbs */
+     ASSERT(size < USHRT_MAX, "size overflow");
+     bb_entry->size = (ushort)size;
++    bb_entry->hits_since_last_reset = 0; // drMultiCov - initialize to 0
+     if (res == DRCOVLIB_SUCCESS) {
+         ASSERT(mod_id < USHRT_MAX, "module id overflow");
+         bb_entry->mod_id = (ushort)mod_id;
+@@ -171,6 +194,7 @@
+         bb_entry->mod_id = UNKNOWN_MODULE_ID;
+         bb_entry->start = (uint)(ptr_uint_t)start;
+     }
++    return bb_entry; // drMultiCov - return pointer to the newly allocated entry
+ }
+ 
+ #define INIT_BB_TABLE_ENTRIES 4096
+@@ -214,6 +238,11 @@
+         return;
+     }
+     version_print(data->log);
++
++    // Edge coverage - print hash to log
++    uint64_t hash = hash64(edge_coverage_area, EDGE_COVERAGE_MAP_SIZE);
++    dr_fprintf(data->log, "Edge Coverage Hash: %lx\n", hash);
++
+     drmodtrack_dump(data->log);
+     bb_table_print(drcontext, data);
+ }
+@@ -365,7 +394,7 @@
+      * 4. The duplication can be easily handled in a post-processing step,
+      *    which is required anyway.
+      */
+-    bb_table_entry_add(drcontext, data, tag_pc, (uint)(end_pc - start_pc));
++    *user_data = (void *)bb_table_entry_add(drcontext, data, tag_pc, (uint)(end_pc - start_pc)); // drMultiCov - set user_data
+ 
+     if (go_native)
+         return DR_EMIT_GO_NATIVE;
+@@ -373,6 +402,187 @@
+         return DR_EMIT_DEFAULT;
+ }
+ 
++// drMultiCov - new function
++// Inspired by https://github.com/firodj/bbtrace/blob/master/clients/bbtrace.c, http://dynamorio.org/docs/samples/bbcount.c, and https://github.com/googleprojectzero/winafl/blob/master/winafl.c
++static dr_emit_flags_t
++event_bb_insert(void *drcontext, void *tag, instrlist_t *bb, instr_t *inst,
++                bool for_trace, bool translating, void *user_data)
++{
++    if (!drmgr_is_first_instr(drcontext, inst))
++        return DR_EMIT_DEFAULT;
++
++    // Needed to ensure instrumention unconditionally executes
++    drmgr_disable_auto_predication(drcontext, bb);
++
++#if defined(AARCH64) || defined(ARM)
++    // Initialization
++    size_t naked_addr;
++    reg_id_t reg1, reg2;
++    opnd_t opnd1, opnd2, opnd3;
++    instr_t *new_instr;
++
++    // Save registers
++    drreg_reserve_aflags(drcontext, bb, inst);
++    drreg_reserve_register(drcontext, bb, inst, NULL, &reg1);
++    drreg_reserve_register(drcontext, bb, inst, NULL, &reg2);
++
++    // Get address to increment
++    naked_addr = (size_t) & (((bb_entry_t *)user_data)->hits_since_last_reset);
++
++#if defined(ARM)
++    // Load high
++    opnd1 = opnd_create_reg(reg1);
++    opnd2 = OPND_CREATE_INT16(naked_addr & 0xFFFF);
++    new_instr = INSTR_CREATE_movw(drcontext, opnd1, opnd2);
++    instrlist_meta_preinsert(bb, inst, new_instr);
++
++    // Load low
++    opnd1 = opnd_create_reg(reg1);
++    opnd2 = OPND_CREATE_INT16((naked_addr >> 16) & 0xFFFF);
++    new_instr = INSTR_CREATE_movt(drcontext, opnd1, opnd2);
++    instrlist_meta_preinsert(bb, inst, new_instr);
++#else
++    // Load
++    opnd1 = opnd_create_reg(reg1);
++    opnd2 = OPND_CREATE_INT16((naked_addr >> 0) & 0xFFFF);
++    opnd3 = OPND_CREATE_INT8(0);
++    new_instr = INSTR_CREATE_movk(drcontext, opnd1, opnd2, opnd3);
++    instrlist_meta_preinsert(bb, inst, new_instr);
++
++    opnd1 = opnd_create_reg(reg1);
++    opnd2 = OPND_CREATE_INT16((naked_addr >> 16) & 0xFFFF);
++    opnd3 = OPND_CREATE_INT8(16);
++    new_instr = INSTR_CREATE_movk(drcontext, opnd1, opnd2, opnd3);
++    instrlist_meta_preinsert(bb, inst, new_instr);
++
++    opnd1 = opnd_create_reg(reg1);
++    opnd2 = OPND_CREATE_INT16((naked_addr >> 32) & 0xFFFF);
++    opnd3 = OPND_CREATE_INT8(32);
++    new_instr = INSTR_CREATE_movk(drcontext, opnd1, opnd2, opnd3);
++    instrlist_meta_preinsert(bb, inst, new_instr);
++
++    opnd1 = opnd_create_reg(reg1);
++    opnd2 = OPND_CREATE_INT16((naked_addr >> 48) & 0xFFFF);
++    opnd3 = OPND_CREATE_INT8(48);
++    new_instr = INSTR_CREATE_movk(drcontext, opnd1, opnd2, opnd3);
++    instrlist_meta_preinsert(bb, inst, new_instr);
++#endif
++    // Dereference
++    opnd1 = opnd_create_reg(reg2);
++    opnd2 = OPND_CREATE_MEM32(reg1, 0);
++    new_instr = INSTR_CREATE_ldr(drcontext, opnd1, opnd2);
++    instrlist_meta_preinsert(bb, inst, new_instr);
++
++    // Increment
++    opnd1 = opnd_create_reg(reg2);
++    opnd2 = opnd_create_reg(reg2);
++    opnd3 = OPND_CREATE_INT(1));
++    new_instr = INSTR_CREATE_add(drcontext, opnd1, opnd2, opnd3);
++    instrlist_meta_preinsert(bb, inst, new_instr);
++
++    // Store
++    opnd1 = OPND_CREATE_MEM32(reg1, 0);
++    opnd2 = opnd_create_reg(reg2);
++    new_instr = INSTR_CREATE_str(drcontext, opnd1, opnd2);
++    instrlist_meta_preinsert(bb, inst, new_instr);
++
++    // Restore registers
++    drreg_unreserve_register(drcontext, bb, inst, reg2);
++    drreg_unreserve_register(drcontext, bb, inst, reg1);
++    drreg_unreserve_aflags(drcontext, bb, inst);
++
++#else
++    // Initialization
++    bool edge_coverage;
++    app_pc start_pc, mod_start;
++    module_entry_t *mod_entry;
++    uint mod_id, offset;
++    const char *mod_name;
++    reg_id_t reg, reg2, reg3;
++    opnd_t opnd1, opnd2;
++    instr_t *new_instr;
++
++    // Check module name
++    edge_coverage = false;
++    if (target_module != NULL)
++    {
++        start_pc = dr_fragment_app_pc(tag);
++        drcovlib_status_t res = drmodtrack_lookup_data(drcontext, start_pc, &mod_id, &mod_start, &mod_entry);
++        if (res == DRCOVLIB_SUCCESS)
++        {
++            mod_name = dr_module_preferred_name(mod_entry->data);
++            if (strcasecmp(mod_name, target_module) == 0)
++            {
++                edge_coverage = true;
++            }
++        }
++    }
++
++    // Reserve registers
++    drreg_reserve_aflags(drcontext, bb, inst);
++    if (edge_coverage)
++    {
++        drreg_reserve_register(drcontext, bb, inst, NULL, &reg);
++        drreg_reserve_register(drcontext, bb, inst, NULL, &reg2);
++        drreg_reserve_register(drcontext, bb, inst, NULL, &reg3);
++
++        // Get BB offset
++        offset = (uint)(start_pc - mod_start);
++        offset &= EDGE_COVERAGE_MAP_SIZE - 1;
++
++        // Load pointer to previous offset into reg3
++        drmgr_insert_read_tls_field(drcontext, edge_coverage_tls, bb, inst, reg3);
++
++        // Load pointer to shared memory into reg2
++        opnd1 = opnd_create_reg(reg2);
++        opnd2 = OPND_CREATE_INTPTR((uint64)edge_coverage_area);
++        new_instr = INSTR_CREATE_mov_imm(drcontext, opnd1, opnd2);
++        instrlist_meta_preinsert(bb, inst, new_instr);
++
++        // Load previous offset into reg
++        opnd1 = opnd_create_reg(reg);
++        opnd2 = OPND_CREATE_MEMPTR(reg3, 0);
++        new_instr = INSTR_CREATE_mov_ld(drcontext, opnd1, opnd2);
++        instrlist_meta_preinsert(bb, inst, new_instr);
++
++        // XOR reg (previous offset) with the new offset
++        opnd1 = opnd_create_reg(reg);
++        opnd2 = OPND_CREATE_INT32(offset);
++        new_instr = INSTR_CREATE_xor(drcontext, opnd1, opnd2);
++        instrlist_meta_preinsert(bb, inst, new_instr);
++
++        // Increment the counter in shared memory
++        opnd1 = opnd_create_base_disp(reg2, reg, 1, 0, OPSZ_1);
++        new_instr = INSTR_CREATE_inc(drcontext, opnd1);
++        instrlist_meta_preinsert(bb, inst, new_instr);
++
++        // Store the new offset
++        offset = (offset >> 1) & (EDGE_COVERAGE_MAP_SIZE - 1);
++        opnd1 = OPND_CREATE_MEMPTR(reg3, 0);
++        opnd2 = OPND_CREATE_INT32(offset);
++        new_instr = INSTR_CREATE_mov_st(drcontext, opnd1, opnd2);
++        instrlist_meta_preinsert(bb, inst, new_instr);
++    }
++
++    // Increment for drMultiCov
++    opnd1 = OPND_CREATE_ABSMEM(&(((bb_entry_t *)user_data)->hits_since_last_reset), OPSZ_4);
++    new_instr = INSTR_CREATE_inc(drcontext, opnd1);
++    instrlist_meta_preinsert(bb, inst, new_instr);
++
++    // Unreserve registers
++    if (edge_coverage)
++    {
++        drreg_unreserve_register(drcontext, bb, inst, reg3);
++        drreg_unreserve_register(drcontext, bb, inst, reg2);
++        drreg_unreserve_register(drcontext, bb, inst, reg);
++    }
++    drreg_unreserve_aflags(drcontext, bb, inst);
++
++#endif
++
++    return DR_EMIT_DEFAULT;
++}
++
+ static void
+ event_thread_exit(void *drcontext)
+ {
+@@ -388,6 +598,10 @@
+         /* the per-thread data is a copy of global data */
+         dr_thread_free(drcontext, data, sizeof(*data));
+     }
++
++    // Edge coverage - free TLS field
++    void *thread_data = drmgr_get_tls_field(drcontext, edge_coverage_tls);
++    dr_thread_free(drcontext, thread_data, 2 * sizeof(void *));
+ }
+ 
+ static void
+@@ -433,6 +647,11 @@
+     else
+         data = thread_data_copy(drcontext);
+     drmgr_set_tls_field(drcontext, tls_idx, data);
++
++    // Edge coverage - allocate TLS field
++    void **thread_data = (void **)dr_thread_alloc(drcontext, sizeof(void *));
++    *thread_data = 0;
++    drmgr_set_tls_field(drcontext, edge_coverage_tls, thread_data);
+ }
+ 
+ #ifndef WINDOWS
+@@ -505,6 +724,11 @@
+ 
+     drmgr_unregister_tls_field(tls_idx);
+ 
++    // Edge coverage - free resources
++    drmgr_unregister_tls_field(edge_coverage_tls);
++    dr_global_free(edge_coverage_area, EDGE_COVERAGE_MAP_SIZE);
++    drreg_exit();
++
+     drx_exit();
+     drmgr_exit();
+ 
+@@ -565,6 +789,22 @@
+     drmgr_init();
+     drx_init();
+ 
++    // Edge coverage - drreg initialization
++    drreg_options_t drreg_ops = {sizeof(drreg_ops), 2 /*max slots needed: aflags*/, false};
++    drreg_init(&drreg_ops);
++
++    // Edge coverage - TLS initialization
++    edge_coverage_tls = drmgr_register_tls_field();
++    if (edge_coverage_tls == -1)
++        return DRCOVLIB_ERROR;
++    
++    // Edge coverage - global area initialization
++    edge_coverage_area = (unsigned char *)dr_global_alloc(EDGE_COVERAGE_MAP_SIZE);
++    memset(edge_coverage_area, 0, EDGE_COVERAGE_MAP_SIZE);
++
++    // Edge coverage - set target module
++    target_module = ops->target_module;
++
+     /* We follow a simple model of the caller requesting the coverage dump,
+      * either via calling the exit routine, using its own soft_kills nudge, or
+      * an explicit dump call for unusual cases.  This means that drx's
+@@ -575,7 +815,7 @@
+ 
+     drmgr_register_thread_init_event(event_thread_init);
+     drmgr_register_thread_exit_event(event_thread_exit);
+-    drmgr_register_bb_instrumentation_event(event_basic_block_analysis, NULL, NULL);
++    drmgr_register_bb_instrumentation_event(event_basic_block_analysis, event_bb_insert, NULL); // drMultiCov - add instrumentation function
+     dr_register_filter_syscall_event(event_filter_syscall);
+     drmgr_register_pre_syscall_event(event_pre_syscall);
+ #ifdef UNIX
+@@ -588,3 +828,85 @@
+ 
+     return event_init();
+ }
++
++// drMultiCov - new function
++static bool
++bb_table_entry_clear_hits(ptr_uint_t idx, void *entry, void *iter_data)
++{
++    bb_entry_t *bb_entry = (bb_entry_t *)entry;
++    bb_entry->hits_since_last_reset = 0;
++
++    return true;
++}
++
++// drMultiCov - new function
++drcovlib_status_t
++reset_coverage(void)
++{
++    void **drcontexts = NULL;
++    uint num_threads, i;
++    if (dr_suspend_all_other_threads_ex(&drcontexts, &num_threads, NULL, DR_SUSPEND_NATIVE))
++    {
++        NOTIFY(1, "suspended %d threads\n", num_threads);
++        if (!drcov_per_thread)
++        {
++            drtable_iterate(global_data->bb_table, global_data, bb_table_entry_clear_hits);
++        }
++        else
++        {
++            for (i = 0; i < num_threads; i++)
++            {
++                per_thread_t *data = (per_thread_t *)drmgr_get_tls_field(drcontexts[i], tls_idx);
++                drtable_iterate(data->bb_table, data, bb_table_entry_clear_hits);
++            }
++        }
++        if (!dr_resume_all_other_threads(drcontexts, num_threads))
++        {
++            ASSERT(false, "failed to resume threads");
++        }
++    }
++    else
++    {
++        ASSERT(false, "failed to suspend threads");
++    }
++
++    return DRCOVLIB_SUCCESS;
++}
++
++// drMultiCov - new function
++drcovlib_status_t
++dump_current_coverage(void)
++{
++    void **drcontexts = NULL;
++    uint num_threads, i;
++    if (dr_suspend_all_other_threads_ex(&drcontexts, &num_threads, NULL, DR_SUSPEND_NATIVE))
++    {
++        NOTIFY(1, "suspended %d threads\n", num_threads);
++        if (!drcov_per_thread)
++        {
++            dump_drcov_data(NULL, global_data);
++            dr_close_file(global_data->log);
++            log_file_create(NULL, global_data);
++        }
++        else
++        {
++            for (i = 0; i < num_threads; i++)
++            {
++                per_thread_t *data = (per_thread_t *)drmgr_get_tls_field(drcontexts[i], tls_idx);
++                dump_drcov_data(drcontexts[i], data);
++                dr_close_file(data->log);
++                log_file_create(drcontexts[i], data);
++            }
++        }
++        if (!dr_resume_all_other_threads(drcontexts, num_threads))
++        {
++            ASSERT(false, "failed to resume threads");
++        }
++    }
++    else
++    {
++        ASSERT(false, "failed to suspend threads");
++    }
++
++    return DRCOVLIB_SUCCESS;
++}
