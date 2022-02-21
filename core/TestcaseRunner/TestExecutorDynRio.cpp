@@ -58,6 +58,16 @@ void TestExecutorDynRio::copyCoveredModulesToDebugExecutionOutput(const std::vec
 		return;
 	}
 
+	// Get edge coverage hash
+	std::getline(iss, line);
+	if (line.find("Hash: ") != std::string::npos) {
+		size_t pointerToHash = line.find("Hash: ");
+		texOutput->m_edgeCoverageHash = line.substr(pointerToHash + 6, line.length() - pointerToHash - 6);
+	} else {
+		LOG(ERROR) << "Trace::copyCoveredModulesToTestResult was called but dynamo rio's output did not contain the edge coverage hash.";
+		return;
+	}
+
 	int num_mods = -1;
 
 	// get num of modules loaded

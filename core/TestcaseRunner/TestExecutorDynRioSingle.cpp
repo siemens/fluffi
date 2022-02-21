@@ -165,20 +165,23 @@ std::shared_ptr<DebugExecutionOutput> TestExecutorDynRioSingle::execute(const Fl
 		return firstExecutionOutput;
 	}
 
+	// Get target module name
+	std::string targetModuleName = m_modulesToCover.begin()->m_modulename;
+
 	// build command line to execute
 	std::stringstream firstCMDLine;
 #if defined(_WIN64)
 	//64 bit Windows
-	firstCMDLine << "dyndist64\\bin64\\drrun.exe -v -t drcov -dump_binary -logdir \"" + m_testcaseDir + "\" -- ";
+	firstCMDLine << "dyndist64\\bin64\\drrun.exe -v -t drcov -dump_binary -target_module " + targetModuleName + " -logdir \"" + m_testcaseDir + "\" -- ";
 #elif defined(_WIN32)
 	//32 bit Windows
-	firstCMDLine << "dyndist32\\bin32\\drrun.exe -v -t drcov -dump_binary -logdir \"" + m_testcaseDir + "\" -- ";
+	firstCMDLine << "dyndist32\\bin32\\drrun.exe -v -t drcov -dump_binary -target_module " + targetModuleName + " -logdir \"" + m_testcaseDir + "\" -- ";
 #elif (__WORDSIZE == 64 )
 	//64 bit Linux
-	firstCMDLine << "dynamorio/bin64/drrun -v -t drcov -dump_binary -logdir \"" + m_testcaseDir + "\" -- ";
+	firstCMDLine << "dynamorio/bin64/drrun -v -t drcov -dump_binary -target_module " + targetModuleName + " -logdir \"" + m_testcaseDir + "\" -- ";
 #else
 	//32 bit Linux
-	firstCMDLine << "dynamorio/bin32/drrun -v -t drcov -dump_binary -logdir \"" + m_testcaseDir + "\" -- ";
+	firstCMDLine << "dynamorio/bin32/drrun -v -t drcov -dump_binary -target_module " + targetModuleName + " -logdir \"" + m_testcaseDir + "\" -- ";
 #endif
 
 	if (m_targetCMDline.find("<INPUT_FILE>") != std::string::npos) {

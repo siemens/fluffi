@@ -25,13 +25,13 @@ Author(s): Thomas Riedmaier, Abian Blome
 #include "stdafx.h"
 #include "FluffiTestResult.h"
 
-FluffiTestResult::FluffiTestResult(const ExitType exitType, const std::vector<FluffiBasicBlock> blocks, const std::string crashFootprint, bool hasFullCoverage) :
-	m_exitType(exitType), m_blocks(blocks), m_crashFootprint(crashFootprint), m_hasFullCoverage(hasFullCoverage)
+FluffiTestResult::FluffiTestResult(const ExitType exitType, const std::vector<FluffiBasicBlock> blocks, const std::string crashFootprint, bool hasFullCoverage, const std::string edgeCoverageHash) :
+	m_exitType(exitType), m_blocks(blocks), m_crashFootprint(crashFootprint), m_hasFullCoverage(hasFullCoverage), m_edgeCoverageHash(edgeCoverageHash)
 {
 }
 
 FluffiTestResult::FluffiTestResult(const TestResult& testResult) :
-	m_exitType(testResult.exittype()), m_crashFootprint(testResult.crashfootprint()), m_hasFullCoverage(testResult.hasfullcoverage())
+	m_exitType(testResult.exittype()), m_crashFootprint(testResult.crashfootprint()), m_hasFullCoverage(testResult.hasfullcoverage()), m_edgeCoverageHash(testResult.edgecoveragehash())
 {
 	google::protobuf::RepeatedPtrField< ::BasicBlock > b = testResult.blocks();
 	for (int i = 0; i < b.size(); i++) {
@@ -49,6 +49,7 @@ TestResult FluffiTestResult::getProtobuf() const
 	tr.set_exittype(m_exitType);
 	tr.set_crashfootprint(m_crashFootprint);
 	tr.set_hasfullcoverage(m_hasFullCoverage);
+	tr.set_edgecoveragehash(m_edgeCoverageHash);
 
 	for (auto const& block : m_blocks) {
 		BasicBlock* newblock = tr.add_blocks();
@@ -63,6 +64,7 @@ void FluffiTestResult::setProtobuf(TestResult* tr) const
 	tr->set_exittype(m_exitType);
 	tr->set_crashfootprint(m_crashFootprint);
 	tr->set_hasfullcoverage(m_hasFullCoverage);
+	tr->set_edgecoveragehash(m_edgeCoverageHash);
 
 	tr->clear_blocks();
 	for (auto const& block : m_blocks) {

@@ -57,7 +57,7 @@ void ReportTestcaseWithNoResultRequestHandler::handleFLUFFIMessage(WorkerThreadS
 	}
 	else {
 		//will delete the testcase file
-		success = lmWorkerThreadState->dbManager->addEntryToInterestingTestcasesTable(FluffiTestcaseID(reportTestcaseWithNoResultRequest->id()), FluffiTestcaseID(reportTestcaseWithNoResultRequest->parentid()), 0, m_testcaseDir, LMDatabaseManager::TestCaseType::NoResponse);
+		success = lmWorkerThreadState->dbManager->addEntryToInterestingTestcasesTable(FluffiTestcaseID(reportTestcaseWithNoResultRequest->id()), FluffiTestcaseID(reportTestcaseWithNoResultRequest->parentid()), 0, m_testcaseDir, LMDatabaseManager::TestCaseType::NoResponse, "");
 
 		if (!success) {
 			LOG(ERROR) << "ReportTestcaseWithNoResultRequestHandler failed to add the testcase " << FluffiTestcaseID(reportTestcaseWithNoResultRequest->id()) << " to the database.";

@@ -28,7 +28,7 @@ Author(s): Thomas Riedmaier, Abian Blome
 class FluffiTestResult
 {
 public:
-	FluffiTestResult(const ExitType exitType, const std::vector<FluffiBasicBlock> blocks, const std::string crashFootprint, bool hasFullCoverage);
+	FluffiTestResult(const ExitType exitType, const std::vector<FluffiBasicBlock> blocks, const std::string crashFootprint, bool hasFullCoverage, const std::string edgeCoverageHash);
 	FluffiTestResult(const TestResult& testResult);
 	virtual ~FluffiTestResult();
 
@@ -39,4 +39,5 @@ public:
 	std::vector<FluffiBasicBlock> m_blocks;
 	std::string m_crashFootprint;
 	bool m_hasFullCoverage;
+	std::string m_edgeCoverageHash;
 };

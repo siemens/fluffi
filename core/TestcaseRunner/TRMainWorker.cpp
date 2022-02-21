@@ -661,22 +661,22 @@ FluffiTestResult TRMainWorker::fuzzTestCase(const FluffiTestcaseID testcaseId, b
 	LOG(DEBUG) << "Termination description:" << output->m_terminationDescription;
 	if (output->m_terminationType == DebugExecutionOutput::PROCESS_TERMINATION_TYPE::CLEAN) {
 		LOG(DEBUG) << "exit normal";
-		return FluffiTestResult(ExitType::CleanExit, output->getCoveredBasicBlocks(), "", output->m_hasFullCoverage);
+		return FluffiTestResult(ExitType::CleanExit, output->getCoveredBasicBlocks(), "", output->m_hasFullCoverage, output->m_edgeCoverageHash);
 	}
 	else {
 		switch (output->m_terminationType) {
 		case DebugExecutionOutput::PROCESS_TERMINATION_TYPE::ERR:
 			LOG(INFO) << "ERROR: " << output->m_terminationDescription;
-			return FluffiTestResult(ExitType::Exception_Other, std::vector<FluffiBasicBlock>(), "Internal Error: " + output->m_terminationDescription, output->m_hasFullCoverage);
+			return FluffiTestResult(ExitType::Exception_Other, std::vector<FluffiBasicBlock>(), "Internal Error: " + output->m_terminationDescription, output->m_hasFullCoverage, output->m_edgeCoverageHash);
 		case DebugExecutionOutput::PROCESS_TERMINATION_TYPE::EXCEPTION_OTHER:
 			LOG(INFO) << "CRASH @ " << std::hex << output->m_lastCrash << " !";
-			return FluffiTestResult(ExitType::Exception_Other, std::vector<FluffiBasicBlock>(), output->m_firstCrash + "-" + output->m_lastCrash, output->m_hasFullCoverage);
+			return FluffiTestResult(ExitType::Exception_Other, std::vector<FluffiBasicBlock>(), output->m_firstCrash + "-" + output->m_lastCrash, output->m_hasFullCoverage, output->m_edgeCoverageHash);
 		case DebugExecutionOutput::PROCESS_TERMINATION_TYPE::EXCEPTION_ACCESSVIOLATION:
 			LOG(INFO) << "ACCESS VIOLATION @ " << std::hex << output->m_lastCrash << " !";
-			return FluffiTestResult(ExitType::Exception_AccessViolation, std::vector<FluffiBasicBlock>(), output->m_firstCrash + "-" + output->m_lastCrash, output->m_hasFullCoverage);
+			return FluffiTestResult(ExitType::Exception_AccessViolation, std::vector<FluffiBasicBlock>(), output->m_firstCrash + "-" + output->m_lastCrash, output->m_hasFullCoverage, output->m_edgeCoverageHash);
 		case DebugExecutionOutput::PROCESS_TERMINATION_TYPE::TIMEOUT:
 			LOG(INFO) << "HANG!";
-			return FluffiTestResult(ExitType::Hang, std::vector<FluffiBasicBlock>(), "", output->m_hasFullCoverage);
+			return FluffiTestResult(ExitType::Hang, std::vector<FluffiBasicBlock>(), "", output->m_hasFullCoverage, output->m_edgeCoverageHash);
 		default:
 			LOG(ERROR) << "Observed non-implemented termination type!";
 			google::protobuf::ShutdownProtobufLibrary();

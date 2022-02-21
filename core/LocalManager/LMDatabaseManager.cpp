@@ -963,7 +963,7 @@ std::vector<StatusOfInstance> LMDatabaseManager::getStatusOfManagedInstances(std
 }
 
 //Add testcase to database (Testacase file gets deleted here)
-bool LMDatabaseManager::addEntryToInterestingTestcasesTable(const FluffiTestcaseID tcID, const FluffiTestcaseID tcparentID, int rating, const std::string testcaseDir, TestCaseType tcType) {
+bool LMDatabaseManager::addEntryToInterestingTestcasesTable(const FluffiTestcaseID tcID, const FluffiTestcaseID tcparentID, int rating, const std::string testcaseDir, TestCaseType tcType, const std::string edgeCoverageHash) {
 	PERFORMANCE_WATCH_FUNCTION_ENTRY
 		const char* cStrCreatorServiceDescriptorGUID = tcID.m_serviceDescriptor.m_guid.c_str();
 	unsigned long creatorGUIDLength = static_cast<unsigned long>(tcID.m_serviceDescriptor.m_guid.length());
@@ -979,6 +979,9 @@ bool LMDatabaseManager::addEntryToInterestingTestcasesTable(const FluffiTestcase
 
 	const char* cStrParentServiceDescriptorGUID = tcparentIDToSet.m_serviceDescriptor.m_guid.c_str();
 	unsigned long parentGUIDLength = static_cast<unsigned long>(tcparentIDToSet.m_serviceDescriptor.m_guid.length());
+
+	const char* hashString = edgeCoverageHash.c_str();
+	unsigned long hashLength = static_cast<unsigned long>(edgeCoverageHash.length());
 
 	uint64_t preparedParentLocalID = tcparentIDToSet.m_localID;
 
@@ -1031,12 +1034,22 @@ bool LMDatabaseManager::addEntryToInterestingTestcasesTable(const FluffiTestcase
 	// Second step: Actually insert the interesting testcase
 	{
 		MYSQL_STMT* sql_stmt = mysql_stmt_init(getDBConnection());
-
-		const char* stmt = "INSERT INTO interesting_testcases (CreatorServiceDescriptorGUID, CreatorLocalID, ParentServiceDescriptorGUID, ParentLocalID, Rating, RawBytes, TestCaseType, TimeOfInsertion) values (?, ?, ?, ?, ?, ?, ?,CURRENT_TIMESTAMP())";
+		const char *stmt;
+		int bind_len;
+		if (edgeCoverageHash.empty())
+		{
+			bind_len = 7;
+			stmt = "INSERT INTO interesting_testcases (CreatorServiceDescriptorGUID, CreatorLocalID, ParentServiceDescriptorGUID, ParentLocalID, Rating, RawBytes, TestCaseType, TimeOfInsertion) values (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP())";
+		}
+		else
+		{
+			bind_len = 8;
+			stmt = "INSERT INTO interesting_testcases (CreatorServiceDescriptorGUID, CreatorLocalID, ParentServiceDescriptorGUID, ParentLocalID, Rating, RawBytes, TestCaseType, TimeOfInsertion, EdgeCoverageHash) values (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP(), ?)";
+		}
 		mysql_stmt_prepare(sql_stmt, stmt, static_cast<unsigned long>(strlen(stmt)));
 
 		//params
-		MYSQL_BIND bind[9];
+		MYSQL_BIND bind[bind_len];
 		memset(bind, 0, sizeof(bind));
 
 		bind[0].buffer_type = MYSQL_TYPE_VAR_STRING;
@@ -1078,17 +1091,12 @@ bool LMDatabaseManager::addEntryToInterestingTestcasesTable(const FluffiTestcase
 		bind[6].is_unsigned = true;
 		bind[6].length = NULL;
 
-		bind[7].buffer_type = MYSQL_TYPE_LONG;
-		bind[7].buffer = &preparedRating;
-		bind[7].is_null = 0;
-		bind[7].is_unsigned = false;
-		bind[7].length = NULL;
-
-		bind[8].buffer_type = MYSQL_TYPE_LONG;
-		bind[8].buffer = &preparedType;
-		bind[8].is_null = 0;
-		bind[8].is_unsigned = true;
-		bind[8].length = NULL;
+		if (!edgeCoverageHash.empty()) {
+			bind[7].buffer_type = MYSQL_TYPE_STRING;
+			bind[7].buffer = const_cast<char*>(hashString);
+			bind[7].buffer_length = hashLength;
+			bind[7].length = &hashLength;
+		}
 
 		mysql_stmt_bind_param(sql_stmt, bind);
 		//if problems with big files arise, mysql_stmt_send_long_data might be the solution
@@ -2171,5 +2179,43 @@ bool LMDatabaseManager::getParentTCID(const FluffiTestcaseID tcID, FluffiTestcas
 	mysql_stmt_close(sql_stmt);
 
 	PERFORMANCE_WATCH_FUNCTION_EXIT("getParentTCID")
+		return re;
+}
+
+bool LMDatabaseManager::incrementEdgeCoverage(const std::string hash) {
+	PERFORMANCE_WATCH_FUNCTION_ENTRY
+
+	const char* hashString = hash.c_str();
+	unsigned long hashLength = static_cast<unsigned long>(hash.length());
+
+	if (hashLength != 16) {
+		PERFORMANCE_WATCH_FUNCTION_EXIT("incrementEdgeCoverage")
+		return true;
+	}
+
+	//// prepared Statement
+	MYSQL_STMT* sql_stmt = mysql_stmt_init(getDBConnection());
+
+	const char* stmt = "INSERT INTO edge_coverage (Hash, Counter) VALUES (?, 1) ON DUPLICATE KEY UPDATE Counter = Counter + 1";
+	mysql_stmt_prepare(sql_stmt, stmt, static_cast<unsigned long>(strlen(stmt)));
+
+	//params
+	MYSQL_BIND bind[1];
+	memset(bind, 0, sizeof(bind));
+
+	bind[0].buffer_type = MYSQL_TYPE_STRING;
+	bind[0].buffer = const_cast<char*>(hashString);
+	bind[0].buffer_length = hashLength;
+	bind[0].length = &hashLength;
+
+	mysql_stmt_bind_param(sql_stmt, bind);
+	bool re = mysql_stmt_execute(sql_stmt) == 0;
+	if (!re) {
+		LOG(ERROR) << "incrementEdgeCoverage encountered the following error: " << mysql_stmt_error(sql_stmt);
+	}
+
+	mysql_stmt_close(sql_stmt);
+
+	PERFORMANCE_WATCH_FUNCTION_EXIT("incrementEdgeCoverage")
 		return re;
 }
