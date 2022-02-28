@@ -831,11 +831,11 @@ GetTestcaseToMutateResponse* LMDatabaseManager::generateGetTestcaseToMutateRespo
 		mysql_stmt_close(sql_stmt);
 	}
 
-	// Increment ChosenCounter for chosen testcase
+	// Increment ChosenCounter for chosen testcase and timestamp for when testcase was last chosen
 	{
 		// Prepared statement
 		MYSQL_STMT* sql_stmt = mysql_stmt_init(getDBConnection());
-		const char* stmt = "UPDATE interesting_testcases SET ChosenCounter = ChosenCounter + 1 WHERE ID = ?";
+		const char* stmt = "UPDATE interesting_testcases SET TimeLastChosen = CURRENT_TIMESTAMP(), ChosenCounter = ChosenCounter + 1 WHERE ID = ?";
 		mysql_stmt_prepare(sql_stmt, stmt, static_cast<unsigned long>(strlen(stmt)));
 
 		// Param
@@ -1064,12 +1064,12 @@ bool LMDatabaseManager::addEntryToInterestingTestcasesTable(const FluffiTestcase
 		if (edgeCoverageHash.empty())
 		{
 			bind_len = 7;
-			stmt = "INSERT INTO interesting_testcases (CreatorServiceDescriptorGUID, CreatorLocalID, ParentServiceDescriptorGUID, ParentLocalID, Rating, RawBytes, TestCaseType, TimeOfInsertion) values (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP())";
+			stmt = "INSERT INTO interesting_testcases (CreatorServiceDescriptorGUID, CreatorLocalID, ParentServiceDescriptorGUID, ParentLocalID, Rating, RawBytes, TestCaseType, TimeOfInsertion, TimeLastChosen, ChosenCounter) values (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), 0)";
 		}
 		else
 		{
 			bind_len = 8;
-			stmt = "INSERT INTO interesting_testcases (CreatorServiceDescriptorGUID, CreatorLocalID, ParentServiceDescriptorGUID, ParentLocalID, Rating, RawBytes, TestCaseType, TimeOfInsertion, EdgeCoverageHash) values (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP(), ?)";
+			stmt = "INSERT INTO interesting_testcases (CreatorServiceDescriptorGUID, CreatorLocalID, ParentServiceDescriptorGUID, ParentLocalID, Rating, RawBytes, TestCaseType, TimeOfInsertion, TimeLastChosen, EdgeCoverageHash, ChosenCounter) values (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), ?, 0)";
 		}
 		mysql_stmt_prepare(sql_stmt, stmt, static_cast<unsigned long>(strlen(stmt)));
 

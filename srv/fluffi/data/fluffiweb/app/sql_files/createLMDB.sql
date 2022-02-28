@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS fluffi.interesting_testcases (
 	`RawBytes` LONGBLOB NOT NULL,
 	`TestCaseType` INT(1) NOT NULL,
 	`TimeOfInsertion` TIMESTAMP NULL DEFAULT NULL,
+	`TimeLastChosen` TIMESTAMP NOT NULL,
 	`EdgeCoverageHash` CHAR(16) NULL DEFAULT NULL,
 	`ChosenCounter` BIGINT NOT NULL DEFAULT 0,
 	UNIQUE (`CreatorServiceDescriptorGUID`, `CreatorLocalID`),
