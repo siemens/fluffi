@@ -117,7 +117,6 @@ def encode_seq(mapping, seq):
 
 def getCharset(testcases):
     # create a character mapping index
-    chars = list()
     charset = set()
     for testcase in testcases:
         charset = charset.union(set(testcase))
