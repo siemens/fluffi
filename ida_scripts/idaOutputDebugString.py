@@ -56,5 +56,5 @@ for frm, to in xrefs:
     try:
         patchFile(frm, offset)
     except:
-        pass
+        print(e)
 
