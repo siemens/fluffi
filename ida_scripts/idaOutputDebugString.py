@@ -55,6 +55,6 @@ for frm, to in xrefs:
     print "File location: %08x (%08x -> %08x)" % (offset, frm, to)
     try:
         patchFile(frm, offset)
-    except:
+    except Exception as e:
         print(e)
 
