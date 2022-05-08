@@ -166,13 +166,13 @@ class AnsibleRESTConnector:
     def removeSystem(self, hostName):
         systems = self.getSystems()
             
-        url = ""
+        url = str()
         for system in systems:
             if system[0] == hostName:
                 url = self.ansibleURL + "host/" + str(system[1])
                 break
             
-        if url != "":
+        if url:
             try:
                 response = requests.delete(url, auth = self.auth)
                 return True
