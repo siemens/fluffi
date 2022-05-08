@@ -748,7 +748,6 @@ def getResultOfStatement(projId, stmt, params=None):
         engine.dispose()
     except Exception as e:
         print(e)
-        pass
 
     return result
 
