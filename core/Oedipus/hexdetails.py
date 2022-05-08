@@ -31,7 +31,7 @@ if __name__ == '__main__':
     p.add_argument('job', help='fuzzjob name (without prefix)')
     args = p.parse_args()
 
-    s = args.user + ':' + args.passwd + '@tcp(' + args.host + ':' + args.port +')/fluffi_' + args.job
+    s = args.user + ':' + '@tcp(' + args.host + ':' + args.port +')/fluffi_' + args.job
     print(s)
     st = ["{:x}".format(ord(i)) for i in s]
     er = ''
