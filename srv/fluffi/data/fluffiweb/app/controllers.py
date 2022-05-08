@@ -1106,8 +1106,7 @@ def insertModules(projId, request):
     project = models.Fuzzjob.query.filter_by(ID = projId).first()
     if project is None:
         return "Error: Project not found", "error"
-
-    msg, category = "", ""    
+ 
     try:
         engine = create_engine(
             'mysql://%s:%s@%s/%s' % (project.DBUser, project.DBPass, fluffiResolve(project.DBHost), project.DBName))
