@@ -188,7 +188,6 @@ os.mkdir(storDir)
 
 engine = get_engine(database_string, fuzzjobName)
 registerInDB(engine, guid)
-maxdate = get_maxdate(engine)
 testcases = get_testcases(engine, limit)
 sequences = getFeatures(testcases)
 charset = getCharset(testcases)
