@@ -98,9 +98,7 @@ core/dependencies/libuuid/lib/
 core/dependencies/mariadb/bin/
 core/dependencies/mariadb/include/
 core/dependencies/mariadb/lib/
-core/dependencies/openssl/include/
-core/dependencies/openssl/include64/
-core/dependencies/openssl/include86/
+core/dependencies/openssl/include*/
 core/dependencies/openssl/lib/
 core/dependencies/qemu/ARM/
 core/dependencies/qemu/ARMaarch64/
