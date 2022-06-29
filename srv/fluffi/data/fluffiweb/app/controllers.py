@@ -225,6 +225,9 @@ def getProject(projId):
         result = connection.execute(NUM_BLOCKS)
         project.numBlocks = result.fetchone()[0]
 
+        result = connection.execute(NUM_PATHS)
+        project.numPaths = result.fetchone()[0]
+
         result = connection.execute(getMICountOfTypeQuery(2))
         project.numTE = result.fetchone()[0]
 
