@@ -85,19 +85,21 @@
  }
  
  #define INIT_BB_TABLE_ENTRIES 4096
-@@ -214,6 +238,11 @@
+@@ -214,6 +238,13 @@
          return;
      }
      version_print(data->log);
 +
 +    // Edge coverage - print hash to log
-+    uint64_t hash = hash64(edge_coverage_area, EDGE_COVERAGE_MAP_SIZE);
-+    dr_fprintf(data->log, "Edge Coverage Hash: %lx\n", hash);
++    if (target_module != NULL) {
++        uint64_t hash = hash64(edge_coverage_area, EDGE_COVERAGE_MAP_SIZE);
++        dr_fprintf(data->log, "Edge Coverage Hash: %lx\n", hash);
++    }
 +
      drmodtrack_dump(data->log);
      bb_table_print(drcontext, data);
  }
-@@ -365,7 +394,7 @@
+@@ -365,7 +396,7 @@
       * 4. The duplication can be easily handled in a post-processing step,
       *    which is required anyway.
       */
@@ -106,7 +108,7 @@
  
      if (go_native)
          return DR_EMIT_GO_NATIVE;
-@@ -373,6 +402,187 @@
+@@ -373,6 +404,187 @@
          return DR_EMIT_DEFAULT;
  }
  
@@ -294,7 +296,7 @@
  static void
  event_thread_exit(void *drcontext)
  {
-@@ -388,6 +598,10 @@
+@@ -388,6 +600,10 @@
          /* the per-thread data is a copy of global data */
          dr_thread_free(drcontext, data, sizeof(*data));
      }
@@ -305,7 +307,7 @@
  }
  
  static void
-@@ -433,6 +647,11 @@
+@@ -433,6 +649,11 @@
      else
          data = thread_data_copy(drcontext);
      drmgr_set_tls_field(drcontext, tls_idx, data);
@@ -317,7 +319,7 @@
  }
  
  #ifndef WINDOWS
-@@ -505,6 +724,11 @@
+@@ -505,6 +726,11 @@
  
      drmgr_unregister_tls_field(tls_idx);
  
@@ -329,7 +331,7 @@
      drx_exit();
      drmgr_exit();
  
-@@ -565,6 +789,22 @@
+@@ -565,6 +791,22 @@
      drmgr_init();
      drx_init();
  
@@ -352,7 +354,7 @@
      /* We follow a simple model of the caller requesting the coverage dump,
       * either via calling the exit routine, using its own soft_kills nudge, or
       * an explicit dump call for unusual cases.  This means that drx's
-@@ -575,7 +815,7 @@
+@@ -575,7 +817,7 @@
  
      drmgr_register_thread_init_event(event_thread_init);
      drmgr_register_thread_exit_event(event_thread_exit);
@@ -361,7 +363,7 @@
      dr_register_filter_syscall_event(event_filter_syscall);
      drmgr_register_pre_syscall_event(event_pre_syscall);
  #ifdef UNIX
-@@ -588,3 +828,85 @@
+@@ -588,3 +830,85 @@
  
      return event_init();
  }

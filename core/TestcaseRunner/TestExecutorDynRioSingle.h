@@ -29,7 +29,7 @@ class TestExecutorDynRioSingle :
 	public TestExecutorDynRio
 {
 public:
-	TestExecutorDynRioSingle(const std::string targetCMDline, int hangTimeoutMS, const std::set<Module> modulesToCover, const std::string testcaseDir, ExternalProcess::CHILD_OUTPUT_TYPE child_output_mode, const std::string additionalEnvParam, GarbageCollectorWorker* garbageCollectorWorker, bool treatAnyAccessViolationAsFatal);
+	TestExecutorDynRioSingle(const std::string targetCMDline, int hangTimeoutMS, const std::set<Module> modulesToCover, const std::string testcaseDir, ExternalProcess::CHILD_OUTPUT_TYPE child_output_mode, const std::string additionalEnvParam, GarbageCollectorWorker* garbageCollectorWorker, bool treatAnyAccessViolationAsFatal, const std::string edgeCoverageModule);
 	virtual ~TestExecutorDynRioSingle();
 
 	std::shared_ptr<DebugExecutionOutput> execute(const FluffiTestcaseID testcaseId, bool forceFullCoverage);
@@ -42,4 +42,6 @@ private:
 	static void DebugCommandLine(std::string commandline, ExternalProcess::CHILD_OUTPUT_TYPE child_output_mode, int timeoutMS, std::shared_ptr<DebugExecutionOutput> exOutput, bool doPostMortemAnalysis, bool treatAnyAccessViolationAsFatal, const std::string additionalEnvParam);
 
 	std::string getDrCovOutputFile();
+
+	std::string m_edgeCoverageModule;
 };

@@ -70,5 +70,5 @@ protected:
 
 	bool m_treatAnyAccessViolationAsFatal;
 
-	static void copyCoveredModulesToDebugExecutionOutput(const std::vector<char>* input, const std::set<Module>* modulesToCover, std::shared_ptr<DebugExecutionOutput> exOutput);
+	static void copyCoveredModulesToDebugExecutionOutput(const std::vector<char>* input, const std::set<Module>* modulesToCover, std::shared_ptr<DebugExecutionOutput> exOutput, const std::string edgeCoverageModule);
 };

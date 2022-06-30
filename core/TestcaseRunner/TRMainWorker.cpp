@@ -362,7 +362,12 @@ bool TRMainWorker::tryGetConfigFromLM() {
 		}
 #endif
 
-		m_executor = new TestExecutorDynRioSingle(targetcmdline, hangTimeout, modulesToCover, m_testcaseDir, suppressChildOutput, additionalEnvParam, m_garbageCollectorWorker, treatAnyAccessViolationAsFatal);
+		std::string edgeCoverageModule = "";
+		if (settings.count("edgeCoverageModule") != 0) {
+			edgeCoverageModule = settings["edgeCoverageModule"];
+		}
+
+		m_executor = new TestExecutorDynRioSingle(targetcmdline, hangTimeout, modulesToCover, m_testcaseDir, suppressChildOutput, additionalEnvParam, m_garbageCollectorWorker, treatAnyAccessViolationAsFatal, edgeCoverageModule);
 	}
 	else if (Util::stringHasEnding(settings["chosenSubtype"], "DynRioMulti")) {
 		LOG(INFO) << "Using TestExecutorDynRioMulti for running testcases";
