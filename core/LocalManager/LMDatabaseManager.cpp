@@ -831,6 +831,31 @@ GetTestcaseToMutateResponse* LMDatabaseManager::generateGetTestcaseToMutateRespo
 		mysql_stmt_close(sql_stmt);
 	}
 
+	// Increment ChosenCounter for chosen testcase
+	{
+		// Prepared statement
+		MYSQL_STMT* sql_stmt = mysql_stmt_init(getDBConnection());
+		const char* stmt = "UPDATE interesting_testcases SET ChosenCounter = ChosenCounter + 1 WHERE ID = ?";
+		mysql_stmt_prepare(sql_stmt, stmt, static_cast<unsigned long>(strlen(stmt)));
+
+		// Param
+		MYSQL_BIND bind[1];
+		memset(bind, 0, sizeof(bind));
+		bind[0].buffer_type = MYSQL_TYPE_LONGLONG;
+		bind[0].buffer = &testcaseID;
+		bind[0].is_null = 0;
+		bind[0].is_unsigned = true;
+		bind[0].length = NULL;
+
+		// Run query
+		mysql_stmt_bind_param(sql_stmt, bind);
+		bool re = mysql_stmt_execute(sql_stmt) == 0;
+		if (!re) {
+			LOG(ERROR) << "generateGetTestcaseToMutateResponse encountered the following error (2): " << mysql_stmt_error(sql_stmt);
+		}
+		mysql_stmt_close(sql_stmt);
+	}
+
 	PERFORMANCE_WATCH_FUNCTION_EXIT("generateGetTestcaseToMutateResponse")
 		return response;
 }
