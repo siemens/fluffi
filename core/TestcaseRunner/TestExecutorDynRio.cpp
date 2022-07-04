@@ -38,7 +38,7 @@ TestExecutorDynRio::~TestExecutorDynRio()
 {
 }
 
-void TestExecutorDynRio::copyCoveredModulesToDebugExecutionOutput(const std::vector<char>* input, const std::set<Module>* modulesToCover, std::shared_ptr<DebugExecutionOutput> texOutput)
+void TestExecutorDynRio::copyCoveredModulesToDebugExecutionOutput(const std::vector<char>* input, const std::set<Module>* modulesToCover, std::shared_ptr<DebugExecutionOutput> texOutput, const std::string edgeCoverageModule)
 {
 	// save header to member
 	std::string m_header = std::string(&(*input)[0]);
@@ -56,6 +56,26 @@ void TestExecutorDynRio::copyCoveredModulesToDebugExecutionOutput(const std::vec
 	if (line != "DRCOV FLAVOR: drcov" && line != "DRCOV FLAVOR: drcov-64" && line != "DRCOV FLAVOR: drcov-32") { //windows, linux x64, linux x86
 		LOG(ERROR) << "Trace::copyCoveredModulesToTestResult was called but dynamo rio's output did not start with the expected header (2/2). It was " << line;
 		return;
+	}
+
+	// Get edge coverage hash
+	if (edgeCoverageModule.empty())
+	{
+		texOutput->m_edgeCoverageHash = "";
+	}
+	else
+	{
+		std::getline(iss, line);
+		if (line.find("Hash: ") != std::string::npos)
+		{
+			size_t pointerToHash = line.find("Hash: ");
+			texOutput->m_edgeCoverageHash = line.substr(pointerToHash + 6, line.length() - pointerToHash - 6);
+		}
+		else
+		{
+			LOG(ERROR) << "Trace::copyCoveredModulesToTestResult was called but dynamo rio's output did not contain the edge coverage hash.";
+			return;
+		}
 	}
 
 	int num_mods = -1;

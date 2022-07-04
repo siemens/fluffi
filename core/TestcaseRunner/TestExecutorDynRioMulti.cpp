@@ -1339,7 +1339,7 @@ bool TestExecutorDynRioMulti::runSingleTestcase(const FluffiTestcaseID testcaseI
 			return false;
 		}
 
-		copyCoveredModulesToDebugExecutionOutput(&drcovOutput, &m_modulesToCover, exResult);
+		copyCoveredModulesToDebugExecutionOutput(&drcovOutput, &m_modulesToCover, exResult, "");
 	}
 	exResult->m_terminationType = DebugExecutionOutput::PROCESS_TERMINATION_TYPE::CLEAN;
 	exResult->m_terminationDescription = "Fuzzcase executed normally!";

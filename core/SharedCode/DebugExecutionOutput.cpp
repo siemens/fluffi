@@ -30,6 +30,7 @@ DebugExecutionOutput::DebugExecutionOutput() :
 	m_lastCrash(""),
 	m_terminationType(PROCESS_TERMINATION_TYPE::ERR),
 	m_terminationDescription("NOT SET"),
+	m_edgeCoverageHash(""),
 	m_PID(0),
 	m_debuggerThreadDone(true), //defaults to true to allow "waitfordebugger" to return if the debugger was never started. It will be set to false as first action within the debuggerthread
 	m_hasFullCoverage(true) //defaults to true, as most techniques capture full coverage by default
@@ -41,6 +42,7 @@ DebugExecutionOutput::DebugExecutionOutput(const DebugExecutionOutput &obj) :
 	m_lastCrash(obj.m_lastCrash),
 	m_terminationType(obj.m_terminationType),
 	m_terminationDescription(obj.m_terminationDescription),
+	m_edgeCoverageHash(obj.m_edgeCoverageHash),
 	m_PID(obj.m_PID),
 	m_debuggerThreadDone(obj.m_debuggerThreadDone),
 	m_hasFullCoverage(obj.m_hasFullCoverage)
