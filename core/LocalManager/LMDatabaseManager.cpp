@@ -715,11 +715,53 @@ std::string LMDatabaseManager::getRegisteredInstanceSubType(std::string ServiceD
 GetTestcaseToMutateResponse* LMDatabaseManager::generateGetTestcaseToMutateResponse(std::string testcaseTempDir) {
 	PERFORMANCE_WATCH_FUNCTION_ENTRY
 		GetTestcaseToMutateResponse* response = new GetTestcaseToMutateResponse();
-	long long int testcaseID = 0;
 
-	//#################### First part: get testcase ####################
+	//#################### First part: get search strategy ####################
+	std::string searchStrategy = "rating";
 	{
-		if (mysql_query(getDBConnection(), "SELECT ID, CreatorServiceDescriptorGUID, CreatorLocalID, RawBytes  FROM interesting_testcases WHERE TestCaseType = 0 ORDER BY Rating DESC LIMIT 1") != 0) {
+		if (mysql_query(getDBConnection(), "SELECT SettingValue FROM settings WHERE SettingName = 'searchStrategy'") != 0)
+		{
+			LOG(ERROR) << "LMDatabaseManager::generateGetTestcaseToMutateResponse could not get search strategy";
+			return response;
+		}
+
+		MYSQL_RES *result = mysql_store_result(getDBConnection());
+		if (result != NULL)
+		{
+			MYSQL_ROW row = mysql_fetch_row(result);
+			if (row != NULL)
+			{
+				std::string value = row[0];
+				if (value == "roundRobin" || value == "FAST") {
+					searchStrategy = value;
+				}
+			}
+
+			mysql_free_result(result);
+		}
+	}
+
+	//#################### Second part: get testcase ####################
+	long long int testcaseID = 0;
+	{
+		// Change query for search strategy
+		std::string orderBy = "Rating DESC";
+		if (searchStrategy == "roundRobin")
+		{
+			orderBy = "TimeLastChosen ASC";
+			LOG(INFO) << "LMDatabaseManager::generateGetTestcaseToMutateResponse using roundRobin search strategy";
+		}
+		else if (searchStrategy == "FAST")
+		{
+			orderBy = "ChosenCounter ASC, IFNULL(Counter, 1) ASC, Rating DESC";
+			LOG(INFO) << "LMDatabaseManager::generateGetTestcaseToMutateResponse using FAST search strategy";
+		}
+		else
+		{
+			LOG(INFO) << "LMDatabaseManager::generateGetTestcaseToMutateResponse using rating search strategy";
+		}
+
+		if (mysql_query(getDBConnection(), ("SELECT ID, CreatorServiceDescriptorGUID, CreatorLocalID, RawBytes, Rating, ChosenCounter, IFNULL(Counter, 1) FROM interesting_testcases LEFT JOIN edge_coverage ON EdgeCoverageHash = Hash WHERE TestCaseType = 0 ORDER BY " + orderBy + " LIMIT 1").c_str()) != 0) {
 			LOG(ERROR) << "LMDatabaseManager::generateGetTestcaseToMutateResponse could not get a testcase from the database";
 			return response;
 		}
@@ -781,7 +823,7 @@ GetTestcaseToMutateResponse* LMDatabaseManager::generateGetTestcaseToMutateRespo
 		mysql_free_result(result);
 	}
 
-	//#################### Second part: check if we already have coverage for this testcase ####################
+	//#################### Third part: check if we already have coverage for this testcase ####################
 	{
 		//// prepared Statement
 		MYSQL_STMT* sql_stmt = mysql_stmt_init(getDBConnection());
@@ -831,7 +873,7 @@ GetTestcaseToMutateResponse* LMDatabaseManager::generateGetTestcaseToMutateRespo
 		mysql_stmt_close(sql_stmt);
 	}
 
-	// Increment ChosenCounter for chosen testcase and timestamp for when testcase was last chosen
+	//#################### Fourth part: increment ChosenCounter for chosen testcase and timestamp for when testcase was last chosen ####################
 	{
 		// Prepared statement
 		MYSQL_STMT* sql_stmt = mysql_stmt_init(getDBConnection());
