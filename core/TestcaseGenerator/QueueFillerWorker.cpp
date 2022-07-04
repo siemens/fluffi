@@ -114,25 +114,34 @@ void QueueFillerWorker::workerMain() {
 			continue;
 		}
 
+		// Default energy for constant power schedule
+		unsigned long long int energy = m_bulkGenerationSize;
+
 		// FAST power schedule
-		unsigned long long int energy = 0;
-		if (chosenCounter > 62) // prevent overflow
+		if (m_powerSchedule == "FAST")
 		{
-			energy = m_maxBulkGenerationSize;
-		}
-		else
-		{
-			energy = rating * (static_cast<unsigned long long int>(1) << chosenCounter) / (m_powerScheduleConstant * (pathCounter == 0 ? 1 : pathCounter));
-			if (energy > m_maxBulkGenerationSize)
+			if (chosenCounter > 62) // prevent overflow
 			{
 				energy = m_maxBulkGenerationSize;
 			}
-			else if (energy < m_minBulkGenerationSize)
+			else
 			{
-				energy = m_minBulkGenerationSize;
+				energy = rating * (static_cast<unsigned long long int>(1) << chosenCounter) / (m_powerScheduleConstant * (pathCounter == 0 ? 1 : pathCounter));
+				if (energy > m_maxBulkGenerationSize)
+				{
+					energy = m_maxBulkGenerationSize;
+				}
+				else if (energy < m_minBulkGenerationSize)
+				{
+					energy = m_minBulkGenerationSize;
+				}
 			}
+			LOG(INFO) << "FAST Power Schedule - chosen: " << std::to_string(chosenCounter) << " paths: " << std::to_string(pathCounter) << " rating: " << std::to_string(rating) << " energy: " << std::to_string(energy);
 		}
-		LOG(INFO) << "POWER SCHEDULE - chosen: " << std::to_string(chosenCounter) << " paths: " << std::to_string(pathCounter) << " rating: " << std::to_string(rating) << " energy: " << std::to_string(energy);
+		else if (m_powerSchedule == "constant")
+		{
+			LOG(INFO) << "Constant Power Schedule - energy: " << std::to_string(energy);
+		}
 
 		//from this point on there is a parent testcase file that we have to take care of!
 		std::string parentPathAndFileName = Util::generateTestcasePathAndFilename(parentID, m_queueFillerTempDir);
@@ -145,6 +154,11 @@ void QueueFillerWorker::workerMain() {
 			{
 				m_testcaseManager->pushNewGeneratedTestcases(children);
 				reportNewMutations(parentID, static_cast<int>(children.size()));
+
+				// Constant power schedule - adapt bulk generation size
+				if (m_powerSchedule == "constant" && m_bulkGenerationSize < m_maxBulkGenerationSize) {
+					m_bulkGenerationSize++;
+				}
 			}
 			else
 			{
@@ -153,6 +167,11 @@ void QueueFillerWorker::workerMain() {
 		}
 		catch (const std::runtime_error& e) {
 			LOG(ERROR) << "batchMutate failed (" << e.what() << ")!";
+
+			// Constant power schedule - adapt bulk generation size
+			if (m_powerSchedule == "constant" && m_bulkGenerationSize > 1) {
+				m_bulkGenerationSize--;
+			}
 		}
 
 		//delete the parent testcase file
@@ -285,6 +304,64 @@ bool QueueFillerWorker::tryGetConfigFromLM() {
 		LOG(ERROR) << "The specified chosenSubtype/generatorType \"" << settings["chosenSubtype"] << "\" is not implemented but m_myAgentSubTypes.count(settings[\"chosenSubtype\"]) was >0. This should never happen!";
 		google::protobuf::ShutdownProtobufLibrary();
 		_exit(EXIT_FAILURE); //make compiler happy;
+	}
+
+	// Set power schedule constants
+	if (settings.count("constantFuzz") != 0)
+	{
+		try
+		{
+			m_bulkGenerationSize = std::stoi(settings["constantFuzz"]);
+		}
+		catch (...)
+		{
+		}
+	}
+	if (settings.count("minFuzz") != 0)
+	{
+		try
+		{
+			m_minBulkGenerationSize = std::stoi(settings["minFuzz"]);
+		}
+		catch (...)
+		{
+		}
+	}
+	if (settings.count("maxFuzz") != 0)
+	{
+		try
+		{
+			m_maxBulkGenerationSize = std::stoi(settings["maxFuzz"]);
+		}
+		catch (...)
+		{
+		}
+	}
+	if (settings.count("fastConstant") != 0)
+	{
+		try
+		{
+			m_powerScheduleConstant = std::stoi(settings["fastConstant"]);
+		}
+		catch (...)
+		{
+		}
+	}
+
+	// Set power schedule
+	if (settings.count("powerSchedule") == 0 || settings["powerSchedule"] != "FAST")
+	{
+		m_powerSchedule = "constant";
+	}
+	else
+	{
+		m_powerSchedule = "FAST";
+	}
+	
+	// Constant power schedule by default starts at maximum
+	if (m_powerSchedule == "constant" && settings.count("maxFuzz") == 0)
+	{
+		m_maxBulkGenerationSize = m_bulkGenerationSize;
 	}
 
 	//check if the setup is actually working

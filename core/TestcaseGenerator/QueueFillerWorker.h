@@ -54,6 +54,8 @@ private:
 	size_t m_desiredQueueFillLevel;
 	std::string m_queueFillerTempDir;
 	TGTestcaseManager* m_testcaseManager;
+	std::string m_powerSchedule = "constant";
+	unsigned int m_bulkGenerationSize = 50; // only for constant PS
 	unsigned int m_minBulkGenerationSize = 30;
 	unsigned int m_maxBulkGenerationSize = 500;
 	unsigned int m_powerScheduleConstant = 100;
