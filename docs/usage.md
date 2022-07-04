@@ -179,6 +179,30 @@ The location(s) in which you want to run your FuzzJob. This can be changed later
 
 Options for the FuzzJob. 
 
+### LocalManager
+
+- **searchStrategy**: determines which testcase is chosen to be mutated. Defaults to `rating`.
+  - `rating`: the testcase with the highest rating is chosen.
+  - `roundRobin`: the testcase that has not been chosen for the longest time is chosen, and new testcases are added to the back of the queue.
+  - `FAST`: the testcase with the lowest number of times chosen, then lowest number of paths exercised, then the highest rating is chosen. Edge coverage must be enabled using the **edgeCoverageModule** option.
+
+### TestcaseGenerator
+
+- **powerSchedule**: determines how many new testcases (*energy*) are generated for each mutation. Defaults to `constant`.
+  - `constant`: Constant energy. On successful mutation, energy increments by one until maximum. On error, energy decrements by one until 1.
+    - **constantFuzz**: The starting energy (default: 50).
+    - **maxFuzz**: The maximum possible energy (default: equal to **constantFuzz**).
+  - `FAST`: $$\min\left(\frac{\alpha(i)}{\beta}\cdot\frac{2^{s(i)}}{f(i)},M\right)$$
+    - where $\alpha(i)$ is the rating,
+    - $\beta$ is a constant,
+    - $s(i)$ is the number of times the testcase has been chosen,
+    - $f(i)$ is the number of paths that the testcase exercises,
+    - and $M$ is the maximum possible energy.
+    - Edge coverage must be enabled using the **edgeCoverageModule** option.
+    - **minFuzz**: The minimum possible energy (default: 30).
+    - **maxFuzz**: The maximum possible energy (default: 500).
+    - **fastConstant**: The value of $\beta$ in the above equation (default: 100).
+
 ### TestcaseRunner
 
 The runnerType parameter sets which runner will be used. For possible values see `myAgentSubTypes` in [TestcaseRunner.cpp](core/TestcaseRunner/TestcaseRunner.cpp).
@@ -190,6 +214,7 @@ For *_DynRioSingle:
 - **populationMinimization**: The database will mark population items with exactly the same covered blocks as duplicates and ignore them from then on. By default this is set to *false*, but can be set to *true*.
 - **treatAnyAccessViolationAsFatal**: Some targets catch access violations. These access violations might be part of normal operation, or not. Setting this parameter to true makes FLUFFI treat each access violation as an access violation crash - even if the application would catch and handle it (defaults to false).
 - **additionalEnvParam**: Parameter to append to the target process's environment (Linux only), e.g. `LD_PRELOAD=/my/shared/obj.so`.
+- **edgeCoverageModule**: set to a single module name to enable tracking path coverage via AFL's method of edge coverage. A 64-bit xxHash of the edges is computed and stored. Only supports x86.
 
 For *_DynRioMulti:
 - **targetCMDLine**: The command line to start the target (e.g. `"C:\FLUFFI\SUT\my target\mytarget.exe" -startnormal` on Windows or `/home/<FluffiUser>/fluffi/persistent/SUT/my target/mytargetbin` on Linux). It needs to be absolute! FLUFFI will replace \<RANDOM_SHAREDMEM\> with a randomly generated shared memory name. This makes sense when using the [SharedMemFeeder](core/helpers/Feeder/SharedMemFeeder), which expects a shared memory name as the last parameter of the target. Furthermore, FLUFFI will replace \<RANDOM_PORT\> with a random free port. This makes sense when applications bind to a TCP port that can be specified via command line. Setting it makes it possible to launch multiple target instances on a single machine.
