@@ -79,12 +79,12 @@ namespace TestExecutorDynRioSingleTester
 			{
 				GarbageCollectorWorker garbageCollector(0);
 				TestExecutorDynRioSingle::DebugCommandLine("dyndist64\\bin64\\drrun.exe -v -t drcov -dump_binary -logdir . -- DebuggerTester.exe 0", ExternalProcess::CHILD_OUTPUT_TYPE::SUPPRESS, 5000, texOut, false, false, "");
-				std::string drCovFilename = TestExecutorDynRioSingle("", 0, std::set<Module>(), ".", ExternalProcess::CHILD_OUTPUT_TYPE::SUPPRESS, "", &garbageCollector, false).getDrCovOutputFile();
+				std::string drCovFilename = TestExecutorDynRioSingle("", 0, std::set<Module>(), ".", ExternalProcess::CHILD_OUTPUT_TYPE::SUPPRESS, "", &garbageCollector, false, "").getDrCovOutputFile();
 
 				std::vector<char> drcovOutput = Util::readAllBytesFromFile(drCovFilename);
 				std::set<Module> modulesToCover;
 				modulesToCover.emplace("DebuggerTester.exe", "*", 1);
-				TestExecutorDynRio::copyCoveredModulesToDebugExecutionOutput(&drcovOutput, &modulesToCover, texOut);
+				TestExecutorDynRio::copyCoveredModulesToDebugExecutionOutput(&drcovOutput, &modulesToCover, texOut, "");
 
 				garbageCollector.markFileForDelete(drCovFilename);
 			}
@@ -121,7 +121,7 @@ namespace TestExecutorDynRioSingleTester
 
 			{
 				GarbageCollectorWorker garbageCollector(0);
-				std::string foundDRCovfile = TestExecutorDynRioSingle("", 0, std::set<Module>(), ".", ExternalProcess::CHILD_OUTPUT_TYPE::SUPPRESS, "", &garbageCollector, false).getDrCovOutputFile();
+				std::string foundDRCovfile = TestExecutorDynRioSingle("", 0, std::set<Module>(), ".", ExternalProcess::CHILD_OUTPUT_TYPE::SUPPRESS, "", &garbageCollector, false, "").getDrCovOutputFile();
 
 				Assert::IsTrue(std::experimental::filesystem::path(foundDRCovfile).filename() == filename, L"The found filename is not the expected one");
 
@@ -152,19 +152,19 @@ namespace TestExecutorDynRioSingleTester
 		TEST_METHOD(TestExecutorDynRioSingle_isSetupFunctionable)
 		{
 			GarbageCollectorWorker garbageCollector(0);
-			TestExecutorDynRioSingle* te = new TestExecutorDynRioSingle(".\\DebuggerTester.exe 0", 0, std::set<Module>{}, ".", ExternalProcess::CHILD_OUTPUT_TYPE::SUPPRESS, "", &garbageCollector, false);
+			TestExecutorDynRioSingle* te = new TestExecutorDynRioSingle(".\\DebuggerTester.exe 0", 0, std::set<Module>{}, ".", ExternalProcess::CHILD_OUTPUT_TYPE::SUPPRESS, "", &garbageCollector, false, "");
 			Assert::IsTrue(te->isSetupFunctionable());
 			delete te;
 
-			te = new TestExecutorDynRioSingle("\".\\DebuggerTester.exe\" 0", 0, std::set<Module>{}, ".", ExternalProcess::CHILD_OUTPUT_TYPE::SUPPRESS, "", &garbageCollector, false);
+			te = new TestExecutorDynRioSingle("\".\\DebuggerTester.exe\" 0", 0, std::set<Module>{}, ".", ExternalProcess::CHILD_OUTPUT_TYPE::SUPPRESS, "", &garbageCollector, false, "");
 			Assert::IsTrue(te->isSetupFunctionable());
 			delete te;
 
-			te = new TestExecutorDynRioSingle("\".\\wrongpath\\DebuggerTester.exe\" 0", 0, std::set<Module>{}, ".", ExternalProcess::CHILD_OUTPUT_TYPE::SUPPRESS, "", &garbageCollector, false);
+			te = new TestExecutorDynRioSingle("\".\\wrongpath\\DebuggerTester.exe\" 0", 0, std::set<Module>{}, ".", ExternalProcess::CHILD_OUTPUT_TYPE::SUPPRESS, "", &garbageCollector, false, "");
 			Assert::IsFalse(te->isSetupFunctionable());
 			delete te;
 
-			te = new TestExecutorDynRioSingle("\".\\DebuggerTester.exe\" 0", 0, std::set<Module>{}, "\\wrongpath", ExternalProcess::CHILD_OUTPUT_TYPE::SUPPRESS, "", &garbageCollector, false);
+			te = new TestExecutorDynRioSingle("\".\\DebuggerTester.exe\" 0", 0, std::set<Module>{}, "\\wrongpath", ExternalProcess::CHILD_OUTPUT_TYPE::SUPPRESS, "", &garbageCollector, false, "");
 			Assert::IsFalse(te->isSetupFunctionable());
 			delete te;
 		}
