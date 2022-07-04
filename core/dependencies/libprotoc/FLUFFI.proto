@@ -264,6 +264,9 @@ message GetTestcaseToMutateResponse{
   bytes testCaseFirstChunk = 2; //up to CommInt::chunkSizeInBytes bytes
   bool isLastChunk = 3;
   bool alsoRunWithoutMutation = 4;
+  int64 rating = 5;
+  int64 chosenCounter = 6;
+  int64 pathCounter = 7;
 }
 
 message ReportTestcaseWithNoResultRequest{

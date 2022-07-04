@@ -41,15 +41,13 @@ Author(s): Thomas Riedmaier, Abian Blome, Roman Bendt
 #include "FluffiMutator.h"
 #include "AFLMutator.h"
 
-QueueFillerWorker::QueueFillerWorker(CommInt* commInt, TGWorkerThreadStateBuilder* workerThreadStateBuilder, int delayToWaitUntilConfigIsCompleteInMS, size_t desiredQueueFillLevel, std::string testcaseDirectory, std::string queueFillerTempDir, TGTestcaseManager* testcaseManager, std::set<std::string> myAgentSubTypes, GarbageCollectorWorker* garbageCollectorWorker, int maxBulkGenerationSize) :
+QueueFillerWorker::QueueFillerWorker(CommInt* commInt, TGWorkerThreadStateBuilder* workerThreadStateBuilder, int delayToWaitUntilConfigIsCompleteInMS, size_t desiredQueueFillLevel, std::string testcaseDirectory, std::string queueFillerTempDir, TGTestcaseManager* testcaseManager, std::set<std::string> myAgentSubTypes, GarbageCollectorWorker* garbageCollectorWorker) :
 	m_gotConfigFromLM(false),
 	m_commInt(commInt),
 	m_workerThreadStateBuilder(workerThreadStateBuilder),
 	m_desiredQueueFillLevel(desiredQueueFillLevel),
 	m_queueFillerTempDir(queueFillerTempDir),
 	m_testcaseManager(testcaseManager),
-	m_bulkGenerationSize(maxBulkGenerationSize),
-	m_maxBulkGenerationSize(maxBulkGenerationSize),
 	m_mySelfServiceDescriptor(commInt->getOwnServiceDescriptor()),
 	m_workerThreadState(nullptr),
 	m_garbageCollectorWorker(garbageCollectorWorker),
@@ -102,10 +100,13 @@ void QueueFillerWorker::workerMain() {
 		}
 
 		FluffiTestcaseID parentID{ FluffiServiceDescriptor{"",""},0 };
+		long long int rating = 0;
+		long long int chosenCounter = 0;
+		long long int pathCounter = 0;
 		try
 		{
 			if (m_mutatorNeedsParents) {
-				parentID = getNewParent();
+				std::tie(parentID, rating, chosenCounter, pathCounter) = getNewParent();
 			}
 		}
 		catch (const std::runtime_error& e) {
@@ -113,22 +114,37 @@ void QueueFillerWorker::workerMain() {
 			continue;
 		}
 
+		// FAST power schedule
+		unsigned long long int energy = 0;
+		if (chosenCounter > 62) // prevent overflow
+		{
+			energy = m_maxBulkGenerationSize;
+		}
+		else
+		{
+			energy = rating * (static_cast<unsigned long long int>(1) << chosenCounter) / (m_powerScheduleConstant * (pathCounter == 0 ? 1 : pathCounter));
+			if (energy > m_maxBulkGenerationSize)
+			{
+				energy = m_maxBulkGenerationSize;
+			}
+			else if (energy < m_minBulkGenerationSize)
+			{
+				energy = m_minBulkGenerationSize;
+			}
+		}
+		LOG(INFO) << "POWER SCHEDULE - chosen: " << std::to_string(chosenCounter) << " paths: " << std::to_string(pathCounter) << " rating: " << std::to_string(rating) << " energy: " << std::to_string(energy);
+
 		//from this point on there is a parent testcase file that we have to take care of!
 		std::string parentPathAndFileName = Util::generateTestcasePathAndFilename(parentID, m_queueFillerTempDir);
 
 		try
 		{
-			std::deque<TestcaseDescriptor> children = m_mutator->batchMutate(m_bulkGenerationSize, parentID, parentPathAndFileName);
+			std::deque<TestcaseDescriptor> children = m_mutator->batchMutate(static_cast<unsigned int>(energy), parentID, parentPathAndFileName);
 
 			if (children.size() > 0)
 			{
 				m_testcaseManager->pushNewGeneratedTestcases(children);
 				reportNewMutations(parentID, static_cast<int>(children.size()));
-
-				//adapt bulk generation size
-				if (m_bulkGenerationSize < m_maxBulkGenerationSize) {
-					m_bulkGenerationSize++;
-				}
 			}
 			else
 			{
@@ -137,11 +153,6 @@ void QueueFillerWorker::workerMain() {
 		}
 		catch (const std::runtime_error& e) {
 			LOG(ERROR) << "batchMutate failed (" << e.what() << ")!";
-
-			//adapt bulk generation size
-			if (m_bulkGenerationSize > 1) {
-				m_bulkGenerationSize--;
-			}
 		}
 
 		//delete the parent testcase file
@@ -157,7 +168,7 @@ void QueueFillerWorker::workerMain() {
 	m_workerThreadStateBuilder->destructState(m_workerThreadState);
 }
 
-FluffiTestcaseID QueueFillerWorker::getNewParent()
+std::tuple<FluffiTestcaseID, long long int, long long int, long long int> QueueFillerWorker::getNewParent()
 {
 	FLUFFIMessage req;
 	GetTestcaseToMutateRequest* getTestcaseToMutateRequest = new GetTestcaseToMutateRequest();
@@ -195,7 +206,7 @@ FluffiTestcaseID QueueFillerWorker::getNewParent()
 				}
 			}
 
-			return parentID;
+			return std::make_tuple(parentID, receivedTestcase->rating(), receivedTestcase->chosencounter(), receivedTestcase->pathcounter());
 		}
 		else
 		{
