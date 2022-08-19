@@ -203,6 +203,7 @@ message TestResult{
   repeated BasicBlock blocks = 2;
   string crashFootprint = 3; //optional! Only set if ExitType Exception_AccessViolation or Exception_Other
   bool hasFullCoverage = 4;
+  string edgeCoverageHash = 5;
 }
 
 message PutTestResultRequest{
@@ -232,6 +233,7 @@ message PutTestEvaluationRequest{
   bytes testCaseFirstChunk = 6; //up to CommInt::chunkSizeInBytes bytes,  optional! If TestEvaluation says discard will not be set!
   bool isLastChunk = 7; //optional! If TestEvaluation says discard will not be set!
   ServiceDescriptor sdOfEvaluator = 8; //optional! If TestEvaluation says discard will not be set!
+  string edgeCoverageHash = 9;
 }
 
 message PutTestEvaluationResponse{

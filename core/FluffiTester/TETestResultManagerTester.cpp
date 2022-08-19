@@ -68,7 +68,7 @@ namespace TETestResultManagerTester
 			const FluffiServiceDescriptor sd1 = FluffiServiceDescriptor("testServiceDescriptor1", "testGuiID1");
 			FluffiTestcaseID id1 = FluffiTestcaseID(sd1, 111);
 			FluffiTestcaseID parentId1 = FluffiTestcaseID(sd1, 222);
-			FluffiTestResult tR1 = FluffiTestResult(ExitType::Exception_Other, std::vector<FluffiBasicBlock>(), std::string("testMessage1"), true);
+			FluffiTestResult tR1 = FluffiTestResult(ExitType::Exception_Other, std::vector<FluffiBasicBlock>(), std::string("testMessage1"), true, "");
 			TestOutcomeDescriptor* outcomeDesc1 = new TestOutcomeDescriptor(id1, parentId1, tR1);
 
 			// Test Method
@@ -79,7 +79,7 @@ namespace TETestResultManagerTester
 			const FluffiServiceDescriptor sd2 = FluffiServiceDescriptor("testServiceDescriptor2", "testGuiID2");
 			FluffiTestcaseID id2 = FluffiTestcaseID(sd2, 333);
 			FluffiTestcaseID parentId2 = FluffiTestcaseID(sd2, 444);
-			FluffiTestResult tR2 = FluffiTestResult(ExitType::Exception_Other, std::vector<FluffiBasicBlock>(), std::string("testMessage2"), true);
+			FluffiTestResult tR2 = FluffiTestResult(ExitType::Exception_Other, std::vector<FluffiBasicBlock>(), std::string("testMessage2"), true, "");
 			TestOutcomeDescriptor* outcomeDesc2 = new TestOutcomeDescriptor(id2, parentId2, tR2);
 
 			// Test Method
@@ -95,7 +95,7 @@ namespace TETestResultManagerTester
 			const FluffiServiceDescriptor sd = FluffiServiceDescriptor("testServiceDescriptor", "testGuiID");
 			FluffiTestcaseID id = FluffiTestcaseID(sd, 111);
 			FluffiTestcaseID parentId = FluffiTestcaseID(sd, 222);
-			FluffiTestResult tR = FluffiTestResult(ExitType::Exception_Other, std::vector<FluffiBasicBlock>(), std::string("testMessage"), true);
+			FluffiTestResult tR = FluffiTestResult(ExitType::Exception_Other, std::vector<FluffiBasicBlock>(), std::string("testMessage"), true, "");
 
 			TestOutcomeDescriptor* outcomeDesc = new TestOutcomeDescriptor(id, parentId, tR);
 			testResultManager->pushNewTestOutcomeFromTCRunner(outcomeDesc);
@@ -118,7 +118,7 @@ namespace TETestResultManagerTester
 				const FluffiServiceDescriptor sd = FluffiServiceDescriptor("testServiceDescriptor", "testGuiID");
 				FluffiTestcaseID id = FluffiTestcaseID(sd, runningId);
 				FluffiTestcaseID parentId = FluffiTestcaseID(sd, runningPId);
-				FluffiTestResult tR = FluffiTestResult(ExitType::Exception_Other, std::vector<FluffiBasicBlock>(), std::string("testMessage" + runningId), true);
+				FluffiTestResult tR = FluffiTestResult(ExitType::Exception_Other, std::vector<FluffiBasicBlock>(), std::string("testMessage" + runningId), true, "");
 
 				TestOutcomeDescriptor* outcomeDesc = new TestOutcomeDescriptor(id, parentId, tR);
 				testResultManager->pushNewTestOutcomeFromTCRunner(outcomeDesc);
@@ -157,7 +157,7 @@ namespace TETestResultManagerTester
 			const FluffiServiceDescriptor sd = FluffiServiceDescriptor("testServiceDescriptor", "testGuiID");
 			FluffiTestcaseID id = FluffiTestcaseID(sd, 190);
 			FluffiTestcaseID parentId = FluffiTestcaseID(sd, 111);
-			FluffiTestResult tR = FluffiTestResult(ExitType::Exception_Other, std::vector<FluffiBasicBlock>(), std::string("testMessage"), true);
+			FluffiTestResult tR = FluffiTestResult(ExitType::Exception_Other, std::vector<FluffiBasicBlock>(), std::string("testMessage"), true, "");
 
 			TestOutcomeDescriptor* outcomeDesc = new TestOutcomeDescriptor(id, parentId, tR);
 			testResultManager->pushNewTestOutcomeFromTCRunner(outcomeDesc);
@@ -169,7 +169,7 @@ namespace TETestResultManagerTester
 				const FluffiServiceDescriptor sd = FluffiServiceDescriptor("testServiceDescriptor", "testGuiID");
 				FluffiTestcaseID id = FluffiTestcaseID(sd, 190);
 				FluffiTestcaseID parentId = FluffiTestcaseID(sd, 111);
-				FluffiTestResult tR = FluffiTestResult(ExitType::Exception_Other, std::vector<FluffiBasicBlock>(), std::string("testMessage"), true);
+				FluffiTestResult tR = FluffiTestResult(ExitType::Exception_Other, std::vector<FluffiBasicBlock>(), std::string("testMessage"), true, "");
 
 				TestOutcomeDescriptor* outcomeDesc = new TestOutcomeDescriptor(id, parentId, tR);
 				testResultManager->pushNewTestOutcomeFromTCRunner(outcomeDesc);
@@ -189,7 +189,7 @@ namespace TETestResultManagerTester
 			const FluffiServiceDescriptor sd = FluffiServiceDescriptor("testServiceDescriptor", "testGuiID");
 			FluffiTestcaseID id = FluffiTestcaseID(sd, 190);
 			FluffiTestcaseID parentId = FluffiTestcaseID(sd, 111);
-			FluffiTestResult tR = FluffiTestResult(ExitType::Exception_Other, std::vector<FluffiBasicBlock>(), std::string("testMessage"), true);
+			FluffiTestResult tR = FluffiTestResult(ExitType::Exception_Other, std::vector<FluffiBasicBlock>(), std::string("testMessage"), true, "");
 
 			TestOutcomeDescriptor* outcomeDesc = new TestOutcomeDescriptor(id, parentId, tR);
 			testResultManager->pushNewTestOutcomeFromTCRunner(outcomeDesc);

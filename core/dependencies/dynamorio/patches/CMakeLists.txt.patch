@@ -1,0 +1,16 @@
+--- ext/drcovlib/CMakeLists.txt
++++ ext/drcovlib/CMakeLists.txt
+@@ -52,11 +52,13 @@
+ use_DynamoRIO_extension(drcovlib drcontainers)
+ use_DynamoRIO_extension(drcovlib drmgr)
+ use_DynamoRIO_extension(drcovlib drx)
++use_DynamoRIO_extension(drcovlib drreg)
+ 
+ add_library(drcovlib_static STATIC ${srcs_static})
+ configure_extension(drcovlib_static ON)
+ use_DynamoRIO_extension(drcovlib_static drcontainers)
+ use_DynamoRIO_extension(drcovlib_static drmgr_static)
+ use_DynamoRIO_extension(drcovlib_static drx_static)
++use_DynamoRIO_extension(drcovlib drreg_static)
+ 
+ install_ext_header(drcovlib.h)

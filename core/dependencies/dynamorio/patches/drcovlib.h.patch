@@ -1,0 +1,65 @@
+--- ext/drcovlib/drcovlib.h
++++ ext/drcovlib/drcovlib.h
+@@ -102,8 +102,30 @@
+      * option, is created.  This option only works under Windows.
+      */
+     int native_until_thread;
++
++    // Edge coverage - add target module member
++    const char *target_module;
+ } drcovlib_options_t;
+ 
++// Edge coverage - move module_entry_t definition from modules.c to drcovlib.h
++typedef struct _module_entry_t {
++    uint id;
++    uint containing_id;
++    bool unload; /* if the module is unloaded */
++    /* The bounds of the segment, or whole module if it's contiguous. */
++    app_pc start;
++    app_pc end;
++    /* A copy of the data.  Segments of non-contiguous modules all share
++     * the same data pointer.
++     */
++    module_data_t *data;
++    void *custom;
++#ifndef WINDOWS
++    /* The file offset of the segment */
++    uint64 offset;
++#endif
++} module_entry_t;
++
+ /***************************************************************************
+  * Coverage log file format for use in postprocessing.
+  *
+@@ -140,6 +162,7 @@
+     uint start; /* offset of bb start from the image base */
+     ushort size;
+     ushort mod_id;
++    uint hits_since_last_reset; // drMultiCov - new member
+ } bb_entry_t;
+ 
+ /***************************************************************************
+@@ -272,6 +295,12 @@
+ drcovlib_status_t
+ drmodtrack_init(void);
+ 
++
++// Edge coverage - add prototype for drmodtrack_lookup_data
++DR_EXPORT
++drcovlib_status_t
++drmodtrack_lookup_data(void *drcontext, app_pc pc, OUT uint *mod_index, OUT app_pc *mod_base, OUT module_entry_t **mod_entry);
++
+ DR_EXPORT
+ /**
+  * Returns the base address in \p mod_base and the unique index identifier in \p
+@@ -393,6 +422,10 @@
+ 
+ /*@}*/ /* end doxygen group */
+ 
++// drMultiCov - new definitions
++DR_EXPORT drcovlib_status_t reset_coverage(void);
++DR_EXPORT drcovlib_status_t dump_current_coverage(void);
++
+ #ifdef __cplusplus
+ }
+ #endif
