@@ -30,8 +30,9 @@ Author(s): Roman Bendt, Thomas Riedmaier, Abian Blome
 #include "ExternalProcess.h"
 #include "GarbageCollectorWorker.h"
 
-TestExecutorDynRioSingle::TestExecutorDynRioSingle(const std::string targetCMDline, int hangTimeoutMS, const std::set<Module> modulesToCover, const std::string testcaseDir, ExternalProcess::CHILD_OUTPUT_TYPE child_output_mode, const std::string additionalEnvParam, GarbageCollectorWorker* garbageCollectorWorker, bool treatAnyAccessViolationAsFatal)
-	: TestExecutorDynRio(targetCMDline, hangTimeoutMS, modulesToCover, testcaseDir, child_output_mode, additionalEnvParam, garbageCollectorWorker, treatAnyAccessViolationAsFatal)
+TestExecutorDynRioSingle::TestExecutorDynRioSingle(const std::string targetCMDline, int hangTimeoutMS, const std::set<Module> modulesToCover, const std::string testcaseDir, ExternalProcess::CHILD_OUTPUT_TYPE child_output_mode, const std::string additionalEnvParam, GarbageCollectorWorker *garbageCollectorWorker, bool treatAnyAccessViolationAsFatal, const std::string edgeCoverageModule)
+	: TestExecutorDynRio(targetCMDline, hangTimeoutMS, modulesToCover, testcaseDir, child_output_mode, additionalEnvParam, garbageCollectorWorker, treatAnyAccessViolationAsFatal),
+	  m_edgeCoverageModule(edgeCoverageModule)
 {
 	Util::markAllFilesOfTypeInPathForDeletion(m_testcaseDir, ".log", m_garbageCollectorWorker);
 }
@@ -165,20 +166,27 @@ std::shared_ptr<DebugExecutionOutput> TestExecutorDynRioSingle::execute(const Fl
 		return firstExecutionOutput;
 	}
 
+	// Set target module option for edge coverage
+	std::string targetModuleOption = "";
+	if (!m_edgeCoverageModule.empty())
+	{
+		targetModuleOption = "-target_module " + m_edgeCoverageModule;
+	}
+
 	// build command line to execute
 	std::stringstream firstCMDLine;
 #if defined(_WIN64)
 	//64 bit Windows
-	firstCMDLine << "dyndist64\\bin64\\drrun.exe -v -t drcov -dump_binary -logdir \"" + m_testcaseDir + "\" -- ";
+	firstCMDLine << "dyndist64\\bin64\\drrun.exe -v -t drcov -dump_binary " + targetModuleOption + " -logdir \"" + m_testcaseDir + "\" -- ";
 #elif defined(_WIN32)
 	//32 bit Windows
-	firstCMDLine << "dyndist32\\bin32\\drrun.exe -v -t drcov -dump_binary -logdir \"" + m_testcaseDir + "\" -- ";
+	firstCMDLine << "dyndist32\\bin32\\drrun.exe -v -t drcov -dump_binary " + targetModuleOption + " -logdir \"" + m_testcaseDir + "\" -- ";
 #elif (__WORDSIZE == 64 )
 	//64 bit Linux
-	firstCMDLine << "dynamorio/bin64/drrun -v -t drcov -dump_binary -logdir \"" + m_testcaseDir + "\" -- ";
+	firstCMDLine << "dynamorio/bin64/drrun -v -t drcov -dump_binary " + targetModuleOption + " -logdir \"" + m_testcaseDir + "\" -- ";
 #else
 	//32 bit Linux
-	firstCMDLine << "dynamorio/bin32/drrun -v -t drcov -dump_binary -logdir \"" + m_testcaseDir + "\" -- ";
+	firstCMDLine << "dynamorio/bin32/drrun -v -t drcov -dump_binary " + targetModuleOption + " -logdir \"" + m_testcaseDir + "\" -- ";
 #endif
 
 	if (m_targetCMDline.find("<INPUT_FILE>") != std::string::npos) {
@@ -220,7 +228,7 @@ std::shared_ptr<DebugExecutionOutput> TestExecutorDynRioSingle::execute(const Fl
 			firstExecutionOutput->m_terminationType = DebugExecutionOutput::ERR;
 			return firstExecutionOutput;
 		}
-		copyCoveredModulesToDebugExecutionOutput(&drcovOutput, &m_modulesToCover, firstExecutionOutput);
+		copyCoveredModulesToDebugExecutionOutput(&drcovOutput, &m_modulesToCover, firstExecutionOutput, m_edgeCoverageModule);
 	}
 	else {
 		if (drcovLogFile != "") {

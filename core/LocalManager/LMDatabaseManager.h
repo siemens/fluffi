@@ -79,7 +79,8 @@ public:
 	bool addEntriesToCompletedTestcasesTable(const std::set<FluffiTestcaseID>& testcaseIDs);
 	bool addEntryToCompletedTestcasesTable(const FluffiTestcaseID tcID);
 	bool addEntryToCrashDescriptionsTable(const FluffiTestcaseID tcID, const std::string crashFootprint);
-	bool addEntryToInterestingTestcasesTable(const FluffiTestcaseID tcID, const FluffiTestcaseID tcparentID, int rating, const std::string testcaseDir, TestCaseType tcType);
+	bool addEntryToInterestingTestcasesTable(const FluffiTestcaseID tcID, const FluffiTestcaseID tcparentID, int rating, const std::string testcaseDir, TestCaseType tcType, const std::string edgeCoverageHash);
+	bool incrementEdgeCoverage(const std::string hash);
 
 	bool dropTestcaseIfCrashFootprintAppearedMoreThanXTimes(int times, std::string crashFootprint);
 	bool dropTestcaseTypeIFMoreThan(LMDatabaseManager::TestCaseType type, int instances);

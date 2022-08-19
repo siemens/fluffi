@@ -32,6 +32,8 @@ COMPLETED_TESTCASES_COUNT = (
     "SELECT COUNT(*) FROM completed_testcases")
 NUM_BLOCKS = (
     "SELECT COUNT(DISTINCT ModuleID, Offset) FROM covered_blocks")
+NUM_PATHS = (
+    "SELECT COUNT(*) FROM edge_coverage")
 GET_SETTINGS = (
     "SELECT ID, SettingName, SettingValue FROM settings")
 GET_RUNNERTYPE = (

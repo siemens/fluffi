@@ -91,6 +91,13 @@ void PutTestEvaluationRequestHandler::handleFLUFFIMessage(WorkerThreadState* wor
 		goto fail;
 	}
 
+	// Increment edge coverage
+	success = lmWorkerThreadState->dbManager->incrementEdgeCoverage(putTestEvaluationRequest->edgecoveragehash());
+	if (!success) {
+		LOG(ERROR) << "PutTestEvaluationRequestHandler: incrementEdgeCoverage failed";
+		goto fail;
+	}
+
 	//Modify rating of parent
 	success = lmWorkerThreadState->dbManager->addDeltaToTestcaseRating(parentTestcaseID, putTestEvaluationRequest->parentratingdelta());
 	if (!success) {
@@ -140,7 +147,8 @@ void PutTestEvaluationRequestHandler::handleFLUFFIMessage(WorkerThreadState* wor
 			parentTestcaseID,
 			(tcType == LMDatabaseManager::TestCaseType::Population) ? LMDatabaseManager::defaultInitialPopulationRating : 0,
 			m_testcaseDir,
-			(tcType == LMDatabaseManager::TestCaseType::Population) ? LMDatabaseManager::TestCaseType::Locked : tcType);
+			(tcType == LMDatabaseManager::TestCaseType::Population) ? LMDatabaseManager::TestCaseType::Locked : tcType,
+			putTestEvaluationRequest->edgecoveragehash());
 		if (!success) {
 			LOG(ERROR) << "PutTestEvaluationRequestHandler: addEntryToInterestingTestcasesTable failed";
 			goto fail;
