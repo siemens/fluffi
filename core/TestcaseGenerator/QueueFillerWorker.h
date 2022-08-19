@@ -35,7 +35,7 @@ class FluffiMutator;
 class QueueFillerWorker
 {
 public:
-	QueueFillerWorker(CommInt* commInt, TGWorkerThreadStateBuilder* workerThreadStateBuilder, int delayToWaitUntilConfigIsCompleteInMS, size_t desiredQueueFillLevel, std::string testcaseDirectory, std::string queueFillerTempDir, TGTestcaseManager*  testcaseManager, std::set<std::string> myAgentSubTypes, GarbageCollectorWorker* garbageCollectorWorker, int maxBulkGenerationSize = 50);
+	QueueFillerWorker(CommInt* commInt, TGWorkerThreadStateBuilder* workerThreadStateBuilder, int delayToWaitUntilConfigIsCompleteInMS, size_t desiredQueueFillLevel, std::string testcaseDirectory, std::string queueFillerTempDir, TGTestcaseManager*  testcaseManager, std::set<std::string> myAgentSubTypes, GarbageCollectorWorker* garbageCollectorWorker);
 	virtual ~QueueFillerWorker();
 
 	void workerMain();
@@ -44,7 +44,7 @@ public:
 	std::thread* m_thread = nullptr;
 
 private:
-	FluffiTestcaseID getNewParent();
+	std::tuple<FluffiTestcaseID, long long int, long long int, long long int> getNewParent();
 	void reportNewMutations(FluffiTestcaseID id, int numOfNewMutations);
 	bool tryGetConfigFromLM();
 
@@ -54,8 +54,11 @@ private:
 	size_t m_desiredQueueFillLevel;
 	std::string m_queueFillerTempDir;
 	TGTestcaseManager* m_testcaseManager;
-	int m_bulkGenerationSize;
-	int m_maxBulkGenerationSize;
+	std::string m_powerSchedule = "constant";
+	unsigned int m_bulkGenerationSize = 50; // only for constant PS
+	unsigned int m_minBulkGenerationSize = 30;
+	unsigned int m_maxBulkGenerationSize = 500;
+	unsigned int m_powerScheduleConstant = 100;
 	FluffiServiceDescriptor m_mySelfServiceDescriptor;
 	TGWorkerThreadState* m_workerThreadState;
 	GarbageCollectorWorker* m_garbageCollectorWorker;

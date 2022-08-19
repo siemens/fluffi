@@ -1,0 +1,79 @@
+--- ext/drcovlib/modules.c
++++ ext/drcovlib/modules.c
+@@ -43,23 +43,7 @@
+ #define NUM_GLOBAL_MODULE_CACHE 8
+ #define NUM_THREAD_MODULE_CACHE 4
+ 
+-typedef struct _module_entry_t {
+-    uint id;
+-    uint containing_id;
+-    bool unload; /* if the module is unloaded */
+-    /* The bounds of the segment, or whole module if it's contiguous. */
+-    app_pc start;
+-    app_pc end;
+-    /* A copy of the data.  Segments of non-contiguous modules all share
+-     * the same data pointer.
+-     */
+-    module_data_t *data;
+-    void *custom;
+-#ifndef WINDOWS
+-    /* The file offset of the segment */
+-    uint64 offset;
+-#endif
+-} module_entry_t;
++// Edge coverage - move module_entry_t definition from modules.c to drcovlib.h
+ 
+ typedef struct _module_table_t {
+     /* A vector of entries.  Non-contiguous modules have entries that
+@@ -240,9 +224,9 @@
+         *mod_base = entry->data->start; /* Yes, absolute base, not segment base. */
+ }
+ 
++// Edge coverage - change drmodtrack_lookup so it also returns a pointer to the module entry
+ drcovlib_status_t
+-drmodtrack_lookup(void *drcontext, app_pc pc, OUT uint *mod_index, OUT app_pc *mod_base)
+-{
++drmodtrack_lookup_data(void *drcontext, app_pc pc, OUT uint *mod_index, OUT app_pc *mod_base, OUT module_entry_t **mod_entry) {
+     per_thread_t *data = (per_thread_t *)drmgr_get_tls_field(drcontext, tls_idx);
+     module_entry_t *entry;
+     int i;
+@@ -258,6 +242,7 @@
+                                            NUM_THREAD_MODULE_CACHE);
+             }
+             lookup_helper_set_fields(entry, mod_index, mod_base);
++            *mod_entry = entry;
+             return DRCOVLIB_SUCCESS;
+         }
+     }
+@@ -267,6 +252,7 @@
+         entry = module_table.cache[i];
+         if (pc_is_in_module(entry, pc)) {
+             lookup_helper_set_fields(entry, mod_index, mod_base);
++            *mod_entry = entry;
+             return DRCOVLIB_SUCCESS;
+         }
+     }
+@@ -283,12 +269,22 @@
+         }
+         entry = NULL;
+     }
+-    if (entry != NULL)
++    if (entry != NULL) {
+         lookup_helper_set_fields(entry, mod_index, mod_base);
++        *mod_entry = entry;
++    }
+     drvector_unlock(&module_table.vector);
+     return entry == NULL ? DRCOVLIB_ERROR_NOT_FOUND : DRCOVLIB_SUCCESS;
+ }
+ 
++// Edge coverage - wrapper for drmodtrack_lookup so other code doesn't break
++drcovlib_status_t
++drmodtrack_lookup(void *drcontext, app_pc pc, OUT uint *mod_index, OUT app_pc *mod_base)
++{
++    module_entry_t *mod_entry;
++    return drmodtrack_lookup_data(drcontext, pc, mod_index, mod_base, &mod_entry);
++}
++
+ static void
+ event_module_unload(void *drcontext, const module_data_t *data)
+ {

@@ -65,6 +65,7 @@ void CoverageEvaluator::processTestOutcomeDescriptor(TestOutcomeDescriptor* tod)
 	PutTestEvaluationRequest* putTestEvaluationRequest = new PutTestEvaluationRequest();
 	putTestEvaluationRequest->set_allocated_id(mutableTestcaseId);
 	putTestEvaluationRequest->set_allocated_parentid(mutableParentTestcaseId);
+	putTestEvaluationRequest->set_edgecoveragehash(tod->getTestResult().m_edgeCoverageHash);
 
 	bool hasNewBlocks = false;
 	for (FluffiBasicBlock const& fbb : tod->getTestResult().m_blocks) {
@@ -100,7 +101,7 @@ void CoverageEvaluator::processTestOutcomeDescriptor(TestOutcomeDescriptor* tod)
 		}
 		else {
 			//We only got partial coverage. Report this as "empty" coverage. This will trigger a re-run of this Testcase with "forceFullCoverage"
-			FluffiTestResult  testResult = FluffiTestResult(tod->getTestResult().m_exitType, std::vector<FluffiBasicBlock>(), tod->getTestResult().m_crashFootprint, false);
+			FluffiTestResult  testResult = FluffiTestResult(tod->getTestResult().m_exitType, std::vector<FluffiBasicBlock>(), tod->getTestResult().m_crashFootprint, false, tod->getTestResult().m_edgeCoverageHash);
 			testResult.setProtobuf(mutableTestResult);
 		}
 
@@ -172,7 +173,7 @@ FluffiTestResult CoverageEvaluator::copyTestResultButStripDuplicateBlocks(const 
 	std::set<FluffiBasicBlock> strippedBlocks_s(originalTestResult.m_blocks.begin(), originalTestResult.m_blocks.end());
 	std::vector<FluffiBasicBlock> strippedBlocks(strippedBlocks_s.begin(), strippedBlocks_s.end());
 
-	return FluffiTestResult(originalTestResult.m_exitType, strippedBlocks, originalTestResult.m_crashFootprint, originalTestResult.m_hasFullCoverage);
+	return FluffiTestResult(originalTestResult.m_exitType, strippedBlocks, originalTestResult.m_crashFootprint, originalTestResult.m_hasFullCoverage, originalTestResult.m_edgeCoverageHash);
 }
 
 void CoverageEvaluator::updateTestcaseEvaluationSendTimeout(bool wasLastTransferSuccessful, TestEvaluation eval, ExitType exitType) {

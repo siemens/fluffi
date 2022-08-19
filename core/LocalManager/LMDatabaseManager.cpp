@@ -719,7 +719,7 @@ GetTestcaseToMutateResponse* LMDatabaseManager::generateGetTestcaseToMutateRespo
 
 	//#################### First part: get testcase ####################
 	{
-		if (mysql_query(getDBConnection(), "SELECT ID, CreatorServiceDescriptorGUID, CreatorLocalID, RawBytes  FROM interesting_testcases WHERE TestCaseType = 0 ORDER BY Rating DESC LIMIT 1") != 0) {
+		if (mysql_query(getDBConnection(), "SELECT ID, CreatorServiceDescriptorGUID, CreatorLocalID, RawBytes, Rating, ChosenCounter, IFNULL(Counter, 1) FROM interesting_testcases LEFT JOIN edge_coverage ON EdgeCoverageHash = Hash WHERE TestCaseType = 0 ORDER BY Rating DESC LIMIT 1") != 0) {
 			LOG(ERROR) << "LMDatabaseManager::generateGetTestcaseToMutateResponse could not get a testcase from the database";
 			return response;
 		}
@@ -746,6 +746,9 @@ GetTestcaseToMutateResponse* LMDatabaseManager::generateGetTestcaseToMutateRespo
 		long long int creatorLocalID = _strtoui64(row[2], NULL, 10);
 		std::string* rawBytesFirstChunk = new std::string(row[3], min(lengths[3], static_cast<unsigned int>(CommInt::chunkSizeInBytes)));
 		bool isOnlyOneChunk = lengths[3] <= static_cast<unsigned long>(CommInt::chunkSizeInBytes);
+		long long int rating = _strtoui64(row[4], NULL, 10);
+		long long int chosenCounter = _strtoui64(row[5], NULL, 10);
+		long long int pathCounter = _strtoui64(row[6], NULL, 10);
 
 		if (!isOnlyOneChunk) {
 			std::string* rawBytes = new std::string(row[3], lengths[3]);
@@ -777,6 +780,9 @@ GetTestcaseToMutateResponse* LMDatabaseManager::generateGetTestcaseToMutateRespo
 		response->set_allocated_id(tcID);
 		response->set_allocated_testcasefirstchunk(rawBytesFirstChunk);
 		response->set_islastchunk(isOnlyOneChunk);
+		response->set_rating(rating);
+		response->set_chosencounter(chosenCounter);
+		response->set_pathcounter(pathCounter);
 
 		mysql_free_result(result);
 	}
@@ -828,6 +834,31 @@ GetTestcaseToMutateResponse* LMDatabaseManager::generateGetTestcaseToMutateRespo
 		}
 
 		mysql_stmt_free_result(sql_stmt);
+		mysql_stmt_close(sql_stmt);
+	}
+
+	// Increment ChosenCounter for chosen testcase
+	{
+		// Prepared statement
+		MYSQL_STMT* sql_stmt = mysql_stmt_init(getDBConnection());
+		const char* stmt = "UPDATE interesting_testcases SET ChosenCounter = ChosenCounter + 1 WHERE ID = ?";
+		mysql_stmt_prepare(sql_stmt, stmt, static_cast<unsigned long>(strlen(stmt)));
+
+		// Param
+		MYSQL_BIND bind[1];
+		memset(bind, 0, sizeof(bind));
+		bind[0].buffer_type = MYSQL_TYPE_LONGLONG;
+		bind[0].buffer = &testcaseID;
+		bind[0].is_null = 0;
+		bind[0].is_unsigned = true;
+		bind[0].length = NULL;
+
+		// Run query
+		mysql_stmt_bind_param(sql_stmt, bind);
+		bool re = mysql_stmt_execute(sql_stmt) == 0;
+		if (!re) {
+			LOG(ERROR) << "generateGetTestcaseToMutateResponse encountered the following error (2): " << mysql_stmt_error(sql_stmt);
+		}
 		mysql_stmt_close(sql_stmt);
 	}
 
@@ -963,7 +994,7 @@ std::vector<StatusOfInstance> LMDatabaseManager::getStatusOfManagedInstances(std
 }
 
 //Add testcase to database (Testacase file gets deleted here)
-bool LMDatabaseManager::addEntryToInterestingTestcasesTable(const FluffiTestcaseID tcID, const FluffiTestcaseID tcparentID, int rating, const std::string testcaseDir, TestCaseType tcType) {
+bool LMDatabaseManager::addEntryToInterestingTestcasesTable(const FluffiTestcaseID tcID, const FluffiTestcaseID tcparentID, int rating, const std::string testcaseDir, TestCaseType tcType, const std::string edgeCoverageHash) {
 	PERFORMANCE_WATCH_FUNCTION_ENTRY
 		const char* cStrCreatorServiceDescriptorGUID = tcID.m_serviceDescriptor.m_guid.c_str();
 	unsigned long creatorGUIDLength = static_cast<unsigned long>(tcID.m_serviceDescriptor.m_guid.length());
@@ -979,6 +1010,9 @@ bool LMDatabaseManager::addEntryToInterestingTestcasesTable(const FluffiTestcase
 
 	const char* cStrParentServiceDescriptorGUID = tcparentIDToSet.m_serviceDescriptor.m_guid.c_str();
 	unsigned long parentGUIDLength = static_cast<unsigned long>(tcparentIDToSet.m_serviceDescriptor.m_guid.length());
+
+	const char* hashString = edgeCoverageHash.c_str();
+	unsigned long hashLength = static_cast<unsigned long>(edgeCoverageHash.length());
 
 	uint64_t preparedParentLocalID = tcparentIDToSet.m_localID;
 
@@ -1031,12 +1065,22 @@ bool LMDatabaseManager::addEntryToInterestingTestcasesTable(const FluffiTestcase
 	// Second step: Actually insert the interesting testcase
 	{
 		MYSQL_STMT* sql_stmt = mysql_stmt_init(getDBConnection());
-
-		const char* stmt = "INSERT INTO interesting_testcases (CreatorServiceDescriptorGUID, CreatorLocalID, ParentServiceDescriptorGUID, ParentLocalID, Rating, RawBytes, TestCaseType, TimeOfInsertion) values (?, ?, ?, ?, ?, ?, ?,CURRENT_TIMESTAMP())";
+		const char *stmt;
+		int bind_len;
+		if (edgeCoverageHash.empty())
+		{
+			bind_len = 7;
+			stmt = "INSERT INTO interesting_testcases (CreatorServiceDescriptorGUID, CreatorLocalID, ParentServiceDescriptorGUID, ParentLocalID, Rating, RawBytes, TestCaseType, TimeOfInsertion, ChosenCounter) values (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP(), 0)";
+		}
+		else
+		{
+			bind_len = 8;
+			stmt = "INSERT INTO interesting_testcases (CreatorServiceDescriptorGUID, CreatorLocalID, ParentServiceDescriptorGUID, ParentLocalID, Rating, RawBytes, TestCaseType, TimeOfInsertion, EdgeCoverageHash, ChosenCounter) values (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP(), ?, 0)";
+		}
 		mysql_stmt_prepare(sql_stmt, stmt, static_cast<unsigned long>(strlen(stmt)));
 
 		//params
-		MYSQL_BIND bind[9];
+		MYSQL_BIND bind[bind_len];
 		memset(bind, 0, sizeof(bind));
 
 		bind[0].buffer_type = MYSQL_TYPE_VAR_STRING;
@@ -1078,17 +1122,12 @@ bool LMDatabaseManager::addEntryToInterestingTestcasesTable(const FluffiTestcase
 		bind[6].is_unsigned = true;
 		bind[6].length = NULL;
 
-		bind[7].buffer_type = MYSQL_TYPE_LONG;
-		bind[7].buffer = &preparedRating;
-		bind[7].is_null = 0;
-		bind[7].is_unsigned = false;
-		bind[7].length = NULL;
-
-		bind[8].buffer_type = MYSQL_TYPE_LONG;
-		bind[8].buffer = &preparedType;
-		bind[8].is_null = 0;
-		bind[8].is_unsigned = true;
-		bind[8].length = NULL;
+		if (!edgeCoverageHash.empty()) {
+			bind[7].buffer_type = MYSQL_TYPE_STRING;
+			bind[7].buffer = const_cast<char*>(hashString);
+			bind[7].buffer_length = hashLength;
+			bind[7].length = &hashLength;
+		}
 
 		mysql_stmt_bind_param(sql_stmt, bind);
 		//if problems with big files arise, mysql_stmt_send_long_data might be the solution
@@ -2171,5 +2210,43 @@ bool LMDatabaseManager::getParentTCID(const FluffiTestcaseID tcID, FluffiTestcas
 	mysql_stmt_close(sql_stmt);
 
 	PERFORMANCE_WATCH_FUNCTION_EXIT("getParentTCID")
+		return re;
+}
+
+bool LMDatabaseManager::incrementEdgeCoverage(const std::string hash) {
+	PERFORMANCE_WATCH_FUNCTION_ENTRY
+
+	const char* hashString = hash.c_str();
+	unsigned long hashLength = static_cast<unsigned long>(hash.length());
+
+	if (hashLength != 16) {
+		PERFORMANCE_WATCH_FUNCTION_EXIT("incrementEdgeCoverage")
+		return true;
+	}
+
+	//// prepared Statement
+	MYSQL_STMT* sql_stmt = mysql_stmt_init(getDBConnection());
+
+	const char* stmt = "INSERT INTO edge_coverage (Hash, Counter) VALUES (?, 1) ON DUPLICATE KEY UPDATE Counter = Counter + 1";
+	mysql_stmt_prepare(sql_stmt, stmt, static_cast<unsigned long>(strlen(stmt)));
+
+	//params
+	MYSQL_BIND bind[1];
+	memset(bind, 0, sizeof(bind));
+
+	bind[0].buffer_type = MYSQL_TYPE_STRING;
+	bind[0].buffer = const_cast<char*>(hashString);
+	bind[0].buffer_length = hashLength;
+	bind[0].length = &hashLength;
+
+	mysql_stmt_bind_param(sql_stmt, bind);
+	bool re = mysql_stmt_execute(sql_stmt) == 0;
+	if (!re) {
+		LOG(ERROR) << "incrementEdgeCoverage encountered the following error: " << mysql_stmt_error(sql_stmt);
+	}
+
+	mysql_stmt_close(sql_stmt);
+
+	PERFORMANCE_WATCH_FUNCTION_EXIT("incrementEdgeCoverage")
 		return re;
 }

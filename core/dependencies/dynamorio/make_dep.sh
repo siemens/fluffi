@@ -53,9 +53,13 @@ mkdir -p clients/drcovMulti
 cp ../drcovMulti/drcovMulti.c clients/drcovMulti/
 cp ../drcovMulti/CMakeLists.txt clients/drcovMulti/
 
-#Apply patches for drcovlib that enables drcovMulti
-patch -p0 < ../patch_for_drmulticov/drcovlib.c.patch
-patch -p0 < ../patch_for_drmulticov/drcovlib.h.patch
+#Apply patches for drcov that enables drcovMulti and edge coverage
+patch -p0 < ../patches/CMakeLists.txt.patch
+patch -p0 < ../patches/drcov.c.patch
+patch -p0 < ../patches/drcovlib.c.patch
+patch -p0 < ../patches/drcovlib.h.patch
+patch -p0 < ../patches/modules.c.patch
+cp ../patches/xxhash.h ext/drcovlib/
 
 #Make dynamorio
 mkdir -p build$ARCH
